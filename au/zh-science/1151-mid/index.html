@@ -1,0 +1,1030 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>四上自然複習練功房</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* 自然科：水藍綠的溪流色＋珊瑚色重點；單欄、手機優先 */
+:root{
+  --paper:#f5fafa; --card:#ffffff; --ink:#152a2b; --muted:#54706f;
+  --sage:#bfe0e2; --sage-deep:#1f6f73; --rose:#f7bfa8; --rose-deep:#c0562f;
+  --line:#cfe2e3; --ok:#1f7a52; --bad:#b3362f; --okbg:#e0f3ea; --badbg:#fbe7e5;
+  --kai:"LXGW WenKai TC","BiauKai","DFKai-SB","標楷體",serif;
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f1818; --card:#172122; --ink:#e4efef; --muted:#9bb4b3;
+  --sage:#234445; --sage-deep:#8ed2d6; --rose:#5a3326; --rose-deep:#f3a884;
+  --line:#2a3b3c; --ok:#7fd2a8; --bad:#ff958c; --okbg:#1a3329; --badbg:#3a1f1d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f1818; --card:#172122; --ink:#e4efef; --muted:#9bb4b3;
+  --sage:#234445; --sage-deep:#8ed2d6; --rose:#5a3326; --rose-deep:#f3a884;
+  --line:#2a3b3c; --ok:#7fd2a8; --bad:#ff958c; --okbg:#1a3329; --badbg:#3a1f1d; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 40px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+header h1{font-family:var(--kai);font-size:clamp(26px,7vw,36px);margin:0;line-height:1.2;text-wrap:balance}
+header p{margin:2px 0 0;color:var(--muted);font-size:14px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--rose-deep);outline-offset:2px}
+.hdr{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+.hdr>div{min-width:0}
+.hdr #sfxBtn{flex:none;margin-top:6px}
+.scope{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:4px 12px;font-size:14px}
+.chip[aria-pressed="true"]{background:var(--sage-deep);border-color:var(--sage-deep);color:var(--paper);font-weight:700}
+.chip.wrongchip[aria-pressed="true"]{background:var(--rose-deep);border-color:var(--rose-deep)}
+.count{font-size:13px;color:var(--muted);margin-left:auto}
+nav.tabs{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;background:var(--sage);padding:4px;border-radius:12px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+nav.tabs button{border:0;background:transparent;border-radius:9px;padding:8px 0;font-size:clamp(12px,3.4vw,15px);font-weight:500;white-space:nowrap}
+@media (max-width:620px){nav.tabs{grid-template-columns:repeat(4,1fr)}}
+nav.tabs button[aria-selected="true"]{background:var(--card);font-weight:700;color:var(--sage-deep);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+section{display:flex;flex-direction:column;gap:12px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{border:1.5px solid var(--sage-deep);background:var(--card);color:var(--sage-deep);border-radius:10px;padding:8px 16px;font-weight:700}
+.btn.primary{background:var(--sage-deep);color:var(--paper)}
+.btn.rose{border-color:var(--rose-deep);color:var(--rose-deep)}
+.btn.rose.primary{background:var(--rose-deep);color:var(--paper)}
+.btn:disabled{opacity:.45;cursor:default}
+.hint{color:var(--muted);font-size:14px;margin:0}
+select{font:inherit;padding:6px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--card);color:var(--ink)}
+.kai{font-family:var(--kai)}
+.modes{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.cover{background:var(--sage);border-radius:6px;color:transparent;user-select:none;cursor:pointer;padding:0 6px}
+.cover::after{content:"點我看";color:var(--sage-deep);font-size:13px}
+.cover *{visibility:hidden}
+
+/* 計時計分 */
+.hud{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:8px}
+.hud div{text-align:center;font-size:12px;color:var(--muted)}
+.hud b{display:block;font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums}
+.hud .warn b{color:var(--bad)}
+.timebar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.timebar i{display:block;height:100%;background:var(--sage-deep);transition:width .25s linear}
+.timebar.warn i{background:var(--bad)}
+.combo{text-align:center;font-family:var(--kai);font-size:22px;color:var(--rose-deep);min-height:1.4em}
+.stars{font-size:34px;letter-spacing:4px;color:var(--rose-deep)}
+.rhud{width:100%;display:flex;flex-direction:column;gap:4px}
+.rrow{display:flex;flex-wrap:wrap;gap:4px 14px;justify-content:center;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.rrow b{color:var(--ink);font-size:17px}.rrow .cdw b{color:var(--bad)}
+.plus{text-align:center;font-size:14px;font-weight:700;color:var(--rose-deep);min-height:1.3em}
+.rsum{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%}
+.rsum div{background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:6px 2px;text-align:center;font-size:12px;color:var(--muted)}
+.rsum b{display:block;font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums}
+
+/* 題目卡 */
+.qcard{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.qask{font-size:17px;margin:0;text-align:center}
+.qbig{font-size:19px;line-height:1.7;text-align:left;width:100%}
+.qtag{font-size:12px;color:var(--muted);align-self:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:1px 10px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.opts.one{grid-template-columns:1fr}
+.opt{border:2px solid var(--line);background:var(--paper);border-radius:12px;padding:10px 12px;display:flex;align-items:flex-start;gap:8px;min-height:52px;text-align:left;font-size:16px;line-height:1.5}
+.opt .no{flex:none;font-size:18px;color:var(--sage-deep);font-weight:700}
+.opt.tf{justify-content:center;align-items:center;font-size:28px;font-family:var(--kai);min-height:72px}
+.opt.ok{border-color:var(--ok);background:var(--okbg)}
+.opt.bad{border-color:var(--bad);background:var(--badbg)}
+.opt .mark{font-size:13px;font-weight:700;margin-left:auto;flex:none}
+.opt.ok .mark{color:var(--ok)}.opt.bad .mark{color:var(--bad)}
+.fb{border-radius:10px;padding:8px 12px;width:100%;font-size:15px;text-align:left}
+.fb.ok{background:var(--okbg);color:var(--ok)}.fb.bad{background:var(--badbg);color:var(--bad)}
+.fb b{color:var(--ink)}
+.fb .src{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+.prog{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.center{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+
+/* 概念卡 */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px}
+.cmini{width:100%;border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:8px 4px;font-family:var(--kai);font-size:17px;line-height:1.3}
+.cmini.sel{border-color:var(--rose-deep);box-shadow:0 0 0 2px var(--rose-deep)}
+.cdetail{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.cdetail .term{font-family:var(--kai);font-size:clamp(30px,8vw,42px);line-height:1.2}
+.cdetail .dsc{font-size:17px;line-height:1.8}
+.groupHead{font-family:var(--kai);font-size:18px;margin:6px 0 -2px;color:var(--sage-deep)}
+
+/* 翻牌 */
+.mem{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mc{aspect-ratio:1;border-radius:12px;border:2px solid var(--sage-deep);background:var(--sage);display:grid;place-items:center;font-size:0;padding:6px;transition:transform .2s;overflow:hidden}
+.mc.open,.mc.done{background:var(--card);font-size:14px}
+.mc.done{border-color:var(--ok);opacity:.65}
+.mc .term{font-family:var(--kai);font-size:clamp(17px,4.6vw,22px);font-weight:700;line-height:1.25}
+.mc .dsc{font-size:clamp(11px,2.9vw,13px);line-height:1.35;color:var(--ink)}
+.mc:not(.open):not(.done)::after{content:"?";font-size:28px;font-family:var(--kai);color:var(--sage-deep)}
+.mc.pop{animation:pop .35s ease}
+.mc.shake{animation:shake .35s ease}
+@keyframes pop{50%{transform:scale(1.08)}}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@media (prefers-reduced-motion:reduce){.mc{transition:none}.mc.pop,.mc.shake{animation:none}}
+
+/* 實驗步驟排序 */
+.steps{display:flex;flex-direction:column;gap:8px;width:100%}
+.step{border:2px solid var(--line);background:var(--paper);border-radius:10px;padding:10px 12px;text-align:left;font-size:15px;line-height:1.5;display:flex;gap:8px;align-items:flex-start;width:100%}
+.step .no{flex:none;width:24px;height:24px;border-radius:50%;background:var(--sage);color:var(--sage-deep);font-size:13px;font-weight:700;display:grid;place-items:center}
+.step.ok{border-color:var(--ok);background:var(--okbg)}
+.step.ok .no{background:var(--ok);color:var(--paper)}
+.step.bad{animation:shake .35s ease;border-color:var(--bad)}
+@media (prefers-reduced-motion:reduce){.step.bad{animation:none}}
+
+/* 結果、錯題 */
+.done-box{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:16px;text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center}
+.score{font-family:var(--kai);font-size:44px;line-height:1;color:var(--sage-deep);font-variant-numeric:tabular-nums}
+.wlist{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.wz{font-family:var(--kai);font-size:20px;border:1.5px solid var(--rose-deep);border-radius:8px;padding:2px 8px;color:var(--rose-deep)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+.tbl{overflow-x:auto;background:var(--card);border:1.5px solid var(--line);border-radius:12px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+th{font-size:13px;color:var(--muted);font-weight:500;white-space:nowrap}
+td.q{white-space:normal;min-width:220px}
+td.n{font-variant-numeric:tabular-nums;text-align:center;white-space:nowrap}
+.confirm{background:var(--badbg);border-radius:10px;padding:10px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* 慶祝 */
+#party{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:color-mix(in srgb,var(--paper) 70%,transparent);padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
+  --c1:#bfe3c6;--c2:#f2a7c0;--c3:#ffd36e;--c4:#a9cdf2;animation:fadein .25s ease}
+#party.out{opacity:0;transition:opacity .3s}
+@keyframes fadein{from{opacity:0}}
+.party-card{position:relative;z-index:2;background:var(--card);border:2px solid var(--sage-deep);border-radius:20px;padding:18px 16px;text-align:center;max-width:380px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.dancers{display:flex;align-items:flex-end;justify-content:center;gap:4px}
+.dancer{width:110px;height:auto}
+.hundred{font-family:var(--kai);font-size:44px;font-weight:700;color:var(--rose-deep);align-self:center;animation:pulse .6s ease-in-out infinite alternate}
+.d1{animation:bounce .5s ease-in-out infinite alternate;transform-origin:50% 100%}
+.d2{animation:bounce .5s ease-in-out .25s infinite alternate;transform-origin:50% 100%}
+.arm{transform-box:fill-box}
+.d1 .al,.d2 .al{transform-origin:100% 100%;animation:wave .5s ease-in-out infinite alternate}
+.d1 .ar,.d2 .ar{transform-origin:0 100%;animation:wave2 .5s ease-in-out infinite alternate}
+.leg{transform-box:fill-box;transform-origin:50% 0}
+.ll{animation:kick .5s ease-in-out infinite alternate}.lr{animation:kick .5s ease-in-out .25s infinite alternate}
+@keyframes bounce{from{transform:translateY(0) rotate(-6deg)}to{transform:translateY(-14px) rotate(6deg)}}
+@keyframes wave{from{transform:rotate(18deg)}to{transform:rotate(-22deg)}}
+@keyframes wave2{from{transform:rotate(-18deg)}to{transform:rotate(22deg)}}
+@keyframes kick{from{transform:rotate(-12deg)}to{transform:rotate(12deg)}}
+@keyframes pulse{from{transform:scale(1)}to{transform:scale(1.15)}}
+.party-title{font-family:var(--kai);font-size:30px;font-weight:700;margin-top:6px}
+.party-sub{color:var(--muted);margin:4px 0 12px}
+.confetti{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.confetti i{position:absolute;top:-20px;width:10px;height:14px;border-radius:2px;animation:fall linear infinite}
+@keyframes fall{to{top:105%;transform:rotate(540deg)}}
+@media (prefers-reduced-motion:reduce){.d1,.d2,.arm,.leg,.hundred,.confetti i{animation:none!important}.confetti{display:none}}
+[hidden]{display:none!important}
+img{max-width:100%}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hdr">
+    <div><h1>四上自然複習練功房</h1>
+    <p>期中考・單元一 地表的變化＋單元二 水生家族：178 題選擇是非、概念卡、翻牌、實驗步驟、分類、因果配對</p></div>
+    <button class="chip" id="sfxBtn" aria-pressed="true">音效：開</button>
+  </header>
+
+  <div class="scope" id="scope" aria-label="練習範圍"></div>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="quiz" aria-selected="true">練習題</button>
+    <button role="tab" data-tab="cards" aria-selected="false">概念卡</button>
+    <button role="tab" data-tab="mem" aria-selected="false">翻牌</button>
+    <button role="tab" data-tab="exp" aria-selected="false">實驗</button>
+    <button role="tab" data-tab="sort" aria-selected="false">分類</button>
+    <button role="tab" data-tab="pair" aria-selected="false">配對</button>
+    <button role="tab" data-tab="wrong" aria-selected="false">錯題</button>
+  </nav>
+
+  <section id="tab-quiz"><div id="quizArea"></div></section>
+  <section id="tab-cards" hidden>
+    <div class="bar"><button class="btn" id="selfTest" aria-pressed="false">考自己：遮住說明</button></div>
+    <div class="cdetail" id="cDetail"></div>
+    <div id="cardGrid"></div>
+    <p class="hint">概念卡的說明都來自課本和重點歸納。點「考自己」可以把說明遮起來，先自己想一遍再看答案。</p>
+  </section>
+  <section id="tab-mem" hidden><div id="memArea"></div></section>
+  <section id="tab-exp" hidden><div id="expArea"></div></section>
+  <section id="tab-sort" hidden><div id="sortArea"></div></section>
+  <section id="tab-pair" hidden><div id="pairArea"></div></section>
+  <section id="tab-wrong" hidden><div id="wrongArea"></div></section>
+</div>
+
+<script>
+/* ===== 題庫資料：答案全部來自教用版印刷答案（複習卷、隨堂、期中考A/B卷、校用卷）===== */
+/* 題庫 A：單元一（地表的靜與動）— 答案全部出自教用版印刷答案
+   g: 1-1 地表物質有什麼 / 1-2 地表環境會變動嗎 / 1-3 怎樣做好地震防災
+   t: tf（是非，a:0=○ 1=╳）/ mc（選擇，a 為正解索引）
+   s: 出處 */
+const QB1=[
+/* ── 複習卷 第一單元（教用）是非 ── */
+{g:'1-1',t:'tf',q:'岩石中含有豐富的養分，是種植農作物的最佳環境。',a:1,s:'複習卷U1',e:'土壤才含有豐富養分，適合種植農作物；岩石只能提供棲息或建材。'},
+{g:'1-1',t:'tf',q:'不同生物適合生長的環境不同，像是栗喉蜂虎喜歡在陡峭的土丘鑽洞棲息。',a:0,s:'複習卷U1',e:'栗喉蜂虎在陡峭的土丘鑽洞築巢。'},
+{g:'1-2',t:'tf',q:'不同地表環境的組成不同，樣貌也不同，但在不同時間觀察相同地方，地表環境的特徵都是一樣的。',a:1,s:'複習卷U1',e:'同一個地方在不同時間觀察，會因風、流水等作用而改變。'},
+{g:'1-2',t:'tf',q:'流水會把地表上的物質搬運到其他地方堆起來，當物質顆粒越小時，容易被搬得越遠。',a:0,s:'複習卷U1',e:'顆粒越小越輕，被流水搬得越遠。'},
+{g:'1-2',t:'tf',q:'不論地表上生長了哪一種植物，都可以保護地表環境，所以可以大量開發山坡地，改為種植蔬菜，土壤也不會流失。',a:1,s:'複習卷U1',e:'大量開發山坡地會使土壤流失，下大雨易造成土石流。'},
+{g:'1-2',t:'tf',q:'在河川地大量開挖砂石會讓河床的地表物質流失，破壞地表環境。',a:0,s:'複習卷U1',e:'開挖砂石會使河床砂石裸露、地表物質流失。'},
+{g:'1-3',t:'tf',q:'強烈的地震不但會造成地表環境的變動，也可能造成嚴重的災害，像是建築物損毀、橋梁斷裂等。',a:0,s:'複習卷U1',e:''},
+{g:'1-3',t:'tf',q:'震源是指引發地震的位置，通常位於地表底下。',a:0,s:'複習卷U1',e:'震源在地底；震源在地表的投影點叫震央。'},
+{g:'1-3',t:'tf',q:'中央氣象署的地震震度分級中，數字越小，表示地震越強烈，造成的災害也可能越大。',a:1,s:'複習卷U1',e:'震度數字越大才越強烈。'},
+{g:'1-3',t:'tf',q:'臺灣經常發生地震，目前的技術已經能夠提前預測地震的發生，避免造成重大的災害。',a:1,s:'複習卷U1',e:'目前還無法事先預測地震發生的時間和地點。'},
+/* ── 複習卷 第一單元（教用）選擇 ── */
+{g:'1-1',t:'mc',q:'地表上有生物和非生物，下列哪一個屬於非生物？',o:['岩石','水稻','螞蟻','小白菜'],a:0,s:'複習卷U1',e:'非生物包含空氣、水、岩石、土壤。'},
+{g:'1-2',t:'mc',q:'進行流水作用實驗，可以觀察到土堆有什麼變化？',o:['土堆沒有任何變化','顆粒越小的地表物質被搬得越遠','顆粒越小的物質越不容易被搬走','流水的作用越強，地表物質會被搬得更近'],a:1,s:'複習卷U1',e:''},
+{g:'1-1',t:'mc',q:'小翔想要觀察招潮蟹，他最可能在下列哪一種環境中觀察到？',o:['茂密的高山森林中','高山的岩石縫中','鬆軟的海濱泥灘地','水流湍急的小溪旁'],a:2,s:'複習卷U1',e:'招潮蟹住在鬆軟的海濱泥灘地。'},
+{g:'1-1',t:'mc',q:'小晴分別觀察礫石、沙和土壤的外觀，他可以發現下列哪一種物質的顆粒最大、摸起來粗粗的？',o:['礫石','土壤','沙','地表物質顆粒大小都一樣'],a:0,s:'複習卷U1',e:'顆粒大小：礫石＞沙＞土壤。'},
+{g:'1-2',t:'mc',q:'觀察流水作用的實驗中，對著礫石、沙和土壤混合的土堆澆水，下列哪一種物質會被搬得最遠？',o:['礫石','礫石和沙','沙','土壤'],a:3,s:'複習卷U1',e:'土壤顆粒最小，被搬得最遠。'},
+{g:'1-2',t:'mc',q:'接續上一題，下列哪一項是造成這個結果的原因？',o:['礫石顆粒最大','土壤顆粒最小','沙顆粒最小','礫石和沙一樣重'],a:1,s:'複習卷U1',e:''},
+{g:'1-2',t:'mc',q:'過度開發的山坡地，下大雨之後容易造成土石流，下列哪一項是主要的原因？',o:['土石被植物的根固定住','土石被風吹走','土石被雨水搬走','土石被動物搬走'],a:2,s:'複習卷U1',e:'沒有植物固定，土石被雨水大量搬走。'},
+{g:'1-3',t:'mc',q:'下列哪一項最不可能是地震造成的災害？',o:['樓房傾斜、倒塌','養殖魚類凍傷','軌道變形彎曲','屋內物品散落一地'],a:1,s:'複習卷U1',e:'魚類凍傷是寒流造成的。'},
+{g:'1-3',t:'mc',q:'下列關於地震規模和地震震度的敘述，哪一項是不正確的？',o:['地震規模是指地震震源放出的能量大小','地震震度是人體感受地面搖動或建築物受破壞的程度','目前世界通用的地震規模是芮氏規模','每次地震的地震震度都是一樣的，但地震規模會隨地點不同而不同'],a:3,s:'複習卷U1',e:'同一次地震的規模只有一個，震度才會隨地點不同。'},
+{g:'1-3',t:'mc',q:'下列哪一項不是地震發生時應採取的行為？',o:['注意搖晃的招牌','按照逃生路線避難','等爐火上的食物煮好後再逃生','走樓梯，不搭電梯'],a:2,s:'複習卷U1',e:'地震時要立刻關閉爐火與瓦斯，不能等食物煮好。'},
+/* ── 期中考A卷（教用）單元一相關 ── */
+{g:'1-1',t:'tf',q:'土壤的顆粒比沙還要大，所以摸起來粗粗的。',a:1,s:'期中A',e:'沙的顆粒比土壤大；土壤摸起來細細粉粉的。'},
+{g:'1-2',t:'tf',q:'水從礫石、沙和土壤混合的土堆流下時，土壤最容易被水搬走。',a:0,s:'期中A',e:''},
+{g:'1-3',t:'tf',q:'阿華在地震時感覺恐懼，還看到沒有固定的花瓶從櫃子上傾倒掉落、房屋搖動甚烈，代表當地的地震震度是 2 級。',a:1,s:'期中A',e:'震度 2 級只是靜止的人感覺輕微搖晃；這樣的情形震度大得多。'},
+{g:'1-2',t:'mc',q:'下列人類對環境的使用方式，哪一種比較不容易產生土石流呢？',o:['大量砍伐山上的樹林','開發山坡地，種植高冷蔬菜','在裸露的山坡地上種植植物，避免地表物質流失','在山坡地上建築房屋'],a:2,s:'期中A',e:'種植植物可以固定土壤，是保護地表的做法。'},
+{g:'1-3',t:'mc',q:'下列何者是平時應做好的地震防災準備？',o:['檢查房屋有無龜裂','進行防震演練','下樓不搭電梯避免斷電','檢查瓦斯管線損壞情況'],a:1,s:'期中A',e:'①④是地震後要做的；③是地震發生時要做的。'},
+{g:'1-1',t:'mc',q:'西瓜較適合生長在下列哪一種環境中呢？',o:['鬆軟的海濱泥灘地','有點黏性的溼潤土壤','陡峭的土丘','排水性好的土壤'],a:3,s:'期中A',e:'西瓜適合鬆散、排水性好的土壤；水稻才適合有黏性的溼潤土壤。'},
+{g:'1-1',t:'mc',q:'下列哪一項是岩石在生活上的應用？',o:['耕種農作物','鋪設步道','飼養蚯蚓','切割後作為食材'],a:1,s:'期中A',e:'岩塊可鋪步道、切割後蓋房子。'},
+{g:'1-1',t:'mc',q:'大部分生物必須依靠下列哪一種物質才能生存？',o:['土壤','沙','岩石','空氣'],a:3,s:'期中A',e:''},
+/* ── 期中考B卷（教用）單元一相關 ── */
+{g:'1-2',t:'tf',q:'強烈地震可能會造成電線走火，引發火災。',a:0,s:'期中B',e:''},
+{g:'1-2',t:'tf',q:'琪琪跟家人在海邊玩，當海風吹襲時，他可觀察到海岸沙丘的沙子飛揚而起。',a:0,s:'期中B',e:'風也會改變地表環境。'},
+{g:'1-2',t:'tf',q:'人類過度開發森林，下大雨後容易形成土石流。',a:0,s:'期中B',e:''},
+{g:'1-2',t:'tf',q:'用水噴灑在礫石、沙和土壤混合的土堆上，礫石、沙和土壤被搬走的距離會完全相同。',a:1,s:'期中B',e:'顆粒大小不同，被搬走的距離也不同。'},
+{g:'1-2',t:'mc',q:'下列哪一種地表環境改變的情況是人為因素造成？',o:['墾丁海邊的風吹沙','太魯閣峽谷','地震後的斷層','盜採砂石'],a:3,s:'期中B',e:'①②③都是自然作用造成的。'},
+{g:'1-2',t:'mc',q:'下列關於人類對環境影響的敘述，哪一項是不正確的？',o:['砍伐森林會使生物生存空間減少','開發山坡地會容易產生土石流','在水邊種植蔬菜，過度使用農藥會汙染水源','在河川開挖砂石，會使水中生物增加'],a:3,s:'期中B',e:'開挖砂石會破壞河床，使水中生物減少。'},
+{g:'1-1',t:'mc',q:'自然環境中有許多種物質存在，下列何者屬於生物？',o:['松鼠','岩石','空氣','水'],a:0,s:'期中B',e:''},
+{g:'1-1',t:'mc',q:'螞蟻較適合在下列何種環境中築巢？',o:['土壤','溪流','岩縫','海洋'],a:0,s:'期中B',e:'螞蟻在土壤裡挖地下洞穴。'},
+/* ── 校用卷 單元一 活動一（教用答案本，掃描逐頁判讀）── */
+{g:'1-1',t:'tf',q:'我們生活的地表環境都是人類創造出來的。',a:1,s:'校用卷1-1',e:'地表環境多為自然形成，人類只是加以利用。'},
+{g:'1-1',t:'tf',q:'地表上除了生物以外，還有非生物存在。',a:0,s:'校用卷1-1',e:'非生物有空氣、水、岩石、土壤。'},
+{g:'1-1',t:'tf',q:'不同的地表環境有不同的特色，可以提供生物不同的生長條件。',a:0,s:'校用卷1-1',e:''},
+{g:'1-1',t:'tf',q:'一個地表環境中只能生存一種生物。',a:1,s:'校用卷1-1',e:'同一個環境裡可以有許多種生物。'},
+{g:'1-1',t:'tf',q:'地表上的物質包含岩石、沙和土壤。',a:0,s:'校用卷1-1',e:''},
+{g:'1-1',t:'tf',q:'岩石只能提供生物棲息，對人類的生活沒有任何幫助。',a:1,s:'校用卷1-1',e:'岩石可以鋪步道、切割後蓋房子。'},
+{g:'1-1',t:'tf',q:'岩石、沙和土壤是大部分生物生存的場所。',a:0,s:'校用卷1-1',e:''},
+{g:'1-1',t:'tf',q:'只有動物需要選擇適合的環境，植物在任何環境中都能生長得很好。',a:1,s:'校用卷1-1',e:'植物也需要適合的環境才能生長。'},
+{g:'1-1',t:'mc',q:'要觀察松鼠，最可能到下列哪一種環境？',o:['海洋','沙漠','泥灘地','森林'],a:3,s:'校用卷1-1',e:''},
+{g:'1-1',t:'mc',q:'要比較礫石、沙和土壤摸起來的感覺，應該用下列哪一種方法？',o:['用眼睛看','用鼻子聞','用手觸摸','用耳朵聽'],a:2,s:'校用卷1-1',e:''},
+{g:'1-1',t:'mc',q:'西瓜最適合種在下列哪一種土地上？',o:['鬆軟、排水性好的土壤','水流湍急的溪床','陡峭的岩壁','海邊的泥灘地'],a:0,s:'校用卷1-1',e:''},
+{g:'1-1',t:'mc',q:'下列哪一項不是觀察地表物質時應該做的事？',o:['用放大鏡觀察顆粒','用手摸摸看粗細','用筆在地面鑽洞','把顆粒排在白紙上比較'],a:2,s:'校用卷1-1',e:'破壞地表的行為不適當。'},
+{g:'1-1',t:'mc',q:'水稻適合種在下列哪一種土壤？',o:['有黏性的溼潤土壤','乾燥的沙地','陡峭的土丘','礫石堆'],a:0,s:'校用卷1-1',e:''},
+{g:'1-1',t:'mc',q:'下列哪一種生物最可能在土壤中發現？',o:['海星','螞蟻','珊瑚','水母'],a:1,s:'校用卷1-1',e:''},
+{g:'1-1',t:'mc',q:'下列哪一個不是非生物？',o:['空氣','水','岩石','小白菜'],a:3,s:'校用卷1-1',e:''},
+{g:'1-1',t:'mc',q:'關於生物和地表環境的關係，下列哪一項敘述正確？',o:['所有生物都住在同一種環境','不同生物適合生存的地表環境不太相同','生物不需要依靠地表物質生存','地表環境不會影響生物'],a:1,s:'校用卷1-1',e:''},
+/* ── 校用卷 單元一 活動二 ── */
+{g:'1-2',t:'tf',q:'在不同時間觀察海灘的沙丘，可能會發現它變得不一樣。',a:0,s:'校用卷1-2',e:''},
+{g:'1-2',t:'tf',q:'地表環境可能因為流水或風的作用而改變。',a:0,s:'校用卷1-2',e:''},
+{g:'1-2',t:'tf',q:'相同的因素作用在不同的地表物質上，改變的程度都會一樣。',a:1,s:'校用卷1-2',e:'顆粒大小不同，改變程度也不同。'},
+{g:'1-2',t:'tf',q:'人類的行為不會使地表產生變化。',a:1,s:'校用卷1-2',e:'砍伐森林、開挖砂石都會改變地表。'},
+{g:'1-2',t:'tf',q:'取締河川地的開挖砂石，對自然生態有幫助。',a:0,s:'校用卷1-2',e:''},
+{g:'1-2',t:'tf',q:'人類為了取得資源，可能會破壞地表環境。',a:0,s:'校用卷1-2',e:''},
+{g:'1-2',t:'tf',q:'開闢山坡地、種植高山蔬菜，可能造成土石流。',a:0,s:'校用卷1-2',e:''},
+{g:'1-2',t:'tf',q:'人類的開發活動不會影響原本棲息在那裡的生物。',a:1,s:'校用卷1-2',e:'會使生物的生存空間減少。'},
+{g:'1-2',t:'mc',q:'用水澆在礫石、沙和土壤混合的土堆上，下列哪一項敘述正確？',o:['三種物質都不會被搬動','三種物質被搬走的距離一樣','只有礫石會被搬走','礫石、沙和土壤的顆粒大小不同，所受影響程度會不同'],a:3,s:'校用卷1-2',e:''},
+{g:'1-2',t:'mc',q:'下列哪一項是保護河川地表環境的做法？',o:['大量開挖河床砂石','在河岸倒廢土','砍除河岸所有植物','整治河川，避免河床和河岸持續受到沖刷'],a:3,s:'校用卷1-2',e:''},
+{g:'1-2',t:'mc',q:'關於流水作用的實驗，下列哪一項敘述不正確？',o:['礫石會被搬得最遠','土壤會被搬得最遠','水量越多，物質被搬得越遠','顆粒越小越容易被搬走'],a:0,s:'校用卷1-2',e:'礫石顆粒最大，被搬得最近。'},
+{g:'1-2',t:'mc',q:'大雨後山坡崩塌的地方，較不可能留下下列哪一種物質？',o:['土壤','沙','大岩石','小石子'],a:2,s:'校用卷1-2',e:'大岩石太重，不容易被雨水搬走堆積。'},
+{g:'1-2',t:'mc',q:'下列哪一項最不會影響沙坑表面的變化？',o:['強風吹襲','大雨沖刷','自己的腳印','水管澆水'],a:2,s:'校用卷1-2',e:''},
+{g:'1-2',t:'mc',q:'在海邊常被風吹得睜不開眼睛，下列哪一項敘述正確？',o:['風不會搬動沙','沙越粗越容易被風吹動','越乾的沙越容易被風吹動','沙會被風吹到海裡消失'],a:2,s:'校用卷1-2',e:'乾燥、顆粒小的沙最容易被風吹起。'},
+{g:'1-2',t:'mc',q:'大雨過後，山區地表變動最劇烈的現象是下列哪一項？',o:['土石流','地震','颱風','海嘯'],a:0,s:'校用卷1-2',e:''},
+{g:'1-2',t:'mc',q:'下列哪一種人類行為最容易引起土石流？',o:['在山坡地種植植物','整治河川','參加淨溪活動','過度開發森林'],a:3,s:'校用卷1-2',e:''},
+/* ── 校用卷 單元一 活動三 ── */
+{g:'1-3',t:'tf',q:'地震和過度砍伐山林一樣，都是人類的行為造成的。',a:1,s:'校用卷1-3',e:'地震是自然現象，不是人類行為造成的。'},
+{g:'1-3',t:'tf',q:'地震可能造成地面斷層隆起、山坡崩塌。',a:0,s:'校用卷1-3',e:''},
+{g:'1-3',t:'tf',q:'只要發生地震，地表環境就一定會產生肉眼可觀察的劇烈變化。',a:1,s:'校用卷1-3',e:'輕微的地震不一定看得出地表變化。'},
+{g:'1-3',t:'tf',q:'從新聞報導可以事前知道地震發生的時間和地點。',a:1,s:'校用卷1-3',e:'目前還無法事先預測地震。'},
+{g:'1-3',t:'tf',q:'地震可能造成房子牆壁龜裂，也可能引發火災、水災。',a:0,s:'校用卷1-3',e:''},
+{g:'1-3',t:'tf',q:'中央氣象署的地震震度分為 10 個等級。',a:0,s:'校用卷1-3',e:'震度分為 0、1、2、3、4、5弱、5強、6弱、6強、7，共 10 級。'},
+{g:'1-3',t:'tf',q:'平時就要熟悉家裡和學校較安全的躲避地點。',a:0,s:'校用卷1-3',e:''},
+{g:'1-3',t:'tf',q:'地震時如果在高樓層，可以搭電梯迅速逃生。',a:1,s:'校用卷1-3',e:'要走樓梯，不可搭電梯。'},
+{g:'1-3',t:'mc',q:'下列哪一項不是地震後可以觀察到的地表變動？',o:['地面隆起','出現斷層','山坡崩塌','河川的洪水量減少'],a:3,s:'校用卷1-3',e:''},
+{g:'1-3',t:'mc',q:'下列哪一項不可能是地震造成的？',o:['減少降雨','形成堰塞湖','鐵軌彎曲','橋梁斷裂'],a:0,s:'校用卷1-3',e:''},
+{g:'1-3',t:'mc',q:'斷層瀑布的形成原因最可能是下列哪一項？',o:['地震','乾旱','寒流','颱風'],a:0,s:'校用卷1-3',e:''},
+{g:'1-3',t:'mc',q:'臺灣的地震資訊是由下列哪一個單位發布？',o:['消防局','衛生福利部','中央氣象署','環境部'],a:2,s:'校用卷1-3',e:''},
+{g:'1-3',t:'mc',q:'下列哪一項不會出現在地震報告中？',o:['地震發生時間','震央位置','各地受災情形','地震規模'],a:2,s:'校用卷1-3',e:'地震報告記錄時間、位置、深度、規模和各地震度。'},
+{g:'1-3',t:'mc',q:'下列關於地震防災的敘述，哪一項不正確？',o:['平時進行防震演練','準備避難救生包','把櫥櫃釘牢固定','隨時注意地震預報'],a:3,s:'校用卷1-3',e:'目前沒有地震預報，只有地震速報（國家級警報）。'},
+{g:'1-3',t:'mc',q:'在教室裡遇到地震，下列哪一項做法最正確？',o:['跑到窗邊看','躲在桌子下抓穩桌腳並保護頭部','搭電梯下樓','留在原位不動也不保護頭部'],a:1,s:'校用卷1-3',e:'趴下、掩護、穩住。'},
+];
+/* 題庫 B：單元二（水生生物與環境）— 答案全部出自教用版印刷答案
+   g: 2-1 水域環境大不同 / 2-2 水中的生物 / 2-3 環境資源與愛護水域 */
+const QB2=[
+/* ── 複習卷 第二單元（教用）是非 ── */
+{g:'2-1',t:'tf',q:'臺灣的自然環境生態豐富，只要到森林裡，就可以觀察到所有種類的生物。',a:1,s:'複習卷U2',e:'不同環境有不同生物，森林裡看不到海洋生物。'},
+{g:'2-1',t:'tf',q:'調查水域環境時，可以用水桶暫時裝著水生生物來觀察，但是觀察完要將生物放回原處。',a:0,s:'複習卷U2',e:''},
+{g:'2-1',t:'tf',q:'溪流是靜止且陽光充足的水域，常可看到睡蓮和荷花等水生植物生長。',a:1,s:'複習卷U2',e:'溪流的水是流動的；睡蓮、荷花長在靜止的水域。'},
+{g:'2-2',t:'tf',q:'植物只要有充分的陽光就能生長，因此把陸域的植物移到水中種植也能生長得很好。',a:1,s:'複習卷U2',e:'陸生植物移到水中並不能順利生長。'},
+{g:'2-2',t:'tf',q:'香蒲的根長在水底的泥土裡，葉和花可以挺出水面，屬於挺水性水生植物。',a:0,s:'複習卷U2',e:''},
+{g:'2-2',t:'tf',q:'大萍的葉子表面有細毛，根漂浮在水裡，屬於漂浮性水生植物。',a:0,s:'複習卷U2',e:''},
+{g:'2-2',t:'tf',q:'魚的外形分為頭、軀幹和鰭，頭和尾較細，中間比較粗，這種體形能幫助牠在水中運動。',a:0,s:'複習卷U2',e:'這樣的體形可以減少水的阻力。'},
+{g:'2-2',t:'tf',q:'蝦會用胸足和腹足在水中步行、游水，用鰓呼吸。',a:0,s:'複習卷U2',e:''},
+{g:'2-3',t:'tf',q:'發電廠排水口排出的高溫廢水，可幫助維持海水溫度，讓附近海域的生物都能更順利成長。',a:1,s:'複習卷U2',e:'熱廢水會使水溫升高，造成珊瑚白化等汙染。'},
+{g:'2-3',t:'tf',q:'在陸地的高山上種植蔬菜時，過度使用農藥會汙染水源和土壤，但是並不會影響到河川中的生物。',a:1,s:'複習卷U2',e:'農藥會被雨水沖入河川，傷害水中生物。'},
+/* ── 複習卷 第二單元（教用）選擇 ── */
+{g:'2-1',t:'mc',q:'下列環境和常見生物的配對，哪一項敘述是正確的？',o:['高山：玉山圓柏','溪流：蜥蜴','海洋：鯉魚','生態池：海龜'],a:0,s:'複習卷U2',e:'蜥蜴住陸地、鯉魚住淡水、海龜住海洋。'},
+{g:'2-1',t:'mc',q:'下列哪一個水域環境中，有機會觀察到海豚？',o:['學校的生態池','一望無際的海洋','寬廣的湖泊','生物豐富的潮間帶'],a:1,s:'複習卷U2',e:''},
+{g:'2-1',t:'mc',q:'有水的環境就是水域環境，下列哪一項不屬於水域環境？',o:['湖泊','森林','水田','生態池'],a:1,s:'複習卷U2',e:'森林屬於陸域環境。'},
+{g:'2-2',t:'mc',q:'小廷在水中擠壓布袋蓮的葉柄，發現從葉柄中冒出許多氣泡，這些儲存空氣的構造有什麼作用？',o:['幫助布袋蓮固定在水中不會移動','幫助布袋蓮吸收水分','幫助布袋蓮漂浮在水面上','幫助布袋蓮吸引昆蟲'],a:2,s:'複習卷U2',e:''},
+{g:'2-2',t:'mc',q:'水蘊草是溝渠中常見的沉水性水生植物，下列哪一項是它們的特徵？',o:['葉子表面有細毛','莖很柔軟','根漂浮在水裡','莖、葉子和花朵會挺出水面生長'],a:1,s:'複習卷U2',e:'莖葉柔軟，可以隨水流擺動。'},
+{g:'2-2',t:'mc',q:'下列關於荷花的敘述，哪一項不正確？',o:['葉柄會隨著水位高低而彎曲或伸展，讓葉面保持平貼在水面','生長在水底泥土裡的地下莖有許多中空孔洞','葉面不容易沾水','葉柄內有儲存空氣的中空構造'],a:0,s:'複習卷U2',e:'葉面平貼水面是睡蓮（浮葉性）的特徵；荷花的葉會挺出水面。'},
+{g:'2-2',t:'mc',q:'水族箱中的魚可以在水中自由游動，主要是用下列哪一個構造幫助牠們保持平衡，控制游動的方向？',o:['口','鰓','鰭','魚鱗'],a:2,s:'複習卷U2',e:''},
+{g:'2-2',t:'mc',q:'下列哪一種水生動物的後腳粗壯，腳上大多有蹼，可以在陸地上跳躍，也能在水中游水，用肺和潮溼的皮膚呼吸？',o:['蝌蚪','蟹','蛙','螺'],a:2,s:'複習卷U2',e:''},
+{g:'2-3',t:'mc',q:'不同的自然環境中，人們可以使用的自然資源也不一樣，下列環境和資源配對，哪一項是正確的？',o:['山區：牡蠣','海岸：高冷蔬菜','海岸：小米酒','山區：茶葉'],a:3,s:'複習卷U2',e:'牡蠣在西部海岸、高冷蔬菜和小米在山區。'},
+{g:'2-3',t:'mc',q:'下列哪一項不是愛護水域環境的行為？',o:['檢舉河川的開挖砂石','定期清理學校的生態池','將吃不完的食物倒進海裡餵魚','在水域環境周遭活動後帶走垃圾'],a:2,s:'複習卷U2',e:'把食物倒進海裡會汙染水質。'},
+/* ── 期中考A卷（教用）單元二相關 ── */
+{g:'2-1',t:'tf',q:'小康到臺灣東北角海邊，可以看到海邊有茂密的森林生長。',a:1,s:'期中A',e:'海邊鹽分高、風大，不會有茂密的森林。'},
+{g:'2-3',t:'tf',q:'工廠在沿海排放熱廢水，會使附近的珊瑚生長得更好。',a:1,s:'期中A',e:'熱廢水會造成珊瑚白化。'},
+{g:'2-1',t:'tf',q:'栗喉蜂虎喜歡在鬆軟的海濱泥灘地棲息。',a:1,s:'期中A',e:'栗喉蜂虎在陡峭的土丘鑽洞；泥灘地是招潮蟹的家。'},
+{g:'2-2',t:'tf',q:'水蘊草的根生長在泥土裡面，莖和葉會隨著水流擺動。',a:0,s:'期中A',e:'水蘊草是沉水性水生植物。'},
+{g:'2-2',t:'tf',q:'蟹具有八隻腳及一對螯，能在水中爬行。',a:0,s:'期中A',e:''},
+{g:'2-1',t:'tf',q:'婷婷一家人到花蓮搭船賞鯨，除了有機會看到鯨之外，也有可能看到海豚。',a:0,s:'期中A',e:''},
+{g:'2-3',t:'tf',q:'臺灣的茶葉適合在海邊生長，烘乾後可以做成飲品。',a:1,s:'期中A',e:'茶葉種在山區。'},
+{g:'2-1',t:'mc',q:'下列哪一種生物居住的環境與小丑魚是一樣的？',o:['睡蓮','珊瑚','麻雀','樹蛙'],a:1,s:'期中A',e:'小丑魚和珊瑚都住在海洋。'},
+{g:'2-2',t:'mc',q:'下列哪一種環境中最容易觀察到香蒲的生長？',o:['湖泊','海洋','高山','森林'],a:0,s:'期中A',e:''},
+{g:'2-1',t:'mc',q:'「有許多大大小小的石頭，水流動的速度較快，可以觀察到魚、蝦、蟹等生物。」最有可能是下列哪一種環境？',o:['水田','海洋','溪流','湖泊'],a:2,s:'期中A',e:''},
+{g:'2-2',t:'mc',q:'生活中常見的蓮藕，是荷花的哪一個構造？',o:['根','葉','葉柄','地下莖'],a:3,s:'期中A',e:''},
+{g:'2-1',t:'mc',q:'在學校生態池中最可能觀察到下列哪一種生物？',o:['鯉魚','海豚','海星','招潮蟹'],a:0,s:'期中A',e:''},
+{g:'2-2',t:'mc',q:'魚的鰓位於身體的哪一個部位呢？',o:['尾巴','軀幹','頭','鰭'],a:2,s:'期中A',e:'鰓在頭部的鰓蓋裡面。'},
+{g:'2-2',t:'mc',q:'下列哪一種動物的呼吸方式和其他三者不一樣？',o:['魚','海龜','螺','蟹'],a:1,s:'期中A',e:'海龜用肺呼吸，其他三種用鰓。'},
+{g:'2-2',t:'mc',q:'在蝌蚪變成蛙的過程中，從來沒有使用下列哪一種構造呼吸呢？',o:['呼吸管','潮溼的皮膚','肺','鰓'],a:0,s:'期中A',e:'呼吸管是紅娘華的構造。'},
+{g:'2-2',t:'mc',q:'浮潛使用的呼吸管，和下列哪一種動物的呼吸構造相似？',o:['蝦','蝌蚪','鯨','紅娘華'],a:3,s:'期中A',e:'紅娘華用腹部末端的呼吸管伸出水面呼吸。'},
+/* ── 期中考B卷（教用）單元二相關 ── */
+{g:'2-3',t:'tf',q:'在山上種植高冷蔬菜會直接危害海邊沿岸，使珊瑚白化。',a:1,s:'期中B',e:'珊瑚白化主要是水溫升高（熱廢水）造成的。'},
+{g:'2-2',t:'tf',q:'鯉魚的鰭有鱗片覆蓋，可以使牠游水的速度增加。',a:1,s:'期中B',e:'魚鱗長在軀幹上保護身體，鰭上沒有鱗片。'},
+{g:'2-1',t:'tf',q:'招潮蟹和鯨適合居住的環境都是鬆軟的海濱泥灘地。',a:1,s:'期中B',e:'鯨住在海洋。'},
+{g:'2-2',t:'tf',q:'布袋蓮和大萍都是漂浮性的水生植物。',a:0,s:'期中B',e:''},
+{g:'2-3',t:'tf',q:'水源受到汙染後，可能會改變溪流生物居住的生態環境。',a:0,s:'期中B',e:''},
+{g:'2-3',t:'tf',q:'蘭嶼地區盛產牡蠣，造就「蚵」的美食文化。',a:1,s:'期中B',e:'蘭嶼以飛魚聞名；牡蠣（蚵）在西部沿海。'},
+{g:'2-1',t:'mc',q:'下列哪一種環境和其他三種環境的類型不同？',o:['海洋','高山','潮間帶','生態池'],a:1,s:'期中B',e:'高山是陸域環境，其他三個是水域環境。'},
+{g:'2-2',t:'mc',q:'下列關於睡蓮和荷花的敘述，何者正確？',o:['花都貼在水面生長','葉子都會挺出水面','地下莖都稱為蓮藕','根都是生長在水底的泥土裡'],a:3,s:'期中B',e:'睡蓮是浮葉性、荷花是挺水性，但根都長在水底泥土裡。'},
+{g:'2-3',t:'mc',q:'下列哪一個行為可以保護水域環境？',o:['定期清理學校的生態池','捕捉或採摘水生生物','工廠任意排放廢水','任意開挖河川地的砂石'],a:0,s:'期中B',e:''},
+{g:'2-1',t:'mc',q:'在學校的生態池中較可能觀察到下列何種生物？',o:['海星','水母','大萍','樟樹'],a:2,s:'期中B',e:''},
+{g:'2-2',t:'mc',q:'下列哪一種水生植物的葉子生長在水面下？',o:['布袋蓮','水蘊草','浮萍','香蒲'],a:1,s:'期中B',e:'水蘊草是沉水性水生植物。'},
+{g:'2-2',t:'mc',q:'下列哪一種水生動物是使用肺呼吸呢？',o:['蝌蚪','蟹','斑龜','螺'],a:2,s:'期中B',e:''},
+{g:'2-1',t:'mc',q:'（潮間帶閱讀）玉黍螺適合在哪一種環境生存？',o:['深海底','低潮帶','中潮帶','高潮帶'],a:3,s:'期中B',e:'玉黍螺能耐長時間缺水和日晒，住在高潮帶。'},
+{g:'2-2',t:'mc',q:'（潮間帶閱讀）下列哪一種生物會利用羽毛狀的觸手捕食？',o:['黑深蝦虎','海蟑螂','藤壺','鯊魚'],a:2,s:'期中B',e:'藤壺漲潮時伸出羽毛狀觸手過濾食物。'},
+{g:'2-1',t:'mc',q:'（潮間帶閱讀）哪一種環境在海水中的時間最長，有許多不能承受乾燥與高溫的生物生存？',o:['低潮帶','中潮帶','高潮帶','都一樣'],a:0,s:'期中B',e:''},
+/* ── 校用卷 單元二 活動一 ── */
+{g:'2-1',t:'tf',q:'森林、草地和湖泊都屬於陸域環境。',a:1,s:'校用卷2-1',e:'湖泊屬於水域環境。'},
+{g:'2-1',t:'tf',q:'有水的環境就是水域環境。',a:0,s:'校用卷2-1',e:''},
+{g:'2-1',t:'tf',q:'水域和陸域中會有不同的生物，例如高山有玉山圓柏、生態池有魚。',a:0,s:'校用卷2-1',e:''},
+{g:'2-1',t:'tf',q:'松鼠在溪流中活動、蜥蜴生活在海洋，牠們都必須在水中才能生存。',a:1,s:'校用卷2-1',e:'松鼠住森林、蜥蜴住陸地。'},
+{g:'2-1',t:'tf',q:'為了更清楚觀察，可以將水生生物用水桶裝回家飼養。',a:1,s:'校用卷2-1',e:'觀察完要把生物放回原來的地方。'},
+{g:'2-1',t:'tf',q:'調查水域環境時要注意自身安全，並請大人陪伴。',a:0,s:'校用卷2-1',e:''},
+{g:'2-1',t:'tf',q:'海洋是最大的水域環境，裡面有海豚、海星和珊瑚等生物。',a:0,s:'校用卷2-1',e:''},
+{g:'2-1',t:'tf',q:'所有溪流中可以看見的水生生物都相同。',a:1,s:'校用卷2-1',e:'不同溪流的環境不同，生物也不同。'},
+{g:'2-1',t:'mc',q:'下列哪一項不屬於水域環境？',o:['水田','潮間帶','湖泊','高山'],a:3,s:'校用卷2-1',e:''},
+{g:'2-1',t:'mc',q:'下列哪一項敘述正確？',o:['松鼠必須在水中生活','玉山圓柏生長在海裡','蜥蜴必須在水中生活','魚、海豚都必須在水中才能生存'],a:3,s:'校用卷2-1',e:''},
+{g:'2-1',t:'mc',q:'下列環境和生物的配對，哪一項不正確？',o:['高山：玉山圓柏','海洋：海豚','溪流：海龜','生態池：睡蓮'],a:2,s:'校用卷2-1',e:'海龜住在海洋。'},
+{g:'2-1',t:'mc',q:'拜訪水域環境時，下列哪一項用品不需要攜帶？',o:['撈網','水桶','撈水器','水生生物圖鑑'],a:2,s:'校用卷2-1',e:''},
+{g:'2-1',t:'mc',q:'記錄水域環境時，下列哪一項不須記錄？',o:['調查的日期和時間','水域的類型','水域附近的空氣品質','水流的情形'],a:2,s:'校用卷2-1',e:''},
+{g:'2-1',t:'mc',q:'關於調查水域環境的做法，下列哪一項不正確？',o:['要走到水中感受水流情形','用望遠鏡觀察遠處的生物','請大人陪同前往','觀察後把生物放回原處'],a:0,s:'校用卷2-1',e:'走進水中很危險。'},
+{g:'2-1',t:'mc',q:'學校裡最可能用來觀察水生生物的水域環境是下列哪一項？',o:['海洋','生態池','潮間帶','溪流'],a:1,s:'校用卷2-1',e:''},
+{g:'2-1',t:'mc',q:'小翔在住家附近的溪流中，無法觀察到下列哪一種生物？',o:['海豚','溪蝦','魚','蟹'],a:0,s:'校用卷2-1',e:'海豚生活在海洋。'},
+/* ── 校用卷 單元二 活動二 ── */
+{g:'2-2',t:'tf',q:'原本長在陸地上的植物，只要改種到水裡就是水生植物。',a:1,s:'校用卷2-2',e:'水生植物是本來就適合在水中生長的植物。'},
+{g:'2-2',t:'tf',q:'布袋蓮的葉柄有儲存空氣的構造，可以幫助它漂浮在水面上。',a:0,s:'校用卷2-2',e:''},
+{g:'2-2',t:'tf',q:'臺灣萍蓬草是浮葉性水生植物，根和地下莖生長在水底泥土裡，葉平貼在水面。',a:0,s:'校用卷2-2',e:''},
+{g:'2-2',t:'tf',q:'水蘊草是沉水性水生植物，不論水位如何變化，整個植株都會沉在水中。',a:0,s:'校用卷2-2',e:''},
+{g:'2-2',t:'tf',q:'魚在水裡的呼吸方式是一直把頭探出水面吸氣和吐氣。',a:1,s:'校用卷2-2',e:'魚用鰓呼吸，口和鰓蓋會一開一合。'},
+{g:'2-2',t:'tf',q:'有些水生動物不但能在水中游水，也可以在陸上活動，例如蛙。',a:0,s:'校用卷2-2',e:''},
+{g:'2-2',t:'tf',q:'所有生活在水裡的水生動物都和魚一樣，依靠鰭來移動覓食。',a:1,s:'校用卷2-2',e:'螺用腹足、蝦用胸足腹足、龜和蛙用蹼。'},
+{g:'2-2',t:'mc',q:'下列哪一項不是布袋蓮的特徵？',o:['葉柄保持平貼在水面','葉柄有儲存空氣的構造','根漂浮在水裡','整株可以隨水流移動'],a:0,s:'校用卷2-2',e:'葉面平貼水面是睡蓮等浮葉性植物的特徵。'},
+{g:'2-2',t:'mc',q:'下列哪一項較不可能在溝渠中觀察到？',o:['水蘊草堅固的莖不怕水流沖刷','水蘊草的莖葉隨水流擺動','水蘊草整株沉在水中','水蘊草的根長在水底泥土裡'],a:0,s:'校用卷2-2',e:'水蘊草的莖很柔軟，不是堅固的。'},
+{g:'2-2',t:'mc',q:'用刀片將荷花的葉柄橫切開，可以看到什麼？',o:['實心的構造','裝滿水的袋子','裡面有一條條中空的管道','許多細毛'],a:2,s:'校用卷2-2',e:'中空管道可以儲存空氣。'},
+{g:'2-2',t:'mc',q:'下列關於睡蓮的敘述，哪一項不正確？',o:['葉面平貼在水面','根長在水底泥土裡','花會挺出水面','有膨大的葉柄'],a:3,s:'校用卷2-2',e:'膨大儲氣的是布袋蓮的葉柄。'},
+{g:'2-2',t:'mc',q:'魚是用下列哪一種方式控制游水的方向？',o:['擺動魚鱗','擺動魚鰭','張開鰓蓋','用口吸水'],a:1,s:'校用卷2-2',e:''},
+{g:'2-2',t:'mc',q:'下列哪一項運動方式的敘述正確？',o:['螺用鰭游水','蝦用蹼游水','斑龜用蹼在水中游水','蛙用腹足爬行'],a:2,s:'校用卷2-2',e:''},
+{g:'2-2',t:'mc',q:'下列哪一種動物的腳上大多具有蹼？',o:['螺','蝦','蟹','蛙'],a:3,s:'校用卷2-2',e:''},
+{g:'2-2',t:'mc',q:'下列哪一種動物不是用鰓呼吸？',o:['龜','蝦','蟹','魚'],a:0,s:'校用卷2-2',e:'龜用肺呼吸。'},
+/* ── 校用卷 單元二 活動三 ── */
+{g:'2-3',t:'tf',q:'四面環海的臺灣擁有豐富的海洋資源，但卻缺乏陸地資源。',a:1,s:'校用卷2-3',e:'臺灣的山區也有豐富的陸地資源，例如茶葉、小米。'},
+{g:'2-3',t:'tf',q:'不同環境中的人們，可能因為自然環境差異而發展出不同的飲食文化與生活方式。',a:0,s:'校用卷2-3',e:''},
+{g:'2-3',t:'tf',q:'小米生長在山區，居住山區的人可以利用小米做成小米酒來飲用。',a:0,s:'校用卷2-3',e:''},
+{g:'2-3',t:'tf',q:'澎湖的海島地形，較可能發展出與海洋有關的飲食習慣。',a:0,s:'校用卷2-3',e:''},
+{g:'2-3',t:'tf',q:'工廠的熱廢水只要透過冷卻就不會造成汙染，可以直接排放到海洋中。',a:1,s:'校用卷2-3',e:'任意排放廢水都會汙染水域環境。'},
+{g:'2-3',t:'tf',q:'在農地裡大量使用農藥，可能使附近水域環境的水質受到汙染。',a:0,s:'校用卷2-3',e:''},
+{g:'2-3',t:'tf',q:'保護水域環境只要靠警察和社會志工的努力就可以了。',a:1,s:'校用卷2-3',e:'每個人都要一起愛護水域環境。'},
+{g:'2-3',t:'tf',q:'水生生物必須依賴水域環境才能生存，所以我們要愛護水域環境，讓牠們可以永續生存。',a:0,s:'校用卷2-3',e:''},
+{g:'2-3',t:'mc',q:'下列哪一種食物最可能來自海洋資源？',o:['小米酒','高冷蔬菜','鯛魚丸','烏龍茶'],a:2,s:'校用卷2-3',e:''},
+{g:'2-3',t:'mc',q:'到阿里山山區旅遊，較不可能買到下列哪一種特產？',o:['高山茶','小米酒','飛魚乾','山葵'],a:2,s:'校用卷2-3',e:'飛魚乾是蘭嶼的海洋特產。'},
+{g:'2-3',t:'mc',q:'下列哪一項活動與當地的自然資源、環境生態有關？',o:['元宵提燈籠','端午包粽子','蘭嶼飛魚季','中秋賞月'],a:2,s:'校用卷2-3',e:''},
+{g:'2-3',t:'mc',q:'在嘉義布袋吃午餐，較可能吃到下列哪一種料理？',o:['高山蔬菜湯','小米粥','烤飛魚','蚵仔飯'],a:3,s:'校用卷2-3',e:'布袋位於西部海岸，盛產牡蠣（蚵）。'},
+{g:'2-3',t:'mc',q:'大量使用農藥和殺蟲劑，可能對環境造成下列哪一種影響？',o:['使河水變清澈','使魚蝦變多','使土壤更肥沃','汙染河川'],a:3,s:'校用卷2-3',e:''},
+];
+/* 題庫 C：概念卡、實驗步驟與變因、分類題、因果配對
+   內容依據：康軒自然4上 重點歸納／重點整理（教用）、課本單元一～二 */
+
+/* ===== 名詞概念卡（也用於翻牌配對：名詞 ↔ 說明）===== */
+const CARDS=[
+{k:'地表物質',d:'地表上的生物和非生物，非生物有空氣、水、岩石、土壤',g:'1-1'},
+{k:'礫石',d:'地表物質中顆粒最大的，摸起來粗糙，可鋪步道、蓋房子',g:'1-1'},
+{k:'沙',d:'顆粒比礫石小、比土壤大，一粒一粒粗粗的，可以拌水泥',g:'1-1'},
+{k:'土壤',d:'顆粒最小、細細粉粉的，含養分，適合種植農作物',g:'1-1'},
+{k:'栗喉蜂虎',d:'喜歡在陡峭的土丘鑽洞築巢的鳥',g:'1-1'},
+{k:'招潮蟹',d:'住在鬆軟的海濱泥灘地，在泥灘上挖洞',g:'1-1'},
+{k:'流水作用',d:'流水把地表物質搬運到別處堆積，顆粒越小搬得越遠',g:'1-2'},
+{k:'風的作用',d:'風把乾燥細小的沙吹起搬走，使沙丘外形改變',g:'1-2'},
+{k:'土石流',d:'過度開發的山坡地，大雨後土石被雨水大量搬走往下沖',g:'1-2'},
+{k:'生態工法',d:'整治河川時兼顧生態，避免河床與河岸持續受沖刷',g:'1-2'},
+{k:'震源',d:'引發地震的位置，通常在地表底下',g:'1-3'},
+{k:'震央',d:'震源在地表的投影點，是最靠近震源的地點',g:'1-3'},
+{k:'地震規模',d:'震源釋放的能量大小，一次地震只有一個，常用芮氏規模',g:'1-3'},
+{k:'地震震度',d:'人體感受地面搖動、建築物受破壞的程度，會隨地點不同',g:'1-3'},
+{k:'堰塞湖',d:'地震使山坡崩塌的土石堵住河道而形成的湖',g:'1-3'},
+{k:'國家級警報',d:'地震發生時手機收到的強震即時警報',g:'1-3'},
+{k:'避難救生包',d:'平時就準備好，裝食物、飲水、手電筒等避難用品',g:'1-3'},
+{k:'陸域環境',d:'陸地上的環境，例如高山、森林、草地',g:'2-1'},
+{k:'水域環境',d:'有水的環境，例如溪流、湖泊、水田、生態池、潮間帶、海洋',g:'2-1'},
+{k:'潮間帶',d:'海岸邊會隨潮水漲退被海水淹沒或露出的區域',g:'2-1'},
+{k:'撈網',d:'調查水域環境時用來採集水生生物的工具',g:'2-1'},
+{k:'水桶',d:'調查水域環境時暫時裝水生生物觀察，觀察完要放回原處',g:'2-1'},
+{k:'漂浮性水生植物',d:'根漂浮在水裡，整株可隨水流移動，如布袋蓮、大萍、浮萍',g:'2-2'},
+{k:'沉水性水生植物',d:'根長在水底泥土，莖葉柔軟沉在水中，如水蘊草、苦草',g:'2-2'},
+{k:'浮葉性水生植物',d:'葉面平貼水面、花挺出水面，如睡蓮、臺灣萍蓬草',g:'2-2'},
+{k:'挺水性水生植物',d:'花和葉都挺出水面，如荷花、香蒲、水稻、茭白',g:'2-2'},
+{k:'蓮藕',d:'荷花生長在水底泥土裡的地下莖，裡面有中空孔洞',g:'2-2'},
+{k:'鰓',d:'魚、蝦、蟹、螺、蝌蚪在水中呼吸的構造，位在鰓蓋裡面',g:'2-2'},
+{k:'鰭',d:'魚用來控制游水方向、保持平衡的構造',g:'2-2'},
+{k:'魚鱗',d:'一片一片覆蓋在魚軀幹上，有保護身體的功能',g:'2-2'},
+{k:'蹼',d:'龜和蛙腳上的構造，可以幫助在水中游水',g:'2-2'},
+{k:'腹足',d:'螺用來在水底爬行的構造',g:'2-2'},
+{k:'珊瑚白化',d:'工廠排放熱廢水使水溫升高，珊瑚失去顏色甚至死亡',g:'2-3'},
+{k:'飛魚',d:'蘭嶼的重要海洋資源，當地有飛魚季的文化',g:'2-3'},
+{k:'牡蠣',d:'西部沿海養殖的海洋資源，也叫「蚵」',g:'2-3'},
+{k:'淨灘',d:'到海邊撿拾垃圾，是愛護水域環境的行動',g:'2-3'},
+];
+
+/* ===== 實驗步驟排序（steps 為正確順序）===== */
+const EXPSEQ=[
+{g:'1-1',t:'觀察礫石、沙和土壤',steps:[
+ '分別取少量礫石、沙和土壤，放在白紙上',
+ '用眼睛和放大鏡比較三者顆粒的大小',
+ '用手輕輕觸摸，比較三者摸起來的感覺',
+ '把觀察結果記錄在紀錄表上',
+ '洗淨雙手，並把材料收拾乾淨'],s:'課本活動一'},
+{g:'1-2',t:'流水作用實驗',steps:[
+ '把礫石、沙和土壤混合，在盤子一端堆成一個土堆',
+ '在土堆上方用寶特瓶緩緩澆水',
+ '觀察哪些地表物質被水搬走',
+ '比較礫石、沙和土壤被搬走的距離遠近',
+ '增加水量再澆一次，比較搬走的距離有什麼不同'],s:'課本活動二'},
+{g:'1-2',t:'風的作用實驗',steps:[
+ '在盤子裡把乾燥的沙堆成小沙丘',
+ '用吹風機（或扇子）從同一側對著沙丘吹',
+ '觀察沙被吹起、搬走的情形',
+ '比較吹之前和吹之後沙丘外形的變化'],s:'課本活動二'},
+{g:'2-2',t:'觀察布袋蓮葉柄的祕密',steps:[
+ '取一株布袋蓮，先觀察葉柄膨大的外形',
+ '把葉柄放進水中',
+ '用手輕輕擠壓葉柄',
+ '觀察水中是否冒出氣泡',
+ '推論葉柄裡儲存空氣的作用'],s:'課本活動二'},
+{g:'2-1',t:'調查校園水域環境',steps:[
+ '出發前查資料，準備撈網、水桶、放大鏡和紀錄表',
+ '請大人陪同，到水域邊注意自身安全',
+ '先在岸邊觀察水流情形並記錄日期、地點、水域類型',
+ '用撈網採集水生生物，暫時放進裝水的水桶',
+ '用水生生物圖鑑對照，記錄生物的名稱和特徵',
+ '觀察完畢把生物放回原來的地方，帶走所有垃圾'],s:'課本活動一'},
+];
+
+/* ===== 變因判斷 ===== */
+const EXPVAR=[
+{g:'1-2',q:'流水作用實驗中，想知道「不同大小的顆粒會被搬多遠」，要改變的是哪一項？',o:['地表物質顆粒的大小','澆水的水量','土堆的高度','盤子的顏色'],a:0,s:'課本活動二',e:'要觀察的原因就是操作變因，這裡是顆粒大小。'},
+{g:'1-2',q:'流水作用實驗中，想知道「不同大小的顆粒會被搬多遠」，下列哪一項必須保持相同？',o:['顆粒的大小','澆水的水量和高度','被搬走的距離','觀察的結果'],a:1,s:'課本活動二',e:'除了要改變的那一項，其他條件都要相同。'},
+{g:'1-2',q:'流水作用實驗中，要測量、觀察的結果（應變變因）是下列哪一項？',o:['水量多少','顆粒大小','地表物質被搬走的距離','盤子的大小'],a:2,s:'課本活動二',e:''},
+{g:'1-2',q:'想知道「水量多寡會不會影響搬運距離」，實驗中應該改變哪一項？',o:['澆水的水量','顆粒的種類','土堆的位置','澆水的高度'],a:0,s:'課本活動二',e:''},
+{g:'1-2',q:'風的作用實驗中，想比較「沙乾溼不同會不會影響被吹走的情形」，要保持相同的是下列哪一項？',o:['沙的乾溼程度','吹風機的風速和距離','被吹走的沙量','沙丘的外形變化'],a:1,s:'課本活動二',e:''},
+{g:'1-1',q:'比較礫石、沙和土壤的顆粒大小時，下列哪一項做法最公平？',o:['礫石取很多、土壤只取一點','三者都取差不多的量，放在同樣的白紙上比較','只用手摸不用眼睛看','把三者混在一起看'],a:1,s:'課本活動一',e:''},
+{g:'2-2',q:'想知道「布袋蓮葉柄裡有沒有空氣」，最適合的做法是下列哪一項？',o:['把葉柄放進水中擠壓，看會不會冒出氣泡','把葉柄晒乾','量葉柄的長度','把葉柄染成紅色'],a:0,s:'課本活動二',e:''},
+{g:'2-2',q:'要比較「不同水位對水生植物外形的影響」，下列哪一項是操作變因？',o:['水位的高低','植物的種類','水的溫度','容器的形狀'],a:0,s:'課本活動二',e:''},
+];
+
+/* ===== 分類題 ===== */
+const SETS=[
+{id:'bio',g:'1-1',name:'生物與非生物',cats:['生物','非生物'],
+ items:[['水稻',0],['螞蟻',0],['小白菜',0],['松鼠',0],['招潮蟹',0],['岩石',1],['空氣',1],['水',1],['沙',1],['土壤',1]]},
+{id:'env',g:'2-1',name:'陸域環境與水域環境',cats:['陸域環境','水域環境'],
+ items:[['高山',0],['森林',0],['草地',0],['溪流',1],['湖泊',1],['水田',1],['生態池',1],['潮間帶',1],['海洋',1]]},
+{id:'plant',g:'2-2',name:'水生植物四大類',cats:['漂浮性','沉水性','浮葉性','挺水性'],
+ items:[['布袋蓮',0],['大萍',0],['浮萍',0],['水蘊草',1],['苦草',1],['睡蓮',2],['臺灣萍蓬草',2],['荷花',3],['香蒲',3],['水稻',3],['茭白',3]]},
+{id:'breath',g:'2-2',name:'水生動物的呼吸方式',cats:['用鰓呼吸','用肺呼吸'],
+ items:[['魚',0],['蝦',0],['蟹',0],['螺',0],['蝌蚪',0],['鯨',1],['海豚',1],['海龜',1],['斑龜',1],['蛙',1]]},
+{id:'cause',g:'1-2',name:'地表改變的原因',cats:['自然因素','人為因素'],
+ items:[['風吹沙',0],['流水沖刷',0],['地震造成斷層',0],['山坡崩塌',0],['盜採砂石',1],['砍伐森林',1],['開闢山坡地種菜',1],['在山坡地蓋房子',1]]},
+{id:'quake',g:'1-3',name:'地震防災三階段',cats:['平時準備','地震發生時','地震發生後'],
+ items:[['把櫥櫃釘牢固定',0],['準備避難救生包',0],['熟悉逃生路線',0],['進行防震演練',0],['趴在桌下抓穩桌腳並保護頭部',1],['關閉爐火和瓦斯',1],['走樓梯，不搭電梯',1],['注意搖晃的招牌和掉落物',1],['檢查房屋有沒有龜裂',2],['檢查瓦斯、水、電等設備',2],['留意正確的地震消息',2]]},
+{id:'res',g:'2-3',name:'山區資源與海洋資源',cats:['山區資源','海洋資源'],
+ items:[['小米',0],['茶葉',0],['高冷蔬菜',0],['山葵',0],['牡蠣',1],['飛魚',1],['海帶',1],['黑鮪魚',1],['鯛魚',1]]},
+{id:'tool',g:'2-1',name:'調查水域環境的用品',cats:['該帶','不必帶'],
+ items:[['撈網',0],['水桶',0],['放大鏡',0],['紀錄表',0],['望遠鏡',0],['水生生物圖鑑',0],['游泳圈下水玩',1],['釣竿把魚帶回家',1]]},
+];
+
+/* ===== 因果配對 ===== */
+const CAUSE=[
+{c:'顆粒越小的地表物質',r:'被流水搬得越遠',g:'1-2'},
+{c:'流水的作用越強',r:'地表物質被搬得越遠',g:'1-2'},
+{c:'過度砍伐森林，山坡地裸露',r:'下大雨後容易形成土石流',g:'1-2'},
+{c:'在山坡地闢菜園、過度使用農藥',r:'雨水把土壤和農藥沖入河川，汙染水源',g:'1-2'},
+{c:'在河川地大量開挖砂石',r:'河床地表物質流失、砂石裸露',g:'1-2'},
+{c:'在裸露的山坡地種植植物',r:'植物的根固定土壤，減少地表物質流失',g:'1-2'},
+{c:'強烈地震搖晃，電線受損走火',r:'引發火災',g:'1-3'},
+{c:'地震使山坡崩塌的土石堵住河道',r:'形成堰塞湖',g:'1-3'},
+{c:'地震時地層錯動形成斷層',r:'出現斷層瀑布或地面隆起',g:'1-3'},
+{c:'平時把櫥櫃釘牢固定',r:'地震時物品比較不會掉落傷人',g:'1-3'},
+{c:'布袋蓮葉柄裡有儲存空氣的中空構造',r:'幫助整株漂浮在水面上',g:'2-2'},
+{c:'大萍的葉面有細毛',r:'不容易沾水，可以漂浮在水面',g:'2-2'},
+{c:'水蘊草的莖和葉很柔軟',r:'可以隨水流擺動，不容易被沖斷',g:'2-2'},
+{c:'睡蓮的葉柄會隨水位伸長或彎曲',r:'葉面始終平貼在水面上',g:'2-2'},
+{c:'荷花的葉面不容易沾水',r:'水會在葉面上形成水珠滾落',g:'2-2'},
+{c:'魚的身體中間粗、頭尾較細',r:'在水中游動時可以減少阻力',g:'2-2'},
+{c:'魚的口和鰓蓋一開一合',r:'讓含有空氣的水流經鰓進行呼吸',g:'2-2'},
+{c:'蛙的後腳粗壯、腳上有蹼',r:'能在陸上跳躍，也能在水中游水',g:'2-2'},
+{c:'工廠把熱廢水排入海中',r:'水溫升高造成珊瑚白化',g:'2-3'},
+{c:'蘭嶼四周海域盛產飛魚',r:'當地發展出飛魚季的飲食文化',g:'2-3'},
+{c:'西部沿海的潮間帶適合養殖牡蠣',r:'當地發展出蚵仔料理的飲食文化',g:'2-3'},
+{c:'大家一起淨灘、淨溪並檢舉汙染',r:'水域環境變乾淨，水生生物能永續生存',g:'2-3'},
+];
+
+/* ===== 課次名稱 ===== */
+const GK=['1-1','1-2','1-3','2-1','2-2','2-3'];
+const GN=['1-1 地表物質','1-2 地表變動','1-3 地震防災','2-1 水域環境','2-2 水中生物','2-3 環境資源'];
+const QB=QB1.concat(QB2);
+
+/* ===== 小工具 ===== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+function load(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+const hash=s=>{let h=0;for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))|0}return (h>>>0).toString(36)};
+const NUM=['①','②','③','④','⑤','⑥'];
+
+/* ===== 音效（Web Audio 合成，不需下載音檔）===== */
+let sfxOn=load('sci4-sfx',true),actx=null;
+function tone(seq){
+  if(!sfxOn)return;
+  try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();
+    let t=actx.currentTime+0.01;
+    seq.forEach(([f,d,type,v])=>{const o=actx.createOscillator(),g=actx.createGain();o.type=type||'sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(v||0.16,t+0.015);g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+      o.connect(g);g.connect(actx.destination);o.start(t);o.stop(t+d+0.03);t+=d*0.8});
+  }catch(e){}
+}
+const SFX={
+  ok:()=>tone([[659,.12],[880,.12],[1175,.25]]),
+  bad:()=>tone([[311,.18,'triangle',.14],[233,.32,'triangle',.14]]),
+  flip:()=>tone([[540,.05,'triangle',.07]]),
+  match:()=>tone([[784,.09],[1047,.2]]),
+  combo:()=>tone([[784,.08],[988,.08],[1319,.22]]),
+  tick:()=>tone([[1250,.04,'square',.035]]),
+  win:()=>tone([[523,.13],[659,.13],[784,.13],[1047,.13],[784,.1],[1047,.4]]),
+  lose:()=>tone([[392,.2,'triangle'],[330,.2,'triangle'],[262,.45,'triangle']])
+};
+function renderSfx(){const b=$('#sfxBtn');b.setAttribute('aria-pressed',sfxOn);b.textContent='音效：'+(sfxOn?'開':'關')}
+$('#sfxBtn').onclick=()=>{sfxOn=!sfxOn;save('sci4-sfx',sfxOn);renderSfx();if(sfxOn)SFX.ok()};
+renderSfx();
+
+/* ===== 每一關的計時與計分 ===== */
+let tmode=load('sci4-tmode','up'),rt=null;const QLIM=15;
+const rmt=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
+const timeChips=()=>`<div class="modes"><button class="chip" data-tm="up" aria-pressed="${tmode==='up'}">計時計分</button><button class="chip" data-tm="cd" aria-pressed="${tmode==='cd'}">每題 ${QLIM} 秒倒數</button></div>`;
+document.addEventListener('click',e=>{const b=e.target.closest('[data-tm]');if(!b)return;tmode=b.dataset.tm;save('sci4-tmode',tmode);document.querySelectorAll('[data-tm]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.tm===tmode))});
+function rtStart(key){rt={key,t0:Date.now(),score:0,streak:0,best:0,ok:0,n:0,qT:Date.now(),onTimeout:null,last:'',lastTick:-1,done:false}}
+function rtQ(onTimeout){if(!rt)return;rt.qT=Date.now();rt.onTimeout=(tmode==='cd'&&onTimeout)?onTimeout:null;rt.lastTick=-1;rtTick()}
+function rtAns(right){
+  if(!rt)return 0;rt.n++;rt.onTimeout=null;let pts=0;
+  if(right){rt.ok++;rt.streak++;rt.best=Math.max(rt.best,rt.streak);const sec=(Date.now()-rt.qT)/1000;
+    const sp=Math.round(50*Math.max(0,Math.min(1,1-(sec-3)/12))),cb=Math.min(5,rt.streak-1)*10;pts=100+sp+cb;rt.score+=pts;
+    rt.last=`＋${pts}${sp?`（快答 ＋${sp}）`:''}${rt.streak>1?`・${rt.streak} 連對`:''}`}
+  else{rt.streak=0;rt.last='連對中斷'}
+  rtTick();return pts;
+}
+function rtTick(){
+  if(!rt||rt.done)return;
+  const now=Date.now(),el=(now-rt.t0)/1000;
+  let cd='';
+  if(rt.onTimeout){const left=QLIM-(now-rt.qT)/1000,c=Math.ceil(left);
+    if(c<=3&&c>0&&c!==rt.lastTick){rt.lastTick=c;SFX.tick()}
+    cd=`<div class="timebar${left<=5?' warn':''}"><i style="width:${Math.max(0,left/QLIM*100)}%"></i></div>`;
+    if(left<=0){const f=rt.onTimeout;rt.onTimeout=null;f();return}}
+  document.querySelectorAll('.rhud').forEach(h=>{const sec=h.closest('section');if(sec&&sec.hidden)return;
+    h.innerHTML=`<div class="rrow"><span>時間 <b>${rmt(el)}</b></span><span>分數 <b>${rt.score}</b></span><span>連對 <b>${rt.streak}</b></span>${rt.onTimeout?`<span class="cdw">剩 <b>${Math.max(0,Math.ceil(QLIM-(now-rt.qT)/1000))}</b> 秒</span>`:''}</div>${cd}<div class="plus">${rt.last}</div>`})
+}
+setInterval(rtTick,250);
+function rtEnd(label){
+  if(!rt)return '';
+  rt.done=true;rt.onTimeout=null;const el=(Date.now()-rt.t0)/1000,acc=rt.n?Math.round(rt.ok/rt.n*100):0;
+  const key='sci4-rbest-'+rt.key+(label||''),best=load(key,null),rec=!best||rt.score>best.sc;
+  if(rec&&rt.n)save(key,{sc:rt.score,t:el});
+  return `<div class="rsum"><div><b>${rt.score}</b>分數</div><div><b>${rmt(el)}</b>用時</div><div><b>${acc}%</b>正確率</div><div><b>${rt.best}</b>最高連對</div></div>
+   <p class="qask">${rec&&rt.n?'<b style="color:var(--rose-deep)">新紀錄！</b>':`這一關最佳紀錄：${best?best.sc:0} 分`}</p>`;
+}
+
+/* ===== 範圍與錯題紀錄 ===== */
+let wq=load('sci4-wrong',{});
+const st={groups:new Set(GK),onlyWrong:false,sel:CARDS[0].k,selfTest:false,qtype:'all'};
+function qid(q){return hash(q)}
+function addWrong(m,q,a,s,g){const k=qid(q);const o=wq[k]||{n:0,q,a,s,g,m};o.n++;o.q=q;o.a=a;o.s=s;o.g=g;o.m=m;wq[k]=o;save('sci4-wrong',wq);renderScope()}
+const isWrong=q=>!!wq[qid(q)];
+const inScope=x=>st.groups.has(x.g);
+function wrongN(){return Object.keys(wq).length}
+function renderScope(){
+  const n=wrongN();if(!n)st.onlyWrong=false;
+  $('#scope').innerHTML=GN.map((g,i)=>`<button class="chip" data-g="${GK[i]}" aria-pressed="${st.groups.has(GK[i])}">${g}</button>`).join('')+
+   `<button class="chip" data-g="all" aria-pressed="false">全選</button>`+
+   (n?`<button class="chip wrongchip" data-g="wrong" aria-pressed="${st.onlyWrong}">只練錯題（${n}）</button>`:'')+
+   `<span class="count">範圍內 ${quizPool().length} 題</span>`;
+}
+$('#scope').addEventListener('click',e=>{
+  const b=e.target.closest('.chip');if(!b)return;const g=b.dataset.g;
+  if(g==='all')st.groups=new Set(GK);
+  else if(g==='wrong')st.onlyWrong=!st.onlyWrong;
+  else{if(st.groups.has(g)){if(st.groups.size>1)st.groups.delete(g)}else st.groups.add(g)}
+  renderScope();refreshTab();
+});
+
+/* ===== 分頁 ===== */
+let mm=null,tab='quiz';
+document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  tab=b.dataset.tab;rt=null;if(mm&&mm.timer){clearInterval(mm.timer);mm.timer=null}
+  document.querySelectorAll('nav.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  document.querySelectorAll('section').forEach(s=>s.hidden=s.id!=='tab-'+tab);
+  refreshTab(true);
+}));
+function refreshTab(fromTab){
+  if(tab==='quiz')quizIntro();
+  if(tab==='cards')renderCards();
+  if(tab==='mem')memIntro();
+  if(tab==='exp')expIntro();
+  if(tab==='sort')sortIntro();
+  if(tab==='pair')pairIntro();
+  if(tab==='wrong')renderWrong();
+}
+const sizeSel=(id,v)=>`<label class="hint" for="${id}">題數</label> <select id="${id}"><option value="10"${v===10?' selected':''}>10 題</option><option value="20"${v===20?' selected':''}>20 題</option><option value="999">全部</option></select>`;
+const emptyMsg=`<p class="hint">這個範圍裡沒有題目，請在上方多選幾個課次。</p>`;
+
+/* ===== 通用選擇題關卡（練習題、變因判斷、分類、因果配對共用）===== */
+let qz=null;
+function qzStart(cfg){qz=Object.assign({i:0,ok:0,bad:[]},cfg);rtStart(cfg.key);qzQ()}
+function qzQ(){
+  const x=qz.items[qz.i],long=x.o.some(s=>s.length>8);
+  $(qz.area).innerHTML=`<div class="qcard"><div class="rhud"></div>
+   ${x.tag?`<span class="qtag">${esc(x.tag)}</span>`:''}
+   <p class="qbig">${qz.i+1}. ${esc(x.q)}</p>
+   <div class="opts${x.tf?'':(long?' one':'')}">${x.o.map((o,i)=>`<button class="opt${x.tf?' tf':''}" data-k="${i}">${x.tf?'':`<span class="no">${NUM[i]}</span>`}<span>${esc(o)}</span></button>`).join('')}</div>
+   <div class="prog">第 ${qz.i+1} / ${qz.items.length} 題${qz.i?`・已對 ${qz.ok} 題`:''}</div></div>`;
+  document.querySelectorAll(qz.area+' .opt').forEach(b=>b.onclick=()=>qzPick(+b.dataset.k));
+  rtQ(()=>qzPick(-1));
+}
+const ansTxt=x=>x.tf?(x.a?'╳ 錯':'○ 對'):NUM[x.a]+' '+x.o[x.a];
+function qzPick(k){
+  const x=qz.items[qz.i],right=k===x.a;
+  document.querySelectorAll(qz.area+' .opt').forEach(b=>{b.disabled=true;const i=+b.dataset.k;
+    if(i===x.a)b.classList.add('ok'),b.insertAdjacentHTML('beforeend','<span class="mark">正解</span>');
+    else if(i===k)b.classList.add('bad'),b.insertAdjacentHTML('beforeend','<span class="mark">你選的</span>')});
+  rtAns(right);
+  if(right){qz.ok++;SFX.ok()}else{qz.bad.push(x);SFX.bad();addWrong(qz.mod,x.q,ansTxt(x),x.s||'',x.g)}
+  const fb=document.createElement('div');fb.className='fb '+(right?'ok':'bad');
+  fb.innerHTML=`<b>${right?'答對了！':(k<0?'時間到：':'正確答案是 ')}${right?'':esc(ansTxt(x))}</b>${x.e?'<br>'+esc(x.e):''}${x.s?`<span class="src">出處：${esc(x.s)}</span>`:''}`;
+  const card=document.querySelector(qz.area+' .qcard');card.appendChild(fb);
+  const nb=document.createElement('button');nb.className='btn primary';nb.textContent=qz.i+1<qz.items.length?'下一題':'看成績';
+  card.appendChild(nb);nb.onclick=()=>{qz.i++;qz.i<qz.items.length?qzQ():qzEnd()};nb.focus();
+}
+function qzEnd(){
+  const n=qz.items.length,full=qz.ok===n;
+  $(qz.area).innerHTML=`<div class="done-box"><div class="score">${qz.ok} / ${n}</div>
+   ${rtEnd()}
+   ${full?'<p class="qask">全部答對，太強了！</p>':`<p class="qask">答錯的已經記進錯題本了。</p><div class="wlist">${qz.bad.map(b=>`<span class="wz">${esc(b.g)}</span>`).join('')}</div>`}
+   <div class="center"><button class="btn primary" id="qzAgain">再來一輪</button>${qz.bad.length?'<button class="btn rose" id="qzRe">只練這輪錯的</button>':''}<button class="btn" id="qzBack">換設定</button></div></div>`;
+  if(full){setTimeout(()=>celebrate(qz.msg||'自然全對！'),250)}else SFX.lose();
+  $('#qzAgain').onclick=()=>qz.again();
+  $('#qzBack').onclick=()=>qz.back();
+  const r=$('#qzRe');if(r)r.onclick=()=>{const bad=shuffle(qz.bad);qzStart(Object.assign({},qz,{items:bad,i:0,ok:0,bad:[]}))};
+}
+
+/* ===== 練習題（選擇題＋是非題）===== */
+function quizPool(){
+  let p=QB.filter(inScope);
+  if(st.qtype==='mc')p=p.filter(x=>x.t==='mc');
+  if(st.qtype==='tf')p=p.filter(x=>x.t==='tf');
+  if(st.onlyWrong)p=p.filter(x=>isWrong(x.q));
+  return p;
+}
+const toQ=x=>x.t==='tf'
+  ? {q:x.q,o:['○ 對','╳ 錯'],a:x.a,e:x.e,s:x.s,g:x.g,tf:true,tag:'是非題・'+x.g}
+  : {q:x.q,o:x.o,a:x.a,e:x.e,s:x.s,g:x.g,tag:'選擇題・'+x.g};
+function quizIntro(){
+  const p=quizPool(),tc=(v,l)=>`<button class="chip" data-qt="${v}" aria-pressed="${st.qtype===v}">${l}</button>`;
+  $('#quizArea').innerHTML=`<div class="qcard">
+   <p class="qask">期中考範圍的選擇題和是非題，全部取自複習卷、期中考 A／B 卷和校用卷的<b>教用版印刷答案</b>。</p>
+   ${timeChips()}
+   <div class="modes">${tc('all','全部')}${tc('mc','只練選擇題')}${tc('tf','只練是非題')}</div>
+   <div class="bar" style="justify-content:center">${sizeSel('qzN',10)}</div>
+   <p class="hint">範圍內有 ${p.length} 題（選擇 ${p.filter(x=>x.t==='mc').length}・是非 ${p.filter(x=>x.t==='tf').length}）</p>
+   ${p.length?'<button class="btn primary" id="qGo">開始練習</button>':emptyMsg}</div>`;
+  document.querySelectorAll('#quizArea [data-qt]').forEach(b=>b.onclick=()=>{st.qtype=b.dataset.qt;quizIntro()});
+  const g=$('#qGo');if(g)g.onclick=()=>{
+    const n=Math.min(+$('#qzN').value,p.length);
+    qzStart({area:'#quizArea',key:'quiz',mod:'練習題',msg:'自然全對！',items:shuffle(p).slice(0,n).map(toQ),again:()=>{const g2=$('#qGo');quizIntro();setTimeout(()=>$('#qGo')&&$('#qGo').click(),0)},back:quizIntro});
+  };
+}
+
+/* ===== 概念卡 ===== */
+const CBY={};CARDS.forEach(c=>CBY[c.k]=c);
+function renderCards(){
+  const p=CARDS.filter(inScope);
+  if(!p.find(c=>c.k===st.sel)&&p.length)st.sel=p[0].k;
+  const x=CBY[st.sel];
+  $('#cDetail').innerHTML=p.length&&x?`<span class="qtag">${esc(x.g)} ${GN[GK.indexOf(x.g)].slice(4)}</span>
+   <div class="term">${esc(x.k)}</div>
+   <div class="dsc">${st.selfTest?`<span class="cover" tabindex="0" role="button">${esc(x.d)}</span>`:esc(x.d)}</div>`
+   :`<p class="hint">這個範圍裡沒有概念卡。</p>`;
+  $('#cardGrid').innerHTML=GK.filter(g=>st.groups.has(g)).map(g=>{
+    const list=p.filter(c=>c.g===g);if(!list.length)return '';
+    return `<div class="groupHead">${GN[GK.indexOf(g)]}</div><div class="cgrid">${list.map(c=>`<button class="cmini${c.k===st.sel?' sel':''}" data-k="${esc(c.k)}">${esc(c.k)}</button>`).join('')}</div>`;
+  }).join('');
+  document.querySelectorAll('#cardGrid .cmini').forEach(b=>b.onclick=()=>{st.sel=b.dataset.k;renderCards()});
+  document.querySelectorAll('#cDetail .cover').forEach(el=>{const op=()=>{el.classList.remove('cover')};el.onclick=op;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();op()}}});
+}
+$('#selfTest').onclick=()=>{st.selfTest=!st.selfTest;$('#selfTest').setAttribute('aria-pressed',st.selfTest);renderCards()};
+
+/* ===== 翻牌配對：名詞 ↔ 說明 ===== */
+let memMode='up',memSize=6;
+const mmt=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
+const memKey=()=>`sci4-best-${memMode}-${memSize}`;
+function memIntro(){
+  if(mm&&mm.timer){clearInterval(mm.timer);mm.timer=null}
+  const best=load(memKey(),null),p=CARDS.filter(inScope);
+  const chip=(k,v,label)=>`<button class="chip" data-${k}="${v}" aria-pressed="${({mode:memMode,size:String(memSize)})[k]===String(v)}">${label}</button>`;
+  $('#memArea').innerHTML=`<div class="qcard"><p class="qask">翻開兩張牌，把<b>名詞</b>和它的<b>說明</b>配成一對。連續配對成功有連擊加分！</p>
+   <div class="modes">${chip('mode','up','計時賽：越快越好')}${chip('mode','down','限時賽：倒數讀秒')}</div>
+   <div class="modes">${chip('size',6,'6 對（12 張）')}${chip('size',8,'8 對（16 張）')}</div>
+   <p class="hint">${best?`這一關的最佳紀錄：${memMode==='up'?`${mmt(best.t)}・翻 ${best.mv} 次`:`${best.sc} 分`}`:'這一關還沒有紀錄，來創第一個吧！'}${memMode==='down'?`　限時 ${memSize===6?90:120} 秒`:''}</p>
+   ${p.length>=memSize?'<button class="btn primary" id="mGo">發牌開始</button>':`<p class="hint">範圍內至少要有 ${memSize} 張概念卡，請多選幾個課次。</p>`}</div>`;
+  document.querySelectorAll('#memArea [data-mode]').forEach(b=>b.onclick=()=>{memMode=b.dataset.mode;memIntro()});
+  document.querySelectorAll('#memArea [data-size]').forEach(b=>b.onclick=()=>{memSize=+b.dataset.size;memIntro()});
+  const g=$('#mGo');if(g)g.onclick=memDeal;
+}
+function memDeal(){
+  if(mm&&mm.timer)clearInterval(mm.timer);
+  const pick=shuffle(CARDS.filter(inScope)).slice(0,memSize);
+  const cards=shuffle(pick.flatMap(x=>[{id:x.k,t:'c',x},{id:x.k,t:'a',x}]));
+  const limit=memMode==='down'?(memSize===6?90:120):0;
+  mm={cards,open:[],done:0,moves:0,n:pick.length,lock:false,score:0,combo:0,maxCombo:0,start:0,el:0,limit,over:false,timer:null,lastTick:-1,msg:''};
+  memRender();
+}
+function memStartClock(){
+  if(mm.start)return;mm.start=Date.now();
+  mm.timer=setInterval(()=>{mm.el=(Date.now()-mm.start)/1000;
+    if(mm.limit){const left=Math.ceil(mm.limit-mm.el);if(left<=10&&left>0&&left!==mm.lastTick){mm.lastTick=left;SFX.tick()}
+      if(mm.el>=mm.limit){mm.el=mm.limit;memEnd(false);return}}
+    memHud()},250);
+}
+function memHud(){
+  const h=$('#mHud');if(!h)return;
+  const left=mm.limit?Math.max(0,mm.limit-mm.el):0,warn=mm.limit&&left<=10;
+  h.innerHTML=`<div class="${warn?'warn':''}">${mm.limit?'剩下':'時間'}<b>${mmt(mm.limit?Math.ceil(left):mm.el)}</b></div><div>翻牌<b>${mm.moves}</b></div><div>配對<b>${mm.done}/${mm.n}</b></div><div>分數<b>${mm.score}</b></div>`;
+  const tb=$('#mBar');if(tb){tb.classList.toggle('warn',!!warn);tb.firstElementChild.style.width=(mm.limit?left/mm.limit*100:mm.done/mm.n*100)+'%'}
+}
+const memFace=c=>c.t==='c'?`<span class="term">${esc(c.x.k)}</span>`:`<span class="dsc">${esc(c.x.d)}</span>`;
+function memRender(fx){
+  $('#memArea').innerHTML=`<div class="hud" id="mHud"></div><div class="timebar" id="mBar"><i></i></div>
+   <div class="combo" id="mCombo">${mm.msg}</div>
+   <div class="mem">${mm.cards.map((c,i)=>`<button class="mc${c.open?' open':''}${c.done?' done':''}${fx&&fx.idx.includes(i)?' '+fx.cls:''}" data-i="${i}" aria-label="${c.open||c.done?'已翻開':'蓋著的牌'}">${c.open||c.done?memFace(c):''}</button>`).join('')}</div>
+   <div class="center"><button class="btn" id="mNew">重新發牌</button><button class="btn" id="mBack">換關卡</button></div>
+   <div id="mMsg"></div>`;
+  memHud();
+  $('#mNew').onclick=memDeal;$('#mBack').onclick=memIntro;
+  document.querySelectorAll('#memArea .mc').forEach(b=>b.onclick=()=>memFlip(+b.dataset.i));
+}
+function memFlip(i){
+  const c=mm.cards[i];if(mm.over||mm.lock||c.open||c.done)return;
+  memStartClock();SFX.flip();
+  c.open=true;mm.open.push(c);
+  if(mm.open.length===2){mm.moves++;const [a,b]=mm.open,ia=mm.cards.indexOf(a),ib=mm.cards.indexOf(b);
+    if(a.id===b.id&&a.t!==b.t){
+      a.done=b.done=true;a.open=b.open=false;mm.done++;mm.open=[];mm.combo++;mm.maxCombo=Math.max(mm.maxCombo,mm.combo);
+      const add=100+(mm.combo-1)*50;mm.score+=add;
+      mm.msg=mm.combo>1?`${mm.combo} 連擊！＋${add}`:`配對成功 ＋${add}`;
+      mm.combo>1?SFX.combo():SFX.match();
+      memRender({idx:[ia,ib],cls:'pop'});
+      if(mm.done===mm.n)memEnd(true);
+    }else{
+      mm.combo=0;mm.msg='';mm.lock=true;memRender({idx:[ia,ib],cls:'shake'});
+      setTimeout(()=>{if(mm.over)return;a.open=b.open=false;mm.open=[];mm.lock=false;memRender()},900);
+    }
+  }else memRender();
+}
+function memEnd(win){
+  mm.over=true;clearInterval(mm.timer);mm.timer=null;
+  if(mm.start)mm.el=Math.min(mm.limit||1e9,(Date.now()-mm.start)/1000);
+  let bonus=0;if(win&&mm.limit)bonus=Math.ceil(mm.limit-mm.el)*10;mm.score+=bonus;
+  memHud();
+  if(!win){SFX.lose();
+    const left=[...new Set(mm.cards.filter(c=>!c.done).map(c=>c.x))];
+    mm.cards.forEach(c=>{if(!c.done)c.open=true});memRender();
+    $('#mMsg').innerHTML=`<div class="done-box"><div class="score">時間到！</div><p class="qask">配了 ${mm.done} / ${mm.n} 對，得 ${mm.score} 分。還沒配到的：</p>
+      <div class="wlist">${left.map(x=>`<span class="wz">${esc(x.k)}</span>`).join('')}</div>
+      <button class="btn primary" id="mAgain">再挑戰一次</button></div>`;
+    $('#mAgain').onclick=memDeal;return;
+  }
+  const stars=mm.moves<=mm.n+2?3:mm.moves<=Math.ceil(mm.n*1.7)?2:1;
+  const key=memKey(),best=load(key,null);let rec=false;
+  if(mm.limit){if(!best||mm.score>best.sc){save(key,{sc:mm.score});rec=true}}
+  else{if(!best||mm.el<best.t){save(key,{t:mm.el,mv:mm.moves});rec=true}}
+  setTimeout(()=>stars===3?celebrate('三顆星過關！'):SFX.win(),250);
+  $('#mMsg').innerHTML=`<div class="done-box"><div class="stars" aria-label="${stars} 顆星">${'★'.repeat(stars)}${'☆'.repeat(3-stars)}</div>
+    <div class="score">${mm.score} 分</div>
+    <p class="qask">用了 ${mmt(mm.el)}、翻 ${mm.moves} 次、最高 ${mm.maxCombo} 連擊${bonus?`，剩餘時間加分 ＋${bonus}`:''}。</p>
+    ${rec?'<p class="qask" style="color:var(--rose-deep)"><b>🏆 新紀錄！</b></p>':''}
+    <div class="center"><button class="btn primary" id="mAgain">再玩一局</button><button class="btn" id="mBack2">換關卡</button></div></div>`;
+  $('#mAgain').onclick=memDeal;$('#mBack2').onclick=memIntro;
+}
+
+/* ===== 實驗：步驟排序＋變因判斷 ===== */
+let expMode='seq',ex=null;
+function expIntro(){
+  const sets=EXPSEQ.filter(inScope),vars=EXPVAR.filter(inScope);
+  const chip=(v,l)=>`<button class="chip" data-xm="${v}" aria-pressed="${expMode===v}">${l}</button>`;
+  $('#expArea').innerHTML=`<div class="qcard">
+   <p class="qask">${expMode==='seq'?'課本活動的步驟被打亂了，請<b>照正確順序</b>一個一個點出來。':'判斷實驗裡<b>要改變的（操作變因）、要固定的（控制變因）、要觀察的（應變變因）</b>各是哪一項。'}</p>
+   <div class="modes">${chip('seq','步驟排序')}${chip('var','變因判斷')}</div>
+   ${expMode==='var'?timeChips():''}
+   <p class="hint">${expMode==='seq'?`範圍內有 ${sets.length} 組實驗步驟`:`範圍內有 ${vars.length} 題變因判斷`}</p>
+   ${(expMode==='seq'?sets.length:vars.length)?`<button class="btn primary" id="xGo">開始</button>`:emptyMsg}</div>`;
+  document.querySelectorAll('#expArea [data-xm]').forEach(b=>b.onclick=()=>{expMode=b.dataset.xm;expIntro()});
+  const g=$('#xGo');if(g)g.onclick=()=>{
+    if(expMode==='var')qzStart({area:'#expArea',key:'expvar',mod:'變因判斷',msg:'變因判斷全對！',items:shuffle(vars).map(x=>Object.assign({},x,{tag:'變因判斷・'+x.g})),again:()=>{expIntro();$('#xGo').click()},back:expIntro});
+    else expSeqStart(sets);
+  };
+}
+function expSeqStart(sets){rtStart('expseq');ex={sets:shuffle(sets),i:0,perfect:0};expSeqQ()}
+function expSeqQ(){
+  const s=ex.sets[ex.i];
+  ex.cur={s,order:shuffle(s.steps),mis:0,placed:[]};
+  expSeqRender();rtQ(null);
+}
+function expSeqRender(fx){
+  const c=ex.cur,s=c.s,n=s.steps.length;
+  $('#expArea').innerHTML=`<div class="qcard"><div class="rhud"></div>
+   <span class="qtag">${esc(s.g)}・${esc(s.s)}</span>
+   <p class="qbig">${esc(s.t)}：請依正確順序點選（第 ${c.placed.length+1} / ${n} 步）</p>
+   <div class="steps">${c.order.map((t,i)=>{const pi=c.placed.indexOf(t);
+     return `<button class="step${pi>=0?' ok':''}${fx===i?' bad':''}" data-i="${i}"${pi>=0?' disabled':''}><span class="no">${pi>=0?pi+1:'?'}</span><span>${esc(t)}</span></button>`}).join('')}</div>
+   <div class="prog">第 ${ex.i+1} / ${ex.sets.length} 組・點錯 ${c.mis} 次</div>
+   <div class="center"><button class="btn" id="xBack">換關卡</button></div></div>`;
+  document.querySelectorAll('#expArea .step').forEach(b=>b.onclick=()=>expSeqTap(+b.dataset.i));
+  $('#xBack').onclick=expIntro;
+}
+function expSeqTap(i){
+  const c=ex.cur,t=c.order[i],want=c.s.steps[c.placed.length];
+  if(t===want){c.placed.push(t);SFX.ok();
+    if(c.placed.length===c.s.steps.length){
+      const perfect=c.mis===0;rtAns(perfect);if(perfect)ex.perfect++;
+      else addWrong('實驗步驟',`${c.s.t}（${c.s.g}）的正確步驟順序`,c.s.steps.map((x,k)=>`${k+1}.${x}`).join('　'),c.s.s,c.s.g);
+      expSeqRender();
+      const card=$('#expArea .qcard'),fb=document.createElement('div');
+      fb.className='fb '+(perfect?'ok':'bad');
+      fb.innerHTML=`<b>${perfect?'順序全對，一次就排好！':`排好了，但中間點錯 ${c.mis} 次。`}</b><br>${c.s.steps.map((x,k)=>`${k+1}. ${esc(x)}`).join('<br>')}<span class="src">出處：${esc(c.s.s)}</span>`;
+      card.appendChild(fb);
+      const nb=document.createElement('button');nb.className='btn primary';nb.textContent=ex.i+1<ex.sets.length?'下一組實驗':'看成績';
+      card.appendChild(nb);nb.onclick=()=>{ex.i++;ex.i<ex.sets.length?expSeqQ():expSeqEnd()};nb.focus();
+      return;
+    }
+    expSeqRender();
+  }else{c.mis++;SFX.bad();expSeqRender(i)}
+}
+function expSeqEnd(){
+  const n=ex.sets.length,full=ex.perfect===n;
+  $('#expArea').innerHTML=`<div class="done-box"><div class="score">${ex.perfect} / ${n}</div>
+   <p class="qask">一次就排對 ${ex.perfect} 組。</p>${rtEnd()}
+   <div class="center"><button class="btn primary" id="xAgain">再排一次</button><button class="btn" id="xBack2">換關卡</button></div></div>`;
+  if(full){setTimeout(()=>celebrate('實驗步驟全對！'),250)}else SFX.lose();
+  $('#xAgain').onclick=()=>expSeqStart(EXPSEQ.filter(inScope));
+  $('#xBack2').onclick=expIntro;
+}
+
+/* ===== 分類題（由分類表自動出題）===== */
+function sortItems(){
+  const out=[];
+  SETS.filter(inScope).forEach(s=>s.items.forEach(([name,ci])=>out.push({
+    q:`「${name}」屬於哪一類？（${s.name}）`,o:s.cats,a:ci,g:s.g,s:'課本・重點歸納',
+    e:`${s.name}：${s.cats.map((c,i)=>`${c}＝${s.items.filter(it=>it[1]===i).map(it=>it[0]).join('、')}`).join('；')}`,
+    tag:'分類・'+s.g+'・'+s.name})));
+  return st.onlyWrong?out.filter(x=>isWrong(x.q)):out;
+}
+function sortIntro(){
+  const p=sortItems(),sets=SETS.filter(inScope);
+  $('#sortArea').innerHTML=`<div class="qcard">
+   <p class="qask">把生物、環境、水生植物、呼吸方式、資源……一個一個放進正確的類別裡。</p>
+   ${timeChips()}
+   <div class="bar" style="justify-content:center">${sizeSel('stN',10)}</div>
+   <p class="hint">範圍內有 ${sets.length} 組分類表、共 ${p.length} 題${sets.length?`：${sets.map(s=>s.name).join('、')}`:''}</p>
+   ${p.length?'<button class="btn primary" id="sGo">開始分類</button>':emptyMsg}</div>`;
+  const g=$('#sGo');if(g)g.onclick=()=>{
+    const n=Math.min(+$('#stN').value,p.length);
+    qzStart({area:'#sortArea',key:'sort',mod:'分類題',msg:'分類全對！',items:shuffle(p).slice(0,n),again:()=>{sortIntro();$('#sGo').click()},back:sortIntro});
+  };
+}
+
+/* ===== 因果配對 ===== */
+function pairItems(){
+  const p=CAUSE.filter(inScope);if(p.length<4)return [];
+  const out=p.map(x=>{
+    const r2c=Math.random()<0.5;
+    const key=r2c?'c':'r',ask=r2c?'r':'c';
+    let pool=p.filter(y=>y!==x&&y.g===x.g&&y[key]!==x[key]);
+    if(pool.length<3)pool=p.filter(y=>y!==x&&y[key]!==x[key]);
+    const seen=new Set([x[key]]),ds=[];
+    for(const y of shuffle(pool)){if(seen.has(y[key]))continue;seen.add(y[key]);ds.push(y[key]);if(ds.length===3)break}
+    const o=shuffle([x[key],...ds]);
+    return {q:r2c?`「${x.r}」最可能是下列哪一個原因造成的？`:`「${x.c}」會造成下列哪一個結果？`,
+      o,a:o.indexOf(x[key]),g:x.g,s:'課本・重點歸納',
+      e:`${x.c} → ${x.r}`,tag:'因果配對・'+x.g};
+  });
+  return st.onlyWrong?out.filter(x=>isWrong(x.q)):out;
+}
+function pairIntro(){
+  const p=pairItems();
+  $('#pairArea').innerHTML=`<div class="qcard">
+   <p class="qask">自然科最常考的就是<b>「為什麼」</b>。看到原因要能說出結果，看到結果要能找出原因。</p>
+   ${timeChips()}
+   <div class="bar" style="justify-content:center">${sizeSel('prN',10)}</div>
+   <p class="hint">範圍內有 ${p.length} 組因果關係</p>
+   ${p.length?'<button class="btn primary" id="pGo">開始配對</button>':(CAUSE.filter(inScope).length?'<p class="hint">這個範圍的因果題太少（至少要 4 組），請多選幾個課次。</p>':emptyMsg)}</div>`;
+  const g=$('#pGo');if(g)g.onclick=()=>{
+    const n=Math.min(+$('#prN').value,p.length);
+    qzStart({area:'#pairArea',key:'pair',mod:'因果配對',msg:'因果配對全對！',items:shuffle(p).slice(0,n),again:()=>{pairIntro();$('#pGo').click()},back:pairIntro});
+  };
+}
+
+/* ===== 慶祝角色（全部原創，每次隨機兩位出場）===== */
+const FACE=(y,c='var(--ink)')=>`<circle cx="48" cy="${y}" r="5" fill="${c}"/><circle cx="72" cy="${y}" r="5" fill="${c}"/><circle cx="49.5" cy="${y-1.5}" r="1.6" fill="#fff"/><circle cx="73.5" cy="${y-1.5}" r="1.6" fill="#fff"/>
+ <ellipse cx="40" cy="${y+11}" rx="6" ry="4" fill="var(--c2)" opacity=".75"/><ellipse cx="80" cy="${y+11}" rx="6" ry="4" fill="var(--c2)" opacity=".75"/><path d="M51 ${y+14} Q60 ${y+23} 69 ${y+14}" stroke="${c}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+const CHARS=[
+ {name:'水滴妹',body:`<path d="M60 18 C30 46 24 70 24 88 a36 36 0 0 0 72 0 C96 70 90 46 60 18Z" fill="#7fc9d6" stroke="var(--ink)" stroke-width="3"/><path d="M40 60 Q36 74 40 86" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".8"/>`+FACE(80)},
+ {name:'小石頭',body:`<path d="M26 96 C18 72 30 44 56 36 C84 28 104 50 100 78 C98 100 80 118 58 116 C40 114 30 108 26 96Z" fill="#b9bfc2" stroke="var(--ink)" stroke-width="3"/><circle cx="38" cy="58" r="3" fill="#8e9598"/><circle cx="88" cy="96" r="4" fill="#8e9598"/>`+FACE(78)},
+ {name:'魚寶寶',body:`<path d="M92 80 L118 56 L118 104Z" fill="#f2a86a" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><path d="M52 50 L62 34 L72 52Z" fill="#f2a86a" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><ellipse cx="56" cy="80" rx="38" ry="29" fill="#ffc98a" stroke="var(--ink)" stroke-width="3"/>`+FACE(76)},
+ {name:'荷葉弟',body:`<path d="M60 80 m-42 0 a42 42 0 1 1 42 42 Z M60 80 L60 38 A42 42 0 0 1 96 60 Z" fill="#8ac98a" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><path d="M60 80 L24 70 M60 80 L30 102 M60 80 L54 120 M60 80 L88 106" stroke="#5f9c62" stroke-width="2"/>`+FACE(80)},
+ {name:'蝌蚪仔',body:`<path d="M86 86 C104 78 112 96 104 108 C116 112 112 130 96 126" fill="none" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/><circle cx="56" cy="80" r="34" fill="#7f8f9c" stroke="var(--ink)" stroke-width="3"/>`+FACE(78)},
+ {name:'小螃蟹',body:`<path d="M20 70 Q8 56 16 44 Q26 36 34 46" fill="none" stroke="var(--ink)" stroke-width="4"/><path d="M100 70 Q112 56 104 44 Q94 36 86 46" fill="none" stroke="var(--ink)" stroke-width="4"/><ellipse cx="60" cy="90" rx="40" ry="28" fill="#e98a6a" stroke="var(--ink)" stroke-width="3"/><path d="M48 62 L48 52 M72 62 L72 52" stroke="var(--ink)" stroke-width="3"/><circle cx="48" cy="48" r="7" fill="#fff" stroke="var(--ink)" stroke-width="2"/><circle cx="72" cy="48" r="7" fill="#fff" stroke="var(--ink)" stroke-width="2"/><circle cx="48" cy="49" r="3" fill="var(--ink)"/><circle cx="72" cy="49" r="3" fill="var(--ink)"/><path d="M50 96 Q60 104 70 96" stroke="var(--ink)" stroke-width="3" fill="none" stroke-linecap="round"/>`},
+ {name:'小苗芽',body:`<path d="M60 112 L60 56" stroke="#5f9c62" stroke-width="5" stroke-linecap="round"/><path d="M60 68 Q34 56 30 34 Q56 36 60 68Z" fill="#8ac98a" stroke="var(--ink)" stroke-width="3"/><path d="M60 78 Q86 66 90 44 Q64 46 60 78Z" fill="#a8d9a0" stroke="var(--ink)" stroke-width="3"/><path d="M34 112 L86 112 L80 142 L40 142Z" fill="#d9a877" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/>`+FACE(124)},
+];
+function dancerSVG(c,cls){
+  const hand=['var(--c2)','var(--c3)','var(--c4)','var(--c1)'][Math.floor(Math.random()*4)];
+  return `<svg class="dancer ${cls}" viewBox="0 0 120 150" aria-hidden="true">
+   <g class="arm al"><path d="M28 80 Q12 64 8 46" stroke="var(--ink)" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="8" cy="44" r="6" fill="${hand}"/></g>
+   <g class="arm ar"><path d="M92 80 Q108 64 112 46" stroke="var(--ink)" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="112" cy="44" r="6" fill="${hand}"/></g>
+   <g class="leg ll"><path d="M48 118 L42 144" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/></g>
+   <g class="leg lr"><path d="M72 118 L78 144" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/></g>
+   ${c.body}</svg>`;
+}
+
+/* ===== 滿分慶祝：隨機兩位原創角色跳舞＋彩紙 ===== */
+function celebrate(msg){
+  SFX.win();
+  let ov=document.getElementById('party');if(ov)ov.remove();
+  ov=document.createElement('div');ov.id='party';ov.setAttribute('role','dialog');ov.setAttribute('aria-label','滿分慶祝');
+  const conf=Array.from({length:40},(_,i)=>`<i style="left:${Math.random()*100}%;animation-delay:${(Math.random()*1.2).toFixed(2)}s;animation-duration:${(2.2+Math.random()*1.8).toFixed(2)}s;background:var(--c${i%4+1});transform:rotate(${Math.random()*360}deg)"></i>`).join('');
+  const pair=shuffle(CHARS).slice(0,2);
+  ov.innerHTML=`<div class="confetti">${conf}</div>
+   <div class="party-card">
+    <div class="dancers">
+     ${dancerSVG(pair[0],'d1')}
+     <div class="hundred">100</div>
+     ${dancerSVG(pair[1],'d2')}
+    </div>
+    <div class="party-title">${esc(msg||'100 分！')}</div>
+    <p class="party-sub">${pair[0].name}和${pair[1].name}在幫你跳舞慶祝！</p>
+    <button class="btn primary" id="partyClose">好耶，繼續加油</button>
+   </div>`;
+  document.body.appendChild(ov);
+  const close=()=>{ov.classList.add('out');setTimeout(()=>ov.remove(),300)};
+  ov.querySelector('#partyClose').onclick=close;ov.addEventListener('click',e=>{if(e.target===ov)close()});
+  ov.querySelector('#partyClose').focus();
+  setTimeout(()=>{if(document.body.contains(ov))close()},7000);
+}
+
+/* ===== 錯題本 ===== */
+function renderWrong(confirm){
+  const ks=Object.keys(wq).sort((a,b)=>wq[b].n-wq[a].n||(wq[a].g<wq[b].g?-1:1));
+  $('#wrongArea').innerHTML=ks.length?`<p class="hint">答錯的題目都會記在這裡（只存在這台裝置的瀏覽器裡）。上方點「只練錯題」，練習題、分類、配對就只出這些題。</p>
+   <div class="tbl"><table><tr><th>課次</th><th>題型</th><th>題目</th><th>正確答案</th><th>出處</th><th>錯幾次</th></tr>
+   ${ks.map(k=>{const w=wq[k];return `<tr><td class="n">${esc(w.g||'')}</td><td class="n">${esc(w.m||'')}</td><td class="q">${esc(w.q)}</td><td class="q">${esc(w.a||'')}</td><td class="n" style="font-size:13px;color:var(--muted)">${esc(w.s||'')}</td><td class="n">${w.n}</td></tr>`}).join('')}</table></div>
+   <div class="bar"><button class="btn rose primary" id="goWrong">只練錯題</button><button class="btn" id="clrW">清空錯題本</button></div>
+   ${confirm?`<div class="confirm">確定清空全部錯題紀錄？<button class="btn rose primary" id="clrYes">清空</button><button class="btn" id="clrNo">取消</button></div>`:''}`
+   :`<div class="done-box"><p class="qask">錯題本是空的。</p><p class="hint">在「練習題」「實驗」「分類」「配對」答錯的題目都會自動記到這裡。</p></div>`;
+  const g=$('#goWrong');if(g)g.onclick=()=>{st.onlyWrong=true;st.qtype='all';renderScope();document.querySelector('[data-tab="quiz"]').click()};
+  const c=$('#clrW');if(c)c.onclick=()=>renderWrong(true);
+  const y=$('#clrYes');if(y)y.onclick=()=>{wq={};save('sci4-wrong',wq);renderScope();renderWrong()};
+  const n=$('#clrNo');if(n)n.onclick=()=>renderWrong();
+}
+
+renderScope();quizIntro();
+</script>
+
+</body>
+</html>
