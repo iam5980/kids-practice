@@ -45,6 +45,7 @@ var SUBJ={reading:"📖 Reading",science:"🔬 Science",grammar:"✏️ Grammar"
 var TERM=function(t){var m=t.match(/^(\d{3})(\d)-(mid|final)$/);return m?m[1]+"-"+m[2]+(m[3]=="mid"?" 期中":" 期末"):t};
 var CATALOG={
   au:[
+    {s:"math",t:"1151-mid"},
     {s:"zh-science",t:"1151-mid"},
     {s:"reading",t:"1151-mid",extra:[["oral.html","🗣 口說練習"]]},
     {s:"science",t:"1151-mid",extra:[["listening.html","🎧 聽力播放"]]},
