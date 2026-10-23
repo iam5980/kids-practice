@@ -23,12 +23,20 @@ a.card:active{transform:scale(.98)}
 .t{font-weight:700}.m{color:var(--muted);font-size:14px}
 .new{display:inline-block;font-size:12px;background:var(--c);color:var(--card);border-radius:6px;padding:0 6px;margin-left:6px;vertical-align:2px}
 .shared a.card{--c:var(--sh)}
+.dept{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 14px 4px;margin-bottom:18px}
+.dept>h2{font-size:21px;color:var(--ink);margin:0 0 10px}
+.term{font-size:16px;font-weight:700;color:var(--c);margin:4px 0 8px}
+details.old{margin:10px 0 12px}
+details.old>summary{cursor:pointer;color:var(--muted);font-size:15px;padding:6px 0;list-style:none}
+details.old>summary::-webkit-details-marker{display:none}
+details.old>summary::before{content:"▸ ";}details.old[open]>summary::before{content:"▾ ";}
+details.old .term{color:var(--muted)}
 </style>
 </head>
 <body>
 <main>
 <h1>練習小站 📚</h1>
-<p class="sub">選一個名字，再點要練習的科目。</p>
+<p class="sub">選一個名字，再點要練習的科目。每個練習左下角的「📚 小站」可以回到這裡。</p>
 <div class="kids" role="group">
   <button class="kid" style="--c:var(--au)" data-kid="au">Audrey</button>
   <button class="kid" style="--c:var(--hw)" data-kid="hw">Howard</button>
@@ -40,7 +48,7 @@ a.card:active{transform:scale(.98)}
 </section>
 </main>
 <script>
-/* 新增練習：在對應孩子的陣列加一行即可。最新的放最前面。 */
+/* 新增練習：在對應孩子的陣列加一行即可（順序不拘，首頁會自動依學期排序、分英文部／中文部）。 */
 var SUBJ={reading:"📖 Reading",science:"🔬 Science",grammar:"✏️ Grammar",social:"🌍 Social Studies",chinese:"🀄 國語","zh-science":"🌱 自然","zh-social":"🗺️ 社會",math:"🔢 數學"};
 var TERM=function(t){var m=t.match(/^(\d{3})(\d)-(mid|final)$/);return m?m[1]+"-"+m[2]+(m[3]=="mid"?" 期中":" 期末"):t};
 var CATALOG={
@@ -59,20 +67,38 @@ var CATALOG={
     {s:"grammar",t:"1151-mid"}
   ]
 };
+/* 分部：英文部 / 中文部（新增科目時把代碼加進對應的陣列） */
+var DEPTS=[{name:"🌏 英文部",subj:["reading","grammar","science","social"]},
+           {name:"🀄 中文部",subj:["chinese","zh-science","zh-social","math"]}];
+function termKey(t){var m=t.match(/^(\d{3})(\d)-(mid|final)$/);return m?(+m[1])*100+(+m[2])*10+(m[3]=="final"?1:0):0}
+function cards(kid,list){
+  var h='<div class="grid">';
+  list.forEach(function(i){
+    var base=kid+"/"+i.s+"/"+i.t+"/";
+    h+='<a class="card" href="'+base+'"><div class="t">'+SUBJ[i.s]+'</div><div class="m">練習 App</div></a>';
+    (i.extra||[]).forEach(function(e){h+='<a class="card" href="'+base+e[0]+'"><div class="t">'+SUBJ[i.s]+'</div><div class="m">'+e[1]+'</div></a>'});
+  });
+  return h+'</div>';
+}
 function show(kid){
   document.querySelectorAll(".kid").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.kid==kid)});
-  var c=kid=="au"?"var(--au)":"var(--hw)",items=CATALOG[kid],terms=[],html="";
-  items.forEach(function(i){if(terms.indexOf(i.t)<0)terms.push(i.t)});
-  terms.forEach(function(t,ti){
-    html+='<section style="--c:'+c+'"><h2>'+TERM(t)+(ti==0?'<span class="new">最新</span>':'')+'</h2><div class="grid">';
-    items.filter(function(i){return i.t==t}).forEach(function(i){
-      var base=kid+"/"+i.s+"/"+i.t+"/";
-      html+='<a class="card" href="'+base+'"><div class="t">'+SUBJ[i.s]+'</div><div class="m">練習 App</div></a>';
-      (i.extra||[]).forEach(function(e){html+='<a class="card" href="'+base+e[0]+'"><div class="t">'+SUBJ[i.s]+'</div><div class="m">'+e[1]+'</div></a>'});
-    });
-    html+='</div></section>';
+  var c=kid=="au"?"var(--au)":"var(--hw)",html="";
+  DEPTS.forEach(function(d){
+    var items=CATALOG[kid].filter(function(i){return d.subj.indexOf(i.s)>=0});
+    if(!items.length)return;
+    var terms=[];items.forEach(function(i){if(terms.indexOf(i.t)<0)terms.push(i.t)});
+    terms.sort(function(x,y){return termKey(y)-termKey(x)});
+    var order=function(t){return items.filter(function(i){return i.t==t}).sort(function(x,y){return d.subj.indexOf(x.s)-d.subj.indexOf(y.s)})};
+    html+='<section class="dept" style="--c:'+c+'"><h2>'+d.name+'</h2>';
+    html+='<div class="term">'+TERM(terms[0])+'<span class="new">最新</span></div>'+cards(kid,order(terms[0]));
+    if(terms.length>1){
+      html+='<details class="old"><summary>📁 以前的練習（'+(terms.length-1)+'）</summary>';
+      terms.slice(1).forEach(function(t){html+='<div class="term">'+TERM(t)+'</div>'+cards(kid,order(t))});
+      html+='</details>';
+    }
+    html+='</section>';
   });
-  document.getElementById("list").innerHTML=html;
+  document.getElementById("list").innerHTML=html||'<p class="sub">目前還沒有練習。</p>';
   try{localStorage.setItem("kid",kid)}catch(e){}
 }
 document.querySelectorAll(".kid").forEach(function(b){b.addEventListener("click",function(){show(b.dataset.kid)})});
