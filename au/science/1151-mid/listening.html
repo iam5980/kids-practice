@@ -1,0 +1,54 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Science Listening Player</title><style>
+body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:#f1f7fd;color:#0f172a;font-size:1.1rem}
+header{background:#0f2a4a;color:#fff;padding:16px}header h1{margin:0;font-size:1.3rem}
+main{max-width:820px;margin:0 auto;padding:16px}
+.box{background:#fff8db;border:2px solid #facc15;border-radius:14px;padding:12px 16px;margin-bottom:16px;font-size:1rem}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+button{min-height:52px;border:0;border-radius:14px;padding:0 18px;font-size:1.05rem;font-weight:700;cursor:pointer;background:#e2e8f0}
+button.pri{background:#0f2a4a;color:#fff}button.on{background:#38bdf8;color:#0f2a4a}
+.card{background:#fff;border-radius:16px;padding:16px;margin:10px 0;box-shadow:0 2px 8px rgba(15,42,74,.08);cursor:pointer;border:3px solid transparent;display:flex;gap:12px;align-items:flex-start}
+.card.play{border-color:#38bdf8}.card .n{font-size:1.5rem;font-weight:800;color:#0f2a4a;min-width:40px}.card .ck{margin-left:auto;font-size:1.4rem}
+.bar{height:10px;background:#e2e8f0;border-radius:6px;overflow:hidden}.bar div{height:100%;background:#38bdf8;width:0}
+.wave{display:none;gap:4px;height:28px;align-items:center}.wave.on{display:flex}
+.wave i{width:6px;background:#38bdf8;border-radius:3px;animation:w 1s infinite}.wave i:nth-child(2){animation-delay:.1s}.wave i:nth-child(3){animation-delay:.2s}.wave i:nth-child(4){animation-delay:.3s}
+@keyframes w{0%,100%{height:6px}50%{height:26px}}
+small{color:#64748b}
+</style></head><body>
+<header><h1>🎧 Science Midterm Practice — Listening Player</h1><div style="color:#bae6fd">Part A · Class Beethoven · A Closer Look 3A</div></header>
+<main>
+<div class="box"><b>How to make the QR code work</b><ol style="margin:6px 0 0 18px;padding:0">
+<li>Upload this HTML file to Google Drive → right-click → Share → “Anyone with the link” → Copy link.</li>
+<li>Go to qr-code-generator.com → paste the link → download the QR image.</li>
+<li>In the exam docx: delete the placeholder QR → Insert → Picture → upload the downloaded QR image.</li>
+<li>On exam day: open this page on your phone/tablet → tap sentences to play.</li></ol><div style="margin-top:6px">✅ Already done for this exam: the QR code in the exam docx points to this page on GitHub (iam5980.github.io/Au-Science-Final/midterm-1151/listening.html).</div></div>
+<div class="ctl"><button class="pri" onclick="playAll()">▶️ Play All in Order</button><button onclick="stopAll()">⏹ Stop</button><button onclick="resetAll()">🔄 Reset</button></div>
+<div class="ctl"><b style="align-self:center">Speed:</b><button data-r="0.7" onclick="setRate(this)">Slow</button><button data-r="0.88" class="on" onclick="setRate(this)">Normal</button><button data-r="1.0" onclick="setRate(this)">Fast</button>
+<b style="align-self:center;margin-left:10px">Repeat:</b><button data-n="1" onclick="setRep(this)">1×</button><button data-n="2" class="on" onclick="setRep(this)">2×</button><button data-n="3" onclick="setRep(this)">3×</button></div>
+<div class="ctl" style="align-items:center"><div class="wave" id="wv"><i></i><i></i><i></i><i></i></div><span id="tm"></span></div>
+<div class="bar"><div id="pb"></div></div>
+<div id="list"></div>
+</main>
+<script>
+const ITEMS=[{"say": "Living things grow, respond, and reproduce. A rock does not grow. Is a rock living or nonliving?", "q": "Is a rock living or nonliving?", "c": ["living", "nonliving", "both"], "ans": "B"}, {"say": "A leaf is the structure where a plant makes food. Where does a plant make food?", "q": "Where does a plant make food?", "c": ["in the leaves", "in the soil", "in the roots"], "ans": "A"}, {"say": "Plants give off oxygen. People and animals need oxygen to live. What gas do plants give off?", "q": "What gas do plants give off?", "c": ["water", "carbon dioxide", "oxygen"], "ans": "C"}, {"say": "Chlorophyll is a substance inside a plant's cells. It gives leaves their green color. What gives leaves their green color?", "q": "What gives leaves their green color?", "c": ["water", "chlorophyll", "sugar"], "ans": "B"}, {"say": "Carrots and radishes have one thick root called a taproot. What kind of root does a carrot have?", "q": "What kind of root does a carrot have?", "c": ["a taproot", "a web of thin roots", "no roots"], "ans": "A"}];
+let rate=0.88,rep=2,voice=null,stop=false,played={},t0=0,ti=null;
+function pickVoice(){const vs=speechSynthesis.getVoices();const pref=["Samantha","Karen","Google US English"];
+ voice=vs.find(v=>pref.some(p=>v.name.indexOf(p)>=0)&&v.lang.indexOf("en")===0)||vs.find(v=>v.lang==="en-US")||vs.find(v=>v.lang.indexOf("en")===0)||null;}
+pickVoice();speechSynthesis.onvoiceschanged=pickVoice;
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+function render(){document.getElementById("list").innerHTML=ITEMS.map((it,i)=>'<div class="card" id="c'+i+'" onclick="playOne('+i+')"><div class="n">'+(i+1)+'</div><div>'+esc(it.say)+'<br><small>Answer: '+it.ans+') '+esc(it.c["ABC".indexOf(it.ans)])+'</small></div><div class="ck">'+(played[i]?"✅":"")+'</div></div>').join("");
+ document.getElementById("pb").style.width=(100*Object.keys(played).length/ITEMS.length)+"%";}
+function say(text){return new Promise(res=>{const u=new SpeechSynthesisUtterance(text);u.lang="en-US";if(voice)u.voice=voice;u.rate=rate;u.onend=res;u.onerror=res;speechSynthesis.speak(u);});}
+function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+function busy(on){document.getElementById("wv").classList.toggle("on",on);clearInterval(ti);if(on){t0=Date.now();ti=setInterval(()=>{document.getElementById("tm").textContent=Math.round((Date.now()-t0)/1000)+"s";},500);}else document.getElementById("tm").textContent="";}
+async function playIdx(i){document.querySelectorAll(".card").forEach(c=>c.classList.remove("play"));const c=document.getElementById("c"+i);if(c)c.classList.add("play");
+ for(let k=0;k<rep&&!stop;k++){await say("Number "+(i+1)+". "+ITEMS[i].say);if(k<rep-1)await wait(1500);}
+ if(!stop){played[i]=1;render();document.getElementById("c"+i).classList.add("play");}}
+async function playOne(i){speechSynthesis.cancel();stop=false;busy(true);await playIdx(i);busy(false);}
+async function playAll(){speechSynthesis.cancel();stop=false;busy(true);for(let i=0;i<ITEMS.length&&!stop;i++){await playIdx(i);await wait(4000);}busy(false);}
+function stopAll(){stop=true;speechSynthesis.cancel();busy(false);}
+function resetAll(){stopAll();played={};render();}
+function setRate(b){rate=parseFloat(b.dataset.r);document.querySelectorAll("[data-r]").forEach(x=>x.classList.toggle("on",x===b));}
+function setRep(b){rep=parseInt(b.dataset.n);document.querySelectorAll("[data-n]").forEach(x=>x.classList.toggle("on",x===b));}
+render();
+</script></body></html>

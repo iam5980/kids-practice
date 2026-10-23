@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>練習小站</title>
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--ink:#1f2328;--muted:#6a6f76;--line:#e4e0d6;--au:#c2410c;--hw:#1d4ed8;--sh:#15803d}
+@media (prefers-color-scheme:dark){:root{--bg:#16181b;--card:#1f2226;--ink:#eceae5;--muted:#9aa0a6;--line:#30343a;--au:#fb923c;--hw:#60a5fa;--sh:#4ade80}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 -apple-system,"PingFang TC","Noto Sans TC",sans-serif}
+main{max-width:880px;margin:0 auto;padding:28px 16px 48px}
+h1{font-size:28px;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 24px}
+.kids{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.kid{border:2px solid var(--line);background:var(--card);border-radius:16px;padding:16px;font-size:22px;font-weight:700;cursor:pointer;color:var(--ink)}
+.kid[aria-pressed=true]{border-color:var(--c);color:var(--c)}
+section{margin-bottom:22px}
+h2{font-size:19px;margin:0 0 10px;color:var(--c)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+a.card{display:block;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-left:5px solid var(--c);border-radius:12px;padding:12px 14px}
+a.card:active{transform:scale(.98)}
+.t{font-weight:700}.m{color:var(--muted);font-size:14px}
+.new{display:inline-block;font-size:12px;background:var(--c);color:var(--card);border-radius:6px;padding:0 6px;margin-left:6px;vertical-align:2px}
+.shared a.card{--c:var(--sh)}
+</style>
+</head>
+<body>
+<main>
+<h1>練習小站 📚</h1>
+<p class="sub">選一個名字，再點要練習的科目。</p>
+<div class="kids" role="group">
+  <button class="kid" style="--c:var(--au)" data-kid="au">Audrey</button>
+  <button class="kid" style="--c:var(--hw)" data-kid="hw">Howard</button>
+</div>
+<div id="list"></div>
+<section class="shared">
+  <h2 style="--c:var(--sh)">一起練</h2>
+  <div class="grid"><a class="card" href="shadowing/"><div class="t">🎤 跟讀小教練</div><div class="m">單字發音・句子跟讀</div></a></div>
+</section>
+</main>
+<script>
+/* 新增練習：在對應孩子的陣列加一行即可。最新的放最前面。 */
+var SUBJ={reading:"📖 Reading",science:"🔬 Science",grammar:"✏️ Grammar",chinese:"🀄 國語"};
+var TERM=function(t){var m=t.match(/^(\d{3})(\d)-(mid|final)$/);return m?m[1]+"-"+m[2]+(m[3]=="mid"?" 期中":" 期末"):t};
+var CATALOG={
+  au:[
+    {s:"reading",t:"1151-mid",extra:[["oral.html","🗣 口說練習"]]},
+    {s:"science",t:"1151-mid",extra:[["listening.html","🎧 聽力播放"]]},
+    {s:"grammar",t:"1151-mid"},
+    {s:"chinese",t:"1151-mid"},
+    {s:"reading",t:"1142-final"},
+    {s:"science",t:"1142-final"},
+    {s:"grammar",t:"1142-final"}
+  ],
+  hw:[
+    {s:"reading",t:"1151-mid",extra:[["oral.html","🗣 口說練習"],["mock_exam.html","📝 模擬考卷"]]},
+    {s:"science",t:"1151-mid"},
+    {s:"grammar",t:"1151-mid"},
+    {s:"reading",t:"1142-final"}
+  ]
+};
+function show(kid){
+  document.querySelectorAll(".kid").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.kid==kid)});
+  var c=kid=="au"?"var(--au)":"var(--hw)",items=CATALOG[kid],terms=[],html="";
+  items.forEach(function(i){if(terms.indexOf(i.t)<0)terms.push(i.t)});
+  terms.forEach(function(t,ti){
+    html+='<section style="--c:'+c+'"><h2>'+TERM(t)+(ti==0?'<span class="new">最新</span>':'')+'</h2><div class="grid">';
+    items.filter(function(i){return i.t==t}).forEach(function(i){
+      var base=kid+"/"+i.s+"/"+i.t+"/";
+      html+='<a class="card" href="'+base+'"><div class="t">'+SUBJ[i.s]+'</div><div class="m">練習 App</div></a>';
+      (i.extra||[]).forEach(function(e){html+='<a class="card" href="'+base+e[0]+'"><div class="t">'+SUBJ[i.s]+'</div><div class="m">'+e[1]+'</div></a>'});
+    });
+    html+='</div></section>';
+  });
+  document.getElementById("list").innerHTML=html;
+  try{localStorage.setItem("kid",kid)}catch(e){}
+}
+document.querySelectorAll(".kid").forEach(function(b){b.addEventListener("click",function(){show(b.dataset.kid)})});
+var k="au";try{k=localStorage.getItem("kid")||"au"}catch(e){}
+show(k);
+</script>
+</body>
+</html>

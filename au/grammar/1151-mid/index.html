@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Audrey Grammar">
+<title>Audrey Grammar Review</title>
+<style>
+:root{--bg:#fff8ef;--card:#ffffff;--ink:#2b2d42;--muted:#6c6f86;--pri:#ff7a45;--pri2:#ffb703;--ok:#2a9d8f;--okbg:#e3f6f3;--bad:#e63946;--badbg:#fde8ea;--hl:#fff3a3;--line:#ecdcc8;--blue:#3a86ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:18px}
+header{background:linear-gradient(135deg,#ff7a45,#ffb703);color:#fff;padding:14px 16px 10px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+header h1{margin:0;font-size:22px}
+header .sub{font-size:13px;opacity:.95}
+nav{display:flex;gap:6px;overflow-x:auto;padding:10px 12px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:4;-webkit-overflow-scrolling:touch}
+nav button{min-height:46px;flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:20px;padding:8px 14px;font-size:15px;color:var(--ink);cursor:pointer}
+nav button.on{background:var(--pri);border-color:var(--pri);color:#fff;font-weight:600}
+main{max-width:860px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.tcard{background:var(--card);border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);cursor:pointer;border:2px solid transparent}
+.tcard:hover{border-color:var(--pri2)}
+.tcard .ic{font-size:34px}
+.tcard h3{margin:6px 0 4px;font-size:18px}
+.tcard .meta{font-size:14px;color:var(--muted)}
+.bar{height:8px;background:#f1e6d8;border-radius:6px;overflow:hidden;margin-top:8px}
+.bar>i{display:block;height:100%;background:var(--ok)}
+.qcard{background:var(--card);border-radius:18px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.qtop{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--muted);margin-bottom:8px}
+.ins{font-size:15px;font-weight:700;color:#7a4a1d;background:#fff0e3;border-radius:8px;padding:6px 10px;display:inline-block}
+.qtext{font-size:22px;line-height:1.45;margin:10px 0 14px}
+.ctx{background:#fbf6ee;border:1px dashed var(--line);border-radius:12px;padding:12px;margin:8px 0 12px;font-size:16px;line-height:1.5;overflow-x:auto}
+.ctx table{border-collapse:collapse;margin:0 auto;font-size:15px}
+.ctx td,.ctx th{border:1px solid #d9c7ae;padding:5px 9px;text-align:center}
+.ctx th{background:#f3e5d0}
+.line{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+.line .front{background:var(--blue);color:#fff;border-radius:8px;padding:3px 8px;font-size:13px;font-weight:700}
+.line .person{background:#fff;border:1px solid #d9c7ae;border-radius:8px;padding:3px 8px}
+.line .arrow{color:var(--muted)}
+.scene{text-align:center}
+.scene .lbl{font-size:12px;color:var(--muted);letter-spacing:1px;margin:4px 0}
+.scene .row{display:flex;justify-content:center;gap:18px;align-items:flex-end}
+.scene .obj{text-align:center;font-size:14px}
+.scene .em{font-size:44px;line-height:1.1}
+.scene .shelf{border-top:4px solid #b08968;width:150px;margin:2px auto}
+.choices{display:flex;flex-direction:column;gap:10px}
+.choice{text-align:left;border:2px solid var(--line);background:#fff;border-radius:12px;padding:12px 14px;font-size:19px;cursor:pointer;color:var(--ink)}
+.choice.sel{border-color:var(--blue);background:#eef4ff}
+.choice.right{border-color:var(--ok);background:var(--okbg)}
+.choice.wrong{border-color:var(--bad);background:var(--badbg)}
+.choice b{display:inline-block;width:28px;color:var(--muted)}
+input.ans{width:100%;font-size:21px;padding:12px 14px;border:2px solid var(--line);border-radius:12px;outline:none;font-family:inherit}
+input.ans:focus{border-color:var(--blue)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.chip{border:2px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;font-size:18px;cursor:pointer;color:var(--ink)}
+.chip.used{opacity:.25;pointer-events:none}
+.build{min-height:56px;border:2px dashed var(--blue);border-radius:12px;padding:8px;display:flex;flex-wrap:wrap;gap:8px;background:#f6f9ff}
+.btns{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.btn{border:0;border-radius:12px;padding:12px 20px;font-size:18px;font-weight:600;cursor:pointer;background:var(--pri);color:#fff}
+.btn.sec{background:#fff;color:var(--ink);border:2px solid var(--line)}
+.btn.blue{background:var(--blue)}
+.btn.sm{padding:8px 12px;font-size:15px}
+.fb{margin-top:14px;border-radius:12px;padding:12px 14px;font-size:18px;font-weight:600}
+.fb.ok{background:var(--okbg);color:var(--ok)}
+.fb.bad{background:var(--badbg);color:var(--bad)}
+.correct{background:var(--hl);border-radius:12px;padding:14px;margin-top:10px;font-size:22px;font-weight:800;color:#5a4500}
+.correct small{display:block;font-size:13px;font-weight:600;color:#8a6d00;margin-bottom:4px}
+.prog{height:10px;background:#f1e6d8;border-radius:6px;overflow:hidden;margin-bottom:12px}
+.prog>i{display:block;height:100%;background:var(--pri)}
+.score{text-align:center}
+.score .big{font-size:56px;font-weight:800;color:var(--pri)}
+.score .stars{font-size:38px}
+.rev{border-radius:12px;padding:12px;margin:8px 0;background:#fff;border-left:6px solid var(--ok);font-size:16px}
+.rev.x{border-left-color:var(--bad)}
+.rev .q{font-weight:600;margin-bottom:4px}
+.intro{background:#fff;border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.intro h2{margin:0 0 6px}
+.oral{background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.oral .oq{font-size:21px;font-weight:700}
+.oral .os{margin:8px 0;padding:10px;background:#f6f9ff;border-radius:10px}
+.oral .ok2{font-size:14px;color:var(--muted)}
+.oral .res{margin-top:8px;font-size:16px}
+.oral mark{background:#bff0d8;border-radius:4px;padding:0 2px}
+.note{font-size:13px;color:var(--muted)}
+
+.drillbar{position:sticky;top:68px;z-index:3;display:flex;align-items:center;gap:8px;background:var(--bg);padding:8px 0;margin:-6px 0 8px}
+.drillbar .dtitle{flex:1;font-weight:700;font-size:17px;text-align:center;line-height:1.2}
+.btn{min-height:50px}
+.btn.sm{min-height:50px;padding:8px 14px;font-size:16px}
+.btn.fin{background:#2a9d8f}
+.btn.rec{background:#e63946}
+.btn.okb{background:#2a9d8f}
+.btn.missb{background:#f4a261}
+.btn.on{outline:4px solid #2b2d42;outline-offset:2px}
+.btn:disabled{opacity:.45;cursor:default}
+.nav2{justify-content:space-between}
+.choice{min-height:56px}
+.chip{min-height:50px}
+.dots{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.dot{width:14px;height:14px;border-radius:50%;background:#e5d6c2;display:inline-block}
+.dot.done{background:var(--ok)}
+.dot.miss{background:var(--bad)}
+.dot.cur{box-shadow:0 0 0 3px var(--blue)}
+.fb.warnfb{background:#fff4e0;color:#a35b00}
+.selfq{font-weight:700;margin-top:14px}
+.oral .os i{font-size:20px}
+@media (max-width:520px){.drillbar .dtitle{font-size:15px}.btn.sm{padding:8px 10px;font-size:14px}}
+</style>
+</head>
+<body>
+<header><h1>🦉 Audrey's Grammar Review</h1><div class="sub">Midterm Grammar Exam · Thu 10/22 · Pathway 3 Unit 1 (p.4-13) &amp; Unit 4 (p.34-36)</div></header>
+<nav id="nav"></nav>
+<main id="app"></main>
+<script>
+"use strict";
+/* ====================== helpers ====================== */
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=arr[i];arr[i]=arr[j];arr[j]=t;}return arr;}
+const CONTR=[["what's","what is"],["it's","it is"],["isn't","is not"],["he's","he is"],["she's","she is"],["that's","that is"],["i'm","i am"],["don't","do not"],["doesn't","does not"],["aren't","are not"],["when's","when is"]];
+function norm(s){
+  s=String(s||"").toLowerCase().replace(/[‘’`]/g,"'").replace(/[“”"]/g,"");
+  s=s.replace(/-/g," ");
+  CONTR.forEach(function(p){s=s.split(p[0]).join(p[1]);});
+  s=s.replace(/[.,!?;:()]/g," ").replace(/\s+/g," ").trim();
+  return s;
+}
+function lineCtx(names,numbered){
+  return "<div class='line'><span class='front'>🚩 FRONT</span>"+names.map(function(n,i){return "<span class='person'>"+(numbered?(i+1)+". ":"")+n+"</span>";}).join("<span class='arrow'>→</span>")+"</div>";
+}
+function tableCtx(head,rows){
+  return "<table><tr>"+head.map(function(h){return "<th>"+h+"</th>";}).join("")+"</tr>"+rows.map(function(r){return "<tr>"+r.map(function(c){return "<td>"+c+"</td>";}).join("")+"</tr>";}).join("")+"</table>";
+}
+function obj(o){return "<div class='obj'><div class='em'>"+o[0]+"</div><div>"+o[1]+"</div></div>";}
+function rowScene(items){return "<div class='scene'><div class='lbl'>LEFT ⟵ &nbsp; ⟶ RIGHT</div><div class='row'>"+items.map(obj).join("")+"</div></div>";}
+function depthScene(front,back){return "<div class='scene'><div class='lbl'>BACK (far from you)</div><div class='row'>"+obj(back)+"</div><div class='lbl'>FRONT (near you)</div><div class='row'>"+obj(front)+"</div></div>";}
+function stackScene(top,bottom){return "<div class='scene'><div class='row'>"+obj(top)+"</div><div class='shelf'></div><div class='row'>"+obj(bottom)+"</div></div>";}
+
+/* ====================== tabs (named after worksheet sections) ====================== */
+const TABS=[
+  {key:"ord",icon:"🔢",name:"Ordinal Numbers",desc:"Spell numbers and ordinals, dates, months and letters"},
+  {key:"line",icon:"🚌",name:"Waiting in Line",desc:"Who is fifth in line? Clues and Climbing the ladder"},
+  {key:"floor",icon:"🏢",name:"Building & Floors",desc:"Which floor is it on? He lives on the ___ floor."},
+  {key:"freq",icon:"📅",name:"How often…?",desc:"always / usually / sometimes / never, twice a week"},
+  {key:"verb",icon:"✏️",name:"He / She / It + s / es",desc:"Circle the correct verb form, do / does"},
+  {key:"prep",icon:"📦",name:"be V + Prepositions",desc:"is / are + in front of, behind, next to, between, under, on"},
+  {key:"wea",icon:"🌦️",name:"What's the weather like?",desc:"Label, write, and match · Is it sunny?"},
+  {key:"read",icon:"📖",name:"Dialogue & Reading",desc:"Unscramble, Dialogue Completion, Reading Comprehension"}
+];
+
+/* ====================== question bank ====================== */
+const questionBank=[];const CNT={};
+function add(tab,ins,o){CNT[tab]=(CNT[tab]||0)+1;o.tab=tab;o.ins=ins;o.id=tab+"_"+String(CNT[tab]).padStart(3,"0");if(!Array.isArray(o.answer))o.answer=[o.answer];questionBank.push(o);return o;}
+function mc(tab,ins,q,choices,a,x){return add(tab,ins,Object.assign({type:"mc",question:q,choices:choices,answer:a},x||{}));}
+function fill(tab,ins,q,a,x){return add(tab,ins,Object.assign({type:"fill",question:q,answer:a,choices:null},x||{}));}
+function sent(tab,ins,q,a,x){return add(tab,ins,Object.assign({type:"sentence",question:q,answer:a,choices:null},x||{}));}
+function unscr(tab,ins,words,a,x){return add(tab,ins,Object.assign({type:"unscramble",question:"",words:words,answer:a,choices:null},x||{}));}
+
+const ORD=[[1,"first"],[2,"second"],[3,"third"],[4,"fourth"],[5,"fifth"],[6,"sixth"],[7,"seventh"],[8,"eighth"],[9,"ninth"],[10,"tenth"],[11,"eleventh"],[12,"twelfth"],[13,"thirteenth"],[14,"fourteenth"],[15,"fifteenth"],[16,"sixteenth"],[17,"seventeenth"],[18,"eighteenth"],[19,"nineteenth"],[20,"twentieth"],[21,"twenty-first"],[22,"twenty-second"],[30,"thirtieth"]];
+function suf(n){if([11,12,13].indexOf(n%100)>=0)return n+"th";return n+({1:"st",2:"nd",3:"rd"}[n%10]||"th");}
+function ow(i){return ORD[i][1];}
+
+/* ---------- 1. Ordinal Numbers ---------- */
+(function(){
+  const T="ord";
+  const WEAK=[5,8,9,11,12,13,19,20,30];
+  ORD.forEach(function(p){fill(T,"Ordinal Numbers — write the ordinal number word.","<b>"+suf(p[0])+"</b>",p[1],{weak:WEAK.indexOf(p[0])>=0});});
+  [[7,"seven"],[8,"eight"],[11,"eleven"],[12,"twelve"],[13,"thirteen"],[14,"fourteen"],[20,"twenty"],[21,"twenty-one"],[22,"twenty-two"],[30,"thirty"]].forEach(function(p){fill(T,"Number (Word) — write the number in words.","<b>"+p[0]+"</b>",p[1]);});
+  [[2,"second"],[3,"third"],[12,"twelfth"],[21,"twenty-first"],[22,"twenty-second"],[30,"thirtieth"]].forEach(function(p){fill(T,"Ordinal Number (number) — write it like 4th.","<b>"+p[1]+"</b>",suf(p[0]));});
+  [["8/2","August second"],["8/3","August third"],["9/5","September fifth"],["9/6","September sixth"],["9/7","September seventh"],["10/8","October eighth"],["10/9","October ninth"],["10/10","October tenth"],["10/21","October twenty-first"],["5/1","May first"],["11/3","November third"],["10/22","October twenty-second"]].forEach(function(p,i){
+    fill(T,"Date (ordinal number word)","<b>"+p[0]+"</b>",p[1],{weak:i<2});
+  });
+  [["8/2","August 2nd"],["9/7","September 7th"],["10/9","October 9th"],["10/21","October 21st"],["11/3","November 3rd"]].forEach(function(p){fill(T,"Date (ordinal number)","<b>"+p[0]+"</b>",p[1]);});
+  fill(T,"Fill in the blank.","Wednesday is the ____ day of the week.","third");
+  fill(T,"Fill in the blank.","Friday is the ____ day of the week.","fifth");
+  fill(T,"Fill in the blank.","A is the ____ letter in the alphabet.","first");
+  fill(T,"Fill in the blank.","B is the ____ letter in the alphabet.","second");
+  fill(T,"Fill in the blank.","____ is the 10th letter in the alphabet.","J");
+  fill(T,"Fill in the blank.","August is the ____ month of the year.","eighth");
+  fill(T,"Fill in the blank.","____ is the 3rd month of the year.","March");
+  fill(T,"Fill in the blank.","September is the ____ month of the year.","ninth");
+  fill(T,"Fill in the blank.","October is the ____ month of the year.","tenth");
+  fill(T,"Fill in the blank.","November is the ____ month of the year.","eleventh",{weak:true});
+  fill(T,"Fill in the blank.","December is the ____ month of the year.","twelfth",{weak:true});
+  fill(T,"Fill in the blank.","Two is the ____ number.","second");
+  const RC="Read and choose.";
+  mc(T,RC,"Which sentence is correct?",["My birthday is on May first.","My birthday is on May oneth."],"My birthday is on May first.");
+  mc(T,RC,"Which sentence is correct?",["Amy is fifth in line.","Amy is fiveth in line."],"Amy is fifth in line.",{weak:true});
+  mc(T,RC,"Which sentence is correct?",["Sally is ninth in line.","Sally is nineth in line."],"Sally is ninth in line.",{weak:true});
+  mc(T,RC,"Which sentence is correct?",["My birthday is on December twelfth.","My birthday is on December twelveth."],"My birthday is on December twelfth.",{weak:true});
+  mc(T,RC,"Which sentence is correct?",["Today is October eleventh.","Today is October eleveth."],"Today is October eleventh.",{weak:true});
+  mc(T,RC,"Which sentence is correct?",["The party is on June twentieth.","The party is on June twenteenth."],"The party is on June twentieth.",{weak:true});
+  mc(T,RC,"Which sentence is correct?",["Today is May thirtieth.","Today is May thirteenth."],"Today is May thirtieth.",{weak:true});
+  const MCI="A. Multiple Choice";
+  mc(T,MCI,"Today is the ____ day of the school fair. Everyone is excited!",["one","first","1th"],"first");
+  mc(T,MCI,"My sister's birthday is on November ____.",["3th","3st","3rd"],"3rd");
+  mc(T,MCI,"Sandy was the ____ runner in the race, so she won the silver medal (2nd place).",["first","second","third"],"second");
+})();
+
+/* ---------- 2. Waiting in Line ---------- */
+const ANIMALS=["Bear","Rabbit","Fox","Tiger","Deer","Panda","Monkey"];
+const KIDS=["Leo","Mia","Sam","Toby","Amy","Kevin","Zoe","Ben"];
+const ZOO=["Ben","Lily","Ryan","Kevin","Emma","Amy","Jack","Mia","Leo","Zoe"];
+const MOVIE=["Jane","Jack","Jim","Vicky","Lily","Peter","John","Fred","Sally"];
+const BUS=[["Kate","She"],["Liz","She"],["Mr. Boris","He"],["Mary","She"],["Susan","She"],["James","He"],["Tim","He"],["Helen","She"],["Mrs. Grey","She"],["Janet","She"]];
+(function(){
+  const T="line";
+  const W1="Waiting in Line: Look at the animals and write the ordinal numbers.";
+  ANIMALS.forEach(function(n,i){if(i>0)fill(T,W1,n+" is ____ in line.",ow(i),{ctx:lineCtx(ANIMALS,true)});});
+  const W2="Waiting in Line: Look at the line and fill in the correct ordinal numbers.";
+  KIDS.forEach(function(n,i){if(i>0)fill(T,W2,n+" is ____ in line.",ow(i),{ctx:lineCtx(KIDS,true)});});
+  const ZC=lineCtx(ZOO.map(function(n,i){return ["🐻","🐰","🦝","🐱","🐧","🐸","🐼","🐶","🐘","🐯"][i]+" "+n;}),false);
+  ZOO.forEach(function(n,i){fill(T,"Waiting in line — write the ordinal number.",n+" is ____ in line.",ow(i),{ctx:ZC,weak:i===9});});
+  fill(T,"Waiting in line — write the name.","Who is fourth in line?","Kevin",{ctx:ZC});
+  fill(T,"Waiting in line — write the name.","Who is sixth in line?","Amy",{ctx:ZC});
+  fill(T,"Waiting in line — write the name.","Who is eighth in line?","Mia",{ctx:ZC});
+  const MC5=lineCtx(MOVIE,false);
+  MOVIE.forEach(function(n,i){fill(T,"Read, label, and complete.",n+" is ____ in line.",ow(i),{ctx:MC5,weak:i===8});});
+  fill(T,"Read, label, and complete.","Who is fifth in line?","Lily",{ctx:MC5});
+  fill(T,"Read, label, and complete.","Who is seventh in line?","John",{ctx:MC5});
+  const BC=lineCtx(BUS.map(function(b){return b[0];}),false)+"<div class='note' style='margin-top:6px'>Where is James? He is sixth in line.</div>";
+  BUS.forEach(function(p,i){if(p[0]!=="James")sent(T,"Waiting in line… Answer the questions.","Where is "+p[0]+"?",p[1]+" is "+ow(i)+" in line.",{ctx:BC});});
+  const CL="<b>Clues:</b><br>1. Ben is first in line.<br>2. Eva is behind Zoe.<br>3. Tom is behind Ben.<br>4. Lucy is next to Tom.<br>5. Mark is between Lucy and Zoe.<br>6. Zoe is in front of Eva.<br>7. Leo is in front of Emma.<br>8. Emma is last in line.";
+  const PA="Part A: Read the clues and write the correct name for each number (1st to 8th).";
+  ["Ben","Tom","Lucy","Mark","Zoe","Eva","Leo","Emma"].forEach(function(n,i){if(i>0)fill(T,PA,suf(i+1)+": ____",n,{ctx:CL});});
+  const PB="Part B: Complete the sentences using ordinal words (first, second, third, etc.).";
+  [["Mark","fourth"],["Leo","seventh"],["Eva","sixth"],["Zoe","fifth"],["Lucy","third"],["Tom","second"]].forEach(function(p){fill(T,PB,p[0]+" is ____ in line.",p[1],{ctx:CL});});
+  const LD="<b>Climbing the ladder</b> (the bottom step is the 1st step)<br>🐸 frog: step 1 · 🐰 rabbit: step 2 · 🐦 bird: step 6 · 🐶 dog: step 8 · 🐍 snake: step 9";
+  [["frog","first"],["rabbit","second"],["bird","sixth"],["dog","eighth"],["snake","ninth"]].forEach(function(p){fill(T,"Climbing the ladder",p[0]==="frog"?"The frog is on the ____ step.":"The "+p[0]+" is on the ____ step.",p[1],{ctx:LD});});
+  const SG="<b>Let's sing! — Waiting in Line</b>"+tableCtx(["Position","Child"],[["3","Dutch boy"],["4","Dutch girl"],["5","English girl"],["6","Mexican boy"],["7","Chinese boy"],["9","Japanese child"],["11","French child"],["12","Japanese child"]]);
+  fill(T,"Let's sing! — write the ordinal number.","The Mexican boy is ____ in line.","sixth",{ctx:SG});
+  fill(T,"Let's sing! — write the ordinal number.","The English girl is ____ in line.","fifth",{ctx:SG});
+  fill(T,"Let's sing! — write the ordinal number.","The French child is ____ in line.","eleventh",{ctx:SG,weak:true});
+  fill(T,"Let's sing! — write the ordinal number.","The Chinese boy is ____ in line.","seventh",{ctx:SG});
+  fill(T,"Let's sing! — write the ordinal number.","One Japanese child is ninth. The other is ____.","twelfth",{ctx:SG,weak:true});
+})();
+
+/* ---------- 3. Building & Floors ---------- */
+(function(){
+  const T="floor";
+  const HI="Sunshine Hotel: Look at the directory and answer in full sentences.";
+  const HOTEL=tableCtx(["Floor","Place"],[["Floor 6","Sky Garden &amp; Cafe"],["Floor 5","Swimming Pool"],["Floor 4","Italian Restaurant"],["Floor 3","Toy &amp; Game Room"],["Floor 2","Bookstore"],["Floor 1","Front Desk &amp; Lobby"]]);
+  sent(T,HI,"Which floor is the Italian Restaurant on?","It's on the fourth floor.",{ctx:HOTEL});
+  sent(T,HI,"Gary wants to buy some comic books. Which floor does he go to?","He goes to the second floor.",{ctx:HOTEL,weak:true});
+  sent(T,HI,"Where is the Swimming Pool?","It's on the fifth floor.",{ctx:HOTEL});
+  sent(T,HI,"Which floor is the Sky Garden on?","It's on the sixth floor.",{ctx:HOTEL});
+  sent(T,HI,"Which floor is the Toy & Game Room on?","It's on the third floor.",{ctx:HOTEL});
+  sent(T,HI,"Which floor is the Front Desk on?","It's on the first floor.",{ctx:HOTEL});
+  sent(T,HI,"Where is the Bookstore?","It's on the second floor.",{ctx:HOTEL});
+  sent(T,HI,"Mom wants to swim. Which floor does she go to?","She goes to the fifth floor.",{ctx:HOTEL,weak:true});
+  sent(T,HI,"Tom wants to play games. Which floor does he go to?","He goes to the third floor.",{ctx:HOTEL,weak:true});
+  sent(T,HI,"Lisa wants to eat pizza. Which floor does she go to?","She goes to the fourth floor.",{ctx:HOTEL,weak:true});
+  sent(T,HI,"Where is the Cafe?","It's on the sixth floor.",{ctx:HOTEL});
+  const SI="Building & Floors: Answer in full sentences with ordinal numbers.";
+  const SCHOOL=tableCtx(["Floor","Place"],[["Floor 5","Music Room &amp; Art Studio"],["Floor 4","Science Lab"],["Floor 3","Library &amp; Reading Corner"],["Floor 2","Gym &amp; Basketball Court"],["Floor 1","Cafeteria &amp; 7-11"]])+"<div class='note' style='margin-top:6px'>e.g. Which floor is the Science Lab on? → It's on the fourth floor.</div>";
+  sent(T,SI,"Which floor is the Cafeteria on?","It's on the first floor.",{ctx:SCHOOL});
+  sent(T,SI,"Andy can borrow storybooks on his favorite floor. Which floor does he go to?","He goes to the third floor.",{ctx:SCHOOL,weak:true});
+  sent(T,SI,"Which floor is the Music Room on?","It's on the fifth floor.",{ctx:SCHOOL});
+  sent(T,SI,"Lucas likes to play basketball on rainy days. Which floor does he play on?","He plays on the second floor.",{ctx:SCHOOL,weak:true});
+  sent(T,SI,"Which floor is the Art Studio on?","It's on the fifth floor.",{ctx:SCHOOL});
+  sent(T,SI,"Which floor is the Library on?","It's on the third floor.",{ctx:SCHOOL});
+  sent(T,SI,"Where is the Gym?","It's on the second floor.",{ctx:SCHOOL});
+  sent(T,SI,"Where is the 7-11?","It's on the first floor.",{ctx:SCHOOL});
+  sent(T,SI,"Mia wants to paint a picture. Which floor does she go to?","She goes to the fifth floor.",{ctx:SCHOOL,weak:true});
+  sent(T,SI,"Kevin wants to buy a snack at the 7-11. Which floor does he go to?","He goes to the first floor.",{ctx:SCHOOL,weak:true});
+  const LI="Look, read, and write.";
+  const APT=tableCtx(["Floor","What is on this floor?"],[["Floor 7","One very big apartment (the biggest of all)"],["Floor 6","Apartments 601, 602, 603 · a painting on the wall"],["Floor 5","Apartments 501, 502, 503 · a FOR SALE sign"],["Floor 4","Six apartments: 401–406"],["Floor 3","GYM · Apartments 301, 302, 303"],["Floor 2","Bistro (restaurant) · Apartment 201"],["Floor 1","Lobby · Apartment 101 · near the swimming pool"]]);
+  sent(T,LI,"Mr. James can swim in the pool near his apartment.","He lives on the first floor.",{ctx:APT});
+  sent(T,LI,"There is a restaurant on Mr. Nakamura's floor.","He lives on the second floor.",{ctx:APT});
+  sent(T,LI,"Mr. Fontaine's apartment is the biggest of all.","He lives on the seventh floor.",{ctx:APT});
+  sent(T,LI,"Ms. Ramirez can exercise on the floor where she lives.","She lives on the third floor.",{ctx:APT});
+  sent(T,LI,"There are six apartments on Mrs. Giordano's floor.","She lives on the fourth floor.",{ctx:APT,weak:true});
+  sent(T,LI,"There is a painting next to Mr. Simpson's apartment.","He lives on the sixth floor.",{ctx:APT});
+  sent(T,LI,"There is an apartment for sale on Ms. Yang's floor.","She lives on the fifth floor.",{ctx:APT});
+  mc(T,"A. Multiple Choice","“Which floor do you live on?” “I live on the ____ floor.”",["eight","eighth","eightth"],"eighth");
+  mc(T,"Read and choose.","Which sentence is correct?",["My English classroom is on the second floor.","My English classroom is on second floor."],"My English classroom is on the second floor.",{weak:true});
+  mc(T,"Read and choose.","Which sentence is correct?",["My Chinese classroom is on the third floor.","My Chinese classroom is on third floor."],"My Chinese classroom is on the third floor.",{weak:true});
+})();
+
+/* ---------- 4. How often…? ---------- */
+(function(){
+  const T="freq";
+  const LRC="Look, read, and circle.";
+  const AM="<b>Miss Amanda — Weekly planner: Class 3A</b>"+tableCtx(["Activities","Mon","Tue","Wed","Thu","Fri"],[["being outdoors","X","X","X","X",""],["homework","X","X","X","X","X"],["exam","X","","","",""],["new song","","X","","X",""],["new grammar","X","","X","","X"]]);
+  mc(T,LRC,"How often does Miss Amanda give exams?",["At four o'clock.","Once a week.","Every day."],"Once a week.",{ctx:AM});
+  mc(T,LRC,"How often does Miss Amanda teach new songs?",["On Wednesdays.","She doesn't.","Twice a week."],"Twice a week.",{ctx:AM});
+  mc(T,LRC,"How often does Miss Amanda teach new grammar?",["Three times a week.","Twice a week.","Once a week."],"Three times a week.",{ctx:AM,weak:true});
+  mc(T,LRC,"How often does Miss Amanda give homework?",["Twice a week.","Once a week.","Every day."],"Every day.",{ctx:AM});
+  mc(T,LRC,"How often does Miss Amanda do outdoor activities with her students?",["Twice a week.","Once a week.","Four times a week."],"Four times a week.",{ctx:AM,weak:true});
+  const PE="<b>Peter's habits from Monday to Friday</b>"+tableCtx(["","Mon","Tue","Wed","Thu","Fri"],[["play baseball","✓","","✓","","✓"],["brush his teeth","✗✗✗","✗✗✗","✗✗✗","✗✗✗","✗✗✗"],["play the violin","","✓","","✓",""],["clean his room","","","✓","",""],["visit his grandparents","","","","","✓"]]);
+  const PQ="Pathway3 Unit1 Pop Quiz";
+  mc(T,PQ,"How often does Peter play baseball?",["Every day.","In the morning.","Three times a week."],"Three times a week.",{ctx:PE});
+  mc(T,PQ,"How often does Peter brush his teeth?",["Three times a week.","Three times a day.","Once a week."],"Three times a day.",{ctx:PE});
+  mc(T,PQ,"How often does Peter play the violin?",["Every day.","Three times a week.","Twice a week."],"Twice a week.",{ctx:PE});
+  mc(T,PQ,"How often does Peter clean his room?",["Once a week.","Every day.","Twice a week."],"Once a week.",{ctx:PE});
+  mc(T,PQ,"How often does Peter visit his grandparents?",["Every Friday.","Twice a week.","He doesn't."],"Every Friday.",{ctx:PE});
+  function cal(m){return tableCtx(["M","T","W","Th","F"],[m.map(function(x){return x?"✓":"";})]);}
+  const ADV=["always","usually","sometimes","never"];
+  mc(T,"Read and choose.","I ____ get up at 7 o'clock.",ADV,"always",{ctx:cal([1,1,1,1,1])});
+  mc(T,"Read and choose.","I ____ walk to school.",ADV,"usually",{ctx:cal([1,1,1,0,1])});
+  mc(T,"Read and choose.","I ____ go to the library.",ADV,"sometimes",{ctx:cal([0,1,0,1,0])});
+  mc(T,"Read and choose.","I ____ drink soda.",ADV,"never",{ctx:cal([0,0,0,0,0])});
+  const DI="D. Fill in the Blanks: Use (always / usually / sometimes / never) to complete sentences.";
+  const BK=tableCtx(["Name","Habit / Activity","Mon","Tue","Wed","Thu","Fri","Sat","Sun"],[["Ben","eat vegetables","√","√","√","√","√","√","√"],["Kelly","play online games","","","√","","√","",""],["Tr. Raymond","drink milk tea","√","√","√","√","√","√",""],["Tina","eat junk food","","","","","","",""]]);
+  fill(T,DI,"Ben ____ eats vegetables. (100% of the time)","always",{ctx:BK});
+  fill(T,DI,"Kelly ____ plays online games. (around 25% of the time)","sometimes",{ctx:BK,weak:true});
+  fill(T,DI,"Tr. Raymond ____ drinks milk tea. (around 85% of the time)","usually",{ctx:BK});
+  fill(T,DI,"Tina ____ eats junk food. (0% of the time)","never",{ctx:BK});
+  const FI="D. Frequency Table: Look at the schedule and answer the questions.";
+  const SC=tableCtx(["Activity","Mon","Tue","Wed","Thu","Fri","Sat","Sun","Frequency"],[["play video games (David)","","","√","","","√","","twice a week"],["eat fresh fruit (Emma)","√","√","√","√","√","√","√","every day"],["read English books (Jack)","√","","√","","√","","","three times a week"],["do exercise / sports (Cathy)","√","√","√","√","","","","four times a week"]]);
+  sent(T,FI,"How often does David play video games?","He plays video games twice a week.",{ctx:SC,weak:true});
+  sent(T,FI,"How often does Emma eat fresh fruit?","She eats fresh fruit every day.",{ctx:SC});
+  sent(T,FI,"How often does Jack read English books?","He reads English books three times a week.",{ctx:SC});
+  sent(T,FI,"How often does Cathy do exercise?",["She does exercise four times a week.","She does exercises four times a week."],{ctx:SC,weak:true});
+  const MCI="A. Multiple Choice";
+  mc(T,MCI,"Peter ____ brushes his teeth before going to bed. He does it every single night.",["never","always","sometimes"],"always");
+  mc(T,MCI,"Lisa ____ eats junk food because she wants to stay healthy.",["never","always","every"],"never");
+  mc(T,MCI,"“How often do you go swimming?” “I go swimming ____.”",["twice a week","on 3 o'clock","two a week"],"twice a week",{weak:true});
+  mc(T,MCI,"Misa usually wakes up at ____.",["the evening","Saturdays","7 o'clock"],"7 o'clock");
+  mc(T,MCI,"Kelly ____ plays online games.",["something","sometimes","sometime"],"sometimes",{weak:true});
+  fill(T,"Read and Write.","How ____ do you eat junk food?","often");
+  const RS="Read and sort.";
+  [["I never go to bed late.","Good habits"],["I always throw papers on the floor.","Bad habits"],["I never clean my room.","Bad habits"],["I always do my homework.","Good habits"],["I always fix my friends' toys.","Good habits"],["I never help my brother.","Bad habits"],["I never drink soda.","Good habits"],["I always draw on the walls.","Bad habits"]].forEach(function(p){mc(T,RS,"“"+p[0]+"”",["Good habits","Bad habits"],p[1]);});
+  const FR="Follow, read, and write.";
+  [["🚗 new car · April 2011, March 2012, March 2014, April 2015","usually","He ____ ____ a new car in spring.","usually buys"],["🧃 juice · 6 P.M. Mon, Tue, Thu, Fri","usually","He ____ ____ juice in the afternoon.","usually drinks"],["✈️ travel · January 2015, December 2011","sometimes","He ____ ____ in winter.","sometimes travels"],["🥗 salad · some Fridays in June","sometimes","He ____ ____ salads on Fridays.","sometimes eats"],["🚿 shower · 7 A.M. Mon, Wed, Fri","sometimes","He ____ ____ a shower in the morning.","sometimes takes"],["🐟 fish · most days in November","usually","He ____ ____ fish for lunch.","usually eats"]].forEach(function(p){fill(T,FR,p[2],p[3],{ctx:p[0]+" → <b>"+p[1]+"</b>",weak:true});});
+  const LRW="Look, read, and write.";
+  const MB="<b>Word bank:</b> eat breakfast · eat lunch · get up · go to the library · walk to school · play basketball";
+  fill(T,LRW,"Mary always ____ at 7 o'clock.","gets up",{ctx:MB});
+  fill(T,LRW,"She usually ____ in the kitchen.","eats breakfast",{ctx:MB});
+  fill(T,LRW,"She always ____ at 8:30.","walks to school",{ctx:MB});
+  fill(T,LRW,"She usually ____ with her friends.","eats lunch",{ctx:MB});
+  fill(T,LRW,"After school, she sometimes ____.","goes to the library",{ctx:MB});
+  fill(T,LRW,"She always ____ with her friend at 5 o'clock.","plays basketball",{ctx:MB,weak:true});
+})();
+
+/* ---------- 5. He / She / It + s / es ---------- */
+(function(){
+  const T="verb";
+  const CI="Circle the correct verb form.";
+  [["Ben always ____ vegetables.","eats","eat"],["Kelly sometimes ____ online games.","plays","play"],["Tr. Raymond usually ____ milk tea.","drinks","drink"],["Tina never ____ junk food.","eats","eat"],["Max ____ his bicycle three times a week.","rides","ride"],["Peter ____ his teeth three times a day.","brushes","brush"],["Mary always ____ to school at 8:30.","walks","walk"],["After school, she sometimes ____ to the library.","goes","go"],["Cathy ____ exercise four times a week.","does","do"],["Lucas ____ basketball on rainy days.","plays","play"],["Andy ____ to the third floor.","goes","go"],["Jack ____ English books three times a week.","reads","read"],["Emma ____ fresh fruit every day.","eats","eat"],["He usually ____ a shower in the morning.","takes","take"],["Penny ____ on the seventh floor.","lives","live"],["Mom ____ heavy bags.","carries","carry"],["Emma ____ science on Wednesdays.","studies","study"],["My brother ____ his friends' toys.","fixes","fix"],["Dad ____ TV after dinner.","watches","watch"],["It ____ a lot in winter.","snows","snow"],["It ____ a lot in June.","rains","rain"],["Max ____ his homework first after school.","finishes","finish"]].forEach(function(p,i){
+    const ch=i%2?[p[1],p[2]]:[p[2],p[1]];
+    mc(T,CI,p[0]+" ("+ch[0]+" / "+ch[1]+")",ch,p[1],{weak:true});
+  });
+  [["Dolly and Ashley ____ to the library every day.","go","goes"],["My parents usually ____ their teeth after each meal.","brush","brushes"],["Sam and I ____ in the park every day.","meet","meets"],["They ____ soccer four times a week.","play","plays"]].forEach(function(p,i){
+    const ch=i%2?[p[1],p[2]]:[p[2],p[1]];
+    mc(T,CI,p[0]+" ("+ch[0]+" / "+ch[1]+")",ch,p[1]);
+  });
+  const MCI="A. Multiple Choice";
+  mc(T,MCI,"How often ____ your brother wash the dishes?",["do","is","does"],"does",{weak:true});
+  mc(T,MCI,"How often ____ you eat junk food?",["do","does","is"],"do");
+  mc(T,MCI,"How often ____ Peter play baseball?",["do","is","does"],"does",{weak:true});
+  mc(T,MCI,"How often ____ Miss Amanda give exams?",["do","is","does"],"does",{weak:true});
+  mc(T,MCI,"How often ____ it rain in June?",["do","is","does"],"does",{weak:true});
+  mc(T,MCI,"How often ____ Ruby and Ken play badminton?",["do","does","is"],"do");
+  mc(T,MCI,"What ____ Max always do first after school?",["do","is","does"],"does",{weak:true});
+  mc(T,MCI,"“I practice the violin five days a week.” “Wow, that ____ great!”",["sounds","sound","sounding"],"sounds",{weak:true});
+  mc(T,MCI,"Dolly and Ashley ____ to library every day.",["going","go","goes"],"go");
+  mc(T,MCI,"Linda always ____ up at 7 o'clock.",["get","gets","getting"],"gets");
+  const FS="Answer in full sentences.";
+  const PE="<b>Peter's habits from Monday to Friday</b>"+tableCtx(["","Mon","Tue","Wed","Thu","Fri"],[["play baseball","✓","","✓","","✓"],["brush his teeth","✗✗✗","✗✗✗","✗✗✗","✗✗✗","✗✗✗"],["play the violin","","✓","","✓",""],["clean his room","","","✓","",""],["visit his grandparents","","","","","✓"]]);
+  sent(T,FS,"How often does Peter play baseball?","He plays baseball three times a week.",{ctx:PE,weak:true});
+  sent(T,FS,"How often does Peter brush his teeth?","He brushes his teeth three times a day.",{ctx:PE,weak:true});
+  sent(T,FS,"How often does Peter play the violin?","He plays the violin twice a week.",{ctx:PE,weak:true});
+  sent(T,FS,"How often does Peter clean his room?","He cleans his room once a week.",{ctx:PE,weak:true});
+  sent(T,FS,"How often does Peter visit his grandparents?",["He visits his grandparents once a week.","He visits his grandparents every Friday."],{ctx:PE,weak:true});
+})();
+
+/* ---------- 6. be V + Prepositions ---------- */
+(function(){
+  const T="prep";
+  const DIS={"in front of":["behind","between"],"behind":["in front of","between"],"between":["next to","behind"],"next to":["between","under"],"under":["on","in front of"],"on":["under","between"]};
+  function p(ins,q,ctx,a,weak){mc(T,ins,q,[a,DIS[a][0],DIS[a][1]],a,{ctx:ctx,weak:!!weak});}
+  const GI="Look at the picture and fill in be V (is or are) + prepositions.";
+  const BR=rowScene([["🥣","cereal"],["🧃","juice"],["🍞","toast"]]);
+  const BD=depthScene(["🥣","cereal"],["🧃","juice"]);
+  p("Read and choose.","The juice is ____ the cereal and the toast.",BR,"between");
+  p("Read and choose.","The cereal is ____ the juice.",BR,"next to");
+  p("Read and Write.","The juice is ____ the cereal.",BD,"behind");
+  p("Read and Write.","The cereal is ____ the juice.",BD,"in front of",true);
+  const PI="Please fill in the blanks with prepositions.";
+  const PL=lineCtx(["Paul","John","Nick","Lucy","Ann","Alex"],false);
+  p(PI,"Paul is ____ John.",PL,"in front of");
+  p(PI,"John is ____ Paul and Nick.",PL,"between");
+  p(PI,"Lucy is ____ Nick.",PL,"behind");
+  p(PI,"Ann is ____ Alex.",PL,"in front of");
+  p(PI,"Nick is ____ John and Lucy.",PL,"between");
+  p(PI,"Alex is ____ Ann.",PL,"behind");
+  const RL="Read, label, and complete.";
+  const ML=lineCtx(MOVIE,false);
+  p(RL,"John is ____ Peter and Fred.",ML,"between");
+  p(RL,"Jane is ____ Jack.",ML,"in front of");
+  p(RL,"Sally is ____ Fred.",ML,"behind");
+  p(RL,"Jim is ____ Jack.",ML,"behind");
+  p(RL,"Vicky is ____ Lily.",ML,"in front of");
+  p(GI,"The girl is ____ the teddy bear.",depthScene(["🧸","teddy bear"],["👧","girl"]),"behind");
+  p(GI,"The dog is ____ the chair.",depthScene(["🐶","dog"],["🪑","chair"]),"in front of",true);
+  p(GI,"The books are ____ the plant.",stackScene(["🪴","plant"],["📚","books"]),"under");
+  p(GI,"The basketball is ____ the dinosaur and the soccer ball.",rowScene([["🦖","dinosaur"],["🏀","basketball"],["⚽","soccer ball"]]),"between");
+  p(GI,"The desk is ____ the chair.",depthScene(["🪑","chair"],["🗄️","desk"]),"behind",true);
+  p(GI,"The cat is ____ the bed.",depthScene(["🐱","cat"],["🛏️","bed"]),"in front of");
+  p(GI,"The desk is ____ the dog.",depthScene(["🐶","dog"],["🗄️","desk"]),"behind");
+  p(GI,"The elephant is ____ the clock.",stackScene(["🕰️","clock"],["🐘","elephant"]),"under");
+  p(GI,"The books are ____ the lamp and the pens.",rowScene([["💡","lamp"],["📚","books"],["✏️","pens"]]),"between");
+  p(GI,"The teddy bear is ____ the girl.",rowScene([["👧","girl"],["🧸","teddy bear"]]),"next to");
+  p(GI,"The cat is ____ the bed.",stackScene(["🐱","cat"],["🛏️","bed"]),"on");
+  fill(T,GI,"The cat ____ ____ the bed.","is in front of",{ctx:depthScene(["🐱","cat"],["🛏️","bed"])});
+  fill(T,GI,"The desk ____ ____ the dog.","is behind",{ctx:depthScene(["🐶","dog"],["🗄️","desk"])});
+  fill(T,GI,"The elephant ____ ____ the clock.","is under",{ctx:stackScene(["🕰️","clock"],["🐘","elephant"])});
+  fill(T,GI,"The books ____ ____ the lamp and pens.","are between",{ctx:rowScene([["💡","lamp"],["📚","books"],["✏️","pens"]])});
+  fill(T,GI,"The teddy bear ____ ____ the girl.","is next to",{ctx:rowScene([["👧","girl"],["🧸","teddy bear"]])});
+  fill(T,GI,"The girl ____ ____ the teddy bear.","is behind",{ctx:depthScene(["🧸","teddy bear"],["👧","girl"])});
+  fill(T,GI,"The dog ____ ____ the chair.","is in front of",{ctx:depthScene(["🐶","dog"],["🪑","chair"]),weak:true});
+  fill(T,GI,"The books ____ ____ the plant.","are under",{ctx:stackScene(["🪴","plant"],["📚","books"])});
+  fill(T,GI,"The basketball ____ ____ the dinosaur and the soccer ball.","is between",{ctx:rowScene([["🦖","dinosaur"],["🏀","basketball"],["⚽","soccer ball"]])});
+  fill(T,GI,"The desk ____ ____ the chair.","is behind",{ctx:depthScene(["🪑","chair"],["🗄️","desk"]),weak:true});
+  fill(T,"Read and Write.","The cereal is ____ the juice.","in front of",{ctx:BD,weak:true});
+  [["The books ____ under the plant.","are"],["The basketball ____ between the dinosaur and the soccer ball.","is"],["The teddy bear ____ next to the girl.","is"],["The pens ____ next to the lamp.","are"],["The juice ____ between the cereal and the toast.","is"]].forEach(function(x){mc(T,"be V (is or are)",x[0],["is","are"],x[1]);});
+})();
+
+/* ---------- 7. What's the weather like? ---------- */
+(function(){
+  const T="wea";
+  function wc(e){return "<div class='scene'><div class='em' style='font-size:64px'>"+e+"</div></div>";}
+  const LW="Label, write, and match.";
+  [["☀️","sunny",["sunny"]],["☁️","cloudy",["cloudy"]],["🌧️","raining",["raining","rainy"]],["❄️","snowing",["snowing","snowy"]],["💨","windy",["windy"]],["🌡️🔴","hot",["hot"]],["🌡️🔵","cold",["cold"]]].forEach(function(w){fill(T,LW,"What's the weather like? It's ____.",w[2],{ctx:wc(w[0])});});
+  fill(T,LW,"What's the ____ like? It's sunny.","weather");
+  fill(T,LW,"What's the weather ____? It's cloudy.","like",{weak:true});
+  sent(T,LW,"Write the question. ____ It's windy.","What's the weather like?",{ctx:wc("💨")});
+  sent(T,LW,"Write the question. ____ It's raining.","What's the weather like?",{ctx:wc("🌧️")});
+  const MCI="A. Multiple Choice";
+  mc(T,MCI,"What's the weather like? It's ____.",["windy","sunny","cloudy"],"sunny",{ctx:wc("☀️")});
+  mc(T,MCI,"What's the weather like? It's ____.",["cloudy","sunny","snowing"],"cloudy",{ctx:wc("☁️")});
+  mc(T,MCI,"What's the weather like? It's ____.",["hot","windy","raining"],"windy",{ctx:wc("💨")});
+  mc(T,MCI,"What's the weather like? It's ____.",["hot","cold","sunny"],"cold",{ctx:wc("🌡️🔵")});
+  mc(T,MCI,"Is it snowy? ____",["Yes, it is. It's snowy.","No, it isn't. It's sunny.","No, it isn't. It's cloudy."],"No, it isn't. It's cloudy.",{ctx:wc("☁️")});
+  mc(T,MCI,"Is it sunny? ____",["Yes, it is.","No, it isn't. It's cloudy.","Yes, it isn't."],"Yes, it is.",{ctx:wc("☀️")});
+  mc(T,MCI,"Is it hot? ____",["No, it isn't. It's cold.","Yes, it is. It's hot.","No, it is. It's cold."],"No, it isn't. It's cold.",{ctx:wc("🌡️🔵")});
+  mc(T,MCI,"Is it windy? ____",["No, it isn't. It's raining.","Yes, it is. It's windy.","Yes, it isn't."],"No, it isn't. It's raining.",{ctx:wc("🌧️")});
+  const LK="Look and write.";
+  [["🌧️","Is it sunny?",["No, it isn't. It's raining.","No, it isn't. It's rainy."]],["☀️","Is it windy?",["No, it isn't. It's sunny."]],["❄️","Is it sunny?",["No, it isn't. It's snowy.","No, it isn't. It's snowing."]],["🌡️🔵","Is it hot?",["No, it isn't. It's cold."]],["☁️","Is it sunny?",["No, it isn't. It's cloudy."]],["🌡️🔴","Is it cold?",["No, it isn't. It's hot."]],["💨","Is it hot?",["No, it isn't. It's windy."]],["🌧️","Is it snowy?",["No, it isn't. It's raining.","No, it isn't. It's rainy."]],["☀️","Is it sunny?",["Yes, it is."]],["❄️","Is it snowy?",["Yes, it is."]],["💨","Is it windy?",["Yes, it is."]]].forEach(function(x){sent(T,LK,x[1],x[2],{ctx:wc(x[0])});});
+  fill(T,LK,"Is it ____? No, it isn't. It's raining.","sunny",{ctx:wc("🌧️")+"<div class='note'>Is it [☀️]?</div>"});
+})();
+
+/* ---------- 8. Dialogue & Reading ---------- */
+(function(){
+  const T="read";
+  const UI="Unscramble the sentences.";
+  unscr(T,UI,["after","do","What","school?","you","do"],"What do you do after school?");
+  unscr(T,UI,["sounds","That","fun!","How","you","do","play?","often"],"That sounds fun! How often do you play?",{weak:true});
+  unscr(T,UI,["often","How","you","eat","do","junk food?"],"How often do you eat junk food?");
+  unscr(T,UI,["do","on","What","you","the weekend?","do"],"What do you do on the weekend?");
+  unscr(T,UI,["lives","the","He","ninth","floor.","on"],"He lives on the ninth floor.",{weak:true});
+  unscr(T,UI,["always","I","my","homework.","do"],"I always do my homework.");
+  unscr(T,UI,["the","weather","What's","like?"],"What's the weather like?");
+  unscr(T,UI,["is","Lily","fifth","line.","in"],"Lily is fifth in line.");
+  unscr(T,UI,["birthday","My","on","is","May","first."],"My birthday is on May first.");
+  unscr(T,UI,["never","She","to bed","goes","late."],"She never goes to bed late.");
+  unscr(T,UI,["twice","week.","plays","He","video games","a"],"He plays video games twice a week.",{weak:true});
+  unscr(T,UI,["does","How","often","Peter","play","baseball?"],"How often does Peter play baseball?",{weak:true});
+  const DI="Dialogue Completion: Choose the best sentence to complete the conversation.";
+  const KEN="<b>Ken:</b> Hi, Ruby! What do you do after school?<br><b>Ruby:</b> (1) ________<br><b>Ken:</b> (2) ________! How often do you play?<br><b>Ruby:</b> (3) ________<br><b>Ken:</b> Can I join you next Tuesday? <b>Ruby:</b> Sure!";
+  mc(T,DI,"(1)",["That sounds fun!","I play badminton with my dad.","On the second floor."],"I play badminton with my dad.",{ctx:KEN});
+  mc(T,DI,"(2)",["That sounds fun","How often do you play?","I never do homework"],"That sounds fun",{ctx:KEN});
+  mc(T,DI,"(3)",["At 4 o'clock.","In the classroom.","Twice a week, on Tuesday and Thursday."],"Twice a week, on Tuesday and Thursday.",{ctx:KEN});
+  const LI="Let's talk! Read and write.";
+  const JK="<b>Jack:</b> (1) ____ do you do on the weekend?<br><b>Daisy:</b> I usually watch movies with my friends. (2) ____ we see a 3-D movie!<br><b>Jack:</b> That sounds fun! How (3) ____ do you see a 3-D movie?<br><b>Daisy:</b> About once a (4) ____.";
+  fill(T,LI,"(1)","What",{ctx:JK});
+  fill(T,LI,"(2)","Sometimes",{ctx:JK,weak:true});
+  fill(T,LI,"(3)","often",{ctx:JK});
+  fill(T,LI,"(4)","month",{ctx:JK});
+  mc(T,"Ordinal numbers","“When's your birthday?”",["My eighth birthday is on May 3rd.","I'm eight.","It's sunny."],"My eighth birthday is on May 3rd.");
+  const RI="F. Reading Comprehension: Read and answer.";
+  const PN="Hi, I am Penny! I live on the seventh floor of Green Tower. My best friend, Sam, lives on the second floor. Every day after school, Sam and I meet in the park. We usually play soccer for one hour. “That sounds fun!” says our teacher. I play soccer four times a week. I also have piano lessons on Wednesday and Friday, so I practice the piano twice a week. I never go to bed late because sleep is very important!";
+  mc(T,RI,"Which floor does Penny live on?",["The second floor.","The seventh floor.","The tenth floor."],"The seventh floor.",{ctx:PN});
+  mc(T,RI,"What do Penny and Sam usually do in the park?",["Play soccer.","Play the piano.","Sleep."],"Play soccer.",{ctx:PN});
+  mc(T,RI,"How often does Penny play soccer?",["Twice a week.","Four times a week.","Every day."],"Four times a week.",{ctx:PN});
+  mc(T,RI,"How often does Penny practice the piano?",["Twice a week.","Once a month.","Never."],"Twice a week.",{ctx:PN});
+  mc(T,RI,"Which sentence is “TRUE” about Penny?",["She always goes to bed late.","She never goes to bed late.","Sam lives on the 7th floor."],"She never goes to bed late.",{ctx:PN});
+  mc(T,RI,"Where do Penny and Sam meet after school?",["In the park.","At Green Tower.","In the classroom."],"In the park.",{ctx:PN});
+  mc(T,RI,"Which floor does Sam live on?",["The second floor.","The seventh floor.","The fourth floor."],"The second floor.",{ctx:PN});
+  const RJ="F. Reading Comprehension: Read and answer the questions.";
+  const MX="Max is a healthy third grader. After school, he always finishes his homework first. Then, he loves to go outside and play sports. He rides his bicycle three times a week with his brother. Max eats vegetables and fresh fruit every day, and he never drinks soda. On the weekend, he lives on the ninth floor of a big apartment building. He usually takes the stairs to the fifth floor to exercise!";
+  mc(T,RJ,"What does Max always do first after school?",["Ride his bike.","Finish his homework.","Drink soda."],"Finish his homework.",{ctx:MX});
+  mc(T,RJ,"How often does Max ride his bicycle?",["Every day.","Once a week.","Three times a week."],"Three times a week.",{ctx:MX});
+  mc(T,RJ,"How often does Max drink soda?",["Never.","Sometimes.","Usually."],"Never.",{ctx:MX});
+  mc(T,RJ,"Which floor does Max live on?",["The fifth floor.","The ninth floor.","The third floor."],"The ninth floor.",{ctx:MX});
+  mc(T,RJ,"How often does Max eat vegetables and fresh fruit?",["Twice a week.","Every day.","Once a month."],"Every day.",{ctx:MX});
+  mc(T,RJ,"Who does Max ride his bicycle with?",["His brother.","His sister.","His dad."],"His brother.",{ctx:MX});
+  mc(T,RJ,"Which floor does Max usually take the stairs to?",["The fifth floor.","The ninth floor.","The first floor."],"The fifth floor.",{ctx:MX});
+})();
+
+/* ---------- Oral (estimated from textbook & worksheets) ---------- */
+const ORAL=[
+ {q:"When's your birthday?",s:"My birthday is on May first.",k:["my birthday","is on","first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth|teenth|tieth|twenty"]},
+ {q:"Which floor is your English classroom on?",s:"My English classroom is on the second floor.",k:["english classroom","on the","floor"]},
+ {q:"Which floor is your Chinese classroom on?",s:"My Chinese classroom is on the third floor.",k:["chinese classroom","on the","floor"]},
+ {q:"What number are you in the list of class?",s:"I'm the second in the list of class.",k:["i am","second|first|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth"]},
+ {q:"How often do you eat junk food?",s:"I sometimes eat junk food. About once a week.",k:["eat junk food","never|sometimes|usually|always|once|twice|times"]},
+ {q:"How often do you brush your teeth?",s:"I always brush my teeth twice a day.",k:["brush my teeth","always|twice|three times|every day"]},
+ {q:"Do you drink soda?",s:"I never drink soda.",k:["never|sometimes|usually|always","drink soda"]},
+ {q:"What do you do after school?",s:"I usually do exercise. Sometimes I walk.",k:["i usually","sometimes"]},
+ {q:"What do you do on the weekend?",s:"I usually watch movies with my friends.",k:["i usually|i always|i sometimes","with"]},
+ {q:"How often do you see a 3-D movie?",s:"About once a month.",k:["once|twice|times|never","a month|a week|a year"]},
+ {q:"Tell me one good habit you have.",s:"I always do my homework.",k:["always|never|usually","i"]},
+ {q:"What's the weather like today?",s:"It's sunny today.",k:["it is","sunny|cloudy|raining|rainy|windy|hot|cold|snowing|snowy"]},
+ {q:"Is it raining today?",s:"No, it isn't. It's sunny.",k:["no it is not|yes it is","it is"]},
+ {q:"Imagine it's November. What's the weather like? What are you wearing?",s:"It's cold. I'm wearing a jacket and gloves.",k:["it is cold","wearing"]}
+];
+
+/* ====================== storage ====================== */
+const SKEY="audreyGrammar_1151_v3";
+let STATS={};
+try{STATS=JSON.parse(localStorage.getItem(SKEY)||"{}")||{};}catch(e){STATS={};}
+function saveStats(){try{localStorage.setItem(SKEY,JSON.stringify(STATS));}catch(e){}}
+
+/* ====== MC answer position: shuffle the stored choices once so the correct answer sits in a random slot ====== */
+questionBank.forEach(function(q){
+  if(q.type==="mc"){q.choices=shuffle(q.choices.slice());q.letter="ABCDE".charAt(q.choices.indexOf(q.answer[0]));}
+});
+
+/* ====================== TTS ====================== */
+let VOICE=null;
+function pickVoice(){
+  try{
+    const vs=window.speechSynthesis.getVoices()||[];
+    const pref=["Samantha","Karen","Google US English"];
+    VOICE=null;
+    for(let i=0;i<pref.length&&!VOICE;i++){for(let j=0;j<vs.length;j++){if(vs[j].name.indexOf(pref[i])>=0){VOICE=vs[j];break;}}}
+    if(!VOICE){for(let j=0;j<vs.length;j++){if(vs[j].lang==="en-US"){VOICE=vs[j];break;}}}
+  }catch(e){VOICE=null;}
+}
+if(window.speechSynthesis){pickVoice();window.speechSynthesis.onvoiceschanged=pickVoice;}
+function speak(t){
+  try{window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="en-US";if(VOICE)u.voice=VOICE;u.rate=0.88;window.speechSynthesis.speak(u);}
+  catch(e){setStatus("Speech is not supported on this device.");}
+}
+
+/* ====================== app shell ====================== */
+const app=document.getElementById("app");
+const nav=document.getElementById("nav");
+const EXAM_COUNT=30;
+let S=null,O=null,current="home";
+const NAVITEMS=[{key:"home",label:"🏠 Home"}].concat(TABS.map(function(t){return {key:t.key,label:t.icon+" "+t.name};}),[{key:"weak",label:"🔥 Fix My Mistakes"},{key:"mock",label:"🎯 Mock Exam"},{key:"oral",label:"🗣️ Oral Practice"}]);
+function drawNav(){nav.innerHTML=NAVITEMS.map(function(n){return "<button class='"+(n.key===current?"on":"")+"' onclick=\"go('"+n.key+"')\">"+n.label+"</button>";}).join("");}
+function weakList(){return questionBank.filter(function(q){return q.weak;});}
+function tabList(key){return questionBank.filter(function(q){return q.tab===key;});}
+function drawMockExam(){return shuffle(questionBank.slice()).slice(0,EXAM_COUNT);}
+function go(key){
+  stopRecording();
+  if(window.speechSynthesis){try{window.speechSynthesis.cancel();}catch(e){}}
+  current=key;drawNav();window.scrollTo(0,0);
+  if(key==="home")return home();
+  if(key==="oral")return startOral();
+  if(key==="mock")return startSession("mock","🎯 Mock Exam",drawMockExam(),true);
+  if(key==="weak")return startSession("weak","🔥 Fix My Mistakes",shuffle(weakList().slice()),false);
+  const t=TABS.filter(function(x){return x.key===key;})[0];
+  startSession(key,t.icon+" "+t.name,shuffle(tabList(key).slice()),false);
+}
+function pct(key){const s=STATS[key];return s?Math.round(s.best):0;}
+function home(){
+  const days=Math.ceil((new Date(2026,9,22)-new Date(new Date().toDateString()))/86400000);
+  let h="<div class='intro' style='border-left:6px solid var(--pri)'><h2>📝 Grammar Midterm: Thu 10/22 "+(days>0?"· "+days+" day"+(days>1?"s":"")+" to go!":days===0?"· Today! Good luck! 🍀":"")+"</h2><div style='font-size:16px;line-height:1.6'>Pathway 3 · Unit 1 (p.4-13) · Unit 4 (p.34-36)<br>✅ Spell the Ordinal Numbers table<br>✅ Waiting in line &amp; “lives on the ___ floor”<br>✅ How often…?<br>✅ He / She / It + does, verb + s / es / ies — <b>don't forget the s!</b><br>✅ Prepositions: in front of, under, next to, between…<br>✅ What's the weather like?</div></div>";
+  h+="<div class='intro'><h2>Hi Audrey! 👋</h2><div>Pick a topic and practice. Press <b>Check Answer</b> after each question. Tap <b>🏁 Finish &amp; Score</b> any time to see your score.</div><div class='note' style='margin-top:6px'>Question bank: "+questionBank.length+" questions</div></div><div class='grid'>";
+  TABS.forEach(function(t){h+=card(t.key,t.icon,t.name,t.desc,tabList(t.key).length);});
+  h+=card("weak","🔥","Fix My Mistakes","Question types you missed on your quizzes",weakList().length);
+  h+=card("mock","🎯","Mock Exam",EXAM_COUNT+" random questions · one per page",EXAM_COUNT);
+  h+="<div class='tcard' onclick=\"go('oral')\"><div class='ic'>🗣️</div><h3>Oral Practice</h3><div class='meta'>"+ORAL.length+" speaking questions · record your voice</div></div>";
+  app.innerHTML=h+"</div>";
+}
+function card(key,ic,name,desc,n){const p=pct(key);return "<div class='tcard' onclick=\"go('"+key+"')\"><div class='ic'>"+ic+"</div><h3>"+name+"</h3><div class='meta'>"+desc+"</div><div class='meta' style='margin-top:6px'>"+n+" questions · best "+p+"%</div><div class='bar'><i style='width:"+p+"%'></i></div></div>";}
+function drillBar(title){return "<div class='drillbar'><button class='btn sec sm' onclick=\"go('home')\">← Home</button><div class='dtitle'>"+title+"</div><button class='btn fin sm' onclick='finishNow()'>🏁 Finish &amp; Score</button></div>";}
+function finishNow(){if(current==="oral")finishOral();else if(S)finish();}
+
+/* ====================== question rendering ====================== */
+function isAnswered(q,g){if(q.type==="mc")return typeof g==="number";if(q.type==="unscramble")return !!(g&&g.length);return !!(g&&String(g).trim());}
+function givenText(q,g){if(q.type==="mc")return q.choices[g];if(q.type==="unscramble")return g.map(function(i){return q.wordOrder[i];}).join(" ");return String(g);}
+function isRight(q,g){const t=norm(givenText(q,g));return q.answer.some(function(x){return norm(x)===t;});}
+function correctText(q){return q.type==="mc"?q.letter+". "+q.answer[0]:q.answer[0];}
+function attr(s){return esc(s).replace(/'/g,"&#39;");}
+function qBody(q,g,locked){
+  let h="<div class='ins'>"+q.ins+"</div>";
+  if(q.ctx)h+="<div class='ctx'>"+q.ctx+"</div>";
+  if(q.question)h+="<div class='qtext'>"+q.question+"</div>";
+  if(q.type==="mc"){
+    h+="<div class='choices'>"+q.choices.map(function(c,i){return "<button class='choice"+(g===i?" sel":"")+"' data-i='"+i+"' onclick='pick("+i+")'"+(locked?" disabled":"")+"><b>"+"ABCDE".charAt(i)+".</b> "+esc(c)+"</button>";}).join("")+"</div>";
+  }else if(q.type==="unscramble"){
+    const b=g||[];
+    h+="<div class='build'>"+b.map(function(i,k){return "<button class='chip' onclick='removeWord("+k+")'"+(locked?" disabled":"")+">"+esc(q.wordOrder[i])+"</button>";}).join("")+"</div>";
+    h+="<div class='chips'>"+q.wordOrder.map(function(w,i){return "<button class='chip"+(b.indexOf(i)>=0?" used":"")+"' onclick='addWord("+i+")'"+(locked?" disabled":"")+">"+esc(w)+"</button>";}).join("")+"</div>";
+    if(!locked)h+="<button class='btn sec sm' onclick='resetWords()'>↺ Reset</button>";
+  }else{
+    h+="<input class='ans' id='ans' value='"+attr(g||"")+"'"+(locked?" disabled":"")+" autocomplete='off' autocorrect='off' autocapitalize='off' spellcheck='false' placeholder='"+(q.type==="sentence"?"Write a full sentence…":"Type your answer…")+"' oninput='typed(this.value)' onkeydown='if(event.key===\"Enter\"){enterKey();}'>";
+  }
+  return h;
+}
+function startSession(key,title,list,isMock){
+  S={key:key,title:title,mock:isMock,list:list.map(function(q){const c=Object.assign({},q);if(c.words)c.wordOrder=shuffle(c.words.slice());return c;}),idx:0,res:[],given:[]};
+  render();
+}
+function render(){if(S.mock)renderMock();else renderDrill();}
+function cur(){return S.list[S.idx];}
+function isLocked(){return !S.mock&&!!S.res[S.idx];}
+function fbHtml(q,r){return r.ok?"<div class='fb ok'>Correct! Great job! ✓</div>":"<div class='fb bad'>✗ Not quite.</div><div class='correct'><small>Correct answer:</small>"+esc(correctText(q))+"</div>";}
+
+/* ---- drill mode (topic tabs, Fix My Mistakes) ---- */
+function renderDrill(){
+  const q=cur(),n=S.list.length,r=S.res[S.idx],locked=!!r;
+  const ok=S.res.filter(function(x){return x&&x.ok;}).length;
+  let h=drillBar(S.title)+"<div class='prog'><i style='width:"+(S.idx/n*100)+"%'></i></div><div class='qcard'><div class='qtop'><span>Question "+(S.idx+1)+" / "+n+"</span><span>✓ "+ok+" correct</span></div>"+qBody(q,S.given[S.idx],locked);
+  h+="<div id='fb'>"+(r?fbHtml(q,r):"")+"</div><div class='btns'>"+(locked?"<button class='btn blue' id='nxt' onclick='nextQ()'>"+(S.idx+1<n?"Next ➜":"See My Score 🏁")+"</button>":"<button class='btn' onclick='checkAns()'>Check Answer</button>")+"</div></div>";
+  app.innerHTML=h;
+  if(locked&&q.type==="mc"){
+    document.querySelectorAll(".choice").forEach(function(b){const i=Number(b.getAttribute("data-i"));if(q.choices[i]===q.answer[0])b.classList.add("right");else if(i===S.given[S.idx])b.classList.add("wrong");});
+  }
+  const f=locked?document.getElementById("nxt"):document.getElementById("ans");
+  if(f){try{f.focus();}catch(e){}}
+}
+function pick(i){
+  if(isLocked())return;
+  S.given[S.idx]=i;
+  document.querySelectorAll(".choice").forEach(function(b){b.classList.toggle("sel",Number(b.getAttribute("data-i"))===i);});
+  if(S.mock)updateProgress();
+}
+function addWord(i){if(isLocked())return;const g=(S.given[S.idx]||[]).slice();if(g.indexOf(i)>=0)return;g.push(i);S.given[S.idx]=g;render();}
+function removeWord(k){if(isLocked())return;const g=(S.given[S.idx]||[]).slice();g.splice(k,1);S.given[S.idx]=g;render();}
+function resetWords(){if(isLocked())return;S.given[S.idx]=[];render();}
+function typed(v){if(isLocked())return;S.given[S.idx]=v;if(S.mock)updateProgress();}
+function enterKey(){if(S.mock){if(S.idx+1<S.list.length)nextM();}else if(S.res[S.idx])nextQ();else checkAns();}
+function flash(m){const f=document.getElementById("fb");if(f)f.innerHTML="<div class='fb warnfb'>"+m+"</div>";}
+function checkAns(){
+  if(S.res[S.idx])return;
+  const q=cur(),g=S.given[S.idx];
+  if(!isAnswered(q,g)){flash(q.type==="mc"?"Please choose an answer first.":q.type==="unscramble"?"Tap the words to build the sentence.":"Please type your answer first.");return;}
+  S.res[S.idx]={q:q,given:givenText(q,g),ok:isRight(q,g)};
+  renderDrill();
+}
+function nextQ(){if(!S.res[S.idx])return;if(S.idx+1<S.list.length){S.idx++;renderDrill();window.scrollTo(0,0);}else finish();}
+
+/* ---- mock exam: one question per page, prev / next, dot bar ---- */
+function renderMock(){
+  const q=cur(),n=S.list.length;
+  let h=drillBar(S.title)+"<div class='btns' style='margin:0 0 10px'><button class='btn blue sm' onclick=\"go('mock')\">🔀 New Random Set</button></div>";
+  h+="<div class='dots' id='dots'>"+dotsHtml()+"</div>";
+  h+="<div class='qcard'><div class='qtop'><span>Question "+(S.idx+1)+" / "+n+"</span><span id='acount'>"+answeredCount()+" answered</span></div>"+qBody(q,S.given[S.idx],false);
+  h+="<div id='fb'></div><div class='btns nav2'><button class='btn sec' onclick='prevM()'"+(S.idx===0?" disabled":"")+">◀ Prev</button>"+(S.idx+1<n?"<button class='btn blue' onclick='nextM()'>Next ▶</button>":"<button class='btn' onclick='finish()'>Submit 🏁</button>")+"</div></div>";
+  app.innerHTML=h;
+}
+function dotsHtml(){return S.list.map(function(q,i){return "<span class='dot"+(i===S.idx?" cur":"")+(isAnswered(q,S.given[i])?" done":"")+"'></span>";}).join("");}
+function answeredCount(){let c=0;S.list.forEach(function(q,i){if(isAnswered(q,S.given[i]))c++;});return c;}
+function updateProgress(){const d=document.getElementById("dots");if(d)d.innerHTML=dotsHtml();const a=document.getElementById("acount");if(a)a.textContent=answeredCount()+" answered";}
+function prevM(){if(S.idx>0){S.idx--;renderMock();window.scrollTo(0,0);}}
+function nextM(){if(S.idx+1<S.list.length){S.idx++;renderMock();window.scrollTo(0,0);}}
+
+/* ---- scoring ---- */
+function stars(p){return p>=90?5:p>=75?4:p>=55?3:p>=40?2:1;}
+function finish(){
+  if(!S)return;
+  let rows=[];
+  if(S.mock){S.list.forEach(function(q,i){const g=S.given[i];if(isAnswered(q,g))rows.push({q:q,given:givenText(q,g),ok:isRight(q,g)});});}
+  else rows=S.res.filter(function(r){return !!r;});
+  const title=S.title,key=S.key,total=S.mock?S.list.length:0;
+  S=null;
+  showResult(title,key,rows,total,false);
+}
+function showResult(title,key,rows,total,isOral){
+  const x=rows.length,y=rows.filter(function(r){return r.ok;}).length,p=x?Math.round(y/x*100):0;
+  let h="<div class='qcard score'><div>"+title+"</div>";
+  if(!x){h+="<div style='font-size:20px;margin:18px 0'>"+(isOral?"Show the model answer and mark how you did first.":"You haven't answered any questions yet.")+"</div>";}
+  else{
+    const prev=STATS[key]||{best:0,tries:0};STATS[key]={best:Math.max(prev.best,p),tries:prev.tries+1,last:p};saveStats();
+    h+="<div class='big'>"+y+" / "+x+"</div><div style='font-size:19px'>Answered "+x+" question"+(x>1?"s":"")+(total?" (of "+total+")":"")+" — "+y+(isOral?" got it":" correct")+" ("+p+"%)</div><div class='stars'>"+"⭐".repeat(stars(p))+"</div><div style='font-size:20px;margin:6px 0'>"+(p>=90?"Amazing! 🎉":p>=75?"Great job! 👍":p>=55?"Good try! 💪":"Keep practicing! 💪")+"</div>";
+  }
+  h+="<div class='btns' style='justify-content:center'><button class='btn' onclick=\"go('"+current+"')\">"+(current==="mock"?"🔀 Try Again (new set)":"↺ Try Again")+"</button><button class='btn sec' onclick=\"go('home')\">🏠 Home</button></div></div>";
+  const wrong=rows.filter(function(r){return !r.ok;}),right=rows.filter(function(r){return r.ok;});
+  if(x)h+="<h3 style='margin:18px 4px 6px'>"+(wrong.length?(isOral?"Practice these again":"Review (mistakes first)"):"No mistakes — perfect! 🌟")+"</h3>";
+  wrong.concat(isOral?[]:right).forEach(function(r){
+    const qt=r.q.question?strip(r.q.question):strip(r.q.ins);
+    h+="<div class='rev "+(r.ok?"":"x")+"'><div class='q'>"+(r.ok?"✓ ":"✗ ")+esc(qt)+"</div>"+(isOral?"":"<div>Your answer: <b>"+esc(r.given)+"</b></div>")+"<div>"+(isOral?"Model answer: ":"Correct answer: ")+"<span style='background:var(--hl);padding:2px 6px;border-radius:6px;font-weight:700'>"+esc(correctText(r.q))+"</span></div></div>";
+  });
+  app.innerHTML=h;window.scrollTo(0,0);
+}
+function strip(s){return String(s).replace(/<[^>]+>/g,"");}
+
+/* ====================== Oral Practice ====================== */
+const recordings={};
+let mediaRecorder=null;
+const WARN="<div style='background:#1a0a2a;border:2px solid #a855f7;color:#e9d5ff;border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:0.85rem;line-height:1.7;'><strong style='color:#c084fc;'>Recording requires Safari or Chrome</strong><br>Open this page in Safari (iOS) or Chrome — not inside another app.<br>iOS: tap ... → Open in Safari</div>";
+function setStatus(m){const e=document.getElementById("ostatus");if(e)e.textContent=m;}
+function stopRecording(){try{if(mediaRecorder&&mediaRecorder.state==="recording")mediaRecorder.stop();}catch(e){}}
+function startOral(){O={idx:0,shown:{},self:{}};renderOral();}
+function renderOral(){
+  const o=ORAL[O.idx],n=ORAL.length,i=O.idx;
+  let h=drillBar("🗣️ Oral Practice")+WARN+"<div class='note' style='margin-bottom:8px'>Estimated questions — confirm with teacher.</div>";
+  h+="<div class='dots'>"+ORAL.map(function(x,j){return "<span class='dot"+(j===i?" cur":"")+(O.self[j]==="ok"?" done":O.self[j]==="miss"?" miss":"")+"'></span>";}).join("")+"</div>";
+  h+="<div class='oral'><div class='qtop'><span>Question "+(i+1)+" / "+n+"</span></div><div class='oq'>"+esc(o.q)+"</div>";
+  h+="<div class='btns'><button class='btn sec' id='hearQ'>🔊 Hear Q</button><button class='btn rec' id='recBtn'>⏺ Record</button><button class='btn sec' id='playBtn'>▶ My Voice</button></div>";
+  h+="<div class='res' id='ostatus'>"+(recordings[i]?"Your answer is recorded. Tap ▶ My Voice to listen.":"")+"</div>";
+  if(!O.shown[i])h+="<div class='btns'><button class='btn blue' id='showBtn'>👁 Show Model Answer</button></div>";
+  else h+="<div class='os'>📝 Model answer:<br><b><i>“"+esc(o.s)+"”</i></b><div class='btns'><button class='btn sec sm' id='hearA'>🔊 Hear Model Answer</button></div></div><div class='selfq'>How did you do?</div><div class='btns'><button class='btn okb"+(O.self[i]==="ok"?" on":"")+"' id='selfOk'>✅ I got it</button><button class='btn missb"+(O.self[i]==="miss"?" on":"")+"' id='selfMiss'>🔁 Need practice</button></div>";
+  h+="<div class='btns nav2'><button class='btn sec' id='oPrev'"+(i===0?" disabled":"")+">◀ Prev</button><button class='btn blue' id='oNext'>"+(i+1<n?"Next ▶":"See My Score 🏁")+"</button></div></div>";
+  app.innerHTML=h;
+  bindOral();
+}
+function bindOral(){
+  document.getElementById("hearQ").addEventListener("click",function(){speak(ORAL[O.idx].q);});
+  const recBtn=document.getElementById("recBtn");
+  recBtn.addEventListener("click",function(){
+    if(mediaRecorder&&mediaRecorder.state==="recording"){mediaRecorder.stop();return;}
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){setStatus("Recording is not supported here. Open this page in Safari or Chrome.");return;}
+    const idx=O.idx;
+    navigator.mediaDevices.getUserMedia({audio:true,video:false}).then(function(stream){
+      const audioChunks=[];
+      const types=["audio/mp4","audio/aac","audio/webm;codecs=opus","audio/webm","audio/ogg"];
+      let mime="";
+      for(let k=0;k<types.length;k++){if(MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(types[k])){mime=types[k];break;}}
+      mediaRecorder=mime?new MediaRecorder(stream,{mimeType:mime}):new MediaRecorder(stream);
+      mediaRecorder.ondataavailable=function(e){if(e.data&&e.data.size>0)audioChunks.push(e.data);};
+      mediaRecorder.onstop=function(){
+        stream.getTracks().forEach(function(t){t.stop();});
+        if(recordings[idx]){try{URL.revokeObjectURL(recordings[idx]);}catch(e){}}
+        recordings[idx]=URL.createObjectURL(new Blob(audioChunks,{type:mime||"audio/webm"}));
+        if(O&&O.idx===idx){const b=document.getElementById("recBtn");if(b)b.textContent="⏺ Record";setStatus("Recorded! Tap ▶ My Voice to listen.");}
+      };
+      mediaRecorder.start(200);
+      recBtn.textContent="⏹ Stop";
+      setStatus("🔴 Recording… tap ⏹ Stop when you finish.");
+    }).catch(function(err){
+      const nm=err&&err.name;
+      setStatus(nm==="NotAllowedError"?"Microphone is blocked. Allow the microphone for this page in Safari / Chrome settings, then try again.":nm==="NotFoundError"?"No microphone was found on this device.":nm==="NotReadableError"?"The microphone is being used by another app.":"Could not start recording: "+((err&&err.message)||nm));
+    });
+  });
+  document.getElementById("playBtn").addEventListener("click",function(){
+    const url=recordings[O.idx];
+    if(!url){setStatus("Record your answer first.");return;}
+    const audio=new Audio();
+    audio.src=url;
+    const p=audio.play();
+    if(p!==undefined)p.catch(function(err){setStatus(err.message);});
+  });
+  const sb=document.getElementById("showBtn");if(sb)sb.addEventListener("click",function(){O.shown[O.idx]=true;renderOral();});
+  const ha=document.getElementById("hearA");if(ha)ha.addEventListener("click",function(){speak(ORAL[O.idx].s);});
+  const so=document.getElementById("selfOk");if(so)so.addEventListener("click",function(){O.self[O.idx]="ok";renderOral();});
+  const sm=document.getElementById("selfMiss");if(sm)sm.addEventListener("click",function(){O.self[O.idx]="miss";renderOral();});
+  document.getElementById("oPrev").addEventListener("click",function(){if(O.idx>0){stopRecording();O.idx--;renderOral();window.scrollTo(0,0);}});
+  document.getElementById("oNext").addEventListener("click",function(){stopRecording();if(O.idx+1<ORAL.length){O.idx++;renderOral();window.scrollTo(0,0);}else finishOral();});
+}
+function finishOral(){
+  if(!O)return;
+  stopRecording();
+  const rows=[];
+  ORAL.forEach(function(o,i){if(O.self[i])rows.push({q:{type:"oral",question:o.q,ins:"",answer:[o.s]},given:"",ok:O.self[i]==="ok"});});
+  showResult("🗣️ Oral Practice","oral",rows,0,true);
+}
+
+drawNav();home();
+</script>
+</body>
+</html>

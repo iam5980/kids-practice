@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beethoven Reading Practice</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D1B4B; --blue:#2563EB; --sky:#38BDF8; --teal:#0D9488;
+  --gold:#F59E0B; --amber:#FCD34D; --rose:#F43F5E; --green:#22C55E;
+  --purple:#7C3AED; --orange:#F97316;
+  --bg:#F0F4FF; --card:#FFFFFF; --muted:#64748B; --border:#E2E8F0;
+  --radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Quicksand',sans-serif;background:var(--bg);min-height:100vh;color:var(--navy);}
+
+/* ── TOP BAR ── */
+.topbar{background:var(--navy);padding:14px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.3);}
+.topbar-logo{font-family:'Baloo 2',cursive;font-size:20px;font-weight:800;color:var(--amber);letter-spacing:.5px;}
+.topbar-sub{font-size:11px;color:#94A3B8;font-weight:600;margin-top:-2px;}
+.topbar-right{margin-left:auto;display:flex;gap:8px;}
+.audio-toggle{background:rgba(255,255,255,.12);border:none;border-radius:50px;padding:6px 12px;color:white;font-size:12px;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif;transition:all .2s;}
+.audio-toggle:hover{background:rgba(255,255,255,.2);}
+.audio-toggle.on{background:var(--teal);}
+
+/* ── HOME SCREEN ── */
+#home-screen{padding:20px 16px 40px;}
+.home-title{font-family:'Baloo 2',cursive;font-size:22px;font-weight:800;color:var(--navy);margin-bottom:4px;}
+.home-sub{font-size:13px;color:var(--muted);margin-bottom:20px;font-weight:600;}
+
+.mode-section{margin-bottom:24px;}
+.mode-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.mode-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.mode-card{background:var(--card);border-radius:var(--radius);padding:14px 12px;cursor:pointer;border:2px solid var(--border);transition:all .2s;text-align:center;position:relative;overflow:hidden;}
+.mode-card::before{content:'';position:absolute;inset:0;opacity:0;transition:.2s;}
+.mode-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.1);}
+.mode-card:hover::before{opacity:1;}
+.mode-card.type-card{border-color:#BFDBFE;}
+.mode-card.type-card:hover{border-color:var(--blue);}
+.mode-card.topic-card{border-color:#BBF7D0;}
+.mode-card.topic-card:hover{border-color:var(--teal);}
+.mode-card.exam-card{grid-column:1/-1;background:linear-gradient(135deg,var(--navy),#1E3A8A);border:none;color:white;}
+.mode-card.exam-card:hover{box-shadow:0 8px 32px rgba(37,99,235,.4);}
+.mode-icon{font-size:28px;margin-bottom:6px;}
+.mode-name{font-size:13px;font-weight:700;color:var(--navy);line-height:1.3;}
+.mode-card.exam-card .mode-name{color:white;font-size:15px;}
+.mode-desc{font-size:11px;color:var(--muted);margin-top:3px;font-weight:600;}
+.mode-card.exam-card .mode-desc{color:#93C5FD;}
+.mode-count{position:absolute;top:8px;right:8px;background:var(--blue);color:white;border-radius:50px;padding:2px 7px;font-size:10px;font-weight:800;}
+.mode-card.exam-card .mode-count{background:var(--amber);color:var(--navy);}
+
+/* ── QUIZ SCREEN ── */
+#quiz-screen{display:none;padding-bottom:40px;}
+.quiz-header{background:var(--navy);padding:12px 16px;display:flex;align-items:center;gap:10px;}
+.back-btn{background:rgba(255,255,255,.15);border:none;border-radius:8px;padding:6px 12px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif;}
+.back-btn:hover{background:rgba(255,255,255,.25);}
+.quiz-title{color:white;font-size:14px;font-weight:700;flex:1;text-align:center;}
+.quiz-mode-tag{background:var(--teal);color:white;border-radius:50px;padding:3px 10px;font-size:11px;font-weight:800;}
+
+.prog-bar-wrap{background:rgba(255,255,255,.1);height:4px;}
+.prog-bar-fill{height:100%;background:linear-gradient(90deg,var(--sky),var(--amber));transition:width .5s ease;}
+
+.quiz-meta{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:white;border-bottom:1px solid var(--border);}
+.q-counter{font-size:13px;font-weight:700;color:var(--muted);}
+.q-score-badge{background:var(--navy);color:var(--amber);border-radius:50px;padding:4px 12px;font-size:13px;font-weight:800;}
+
+.q-area{padding:16px;}
+.q-card{background:var(--card);border-radius:20px;padding:22px 18px;box-shadow:0 4px 20px rgba(0,0,0,.06);animation:popIn .3s ease;}
+@keyframes popIn{from{opacity:0;transform:scale(.96);}to{opacity:1;transform:scale(1);}}
+
+.q-type-row{display:flex;gap:8px;align-items:center;margin-bottom:12px;}
+.q-type-pill{font-size:10px;font-weight:800;padding:4px 10px;border-radius:50px;text-transform:uppercase;letter-spacing:.5px;}
+.pill-fill  {background:#DBEAFE;color:#1D4ED8;}
+.pill-mc    {background:#EDE9FE;color:#5B21B6;}
+.pill-tf    {background:#DCFCE7;color:#15803D;}
+.pill-spell {background:#FEF9C3;color:#854D0E;}
+.q-section-tag{font-size:11px;color:var(--muted);font-weight:600;}
+
+.q-text{font-size:16px;font-weight:700;line-height:1.55;color:var(--navy);margin-bottom:16px;white-space:pre-line;}
+
+/* audio play button */
+.audio-btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--blue),var(--teal));color:white;border:none;border-radius:50px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:14px;font-family:'Quicksand',sans-serif;transition:all .2s;}
+.audio-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,.4);}
+.audio-btn.playing{background:linear-gradient(135deg,var(--rose),#BE123C);animation:pulse 1s ease infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(244,63,94,.4);}50%{box-shadow:0 0 0 8px rgba(244,63,94,0);}}
+
+.word-bank{background:#F8FAFF;border:1.5px dashed #BFDBFE;border-radius:12px;padding:10px 12px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:6px;}
+.wb-label{font-size:10px;font-weight:800;color:var(--blue);text-transform:uppercase;width:100%;margin-bottom:2px;letter-spacing:1px;}
+.wb-chip{background:white;border:1.5px solid #BFDBFE;border-radius:50px;padding:4px 11px;font-size:13px;font-weight:700;color:var(--navy);}
+
+.hint-box{background:#FFF7ED;border-left:4px solid var(--orange);border-radius:0 10px 10px 0;padding:8px 12px;margin-bottom:14px;font-size:13px;font-weight:600;color:#92400E;}
+
+.text-input{width:100%;border:2px solid var(--border);border-radius:12px;padding:14px 16px;font-size:15px;font-family:'Quicksand',sans-serif;font-weight:600;color:var(--navy);outline:none;transition:all .2s;background:#FAFBFF;}
+.text-input:focus{border-color:var(--blue);background:white;box-shadow:0 0 0 3px rgba(37,99,235,.1);}
+.text-input.ok {border-color:var(--green);background:#F0FDF4;}
+.text-input.err{border-color:var(--rose);background:#FFF1F2;}
+
+.mc-opts{display:flex;flex-direction:column;gap:9px;}
+.mc-opt{display:flex;align-items:center;gap:12px;background:#FAFBFF;border:2px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer;font-size:14px;font-weight:600;color:var(--navy);transition:all .2s;font-family:'Quicksand',sans-serif;text-align:left;}
+.mc-opt:hover{border-color:var(--blue);background:#EFF6FF;}
+.mc-opt.sel{border-color:var(--blue);background:#DBEAFE;}
+.mc-opt.ok {border-color:var(--green);background:#DCFCE7;color:#15803D;}
+.mc-opt.err{border-color:var(--rose);background:#FFF1F2;color:#BE123C;}
+.mc-ltr{min-width:28px;height:28px;border-radius:50%;background:#E2E8F0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;}
+.mc-opt.sel .mc-ltr{background:var(--blue);color:white;}
+.mc-opt.ok  .mc-ltr{background:var(--green);color:white;}
+.mc-opt.err .mc-ltr{background:var(--rose);color:white;}
+
+.tf-row{display:flex;gap:12px;}
+.tf-btn{flex:1;padding:18px;border-radius:14px;border:2px solid var(--border);background:#FAFBFF;font-size:15px;font-weight:800;font-family:'Quicksand',sans-serif;cursor:pointer;transition:all .2s;color:var(--navy);}
+.tf-btn:hover{border-color:var(--blue);}
+.tf-btn.sel{border-color:var(--blue);background:#DBEAFE;}
+.tf-btn.ok {border-color:var(--green);background:#DCFCE7;color:#15803D;}
+.tf-btn.err{border-color:var(--rose);background:#FFF1F2;color:#BE123C;}
+
+.feedback{margin-top:14px;padding:12px 16px;border-radius:12px;font-size:14px;font-weight:700;display:none;}
+.feedback.show{display:block;}
+.fb-ok {background:#DCFCE7;color:#14532D;border:1.5px solid #86EFAC;}
+.fb-err{background:#FFF1F2;color:#9F1239;border:1.5px solid #FDA4AF;}
+
+.action-row{display:flex;gap:10px;margin-top:18px;}
+.btn-check{flex:1;background:var(--navy);color:white;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:800;font-family:'Quicksand',sans-serif;cursor:pointer;transition:all .2s;}
+.btn-check:hover{background:#1E3A8A;transform:translateY(-1px);}
+.btn-next{flex:1;background:linear-gradient(135deg,var(--blue),var(--teal));color:white;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:800;font-family:'Quicksand',sans-serif;cursor:pointer;display:none;transition:all .2s;}
+.btn-next:hover{transform:translateY(-1px);}
+.btn-skip{background:#F1F5F9;color:var(--muted);border:none;border-radius:12px;padding:14px 16px;font-size:14px;font-weight:700;font-family:'Quicksand',sans-serif;cursor:pointer;}
+
+.btn-submit{display:none;width:100%;padding:16px;border-radius:14px;border:none;font-size:16px;font-weight:800;font-family:'Quicksand',sans-serif;cursor:pointer;background:linear-gradient(135deg,var(--rose),#BE123C);color:white;margin-top:14px;transition:all .2s;box-shadow:0 4px 16px rgba(244,63,94,.35);}
+.btn-submit.show{display:block;}
+
+/* ── RESULTS ── */
+#result-screen{display:none;padding:20px 16px 40px;}
+.result-back{background:white;border:2px solid var(--border);border-radius:12px;padding:10px 16px;font-size:14px;font-weight:700;font-family:'Quicksand',sans-serif;cursor:pointer;color:var(--navy);margin-bottom:16px;width:100%;}
+.score-hero{background:linear-gradient(135deg,var(--navy) 0%,#1E3A8A 100%);border-radius:24px;padding:30px 20px;text-align:center;color:white;margin-bottom:20px;box-shadow:0 8px 32px rgba(13,27,75,.3);}
+.score-emoji{font-size:52px;margin-bottom:8px;}
+.score-big{font-family:'Baloo 2',cursive;font-size:64px;font-weight:800;color:var(--amber);line-height:1;}
+.score-of{font-size:18px;opacity:.8;margin-top:4px;}
+.score-stars{font-size:26px;margin:10px 0 6px;}
+.score-msg{font-size:14px;font-weight:700;opacity:.9;}
+.score-pct-bar{background:rgba(255,255,255,.15);border-radius:100px;height:8px;margin:14px 0 0;overflow:hidden;}
+.score-pct-fill{height:100%;background:linear-gradient(90deg,var(--sky),var(--amber));border-radius:100px;transition:width 1s ease;}
+
+.review-section{margin-bottom:10px;}
+.review-hdr{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.review-item{background:white;border-radius:14px;padding:14px;margin-bottom:8px;border-left:5px solid var(--green);box-shadow:0 2px 8px rgba(0,0,0,.05);}
+.review-item.miss{border-left-color:var(--rose);}
+.review-q{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:5px;white-space:pre-line;}
+.review-yours{font-size:12px;color:var(--rose);font-weight:700;}
+.review-correct{font-size:12px;color:var(--green);font-weight:700;}
+
+.btn-retry{width:100%;padding:16px;border-radius:14px;border:none;font-size:15px;font-weight:800;font-family:'Quicksand',sans-serif;cursor:pointer;background:var(--navy);color:white;margin-top:10px;}
+
+/* ── EXAM SCREEN ── */
+#exam-screen{display:none;}
+
+/* ── ORAL RECORDER ── */
+.oral-panel{background:linear-gradient(160deg,#0C1526 0%,#162032 100%);border-radius:18px;padding:16px;margin-bottom:14px;}
+.oral-step-label{font-size:10px;font-weight:800;color:#F59E0B;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.oral-step-label::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;}
+
+/* Model answer box */
+.model-sent-box{background:#0A2218;border:1.5px solid #166534;border-radius:14px;padding:14px;margin-bottom:4px;}
+.model-sent-text{font-size:15px;font-weight:700;color:#BBF7D0;line-height:1.65;margin-bottom:10px;}
+.model-sent-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.ref-speak-btn{background:#15803D;color:white;border:none;border-radius:50px;padding:8px 14px;font-size:12px;font-weight:800;font-family:'Quicksand',sans-serif;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:5px;}
+.ref-speak-btn:hover{opacity:.85;transform:translateY(-1px);}
+
+/* Recorder */
+.rec-visualizer{display:flex;align-items:center;justify-content:center;gap:3px;height:44px;margin-bottom:8px;}
+.rec-bar{width:4px;border-radius:4px;background:#1E3A5F;transition:height .08s;}
+.rec-bar.active{background:linear-gradient(180deg,#F43F5E,#FB7185);}
+.rec-btn-row{display:flex;gap:8px;margin-bottom:4px;}
+.rec-btn{flex:1;padding:12px 6px;border:none;border-radius:12px;font-size:12px;font-weight:800;font-family:'Quicksand',sans-serif;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px;}
+.rec-start{background:#F43F5E;color:white;}
+.rec-start:hover:not(:disabled){background:#BE123C;transform:translateY(-1px);}
+.rec-start.recording{background:#9F1239;animation:recPulse 1s ease infinite;}
+@keyframes recPulse{0%,100%{box-shadow:0 0 0 0 rgba(244,63,94,.5);}50%{box-shadow:0 0 0 12px rgba(244,63,94,0);}}
+.rec-stop{background:#374151;color:#D1D5DB;}
+.rec-stop:hover:not(:disabled){background:#4B5563;}
+.rec-play{background:#0D9488;color:white;}
+.rec-play:hover:not(:disabled){background:#0F766E;transform:translateY(-1px);}
+.rec-btn:disabled{opacity:.3;cursor:not-allowed;transform:none!important;}
+.rec-timer{font-size:24px;font-weight:800;color:white;text-align:center;font-family:'Baloo 2',cursive;letter-spacing:3px;margin-bottom:6px;}
+.rec-status{font-size:11px;font-weight:700;text-align:center;color:#64748B;margin-bottom:10px;line-height:1.4;}
+.rec-status.active{color:#F43F5E;}
+.rec-status.done{color:#22C55E;}
+
+/* Score-yourself panel */
+.oral-score-section{border-top:1px solid #1E3A5F;padding-top:14px;margin-top:10px;}
+.oral-score-hint{font-size:12px;color:#94A3B8;font-weight:600;margin-bottom:10px;line-height:1.5;}
+.score-rows{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+.srow{display:flex;align-items:center;gap:10px;background:#1E293B;border:1.5px solid #1E3A5F;border-radius:10px;padding:10px 12px;cursor:pointer;transition:all .2s;user-select:none;}
+.srow:hover{border-color:#3B82F6;background:#1E3A5F;}
+.srow.checked{background:#14532D;border-color:#22C55E;}
+.srow-bonus{border-color:#7C3AED;background:#1E1B4B;}
+.srow-bonus:hover{border-color:#A78BFA;}
+.srow-bonus.checked{background:#2E1065;border-color:#A78BFA;}
+.srow-check{font-size:16px;flex-shrink:0;min-width:20px;text-align:center;transition:all .2s;}
+.srow.checked .srow-check{color:#22C55E;}
+.srow-bonus.checked .srow-check{color:#A78BFA;}
+.srow-label{font-size:13px;font-weight:600;color:#CBD5E1;flex:1;line-height:1.3;}
+.srow.checked .srow-label{color:#BBF7D0;}
+.srow-bonus.checked .srow-label{color:#DDD6FE;}
+.srow-badge{font-size:10px;font-weight:800;background:#1E3A5F;color:#64748B;border-radius:50px;padding:2px 8px;flex-shrink:0;transition:all .2s;}
+.srow.checked .srow-badge{background:#15803D;color:#BBF7D0;}
+.srow-bonus.checked .srow-badge{background:#7C3AED;color:#DDD6FE;}
+
+/* Score display */
+.oral-score-display{background:#0F172A;border-radius:12px;padding:12px;}
+.oral-score-bar-bg{background:#1E293B;border-radius:100px;height:10px;overflow:hidden;margin-bottom:8px;}
+.oral-score-bar-fill{height:100%;border-radius:100px;transition:width .5s ease;background:linear-gradient(90deg,#F43F5E 0%,#F59E0B 50%,#22C55E 100%);background-size:200% 100%;transition:width .5s ease, background-position .5s ease;}
+.oral-score-num-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.oral-score-label{font-size:12px;font-weight:700;color:#64748B;}
+.oral-score-num{font-size:18px;font-weight:800;color:white;font-family:'Baloo 2',cursive;}
+.oral-score-pct{font-size:13px;font-weight:800;color:#F59E0B;margin-left:auto;}
+.oral-score-grade{font-size:13px;font-weight:700;text-align:center;padding:8px;border-radius:8px;background:#1E293B;color:#64748B;transition:all .3s;}
+.grade-A{background:#14532D!important;color:#86EFAC!important;}
+.grade-B{background:#0C4A6E!important;color:#BAE6FD!important;}
+.grade-C{background:#451A03!important;color:#FCD34D!important;}
+.grade-D{background:#3B0764!important;color:#DDD6FE!important;}
+.grade-F{background:#4C0519!important;color:#FDA4AF!important;}
+
+/* ── EXAM BADGE ── */
+.exam-badge{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#DC2626,#B91C1C);color:white;border-radius:50px;padding:4px 11px;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;box-shadow:0 2px 8px rgba(220,38,38,.4);}
+.exam-banner{background:linear-gradient(135deg,#7F1D1D,#991B1B);border:1.5px solid #F87171;border-radius:12px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.exam-banner-icon{font-size:20px;flex-shrink:0;}
+.exam-banner-text{font-size:12px;font-weight:700;color:#FCA5A5;line-height:1.4;}
+.exam-banner-text strong{color:white;}
+/* Home screen exam highlight */
+.mode-card.exam-must{border-color:#FCA5A5!important;position:relative;}
+.exam-must-dot{position:absolute;top:-6px;right:-6px;background:#DC2626;color:white;border-radius:50%;width:20px;height:20px;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(220,38,38,.5);}
+/* ── UTILS ── */
+.hidden{display:none!important;}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div>
+    <div class="topbar-logo">🎵 Beethoven Reading</div>
+    <div class="topbar-sub">Practice · Review · Master</div>
+  </div>
+  <div class="topbar-right">
+    <button class="audio-toggle on" id="audio-toggle" onclick="toggleAudio()">🔊 Sound ON</button>
+  </div>
+</div>
+
+<!-- HOME SCREEN -->
+<div id="home-screen">
+  <br>
+  <div class="home-title">What would you like to practice?</div>
+  <div class="home-sub">Choose a mode to get started.</div>
+
+  <div class="mode-section">
+    <div class="mode-label">📚 Practice by Question Type</div>
+    <div class="card-grid">
+      <div class="mode-card type-card" onclick="startMode('type','vocab')">
+        <span class="mode-count">24</span>
+        <div class="mode-icon">📖</div>
+        <div class="mode-name">Vocabulary</div>
+        <div class="mode-desc">Definitions & word matching</div>
+      </div>
+      <div class="mode-card type-card" onclick="startMode('type','spelling')">
+        <span class="mode-count">26</span>
+        <div class="mode-icon">✏️</div>
+        <div class="mode-name">Spelling & Fill-in</div>
+        <div class="mode-desc">Type the correct word</div>
+      </div>
+      <div class="mode-card type-card" onclick="startMode('type','grammar')">
+        <span class="mode-count">28</span>
+        <div class="mode-icon">⚙️</div>
+        <div class="mode-name">Grammar</div>
+        <div class="mode-desc">Past tense, prepositions, antonyms</div>
+      </div>
+      <div class="mode-card type-card" onclick="startMode('type','comprehension')">
+        <span class="mode-count">30</span>
+        <div class="mode-icon">🔍</div>
+        <div class="mode-name">Comprehension</div>
+        <div class="mode-desc">Who, what, where, why</div>
+      </div>
+      <div class="mode-card type-card" onclick="startMode('type','truefalse')">
+        <span class="mode-count">18</span>
+        <div class="mode-icon">✅</div>
+        <div class="mode-name">True or False</div>
+        <div class="mode-desc">Story facts check</div>
+      </div>
+      <div class="mode-card type-card" onclick="startMode('type','oral')">
+        <span class="mode-count">22 Qs</span>
+        <div class="mode-icon">🎤</div>
+        <div class="mode-name">Oral Practice</div>
+        <div class="mode-desc">⭐ 8 exam must-know + 14 extra</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mode-section">
+    <div class="mode-label">📖 Practice by Story</div>
+    <div class="card-grid">
+      <div class="mode-card topic-card" onclick="startMode('topic','bremen')">
+        <span class="mode-count">50</span>
+        <div class="mode-icon">🎶</div>
+        <div class="mode-name">The Bremen Town Musicians</div>
+        <div class="mode-desc">All questions about this story</div>
+      </div>
+      <div class="mode-card topic-card" onclick="startMode('topic','anansi')">
+        <span class="mode-count">45</span>
+        <div class="mode-icon">🕷️</div>
+        <div class="mode-name">Anansi Goes Fishing</div>
+        <div class="mode-desc">All questions about this story</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mode-section">
+    <div class="mode-label">🏆 Final Exam</div>
+    <div class="card-grid">
+      <div class="mode-card type-card exam-must" onclick="startMode('type','oral-exam')">
+        <span class="exam-must-dot">8</span>
+        <div class="mode-icon">⭐</div>
+        <div class="mode-name">Oral Exam Must-Know</div>
+        <div class="mode-desc">8 required questions from the official worksheet</div>
+      </div>
+      <div class="mode-card exam-card" onclick="startMode('exam','final')">
+        <span class="mode-count">40 Qs</span>
+        <div class="mode-icon">📝</div>
+        <div class="mode-name">Final Mock Exam</div>
+        <div class="mode-desc">All question types · Both stories · Mixed</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ SCREEN -->
+<div id="quiz-screen">
+  <div class="quiz-header">
+    <button class="back-btn" onclick="goHome()">← Back</button>
+    <div class="quiz-title" id="quiz-title">Practice</div>
+    <div class="quiz-mode-tag" id="quiz-mode-tag">TYPE</div>
+  </div>
+  <div class="prog-bar-wrap"><div class="prog-bar-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="quiz-meta">
+    <div class="q-counter" id="q-counter">Question 1 of 1</div>
+    <div class="q-score-badge" id="q-score">⭐ 0</div>
+  </div>
+  <div class="q-area">
+    <div class="q-card" id="q-card"></div>
+    <button class="btn-submit" id="btn-submit" onclick="submitQuiz()">📋 Submit &amp; See My Score</button>
+  </div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div id="result-screen">
+  <button class="result-back" onclick="goHome()">← Back to Home</button>
+  <div class="score-hero">
+    <div class="score-emoji" id="res-emoji">🎉</div>
+    <div class="score-big" id="res-num">0</div>
+    <div class="score-of" id="res-of">/ 0 points</div>
+    <div class="score-stars" id="res-stars">⭐</div>
+    <div class="score-msg" id="res-msg">Well done!</div>
+    <div class="score-pct-bar"><div class="score-pct-fill" id="res-pct-fill" style="width:0%"></div></div>
+  </div>
+  <div class="review-section">
+    <div class="review-hdr">Question Review</div>
+    <div id="review-list"></div>
+  </div>
+  <button class="btn-retry" onclick="retryMode()">🔄 Try Again</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  AUDIO ENGINE
+// ═══════════════════════════════════════════════════════
+let audioOn = true;
+let synth = window.speechSynthesis;
+let currentUtterance = null;
+
+function toggleAudio(){
+  audioOn = !audioOn;
+  const btn = document.getElementById('audio-toggle');
+  btn.textContent = audioOn ? '🔊 Sound ON' : '🔇 Sound OFF';
+  btn.classList.toggle('on', audioOn);
+  if (!audioOn && synth) synth.cancel();
+}
+
+function speak(text, onEnd){
+  if (!audioOn || !synth) { if(onEnd) onEnd(); return; }
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = 0.88; u.pitch = 1.05;
+  u.onend = () => {
+    const btn = document.getElementById('play-btn');
+    if(btn){ btn.textContent = '🔊 Listen Again'; btn.classList.remove('playing'); }
+    if(onEnd) onEnd();
+  };
+  currentUtterance = u;
+  synth.speak(u);
+}
+
+function playQuestion(){
+  const btn = document.getElementById('play-btn');
+  if(!btn) return;
+  const text = btn.dataset.text;
+  btn.textContent = '⏸ Playing...'; btn.classList.add('playing');
+  speak(text);
+}
+
+function playSound(type){
+  if(!audioOn) return;
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.connect(g); g.connect(ctx.destination);
+  if(type === 'correct'){
+    o.frequency.setValueAtTime(523, ctx.currentTime);
+    o.frequency.setValueAtTime(659, ctx.currentTime+0.1);
+    o.frequency.setValueAtTime(784, ctx.currentTime+0.2);
+    g.gain.setValueAtTime(0.3, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.5);
+    o.start(); o.stop(ctx.currentTime+0.5);
+  } else {
+    o.frequency.setValueAtTime(300, ctx.currentTime);
+    o.frequency.setValueAtTime(200, ctx.currentTime+0.15);
+    g.gain.setValueAtTime(0.2, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.3);
+    o.start(); o.stop(ctx.currentTime+0.3);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  QUESTION BANK  (type tags: vocab / spelling / grammar / comprehension / truefalse / oral)
+//  story tags: bremen / anansi / both
+// ═══════════════════════════════════════════════════════
+const BANK = [
+
+// ── VOCABULARY ─────────────────────────────────────────────────────
+{ty:'vocab',st:'bremen',q:'What does "grain" mean?',o:['A place where flour is made','A small hard dry fruit such as rice or wheat','A person who plays an instrument','To remove something'],a:1},
+{ty:'vocab',st:'bremen',q:'What does "mill" mean?',o:['A hard dry fruit like wheat','A place where flour is made','To run away from something','A storyteller'],a:1},
+{ty:'vocab',st:'bremen',q:'What does "musician" mean?',o:['A person who owns animals','A person who plays an instrument','A person who tells stories','A person who makes flour'],a:1},
+{ty:'vocab',st:'bremen',q:'What does "owner" mean?',o:['A narrator','A person who has something that belongs to them','A musician','A miller'],a:1},
+{ty:'vocab',st:'bremen',q:'What does "narrator" mean?',o:['A person who plays music','A person who owns a mill','A person who says what is happening in a story','A person who bakes bread'],a:2},
+{ty:'vocab',st:'bremen',q:'What does "get rid of" mean?',o:['To take care of something','To remove, throw away, or kill something','To give something away as a gift','To find something new'],a:1},
+{ty:'vocab',st:'bremen',q:'What does "glee" mean?',o:['Sadness','Anger','Great happiness and delight','Fear'],a:2},
+{ty:'vocab',st:'bremen',q:'What does "glum" mean?',o:['Very happy','Looking or feeling sad','Very angry','Very tired'],a:1},
+{ty:'vocab',st:'bremen',q:'What does "pleasant" mean?',o:['Unpleasant and boring','Giving enjoyment; agreeable','Very loud','Very old'],a:1},
+{ty:'vocab',st:'bremen',q:'What does "startled" mean?',o:['Very tired','Suddenly surprised or frightened','Very happy','Hungry'],a:1},
+{ty:'vocab',st:'bremen',q:'What does "fireplace" mean?',o:['A place to sleep','A place in a house where you make a fire to stay warm','A place to store food','A place to keep animals'],a:1},
+{ty:'vocab',st:'bremen',q:'What does "roast beef" mean?',o:['Raw beef from a farm','Beef that has been cooked in an oven','A type of bread','A grain dish'],a:1},
+{ty:'vocab',st:'bremen',q:'What does "scratch" mean?',o:['To jump over something','To make sharp cuts on a surface with claws or nails','To run away quickly','To fall down'],a:1},
+{ty:'vocab',st:'bremen',q:'What does "horrible" mean?',o:['Very beautiful','Very boring','Very small','Causing fear or shock; dreadful'],a:3},
+{ty:'vocab',st:'anansi',q:'What does "certainly" mean?',o:['Perhaps; maybe','Slowly; carefully','Without doubt; definitely; yes!','Never; not at all'],a:2},
+{ty:'vocab',st:'anansi',q:'What does "intend" mean?',o:['To forget something','To have a plan or purpose for what you will do','To run away','To trick someone'],a:1},
+{ty:'vocab',st:'anansi',q:'What does "weave" mean?',o:['To catch fish','To make something by passing threads over and under one another','To cook something','To jump over something'],a:1},
+{ty:'vocab',st:'anansi',q:'What does "catch" mean?',o:['To lose something','To throw something away','To take hold of or capture something','To make something'],a:2},
+{ty:'vocab',st:'anansi',q:'What does "trick" mean?',o:['To help someone succeed','To fool someone or make them believe something untrue','To share work fairly','To cook a meal'],a:1},
+{ty:'vocab',st:'anansi',q:'What does "task" mean?',o:['A type of food','A river animal','A piece of work that needs to be done','A fishing tool'],a:2},
+{ty:'vocab',st:'anansi',q:'What does "chase" mean?',o:['To sleep','To cook food','To run after someone or something quickly','To weave a net'],a:2},
+{ty:'vocab',st:'anansi',q:'What does "yawn" mean?',o:['To eat quickly','To open your mouth wide when tired or bored','To laugh loudly','To run fast'],a:1},
+{ty:'vocab',st:'anansi',q:'What does "stomach" mean?',o:['A type of fish','The part of the body that digests food','A river bank','A fishing net'],a:1},
+{ty:'vocab',st:'both',q:'What does "peeked" mean?',o:['Looked secretly through a small opening','Ran away quickly','Made a loud noise','Fell asleep'],a:0},
+{ty:'vocab',st:'both',q:'What does "excitement" mean?',o:['Sadness and disappointment','A strong feeling of enthusiasm and eagerness','Fear and worry','Boredom and tiredness'],a:1},
+{ty:'vocab',st:'both',q:'What does "delicious" mean?',o:['Very ugly','Very boring','Having a very pleasant taste or smell','Very cold'],a:2},
+{ty:'vocab',st:'bremen',q:'What does "sign" mean?',o:['A type of food','A notice or board giving information or directions','A loud noise','A type of animal'],a:1},
+{ty:'vocab',st:'bremen',q:'What does "robbers" mean?',o:['People who grow crops','People who steal things from others','People who tell stories','People who bake bread'],a:1},
+{ty:'vocab',st:'bremen',q:'What does "listen closely" mean?',o:['To make a loud noise','To sleep quietly','To pay very careful attention when listening','To talk to someone'],a:2},
+
+// ── SPELLING / FILL-IN ─────────────────────────────────────────────
+{ty:'spelling',st:'bremen',q:'The donkey worked hard day after day. He carried heavy bags of _____ to the mill.',a:'grain',wb:['grain','mill','narrator','owner','musician']},
+{ty:'spelling',st:'bremen',q:'The donkey heard his _____ talking about getting rid of him.',a:'owner',wb:['owner','narrator','grain','mill','musician']},
+{ty:'spelling',st:'bremen',q:'The donkey decided to go to _____ Town to become a musician.',a:'Bremen',wb:['Bremen','Anansi','Warthog','Hamburg','Berlin']},
+{ty:'spelling',st:'bremen',q:'The donkey said he could be a fine _____ in Bremen Town.',a:'musician',wb:['musician','narrator','owner','grain','mill']},
+{ty:'spelling',st:'bremen',q:'Drama is a story written to be _____ out for others.',a:'acted'},
+{ty:'spelling',st:'bremen',q:'The animals walked until it got _____. Then they saw a light in a house.',a:'dark'},
+{ty:'spelling',st:'bremen',q:'The four musicians saw a sign that said Bremen Town. They were filled with _____ and danced.',a:'excitement',wb:['excitement','sign','robbers','peeked','delicious']},
+{ty:'spelling',st:'bremen',q:'The animals were not tall enough to see inside, so the rooster _____ in the window.',a:'peeked',wb:['peeked','startled','tripped','scratched','screeched']},
+{ty:'spelling',st:'bremen',q:'The robber ran outside. He _____ over the donkey, who kicked him.',a:'tripped'},
+{ty:'spelling',st:'bremen',q:'He went to the fireplace to warm himself. There he surprised the cat, who _____ his face.',a:'scratched'},
+{ty:'spelling',st:'bremen',q:'The dog was _____ and bit the robber on the leg.',a:'startled'},
+{ty:'spelling',st:'bremen',q:'"There are four _____ monsters in there!" said the robber.',a:'horrible'},
+{ty:'spelling',st:'anansi',q:'Anansi loved fish, but he was too _____ to catch them himself.',a:'lazy'},
+{ty:'spelling',st:'anansi',q:'Turtle told Anansi to meet him by the river _____ to go fishing together.',a:'tomorrow'},
+{ty:'spelling',st:'anansi',q:'Turtle showed Anansi how to _____ a net. It is made by passing threads over and under.',a:'weave'},
+{ty:'spelling',st:'anansi',q:'Anansi worked all day. After many hours the net was _____.',a:'done|finished'},
+{ty:'spelling',st:'anansi',q:'The harder Anansi worked, the more tired Turtle _____. Finally Turtle went to sleep.',a:'grew'},
+{ty:'spelling',st:'anansi',q:'How _____ Anansi was to find a large fish caught in the net!',a:'pleased'},
+{ty:'spelling',st:'anansi',q:'Anansi ran to the Justice Tree. Warthog sat _____ its branches.',a:'beneath'},
+{ty:'spelling',st:'anansi',q:'Anansi said: "Turtle _____ me. He tricked me into doing all the work."',a:'cheated'},
+{ty:'spelling',st:'anansi',q:'Anansi went home in _____. It was a long time before he spoke to Turtle again.',a:'disgrace'},
+{ty:'spelling',st:'anansi',q:'Anansi learned how to weave nets. He taught his friends, and soon all spiders were weaving. They are called "spider _____."',a:'webs'},
+{ty:'spelling',st:'both',q:'She baked a cake for me. It was yucky. The _____ of yucky is delicious.',a:'antonym'},
+{ty:'spelling',st:'both',q:'My mom sold a lot of grain. The _____ of sold is bought.',a:'antonym'},
+{ty:'spelling',st:'both',q:'"We\'ve decided we want to weave a net." The two homophones in this sentence are we\'ve and _____.',a:'weave'},
+{ty:'spelling',st:'both',q:'"Big Nutbrown Hare has brown hair." The two homophones are Hare and _____.',a:'hair'},
+
+// ── GRAMMAR ────────────────────────────────────────────────────────
+{ty:'grammar',st:'bremen',q:'Past tense of:  fill',a:'filled'},
+{ty:'grammar',st:'bremen',q:'Past tense of:  see',a:'saw'},
+{ty:'grammar',st:'bremen',q:'Past tense of:  stop',a:'stopped'},
+{ty:'grammar',st:'bremen',q:'Past tense of:  walk',a:'walked'},
+{ty:'grammar',st:'bremen',q:'Past tense of:  come',a:'came'},
+{ty:'grammar',st:'bremen',q:'Past tense of:  hear',a:'heard'},
+{ty:'grammar',st:'bremen',q:'Past tense of:  buy',a:'bought'},
+{ty:'grammar',st:'bremen',q:'Past tense of:  dance',a:'danced'},
+{ty:'grammar',st:'bremen',q:'Past tense of:  are',a:'were'},
+{ty:'grammar',st:'bremen',q:'Past tense of:  want',a:'wanted'},
+{ty:'grammar',st:'bremen',q:'Past tense of:  stand',a:'stood'},
+{ty:'grammar',st:'bremen',q:'Past tense of:  run',a:'ran'},
+{ty:'grammar',st:'bremen',q:'Past tense of:  eat',a:'ate'},
+{ty:'grammar',st:'bremen',q:'Past tense of:  peek',a:'peeked'},
+{ty:'grammar',st:'bremen',q:'Past tense of:  whisper',a:'whispered'},
+{ty:'grammar',st:'bremen',q:'Past tense of:  begin',a:'began'},
+{ty:'grammar',st:'bremen',q:'Past tense of:  make',a:'made'},
+{ty:'grammar',st:'anansi',q:'Past tense of:  catch',a:'caught'},
+{ty:'grammar',st:'anansi',q:'Past tense of:  see',a:'saw'},
+{ty:'grammar',st:'anansi',q:'Past tense of:  weave',a:'wove'},
+{ty:'grammar',st:'bremen',q:'The donkey slept _____ the soft grass in the yard.  (on / in)',o:['on','in'],a:1},
+{ty:'grammar',st:'bremen',q:'The dog slept _____ the front door.  (in front of / behind)',o:['in front of','behind'],a:1},
+{ty:'grammar',st:'bremen',q:'The cat slept _____ the warmth of the fireplace.  (inside / near)',o:['inside','near'],a:1},
+{ty:'grammar',st:'bremen',q:'The rooster slept high _____ a bookshelf.  (above / on)',o:['above','on'],a:1},
+{ty:'grammar',st:'both',q:'Antonym of "empty"?',o:['slow','stupid','full','light','large','strong'],a:2},
+{ty:'grammar',st:'both',q:'Antonym of "small"?',o:['slow','stupid','full','light','large','strong'],a:4},
+{ty:'grammar',st:'both',q:'Antonym of "fast"?',o:['slow','stupid','full','light','large','strong'],a:0},
+{ty:'grammar',st:'both',q:'Antonym of "heavy"?',o:['slow','stupid','full','light','large','strong'],a:3},
+{ty:'grammar',st:'both',q:'Antonym of "smart"?',o:['slow','stupid','full','light','large','strong'],a:1},
+{ty:'grammar',st:'both',q:'Antonym of "weak"?',o:['slow','stupid','full','light','large','strong'],a:5},
+
+// ── COMPREHENSION ──────────────────────────────────────────────────
+{ty:'comprehension',st:'bremen',q:'Who retold The Bremen Town Musicians as a play?',o:['Eric A. Kimmel','Janet Stevens','Carol Pugliano-Martin','Jon Goodell'],a:2},
+{ty:'comprehension',st:'bremen',q:'What is the genre of The Bremen Town Musicians?',o:['Folk tale','Drama / Fairy tale','Biography','Realistic fiction'],a:1},
+{ty:'comprehension',st:'bremen',q:'Why did the donkey decide to leave his owner?',o:['He was hungry','His owner was going to get rid of him','He wanted new friends','He was lost'],a:1},
+{ty:'comprehension',st:'bremen',q:'Why did the dog leave his owner?',o:['He was bored','The owner wanted to get rid of him because he was old and weak','He was hungry','He wanted to travel'],a:1},
+{ty:'comprehension',st:'bremen',q:'Why could the cat no longer catch mice?',o:['She was lazy','She was scared','Her teeth were not sharp anymore','She lost her claws'],a:2},
+{ty:'comprehension',st:'bremen',q:'Why did the farmer want to get rid of the rooster?',o:['He was too noisy','He bought an alarm clock — he no longer needed the rooster to crow','He was too old','He ate too much'],a:1},
+{ty:'comprehension',st:'bremen',q:'Who had the saddest face the donkey and the dog had ever seen?',o:['Rooster','Dog','Cat','Donkey'],a:2},
+{ty:'comprehension',st:'bremen',q:'How did the animals get tall enough to peek inside the window?',o:['They climbed a tree','Dog stood on Donkey, Cat on Dog, Rooster on Cat','They found a ladder','They built steps'],a:1},
+{ty:'comprehension',st:'bremen',q:'What did the Rooster see inside the house?',o:['A family eating dinner','Three robbers sitting at a table full of delicious food','An empty house','Two robbers sleeping'],a:1},
+{ty:'comprehension',st:'bremen',q:'What happened when the animals started singing all at once?',o:['The robbers joined them','The robbers ran out of the house screaming','The robbers hid under the table','The robbers went to sleep'],a:1},
+{ty:'comprehension',st:'bremen',q:'Where did each animal sleep in the house after the robbers left?',o:['All on the sofa together','Donkey in the yard, Dog by the door, Cat near the fireplace, Rooster on a bookshelf','All in one bed','Donkey on the roof, others inside'],a:1},
+{ty:'comprehension',st:'bremen',q:'What happened when Robber 3 went inside the house to check?',o:['He found food and started eating','He was scratched by the cat, bitten by the dog, kicked by the donkey, and scared by the rooster','He found the animals sleeping','He escaped safely'],a:1},
+{ty:'comprehension',st:'bremen',q:'What did Robber 3 tell his friends?',o:['The house is empty and safe','Four horrible monsters are in there','The animals are friendly','The food is gone'],a:1},
+{ty:'comprehension',st:'bremen',q:'What happened to the four animals at the end of the story?',o:['They went back to their owners','They became the famous Bremen Town Musicians','They moved to a different town','They returned to the forest'],a:1},
+{ty:'comprehension',st:'anansi',q:'Who is the author of Anansi Goes Fishing?',o:['Janet Stevens','Carol Pugliano-Martin','Eric A. Kimmel','Jon Goodell'],a:2},
+{ty:'comprehension',st:'anansi',q:'What is the genre of Anansi Goes Fishing?',o:['Drama','Fairy tale','Folk tale','Mystery'],a:2},
+{ty:'comprehension',st:'anansi',q:'Why did Anansi want to learn fishing from Turtle?',o:['He loved the sport','He loved fish but was too lazy to catch them himself','He had nothing else to do','He wanted to trick Turtle'],a:1},
+{ty:'comprehension',st:'anansi',q:'What did Anansi secretly plan to do?',o:['Learn properly','Trick Turtle into doing all the work and take the fish for himself','Share the fish equally','Give the fish to Warthog'],a:1},
+{ty:'comprehension',st:'anansi',q:'On Day 1, who ended up doing all the work of making the net?',o:['Turtle','Anansi — because he said he would rather work than get tired','Both together','Neither'],a:1},
+{ty:'comprehension',st:'anansi',q:'On Day 2, what did Anansi do while Turtle rested?',o:['Anansi rested too','Anansi set the net in the river while Turtle lay on the riverbank','Anansi went home','Anansi cooked'],a:1},
+{ty:'comprehension',st:'anansi',q:'On Day 3, Anansi and Turtle found a large fish in the net. Anansi chose to "get full." What did Turtle then do?',o:['He let Anansi eat first','He said "Then I will eat" and ate the whole fish himself while Anansi got nothing','He shared the fish equally','He threw the fish back'],a:1},
+{ty:'comprehension',st:'anansi',q:'Where did Anansi go to seek justice after Turtle ate all the fish?',o:['To Turtle\'s home','To the river','To the Justice Tree to see Warthog','To his own home'],a:2},
+{ty:'comprehension',st:'anansi',q:"Why did Warthog NOT believe Anansi's story?",o:['Anansi was lying','Warthog knew Anansi was lazy — if Turtle got tired, he must have done all the work','Turtle had a witness','Anansi had no proof at all'],a:1},
+{ty:'comprehension',st:'anansi',q:'What good thing came from Anansi\'s experience?',o:['He became friends with Turtle','He learned to weave nets and taught all spiders — that is why spiders make webs today','He became a good fisher','He stopped being lazy'],a:1},
+{ty:'comprehension',st:'both',q:'What are the genres of the two stories (Bremen + Anansi)?',o:['Folk tale and drama; realistic fiction','Drama / Fairy tale and Folk tale','Animal fantasy and biography','Mystery and fairy tale'],a:1},
+{ty:'comprehension',st:'both',q:'What did the other animals know about Anansi?',o:['He was a good fisher','He was wise and fair','He was very lazy','He was brave'],a:2},
+{ty:'comprehension',st:'both',q:'He is wise and fair. All animals bring their problems to him. Who is this character?',o:['Turtle','Anansi','Warthog','Donkey'],a:2},
+
+// ── TRUE / FALSE ───────────────────────────────────────────────────
+{ty:'truefalse',st:'bremen',q:'A donkey says hee-haw.',a:true},
+{ty:'truefalse',st:'bremen',q:'The donkey had gone far when he saw the dog.',a:false},
+{ty:'truefalse',st:'bremen',q:'The hunting dog was old but still strong.',a:false},
+{ty:'truefalse',st:'bremen',q:'The donkey knelt down to talk to the dog.',a:true},
+{ty:'truefalse',st:'bremen',q:'The dog asked the donkey to join him.',a:false},
+{ty:'truefalse',st:'bremen',q:'The cat had the saddest face the donkey and dog had ever seen.',a:true},
+{ty:'truefalse',st:'bremen',q:'The rooster was happy because he loved the alarm clock.',a:false},
+{ty:'truefalse',st:'bremen',q:'The four musicians danced with excitement when they saw the sign for Bremen Town.',a:true},
+{ty:'truefalse',st:'bremen',q:'The robbers stayed in the house after hearing the animals sing.',a:false},
+{ty:'truefalse',st:'bremen',q:'The donkey slept in the soft grass in the yard.',a:true},
+{ty:'truefalse',st:'bremen',q:'The cat slept behind the front door of the house.',a:false},
+{ty:'truefalse',st:'anansi',q:'Anansi truly wanted to learn how to fish properly.',a:false},
+{ty:'truefalse',st:'anansi',q:'Turtle was slow and stupid, just as Anansi thought.',a:false},
+{ty:'truefalse',st:'anansi',q:'Anansi worked all day weaving the net on Day 1.',a:true},
+{ty:'truefalse',st:'anansi',q:'Turtle pulled the net out of the river on Day 3.',a:false},
+{ty:'truefalse',st:'anansi',q:'Anansi got to eat the whole fish at the end.',a:false},
+{ty:'truefalse',st:'anansi',q:'Turtle said: "You worked hard these past two days."',a:true},
+{ty:'truefalse',st:'anansi',q:'Warthog believed everything Anansi said.',a:false},
+{ty:'truefalse',st:'anansi',q:'After the story, spiders all over the world learned to weave webs.',a:true},
+
+// ── ORAL ───────────────────────────────────────────────────────────
+// q=question  ans=complete model sentence  pts=scoring points
+// exam:true = 考試必考題 (從原始考卷 Oral Practice 直接出題)
+
+// ════════════════════════════════════════════
+// ⭐ EXAM MUST-KNOW — 8 Required Questions
+//    (from official Oral Practice worksheet)
+// ════════════════════════════════════════════
+
+{ty:'oral',st:'bremen',exam:true,
+ q:'Why could the cat no longer catch mice?',
+ ans:'She could no longer catch mice because her teeth are not sharp.',
+ pts:[
+  {p:'Subject: she / the cat',     k:'she|cat'},
+  {p:'Key phrase: no longer',      k:'no longer|could not'},
+  {p:'Reason: teeth',              k:'teeth'},
+  {p:'Key phrase: not sharp',      k:'not sharp'},
+ ]},
+
+{ty:'oral',st:'bremen',exam:true,
+ q:'What happened when the robber surprised the dog?',
+ ans:'The dog bit him on the leg.',
+ pts:[
+  {p:'Subject: the dog',           k:'dog'},
+  {p:'Action: bit',                k:'bit'},
+  {p:'Object: him / the robber',   k:'him|robber'},
+  {p:'Location: on the leg',       k:'leg'},
+ ]},
+
+{ty:'oral',st:'bremen',exam:true,
+ q:'Why did the cat scratch the robber?',
+ ans:'The cat scratched the robber because the robber startled the cat.',
+ pts:[
+  {p:'Subject: the cat',           k:'cat'},
+  {p:'Action: scratched',          k:'scratch|scratched'},
+  {p:'Reason: startled',           k:'startled|surprised|scared'},
+  {p:'Object: the robber',         k:'robber'},
+ ]},
+
+{ty:'oral',st:'bremen',exam:true,
+ q:'Why did the dog leave his owner?',
+ ans:'He left the owner because the owner wanted to get rid of him.',
+ pts:[
+  {p:'Subject: he / the dog',      k:'he|dog'},
+  {p:'Action: left',               k:'left|leave'},
+  {p:'Reason: owner wanted',       k:'owner|wanted'},
+  {p:'Key phrase: get rid of',     k:'get rid of'},
+ ]},
+
+{ty:'oral',st:'anansi',exam:true,
+ q:'What did Turtle say to make Anansi do all the work?',
+ ans:'Turtle said there are two tasks — one person works while the other gets tired.',
+ pts:[
+  {p:'Subject: Turtle said',       k:'Turtle|said'},
+  {p:'Key word: two tasks',        k:'two tasks|tasks'},
+  {p:'One person: works',          k:'work|works|weave'},
+  {p:'Other person: gets tired',   k:'tired|gets tired'},
+ ]},
+
+{ty:'oral',st:'anansi',exam:true,
+ q:'Why did Anansi try to trick Turtle?',
+ ans:'He tried to trick Turtle because he thought Turtle was stupid.',
+ pts:[
+  {p:'Subject: he / Anansi',       k:'he|Anansi'},
+  {p:'Action: trick',              k:'trick|tricked'},
+  {p:'Reason: thought',            k:'thought|think'},
+  {p:'Key word: stupid',           k:'stupid|slow'},
+ ]},
+
+{ty:'oral',st:'anansi',exam:true,
+ q:'What did spiders learn after Turtle tricked Anansi?',
+ ans:'They learned how to weave webs.',
+ pts:[
+  {p:'Subject: they / spiders',    k:'they|spiders'},
+  {p:'Action: learned',            k:'learned|learn'},
+  {p:'Key word: weave',            k:'weave|weaving'},
+  {p:'Key word: webs',             k:'webs'},
+ ]},
+
+{ty:'oral',st:'anansi',exam:true,
+ q:'Why did animals go to the Warthog with their problems?',
+ ans:'Animals went to Warthog because he is a fair and honest judge.',
+ pts:[
+  {p:'Subject: animals',           k:'animals'},
+  {p:'Name: Warthog',              k:'Warthog'},
+  {p:'Key word: fair',             k:'fair'},
+  {p:'Key word: honest judge',     k:'honest|judge'},
+ ]},
+
+// ════════════════════════════════════════════
+// 📚 EXTRA PRACTICE — Additional Questions
+// ════════════════════════════════════════════
+
+{ty:'oral',st:'bremen',
+ q:'Why did the donkey decide to run away from his owner?',
+ ans:'The donkey ran away because his owner was going to get rid of him.',
+ pts:[
+  {p:'Subject: the donkey',        k:'donkey'},
+  {p:'Action: ran away',           k:'ran away|run away'},
+  {p:'Reason: owner',              k:'owner'},
+  {p:'Key phrase: get rid of',     k:'get rid of'},
+ ]},
+
+{ty:'oral',st:'bremen',
+ q:'How did the animals scare the robbers out of the house?',
+ ans:'All four animals sang together and made a loud noise, so the robbers ran out of the house screaming.',
+ pts:[
+  {p:'Who: all four animals',      k:'animals|four'},
+  {p:'Action: sang together',      k:'sang|singing'},
+  {p:'Description: loud noise',    k:'loud|noise'},
+  {p:'Result: robbers ran out',    k:'ran out|ran away|screaming'},
+ ]},
+
+{ty:'oral',st:'bremen',
+ q:'What happened when Robber 3 went inside the house to check?',
+ ans:'The cat scratched his face, the dog bit his leg, the donkey kicked him, and the rooster screamed.',
+ pts:[
+  {p:'Cat: scratched his face',    k:'cat|scratched'},
+  {p:'Dog: bit his leg',           k:'dog|bit'},
+  {p:'Donkey: kicked him',         k:'donkey|kicked'},
+  {p:'Rooster: screamed',          k:'rooster|screamed|screeching'},
+ ]},
+
+{ty:'oral',st:'bremen',
+ q:'Where did each animal sleep in the house after the robbers left?',
+ ans:'The donkey slept in the yard, the dog slept behind the front door, the cat slept near the fireplace, and the rooster slept on a bookshelf.',
+ pts:[
+  {p:'Donkey: in the yard',        k:'donkey|yard'},
+  {p:'Dog: behind the front door', k:'dog|door'},
+  {p:'Cat: near the fireplace',    k:'cat|fireplace'},
+  {p:'Rooster: on a bookshelf',    k:'rooster|bookshelf'},
+ ]},
+
+{ty:'oral',st:'bremen',
+ q:'What is a Drama? What is a Fairy Tale?',
+ ans:'A drama is a story written to be acted out for others. A fairy tale usually takes place long ago and far away, and has fantastic characters.',
+ pts:[
+  {p:'Drama: acted out for others', k:'acted out|performed'},
+  {p:'Fairy tale: long ago',        k:'long ago'},
+  {p:'Fairy tale: far away',        k:'far away'},
+  {p:'Fairy tale: fantastic characters', k:'fantastic|characters'},
+ ]},
+
+{ty:'oral',st:'anansi',
+ q:'Why did Anansi want to learn fishing from Turtle?',
+ ans:'Anansi loved fish, but he was too lazy to catch them himself.',
+ pts:[
+  {p:'Subject: Anansi',            k:'Anansi'},
+  {p:'Key word: loved fish',       k:'loved fish|love fish'},
+  {p:'Key word: lazy',             k:'lazy'},
+  {p:'He could not: catch himself',k:'himself|catch'},
+ ]},
+
+{ty:'oral',st:'anansi',
+ q:"What was Anansi's secret plan when he agreed to go fishing?",
+ ans:'Anansi planned to trick Turtle into doing all the work, so he could take the fish for himself.',
+ pts:[
+  {p:'Key word: trick',            k:'trick'},
+  {p:'Key phrase: all the work',   k:'all the work'},
+  {p:'Result: keep the fish',      k:'fish for himself|keep the fish|take the fish'},
+ ]},
+
+{ty:'oral',st:'anansi',
+ q:'On Day 1, what did Anansi do and what did Turtle do?',
+ ans:'Anansi worked all day weaving the net, while Turtle lay on the riverbank and got tired.',
+ pts:[
+  {p:'Anansi: wove the net',       k:'weave|weaving|wove|net'},
+  {p:'Anansi: worked all day',     k:'all day|worked'},
+  {p:'Turtle: lay on riverbank',   k:'riverbank|lay down|lay'},
+  {p:'Turtle: got tired',          k:'tired'},
+ ]},
+
+{ty:'oral',st:'anansi',
+ q:'On Day 3, how did Turtle trick Anansi out of eating any fish?',
+ ans:'Turtle said one person should eat while the other gets full. Anansi chose to get full, so Turtle ate the whole fish and Anansi got nothing.',
+ pts:[
+  {p:'Key rule: one eats / one gets full', k:'eat|gets full|get full'},
+  {p:'Anansi chose: get full',     k:'Anansi chose|chose to get full'},
+  {p:'Turtle: ate the whole fish', k:'whole fish|ate'},
+  {p:'Result: Anansi got nothing', k:'nothing|empty|did not eat'},
+ ]},
+
+{ty:'oral',st:'anansi',
+ q:"Why did Warthog NOT believe Anansi's story?",
+ ans:'Warthog knew Anansi was lazy. No one gets tired by doing nothing, so if Turtle got tired, Turtle must have done all the work.',
+ pts:[
+  {p:'Anansi is: lazy',            k:'lazy'},
+  {p:'Logic: tired from nothing',  k:'nothing|tired from doing nothing'},
+  {p:'Conclusion: Turtle worked',  k:'Turtle|work|worked'},
+  {p:'Anansi not telling truth',   k:'truth|lying|not telling'},
+ ]},
+
+{ty:'oral',st:'both',
+ q:'What is a folk tale?',
+ ans:'A folk tale is a story that has been handed down over many years.',
+ pts:[
+  {p:'Genre name: folk tale',      k:'folk tale'},
+  {p:'Key phrase: handed down',    k:'handed down'},
+  {p:'Key phrase: many years',     k:'many years'},
+ ]},
+
+{ty:'oral',st:'both',
+ q:'What does a narrator do?',
+ ans:'A narrator is a person who says what is going on in a story.',
+ pts:[
+  {p:'Role: a person',             k:'person'},
+  {p:'Action: says what is going on', k:'says|going on|what is happening'},
+  {p:'Context: in a story',        k:'story'},
+ ]},
+
+];
+
+// ═══════════════════════════════════════════════════════
+//  FINAL EXAM  (40 questions — balanced across types & stories)
+// ═══════════════════════════════════════════════════════
+const EXAM = [
+  // Vocab x8
+  {ty:'vocab',st:'bremen',q:'What does "grain" mean?',o:['A place where flour is made','A small hard dry fruit such as rice or wheat','A person who plays an instrument','To remove something'],a:1},
+  {ty:'vocab',st:'bremen',q:'What does "startled" mean?',o:['Very tired','Suddenly surprised or frightened','Very happy','Hungry'],a:1},
+  {ty:'vocab',st:'anansi',q:'What does "certainly" mean?',o:['Perhaps; maybe','Without doubt; definitely; yes!','Never','Slowly'],a:1},
+  {ty:'vocab',st:'anansi',q:'What does "intend" mean?',o:['To forget something','To have a plan for what you will do','To run away','To trick someone'],a:1},
+  {ty:'vocab',st:'anansi',q:'What does "task" mean?',o:['A type of food','A river animal','A piece of work that needs to be done','A fishing tool'],a:2},
+  {ty:'vocab',st:'bremen',q:'What does "get rid of" mean?',o:['To take care of something','To remove, throw away, or kill something','To give as a gift','To find something new'],a:1},
+  {ty:'vocab',st:'anansi',q:'What does "weave" mean?',o:['To catch fish','To make something by passing threads over and under one another','To cook something','To jump'],a:1},
+  {ty:'vocab',st:'both',q:'What does "delicious" mean?',o:['Very ugly','Very boring','Having a very pleasant taste or smell','Very cold'],a:2},
+{ty:'vocab',st:'bremen',q:'What does "sign" mean?',o:['A type of food','A notice or board giving information or directions','A loud noise','A type of animal'],a:1},
+{ty:'vocab',st:'bremen',q:'What does "robbers" mean?',o:['People who grow crops','People who steal things from others','People who tell stories','People who bake bread'],a:1},
+{ty:'vocab',st:'bremen',q:'What does "listen closely" mean?',o:['To make a loud noise','To sleep quietly','To pay very careful attention when listening','To talk to someone'],a:2},
+  // Spelling / Fill x8
+  {ty:'spelling',st:'bremen',q:'The animals walked until it got _____. Then they saw a light in a house.',a:'dark'},
+  {ty:'spelling',st:'bremen',q:'The robber ran outside. He _____ over the donkey, who kicked him.',a:'tripped'},
+  {ty:'spelling',st:'bremen',q:'The dog was _____ and bit the robber on the leg.',a:'startled'},
+  {ty:'spelling',st:'anansi',q:'Anansi loved fish, but he was too _____ to catch them himself.',a:'lazy'},
+  {ty:'spelling',st:'anansi',q:'Anansi worked all day. After many hours the net was _____.',a:'done|finished'},
+  {ty:'spelling',st:'anansi',q:'Anansi said: "Turtle _____ me. He tricked me into doing all the work."',a:'cheated'},
+  {ty:'spelling',st:'anansi',q:'After the story, all spiders learned to weave. They are called "spider _____."',a:'webs'},
+  {ty:'spelling',st:'both',q:'"Big Nutbrown Hare has brown hair." The two homophones are Hare and _____.',a:'hair'},
+  // Grammar x8
+  {ty:'grammar',st:'bremen',q:'Past tense of:  see',a:'saw'},
+  {ty:'grammar',st:'bremen',q:'Past tense of:  stop',a:'stopped'},
+  {ty:'grammar',st:'bremen',q:'Past tense of:  buy',a:'bought'},
+  {ty:'grammar',st:'bremen',q:'Past tense of:  run',a:'ran'},
+  {ty:'grammar',st:'anansi',q:'Past tense of:  catch',a:'caught'},
+  {ty:'grammar',st:'anansi',q:'Past tense of:  weave',a:'wove'},
+  {ty:'grammar',st:'both',q:'Antonym of "empty"?',o:['slow','stupid','full','light','large','strong'],a:2},
+  {ty:'grammar',st:'both',q:'Antonym of "fast"?',o:['slow','stupid','full','light','large','strong'],a:0},
+  // Comprehension x8
+  {ty:'comprehension',st:'bremen',q:'Why did the donkey decide to leave his owner?',o:['He was hungry','His owner was going to get rid of him','He wanted new friends','He was lost'],a:1},
+  {ty:'comprehension',st:'bremen',q:'What happened when the animals started singing all at once?',o:['The robbers joined them','The robbers ran out of the house screaming','The robbers hid','The robbers went to sleep'],a:1},
+  {ty:'comprehension',st:'bremen',q:'What happened to the four animals at the end of the story?',o:['They went back to their owners','They became the famous Bremen Town Musicians','They moved away','They returned to the forest'],a:1},
+  {ty:'comprehension',st:'anansi',q:'On Day 1, who ended up doing all the work of making the net?',o:['Turtle','Anansi — because he said he would rather work than get tired','Both together','Neither'],a:1},
+  {ty:'comprehension',st:'anansi',q:"Why did Warthog NOT believe Anansi's story?",o:['Anansi was lying','Warthog knew Anansi was lazy — if Turtle got tired, he must have done all the work','Turtle had a witness','Anansi had no proof'],a:1},
+  {ty:'comprehension',st:'anansi',q:'What good thing came from Anansi\'s experience?',o:['He became friends with Turtle','He learned to weave nets and taught all spiders — that is why spiders make webs today','He became a good fisher','He stopped being lazy'],a:1},
+  {ty:'comprehension',st:'both',q:'What are the genres of the two stories (Bremen + Anansi)?',o:['Folk tale and drama; realistic fiction','Drama / Fairy tale and Folk tale','Animal fantasy and biography','Mystery and fairy tale'],a:1},
+  {ty:'comprehension',st:'both',q:'He is wise and fair. All animals bring their problems to him. Who is this character?',o:['Turtle','Anansi','Warthog','Donkey'],a:2},
+  // True/False x4
+  {ty:'truefalse',st:'bremen',q:'The cat had the saddest face the donkey and dog had ever seen.',a:true},
+  {ty:'truefalse',st:'bremen',q:'The donkey slept in the soft grass in the yard.',a:true},
+  {ty:'truefalse',st:'anansi',q:'Anansi truly wanted to learn how to fish properly.',a:false},
+  {ty:'truefalse',st:'anansi',q:'Turtle said: "You worked hard these past two days."',a:true},
+  // Oral / Speaking x4
+  {ty:'oral',st:'bremen',q:'What did the farmer buy that made the rooster useless?',o:['A new dog','An alarm clock','Another rooster','A cat'],a:1},
+  {ty:'oral',st:'anansi',q:'How did Turtle trick Anansi out of eating any fish?',o:['He stole it','He said "one eats while the other gets full" and Anansi chose get full — so Turtle ate everything','He cooked bad food','He hid the fish'],a:1},
+  {ty:'oral',st:'both',q:'What is a "folk tale"?',o:['A story written by one author for school','A story handed down over many years through oral tradition','A story about real people and events','A story written to be performed as a play'],a:1},
+  {ty:'oral',st:'both',q:'What is the "Question of the Week" for The Bremen Town Musicians?',o:['How can creative thinking solve a problem?','Why is it a good idea to work together?','What makes a good friend?','How do animals help people?'],a:1},
+];
+
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+let mode = null, modeKey = null;
+let qs = [], qIdx = 0, score = 0, answered = false;
+let selMC = null, selTF = null, userAnswers = [];
+
+const typeLabel = {vocab:'Vocabulary',spelling:'Spelling',grammar:'Grammar',comprehension:'Comprehension',truefalse:'True/False',oral:'Oral'};
+const typeColor  = {vocab:'pill-mc',spelling:'pill-fill',grammar:'pill-spell',comprehension:'pill-mc',truefalse:'pill-tf',oral:'pill-fill'};
+
+// ═══════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════
+function showScreen(id){
+  ['home-screen','quiz-screen','result-screen'].forEach(s => {
+    document.getElementById(s).style.display = s===id ? 'block' : 'none';
+  });
+}
+
+function goHome(){
+  if(synth) synth.cancel();
+  showScreen('home-screen');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function startMode(modeType, key){
+  mode = modeType; modeKey = key;
+  if(modeType==='type' && key==='oral-exam'){
+    qs = BANK.filter(function(q){ return q.ty==='oral' && q.exam===true; });
+  } else if(modeType==='type'){
+    qs = BANK.filter(q=>q.ty===key);
+  } else if(modeType==='topic'){
+    qs = BANK.filter(q=>q.st===key||q.st==='both');
+  } else if(modeType==='exam'){
+    qs = [...EXAM];
+  }
+  // Shuffle
+  for(let i=qs.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[qs[i],qs[j]]=[qs[j],qs[i]];}
+  qIdx=0; score=0; userAnswers=[];
+  const titleMap = {vocab:'Vocabulary',spelling:'Spelling & Fill-in',grammar:'Grammar',comprehension:'Comprehension',truefalse:'True or False',oral:'Oral Practice','oral-exam':'⭐ Oral Exam Must-Know',bremen:'The Bremen Town Musicians',anansi:'Anansi Goes Fishing',final:'Final Mock Exam'};
+  const modeTagMap = {type:'TYPE',topic:'STORY',exam:'EXAM'};
+  document.getElementById('quiz-title').textContent = titleMap[key]||key;
+  document.getElementById('quiz-mode-tag').textContent = modeTagMap[modeType]||modeType;
+  showScreen('quiz-screen');
+  renderQ();
+}
+
+function retryMode(){ startMode(mode, modeKey); }
+
+// ═══════════════════════════════════════════════════════
+//  RECORDER STATE
+// ═══════════════════════════════════════════════════════
+function stopRecorderClean(){
+  if(mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+  clearInterval(recInterval); clearInterval(vizInterval);
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER QUESTION
+// ═══════════════════════════════════════════════════════
+function renderQ(){
+  stopRecorderClean();
+  recBlob=null; recURL=null; recChunks=[];
+  answered=false; selMC=null; selTF=null;
+  const q=qs[qIdx], total=qs.length, pct=Math.round((qIdx/total)*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('q-counter').textContent='Question '+(qIdx+1)+' of '+total;
+  document.getElementById('q-score').textContent='⭐ '+score;
+
+  const pClass = typeColor[q.ty]||'pill-mc';
+  const pText  = typeLabel[q.ty]||q.ty;
+
+  const audioBtnHtml = audioOn
+    ? '<button class="audio-btn" id="play-btn" data-text="'+q.q.replace(/"/g,"'")+'" onclick="playQuestion()">🔊 Listen to Question</button>'
+    : '';
+
+  const wbHtml = q.wb
+    ? '<div class="word-bank"><span class="wb-label">Word Bank</span>'+q.wb.map(w=>'<span class="wb-chip">'+w+'</span>').join('')+'</div>'
+    : '';
+
+  const hintHtml = q.h ? '<div class="hint-box">💡 '+q.h+'</div>' : '';
+
+  // Oral: model answer visible first → record → score yourself
+  let ansHtml='';
+  if(q.ty==='oral'){
+    const modelSentence = q.ans || '';
+    const pts = q.pts || [];
+    const totalPts = pts.length + 1; // +1 full-sentence bonus
+
+    const ptsRows = pts.map(function(p,i){
+      return '<div class="srow" id="srow-'+i+'" onclick="togglePt('+i+')" data-k="'+p.k+'">'+
+        '<span class="srow-check" id="scheck-'+i+'">☐</span>'+
+        '<span class="srow-label">'+p.p+'</span>'+
+        '<span class="srow-badge" id="sbadge-'+i+'">+1</span>'+
+      '</div>';
+    }).join('');
+
+    const bars = Array.from({length:14},function(_,i){return '<div class="rec-bar" id="bar-'+i+'" style="height:4px"></div>';}).join('');
+
+    const examBanner = q.exam
+      ? '<div class="exam-banner"><span class="exam-banner-icon">⭐</span><div class="exam-banner-text"><strong>EXAM MUST-KNOW</strong> — This question appears on your official Oral Practice worksheet.</div></div>'
+      : '';
+
+    ansHtml =
+      '<div class="oral-panel">'+
+        examBanner+
+
+        // Model answer — always visible first
+        '<div class="oral-step-label">📖 Model Answer — Listen &amp; Practise First</div>'+
+        '<div class="model-sent-box">'+
+          '<div class="model-sent-text" id="ref-answer-text">'+modelSentence+'</div>'+
+          '<div class="model-sent-btns">'+
+            '<button class="ref-speak-btn" id="ref-speak-btn" onclick="speakRef()">🔊 Hear Model</button>'+
+            '<button class="ref-speak-btn" style="background:#7C3AED" onclick="speakQ()">🔊 Hear Question</button>'+
+          '</div>'+
+        '</div>'+
+
+        // Record
+        '<div class="oral-step-label" style="margin-top:14px">🎤 Now Record Your Own Answer</div>'+
+        '<div class="rec-timer" id="rec-timer">0:00</div>'+
+        '<div class="rec-visualizer" id="rec-viz">'+bars+'</div>'+
+        '<div class="rec-status" id="rec-status">Practise the model → then Record your own version</div>'+
+        '<div class="rec-btn-row">'+
+          '<button class="rec-btn rec-start" id="rec-start-btn" onclick="startRec()">⏺ Record</button>'+
+          '<button class="rec-btn rec-stop" id="rec-stop-btn" onclick="stopRec()" disabled>⏹ Stop</button>'+
+          '<button class="rec-btn rec-play" id="rec-play-btn" onclick="playRec()" disabled>▶ Playback</button>'+
+        '</div>'+
+
+        // Score yourself
+        '<div class="oral-score-section" id="score-section">'+
+          '<div class="oral-step-label">✅ Score Yourself</div>'+
+          '<div class="oral-score-hint">After recording, tick each point you said <em>in a complete sentence</em>:</div>'+
+          '<div class="score-rows" id="score-rows">'+ptsRows+
+            '<div class="srow srow-bonus" id="srow-bonus" onclick="toggleBonus()">'+
+              '<span class="srow-check" id="scheck-bonus">☐</span>'+
+              '<span class="srow-label">🏆 Bonus — I used a <strong>complete sentence</strong> with subject + verb</span>'+
+              '<span class="srow-badge" id="sbadge-bonus">+1</span>'+
+            '</div>'+
+          '</div>'+
+          '<div class="oral-score-display">'+
+            '<div class="oral-score-bar-bg"><div class="oral-score-bar-fill" id="oral-score-bar" style="width:0%"></div></div>'+
+            '<div class="oral-score-num-row">'+
+              '<span class="oral-score-label">Score:</span>'+
+              '<span class="oral-score-num" id="oral-score-num">0 / '+totalPts+'</span>'+
+              '<span class="oral-score-pct" id="oral-score-pct">0%</span>'+
+            '</div>'+
+            '<div class="oral-score-grade" id="oral-score-grade">Tap the points you covered above ↑</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+  } else if(q.ty==='truefalse'){
+    ansHtml='<div class="tf-row"><button class="tf-btn" id="tf-true" onclick="selTFAns(true)">✅ TRUE</button><button class="tf-btn" id="tf-false" onclick="selTFAns(false)">❌ FALSE</button></div>';
+  } else if(q.o){
+    const L=['A','B','C','D','E','F'];
+    ansHtml='<div class="mc-opts">'+q.o.map((opt,i)=>'<button class="mc-opt" id="opt-'+i+'" onclick="selMCAns('+i+')"><span class="mc-ltr">'+L[i]+'</span>'+opt+'</button>').join('')+'</div>';
+  } else {
+    ansHtml='<input class="text-input" id="ans-input" placeholder="Type your answer..." onkeydown="if(event.key===\'Enter\')checkAns()">';
+  }
+
+  const isLast = qIdx>=qs.length-1;
+
+  // Oral questions: Next/Submit instead of Check
+  let actionRow='';
+  if(q.ty==='oral'){
+    actionRow='<div class="action-row">'+
+      '<button class="btn-next" id="btn-next" style="display:block" onclick="nextQ()">Next →</button>'+
+      (isLast?'':'<button class="btn-skip" onclick="skipQ()">Skip</button>')+
+      '</div>';
+  } else {
+    actionRow='<div class="action-row">'+
+      '<button class="btn-check" id="btn-check" onclick="checkAns()">Check ✓</button>'+
+      '<button class="btn-next" id="btn-next" onclick="nextQ()">Next →</button>'+
+      (isLast?'':'<button class="btn-skip" onclick="skipQ()">Skip</button>')+
+      '</div>';
+  }
+
+  document.getElementById('q-card').innerHTML=
+    '<div class="q-type-row"><span class="q-type-pill '+pClass+'">'+pText+'</span>'+(q.exam?'&nbsp;<span class="exam-badge">⭐ Exam Must-Know</span>':'')+' </div>'+
+    audioBtnHtml+
+    '<p class="q-text">'+q.q+'</p>'+
+    hintHtml+wbHtml+ansHtml+
+    '<div class="feedback" id="feedback"></div>'+
+    actionRow;
+
+  document.getElementById('btn-submit').classList.remove('show');
+
+  // Oral: show submit on last q
+  if(q.ty==='oral' && isLast){
+    document.getElementById('btn-next').style.display='none';
+    document.getElementById('btn-submit').classList.add('show');
+  }
+
+  const inp=document.getElementById('ans-input');
+  if(inp) setTimeout(()=>inp.focus(),80);
+
+  // Auto-speak oral questions
+  if(q.ty==='oral' && audioOn) setTimeout(()=>speak(q.q),400);
+
+  // Init keyword chips if oral (they exist in DOM now)
+  // Will be initialized by setRecState('done') after recording
+}
+
+// ═══════════════════════════════════════════════════════
+//  RECORDER + ORAL SCORING
+// ═══════════════════════════════════════════════════════
+let mediaRecorder=null, recChunks=[], recBlob=null, recURL=null;
+let recInterval=null, recSeconds=0, vizInterval=null;
+let oralPtsChecked=0, oralBonusChecked=false;
+
+function stopRecorderClean(){
+  if(mediaRecorder && mediaRecorder.state!=='inactive') mediaRecorder.stop();
+  clearInterval(recInterval); clearInterval(vizInterval);
+}
+
+async function startRec(){
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    recChunks=[]; recBlob=null; recURL=null;
+    const mime = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg';
+    mediaRecorder = new MediaRecorder(stream,{mimeType:mime});
+    mediaRecorder.ondataavailable = function(e){ if(e.data.size>0) recChunks.push(e.data); };
+    mediaRecorder.onstop = function(){
+      const bMime = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg';
+      recBlob = new Blob(recChunks,{type:bMime});
+      recURL  = URL.createObjectURL(recBlob);
+      stream.getTracks().forEach(function(t){t.stop();});
+      setRecState('done');
+    };
+    mediaRecorder.start(100);
+    setRecState('recording');
+  } catch(e){
+    var s=document.getElementById('rec-status');
+    if(s){ s.textContent='⚠️ Mic access denied. Allow microphone in browser settings.'; s.className='rec-status'; }
+  }
+}
+
+function stopRec(){
+  if(mediaRecorder && mediaRecorder.state==='recording'){
+    mediaRecorder.stop();
+    clearInterval(recInterval); clearInterval(vizInterval);
+  }
+}
+
+function playRec(){
+  if(!recURL) return;
+  var audio=new Audio(recURL);
+  var btn=document.getElementById('rec-play-btn');
+  if(btn){btn.textContent='⏸ Playing...'; btn.disabled=true;}
+  audio.play();
+  audio.onended=function(){ if(btn){btn.textContent='▶ Playback'; btn.disabled=false;} };
+}
+
+function setRecState(state){
+  var startBtn=document.getElementById('rec-start-btn');
+  var stopBtn=document.getElementById('rec-stop-btn');
+  var playBtn=document.getElementById('rec-play-btn');
+  var status=document.getElementById('rec-status');
+  var timer=document.getElementById('rec-timer');
+  clearInterval(recInterval); clearInterval(vizInterval);
+
+  if(state==='recording'){
+    recSeconds=0;
+    if(startBtn){startBtn.textContent='⏺ Recording...';startBtn.classList.add('recording');startBtn.disabled=true;}
+    if(stopBtn) stopBtn.disabled=false;
+    if(playBtn) playBtn.disabled=true;
+    if(status){status.textContent='🔴 Recording — speak in complete sentences!'; status.className='rec-status active';}
+
+    recInterval=setInterval(function(){
+      recSeconds++;
+      var m=Math.floor(recSeconds/60), s=recSeconds%60;
+      if(timer) timer.textContent=m+':'+(s<10?'0':'')+s;
+      if(recSeconds>=120) stopRec();
+    },1000);
+
+    vizInterval=setInterval(function(){
+      for(var i=0;i<14;i++){
+        var bar=document.getElementById('bar-'+i);
+        if(bar){ bar.style.height=Math.floor(Math.random()*34+4)+'px'; bar.classList.add('active'); }
+      }
+    },80);
+
+  } else if(state==='done'){
+    if(startBtn){startBtn.textContent='⏺ Re-record';startBtn.classList.remove('recording');startBtn.disabled=false;}
+    if(stopBtn) stopBtn.disabled=true;
+    if(playBtn){playBtn.textContent='▶ Playback';playBtn.disabled=false;}
+    if(status){status.textContent='✅ Done! Play it back — then score yourself below.'; status.className='rec-status done';}
+    for(var i=0;i<14;i++){
+      var bar=document.getElementById('bar-'+i);
+      if(bar){bar.style.height='4px'; bar.classList.remove('active');}
+    }
+    // Scroll score section into view
+    var ss=document.getElementById('score-section');
+    if(ss) setTimeout(function(){ss.scrollIntoView({behavior:'smooth',block:'nearest'});},300);
+  }
+}
+
+// ─── Score-yourself ticking ────────────────────────────
+function togglePt(i){
+  var row=document.getElementById('srow-'+i);
+  var chk=document.getElementById('scheck-'+i);
+  if(!row||!chk) return;
+  var isNowChecked = !row.classList.contains('checked');
+  row.classList.toggle('checked');
+  chk.textContent = isNowChecked ? '☑' : '☐';
+  oralPtsChecked = document.querySelectorAll('.srow.checked:not(.srow-bonus)').length;
+  updateOralScore();
+}
+
+function toggleBonus(){
+  var row=document.getElementById('srow-bonus');
+  var chk=document.getElementById('scheck-bonus');
+  if(!row||!chk) return;
+  oralBonusChecked = !row.classList.contains('checked');
+  row.classList.toggle('checked');
+  chk.textContent = oralBonusChecked ? '☑' : '☐';
+  updateOralScore();
+}
+
+function updateOralScore(){
+  var q=qs[qIdx];
+  var totalBase=(q.pts||[]).length;
+  var total=totalBase+1; // +1 bonus
+  var earned=oralPtsChecked+(oralBonusChecked?1:0);
+  var pct=total>0?Math.round((earned/total)*100):0;
+
+  var numEl=document.getElementById('oral-score-num');
+  var pctEl=document.getElementById('oral-score-pct');
+  var barEl=document.getElementById('oral-score-bar');
+  var gradeEl=document.getElementById('oral-score-grade');
+
+  if(numEl) numEl.textContent=earned+' / '+total;
+  if(pctEl) pctEl.textContent=pct+'%';
+  if(barEl){
+    barEl.style.width=pct+'%';
+    // Shift gradient colour based on score
+    var pos = pct>=80?'100%': pct>=60?'70%': pct>=40?'40%':'10%';
+    barEl.style.backgroundPosition=pos+' 0';
+  }
+  if(gradeEl){
+    if(pct>=90){ gradeEl.className='oral-score-grade grade-A'; gradeEl.textContent='🌟 Outstanding! Full marks — excellent answer!'; }
+    else if(pct>=75){ gradeEl.className='oral-score-grade grade-B'; gradeEl.textContent='😊 Good job! You covered the main points.'; }
+    else if(pct>=55){ gradeEl.className='oral-score-grade grade-C'; gradeEl.textContent='📝 Getting there! Try again — add more keywords.'; }
+    else if(pct>=30){ gradeEl.className='oral-score-grade grade-D'; gradeEl.textContent='💬 Keep practising — listen to the model again.'; }
+    else if(earned>0){ gradeEl.className='oral-score-grade grade-F'; gradeEl.textContent='💪 Keep going — re-record after reading the model.'; }
+    else{ gradeEl.className='oral-score-grade'; gradeEl.textContent='Tap each point you said in your recording ↑'; }
+  }
+}
+
+// ─── Model answer helpers ──────────────────────────────
+function speakRef(){
+  var el=document.getElementById('ref-answer-text');
+  if(!el) return;
+  var text=el.textContent||el.innerText;
+  var btn=document.getElementById('ref-speak-btn');
+  if(btn) btn.textContent='⏸ Speaking...';
+  speak(text, function(){ if(btn) btn.textContent='🔊 Hear Model'; });
+}
+
+function speakQ(){
+  var q=qs[qIdx];
+  speak(q.q);
+}
+
+function revealRef(){
+  var el=document.getElementById('ref-answer-text');
+  if(el) el.style.filter='none';
+}
+
+function rateOral(rating){
+  ['great','good','ok','retry'].forEach(function(r){
+    var b=document.getElementById('rate-'+r);
+    if(b) b.className='rate-btn';
+  });
+  var btn=document.getElementById('rate-'+rating);
+  if(btn) btn.classList.add('selected-'+rating);
+  var last=userAnswers[userAnswers.length-1];
+  if(last && last.ty==='oral') last.rating=rating;
+}
+
+// ═══════════════════════════════════════════════════════
+//  SELECTION
+// ═══════════════════════════════════════════════════════
+function selMCAns(i){
+  if(answered)return;
+  selMC=i;
+  document.querySelectorAll('.mc-opt').forEach((el,idx)=>el.classList.toggle('sel',idx===i));
+}
+function selTFAns(v){
+  if(answered)return;
+  selTF=v;
+  document.getElementById('tf-true').classList.toggle('sel',v===true);
+  document.getElementById('tf-false').classList.toggle('sel',v===false);
+}
+
+// ═══════════════════════════════════════════════════════
+//  CHECK ANSWER
+// ═══════════════════════════════════════════════════════
+function checkAns(){
+  if(answered)return;
+  const q=qs[qIdx];
+
+  // Oral questions use self-assessment, not checkAns
+  if(q.ty==='oral') return;
+
+  let userAns, correct;
+
+  if(q.ty==='truefalse'){
+    if(selTF===null)return;
+    userAns=selTF?'TRUE':'FALSE';
+    correct=selTF===q.a;
+    const tb=document.getElementById('tf-true'),fb=document.getElementById('tf-false');
+    (q.a?tb:fb).classList.add('ok');
+    if(!correct)(selTF?tb:fb).classList.add('err');
+  } else if(q.o){
+    if(selMC===null)return;
+    userAns=q.o[selMC]; correct=selMC===q.a;
+    document.querySelectorAll('.mc-opt').forEach((el,i)=>{
+      if(i===q.a)el.classList.add('ok');
+      else if(i===selMC&&!correct)el.classList.add('err');
+    });
+  } else {
+    const inp=document.getElementById('ans-input');
+    userAns=inp?inp.value.trim().toLowerCase():'';
+    if(!userAns)return;
+    const accepted=q.a.toLowerCase().split('|').map(s=>s.trim());
+    correct=accepted.includes(userAns);
+    if(inp)inp.classList.add(correct?'ok':'err');
+  }
+
+  answered=true; selMC=null; selTF=null;
+  if(correct)score++;
+  playSound(correct?'correct':'wrong');
+
+  const correctDisplay = q.ty==='truefalse'?(q.a?'TRUE':'FALSE'):q.o?q.o[q.a]:q.a.replace(/\|/g,' or ');
+  const fb=document.getElementById('feedback');
+  fb.classList.add('show');
+  if(correct){
+    fb.className='feedback show fb-ok';
+    fb.textContent=['🎉 Excellent!','⭐ Correct!','🌟 Great job!','✅ Perfect!'][Math.floor(Math.random()*4)];
+    if(audioOn) setTimeout(()=>speak('Correct! Well done!'),200);
+  } else {
+    fb.className='feedback show fb-err';
+    fb.textContent='❌ Not quite. The correct answer is: "'+correctDisplay+'"';
+    if(audioOn) setTimeout(()=>speak('The correct answer is: '+correctDisplay),200);
+  }
+
+  userAnswers.push({q:q.q, userAns:String(userAns), correctAns:correctDisplay, correct, ty:q.ty});
+
+  document.getElementById('btn-check').style.display='none';
+  document.getElementById('q-score').textContent='⭐ '+score;
+
+  const isLast=qIdx>=qs.length-1;
+  if(isLast){
+    document.getElementById('btn-submit').classList.add('show');
+  } else {
+    const nb=document.getElementById('btn-next');
+    if(nb)nb.style.display='block';
+  }
+}
+
+function skipQ(){
+  stopRecorderClean();
+  const q=qs[qIdx];
+  if(q.ty==='oral'){
+    var refText2 = q.ans || '';
+    userAnswers.push({q:q.q, userAns:'(skipped)', correctAns:refText2, correct:false, ty:'oral', rating:'skip', kwScore:0});
+    oralPtsChecked=0; oralBonusChecked=false;
+  } else {
+    const cd=q.ty==='truefalse'?(q.a?'TRUE':'FALSE'):q.o?q.o[q.a]:q.a.replace(/\|/g,' or ');
+    userAnswers.push({q:q.q, userAns:'(skipped)', correctAns:cd, correct:false, ty:q.ty});
+  }
+  nextQ();
+}
+
+function nextQ(){
+  // For oral: push answer entry if not yet pushed
+  const q=qs[qIdx];
+  if(q.ty==='oral'){
+    var refText = q.ans || '';
+    var totalBase=(q.pts||[]).length;
+    var total=totalBase+1;
+    var earned=oralPtsChecked+(oralBonusChecked?1:0);
+    var kwPct=total>0?Math.round((earned/total)*100):0;
+    var rating='—';
+    ['great','good','ok','retry'].forEach(function(r){var b=document.getElementById('rate-'+r);if(b&&b.classList.contains('selected-'+r))rating=r;});
+    if(!userAnswers[qIdx] || userAnswers.length <= qIdx){
+      userAnswers.push({q:q.q, userAns:'(oral)', correctAns:refText, correct:true, ty:'oral', rating:rating, kwScore:kwPct});
+    }
+    oralPtsChecked=0; oralBonusChecked=false;
+  }
+  stopRecorderClean();
+  qIdx++;
+  if(qIdx>=qs.length)submitQuiz();
+  else{renderQ();window.scrollTo({top:0,behavior:'smooth'});}
+}
+
+// ═══════════════════════════════════════════════════════
+//  RESULTS
+// ═══════════════════════════════════════════════════════
+function submitQuiz(){
+  if(synth)synth.cancel();
+  showScreen('result-screen');
+  const total=userAnswers.length, pct=total?Math.round((score/total)*100):0;
+  document.getElementById('res-num').textContent=score;
+  document.getElementById('res-of').textContent='/ '+total+' points  ('+pct+'%)';
+
+  let emoji,msg,stars;
+  if(pct>=90){emoji='🏆';msg='Outstanding! You are a star!';stars='⭐⭐⭐⭐⭐';}
+  else if(pct>=75){emoji='🎉';msg='Great job! Keep it up!';stars='⭐⭐⭐⭐';}
+  else if(pct>=60){emoji='😊';msg='Good effort! Review the wrong ones.';stars='⭐⭐⭐';}
+  else if(pct>=40){emoji='📚';msg='Keep studying! You can do it!';stars='⭐⭐';}
+  else{emoji='💪';msg="Don't give up! Practice makes perfect!";stars='⭐';}
+
+  document.getElementById('res-emoji').textContent=emoji;
+  document.getElementById('res-msg').textContent=msg;
+  document.getElementById('res-stars').textContent=stars;
+  setTimeout(()=>document.getElementById('res-pct-fill').style.width=pct+'%',100);
+
+  if(audioOn) setTimeout(()=>speak('Your score is '+score+' out of '+total+'. '+msg),400);
+
+  const list=document.getElementById('review-list');
+  list.innerHTML='';
+  userAnswers.forEach((a,i)=>{
+    const div=document.createElement('div');
+    if(a.ty==='oral'){
+      // Oral: show question + reference answer + self rating
+      const ratingMap={'😊 Good':'😊 Good','😐 OK':'😐 OK','😅 Need Practice':'😅 Need Practice','skip':'(skipped)','—':'not rated'};
+      const ratingIcon = (a.rating&&a.rating.includes('Good'))?'😊':(a.rating&&a.rating.includes('OK'))?'😐':(a.rating&&a.rating.includes('Practice'))?'😅':'—';
+      div.className='review-item';
+      div.style.borderLeftColor='#7C3AED';
+      div.innerHTML='<div class="review-q">🎤 '+(i+1)+'. '+a.q+'</div>'+
+        '<div style="font-size:12px;color:#7C3AED;font-weight:700;margin-bottom:4px;">Self-rating: '+ratingIcon+(a.rating||'—')+'</div>'+
+        '<div class="review-correct" style="cursor:pointer" onclick="speakText(\''+a.correctAns.replace(/'/g,"\\'")+'\')" title="Click to hear">'+
+          '📖 Reference: '+a.correctAns+' &nbsp;<span style="opacity:.6;font-size:11px">🔊 tap to hear</span>'+
+        '</div>';
+    } else {
+      div.className='review-item'+(a.correct?'':' miss');
+      div.innerHTML='<div class="review-q">'+(i+1)+'. '+a.q+'</div>'+
+        (a.correct
+          ? '<div class="review-correct">✅ '+a.userAns+'</div>'
+          : '<div class="review-yours">✗ Your answer: '+a.userAns+'</div><div class="review-correct">✓ Correct: '+a.correctAns+'</div>');
+    }
+    list.appendChild(div);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function speakText(text){ speak(text); }
+</script>
+</body>
+</html>

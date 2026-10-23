@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audrey's Grammar Final Review ✨</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --c1: #FF7DA0; /* plurals rose */
+    --c2: #6EC6FF; /* Demonstratives sky */
+    --c3: #7EECC4; /* Can mint */
+    --c4: #FFAD7D; /* Commands peach */
+    --c5: #BFA9FF; /* mock exam lavender */
+    --correct: #34C98A;
+    --wrong: #FF5A7A;
+    --text: #2D3A4A;
+    --muted: #7A8FA6;
+    --card: #ffffff;
+    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: #F0F6FF;
+    min-height: 100vh;
+    color: var(--text);
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px 24px 16px;
+    text-align: center;
+  }
+  header h1 { font-family:'Baloo 2',cursive; font-size:1.9rem; font-weight:800; color:#fff; text-shadow:0 2px 8px rgba(0,0,0,0.2); }
+  header p { color:rgba(255,255,255,0.85); font-size:0.88rem; margin-top:4px; }
+
+  /* EXAM INFO BANNER */
+  .exam-banner {
+    background: #fff8e1;
+    border-left: 5px solid #f5c400;
+    margin: 14px 16px 0;
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #7a5800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* UNIT CARDS (home) */
+  .home-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    padding: 16px;
+  }
+  .unit-card {
+    border-radius: 20px;
+    padding: 20px 16px;
+    cursor: pointer;
+    transition: transform 0.18s, box-shadow 0.18s;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    border: none;
+    text-align: left;
+    font-family: 'Nunito', sans-serif;
+  }
+  .unit-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.13); }
+  .unit-card .card-emoji { font-size: 2.2rem; margin-bottom: 8px; display: block; }
+  .unit-card .card-title { font-family:'Baloo 2',cursive; font-size:1.05rem; font-weight:800; color:#fff; line-height:1.2; }
+  .unit-card .card-sub { font-size:0.75rem; color:rgba(255,255,255,0.85); margin-top:4px; font-weight:600; }
+  .unit-card .card-count { position:absolute; top:12px; right:14px; background:rgba(255,255,255,0.3); border-radius:20px; padding:2px 10px; font-size:0.75rem; font-weight:800; color:#fff; }
+  .unit-card.u1 { background: linear-gradient(135deg, #FF7DA0, #ff5580); }
+  .unit-card.u2 { background: linear-gradient(135deg, #6EC6FF, #3aabff); }
+  .unit-card.u3 { background: linear-gradient(135deg, #7EECC4, #3ddba8); }
+  .unit-card.u4 { background: linear-gradient(135deg, #FFAD7D, #ff8c45); }
+  .unit-card.u5 { grid-column: 1 / -1; background: linear-gradient(135deg, #BFA9FF, #9b7eff); }
+  .unit-card.u5 .card-emoji { display:inline; }
+  .unit-card.u6 { grid-column: 1 / -1; background: linear-gradient(135deg, #FF6B6B, #FF8E53); }
+
+  /* ORAL TEST */
+  .oral-view { display:none; }
+  .oral-view.active { display:block; }
+  .oral-header {
+    background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+    padding: 16px 20px 14px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .oral-card {
+    background: #fff;
+    border-radius: 24px;
+    margin: 16px 16px 12px;
+    padding: 28px 20px 24px;
+    box-shadow: 0 8px 32px rgba(255,107,107,0.15);
+    text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
+  }
+  .oral-q-num { font-size: 0.78rem; font-weight: 800; color: #FF6B6B; letter-spacing: 2px; text-transform: uppercase; }
+  .oral-q-text { font-family: 'Baloo 2', cursive; font-size: 1.4rem; font-weight: 800; color: #2D3A4A; line-height: 1.4; }
+  .oral-example { background: #fff8f0; border-radius: 12px; padding: 10px 14px; font-size: 0.84rem; color: #999; font-style: italic; line-height: 1.6; width: 100%; text-align: left; }
+
+  /* BUTTONS ROW */
+  .oral-btn-row { display: flex; gap: 14px; justify-content: center; align-items: center; margin-top: 4px; }
+  .oral-speak-btn {
+    background: linear-gradient(135deg, #6EC6FF, #3aabff);
+    color: white; border: none; border-radius: 50%; width: 64px; height: 64px;
+    font-size: 1.7rem; cursor: pointer; box-shadow: 0 4px 16px rgba(110,198,255,0.4);
+    transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .oral-speak-btn:hover { transform: scale(1.08); }
+  .oral-speak-btn.speaking { background: linear-gradient(135deg, #667eea, #764ba2); animation: pulse 1s infinite; }
+
+  .oral-rec-btn {
+    background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+    color: white; border: none; border-radius: 50%; width: 72px; height: 72px;
+    font-size: 2rem; cursor: pointer; box-shadow: 0 4px 18px rgba(255,107,107,0.4);
+    transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .oral-rec-btn.recording { background: linear-gradient(135deg, #c0002a, #ff4444); animation: pulse 0.7s infinite; box-shadow: 0 0 0 6px rgba(255,68,68,0.25); }
+  .oral-rec-btn:hover { transform: scale(1.08); }
+
+  .oral-play-btn {
+    background: linear-gradient(135deg, #7EECC4, #3ddba8);
+    color: white; border: none; border-radius: 50%; width: 56px; height: 56px;
+    font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 14px rgba(126,236,196,0.4);
+    transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .oral-play-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .oral-play-btn:not(:disabled):hover { transform: scale(1.08); }
+
+  .oral-rec-label { font-size: 0.75rem; font-weight: 800; color: #aaa; text-align: center; margin-top: 2px; }
+  .oral-rec-status { font-size: 0.82rem; font-weight: 700; color: #FF6B6B; min-height: 20px; }
+
+  /* NAV */
+  .oral-dots { display: flex; justify-content: center; gap: 8px; margin: 8px 0 4px; }
+  .oral-dot { width: 10px; height: 10px; border-radius: 50%; background: #ddd; transition: all 0.2s; }
+  .oral-dot.active { background: #FF6B6B; transform: scale(1.3); }
+  .oral-nav { display: flex; gap: 12px; margin: 0 16px 24px; }
+  .oral-nav-btn { flex: 1; padding: 13px; border-radius: 16px; border: none; font-size: 0.95rem; font-weight: 800; cursor: pointer; font-family: 'Nunito', sans-serif; transition: all 0.18s; }
+  .oral-prev { background: #f0f0f0; color: #666; }
+  .oral-next { background: linear-gradient(135deg, #FF6B6B, #FF8E53); color: white; }
+  .oral-next:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(255,107,107,0.4); }
+  .oral-tip-banner { margin: 10px 16px 6px; background: #fff8f0; border-left: 4px solid #FF8E53; border-radius: 10px; padding: 9px 14px; font-size: 0.8rem; font-weight: 700; color: #c05a00; }
+  .oral-btn-labels { display:flex; gap:14px; justify-content:center; }
+  .oral-btn-col { display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .oral-sample-box {
+    width: 100%;
+    background: linear-gradient(135deg, #f0fff8, #e8f8ff);
+    border: 2px solid #7EECC4;
+    border-radius: 14px;
+    padding: 12px 14px;
+    text-align: left;
+  }
+  .oral-sample-label { font-size: 0.75rem; font-weight: 800; color: #1a7a50; margin-bottom: 6px; letter-spacing: 0.5px; }
+  .oral-sample-text { font-size: 0.92rem; font-weight: 600; color: #2D3A4A; line-height: 1.6; margin-bottom: 10px; }
+  .oral-sample-play {
+    background: linear-gradient(135deg, #7EECC4, #3ddba8);
+    color: white; border: none; border-radius: 20px;
+    padding: 7px 18px; font-size: 0.85rem; font-weight: 800;
+    cursor: pointer; font-family: 'Nunito', sans-serif;
+    transition: all 0.18s;
+  }
+  .oral-sample-play:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(126,236,196,0.5); }
+  @keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.1);} }
+
+  /* PROGRESS RING on card */
+  .card-progress { font-size:0.72rem; color:rgba(255,255,255,0.9); margin-top:6px; font-weight:700; }
+
+  /* SECTION VIEW */
+  .section-view { display:none; padding: 0 0 40px; }
+  .section-view.active { display:block; }
+
+  /* SECTION HEADER */
+  .sec-header {
+    padding: 16px 20px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .back-btn {
+    background: rgba(255,255,255,0.3);
+    border: none;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    cursor: pointer;
+    color: #fff;
+    font-family: 'Nunito', sans-serif;
+  }
+  .sec-title { font-family:'Baloo 2',cursive; font-size:1.2rem; font-weight:800; color:#fff; }
+
+  /* PROGRESS BAR */
+  .prog-wrap { background:rgba(255,255,255,0.3); border-radius:20px; height:8px; margin:0 20px 14px; overflow:hidden; }
+  .prog-bar { height:100%; background:#fff; border-radius:20px; transition:width 0.4s; }
+  .prog-label { text-align:center; font-size:0.78rem; color:rgba(255,255,255,0.9); font-weight:700; margin-bottom:10px; }
+
+  /* QUESTIONS */
+  main { padding: 0 14px 20px; }
+  .q-card {
+    background: var(--card);
+    border-radius: 18px;
+    padding: 20px 18px 16px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    border-top: 4px solid #ddd;
+  }
+  .q-num { font-size:0.72rem; font-weight:800; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-bottom:6px; }
+  .q-text { font-size:1.05rem; font-weight:700; color:var(--text); line-height:1.5; margin-bottom:12px; }
+  .q-hint { font-size:0.78rem; color:var(--muted); margin-bottom:10px; background:#f5f8ff; border-radius:8px; padding:5px 10px; display:inline-block; }
+
+  /* MC */
+  .choices { display:grid; gap:8px; }
+  .choice-btn {
+    background:#f4f9ff; border:2px solid #d8eaff; border-radius:12px;
+    padding:11px 14px; font-size:0.93rem; font-weight:600; cursor:pointer;
+    text-align:left; transition:all 0.15s; color:var(--text); font-family:'Nunito',sans-serif;
+  }
+  .choice-btn:hover:not(:disabled) { background:#e0f0ff; border-color:#6EC6FF; }
+  .choice-btn.reveal-correct { background:#d4fbe8!important; border-color:var(--correct)!important; color:#1a7a50!important; }
+  .choice-btn.selected-wrong { background:#ffe0e6!important; border-color:var(--wrong)!important; color:#c0002a!important; }
+
+  /* FILL */
+  .fill-input {
+    border:2px solid #d8eaff; border-radius:10px; padding:10px 14px;
+    font-size:1rem; font-family:'Nunito',sans-serif; font-weight:600;
+    width:100%; outline:none; background:#f4f9ff; color:var(--text);
+    transition:border 0.2s;
+  }
+  .fill-input:focus { border-color:#6EC6FF; background:#fff; }
+  .fill-input.correct { border-color:var(--correct); background:#d4fbe8; }
+  .fill-input.wrong { border-color:var(--wrong); background:#ffe0e6; }
+
+  /* TF */
+  .tf-row { display:flex; gap:10px; }
+  .tf-btn {
+    flex:1; padding:11px; border-radius:12px; border:2px solid #d8eaff;
+    font-size:1rem; font-weight:800; cursor:pointer; font-family:'Nunito',sans-serif;
+    background:#f4f9ff; transition:all 0.15s;
+  }
+  .tf-btn.t-btn { color:#1a7a50; }
+  .tf-btn.f-btn { color:#c0002a; }
+  .tf-btn.reveal-correct { background:#d4fbe8!important; border-color:var(--correct)!important; }
+  .tf-btn.selected-wrong { background:#ffe0e6!important; border-color:var(--wrong)!important; }
+
+  /* FEEDBACK */
+  .feedback { margin-top:10px; padding:9px 12px; border-radius:10px; font-size:0.88rem; font-weight:700; display:none; }
+  .feedback.show { display:block; }
+  .feedback.ok { background:#d4fbe8; color:#1a7a50; }
+  .feedback.bad { background:#ffe0e6; color:#c0002a; }
+
+  /* CORRECT ANSWER BOX */
+  .ca-box { margin-top:8px; background:#fffbe6; border:2px dashed #f5c400; border-radius:10px; padding:8px 12px; display:none; }
+  .ca-box.show { display:block; }
+  .ca-label { font-size:0.72rem; color:#a07800; font-weight:700; margin-bottom:2px; }
+  .ca-value { font-size:1.1rem; font-weight:800; color:#2D3A4A; }
+  .ca-form { font-size:0.82rem; color:#666; margin-top:2px; font-style:italic; }
+
+  /* BUTTONS */
+  .btn-row { display:flex; gap:8px; margin-top:12px; }
+  .btn { padding:9px 20px; border-radius:18px; border:none; font-size:0.9rem; font-weight:800; cursor:pointer; font-family:'Nunito',sans-serif; transition:all 0.15s; }
+  .btn-check { background:#6EC6FF; color:#fff; }
+  .btn-check:hover { background:#4db8ff; }
+  .btn-submit-sec { background:linear-gradient(90deg,#FF7DA0,#FFAD7D); color:#fff; font-size:0.95rem; padding:12px 28px; border-radius:20px; border:none; font-weight:800; cursor:pointer; font-family:'Nunito',sans-serif; display:block; margin:6px auto 0; transition:all 0.18s; }
+  .btn-submit-sec:hover { transform:translateY(-2px); box-shadow:0 4px 16px rgba(255,125,160,0.4); }
+  .btn-reset { background:#BFA9FF; color:#fff; }
+
+  /* RESULT */
+  .result-panel { background:#fff; border-radius:22px; padding:28px 20px; text-align:center; box-shadow:var(--shadow); margin:0 14px; }
+  .result-emoji { font-size:3.5rem; }
+  .result-stars { font-size:1.8rem; margin:6px 0; }
+  .result-score { font-family:'Baloo 2',cursive; font-size:2.8rem; font-weight:800; }
+  .result-msg { font-size:1rem; font-weight:700; margin:6px 0 14px; color:var(--text); }
+  .review-title { font-family:'Baloo 2',cursive; font-size:1rem; font-weight:800; margin:18px 0 10px; text-align:left; }
+  .review-wrong { color:var(--wrong); }
+  .review-ok { color:var(--correct); }
+  .r-item { border-radius:12px; padding:12px 14px; margin-bottom:8px; text-align:left; }
+  .r-item.bad { background:#fff5f7; border-left:4px solid var(--wrong); }
+  .r-item.good { background:#f0fff8; border-left:4px solid var(--correct); padding:8px 14px; }
+  .r-q { font-size:0.82rem; color:#aaa; margin-bottom:4px; }
+  .r-qtext { font-size:0.93rem; font-weight:700; color:var(--text); margin-bottom:6px; }
+  .r-ans-row { display:flex; flex-direction:column; gap:5px; }
+  .r-user { background:#ffe0e6; border-radius:8px; padding:5px 10px; font-size:0.88rem; }
+  .r-user span { color:#c0002a; font-weight:700; }
+  .r-correct { background:#d4fbe8; border-radius:8px; padding:5px 10px; font-size:0.88rem; }
+  .r-correct span { color:#1a7a50; font-weight:800; font-size:0.95rem; }
+  .r-form { font-size:0.78rem; color:#666; font-style:italic; margin-top:2px; }
+
+  /* ORAL SCORING & KEYWORDS */
+  .oral-tag { font-size:0.72rem; font-weight:800; color:#FF6B6B; background:#fff0f3; border-radius:20px; padding:3px 12px; display:inline-block; margin-bottom:4px; }
+  .oral-structure-box { width:100%; background:#f4f0ff; border:2px solid #BFA9FF; border-radius:12px; padding:10px 14px; text-align:left; }
+  .oral-struct-label { font-size:0.72rem; font-weight:800; color:#6b4fa8; margin-bottom:4px; }
+  .oral-struct-text { font-size:0.9rem; font-weight:700; color:#2D3A4A; line-height:1.6; }
+  .oral-kw-box { width:100%; text-align:left; }
+  .oral-kw-label { font-size:0.72rem; font-weight:800; color:#c07800; margin-bottom:6px; }
+  .oral-kw-chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .kw-chip { background:#fff8e1; border:2px solid #f5c400; border-radius:20px; padding:4px 12px; font-size:0.85rem; font-weight:800; color:#7a5800; transition:all 0.3s; }
+  .kw-chip.kw-matched { background:#d4fbe8; border-color:#34C98A; color:#1a7a50; }
+  .oral-score-badge { border:2.5px solid; border-radius:20px; padding:6px 18px; font-size:1rem; font-weight:800; display:inline-block; margin-top:4px; }
+  .oral-transcript { background:#f5f5f5; border-radius:10px; padding:8px 12px; font-size:0.82rem; color:#666; text-align:left; width:100%; margin-top:4px; font-style:italic; }
+  .oral-transcript-label { font-weight:800; color:#aaa; font-style:normal; }
+  .oral-score-btn {
+    background:linear-gradient(135deg,#BFA9FF,#9b7eff); color:white; border:none;
+    border-radius:50%; width:64px; height:64px; font-size:1.7rem; cursor:pointer;
+    box-shadow:0 4px 16px rgba(191,169,255,0.4); transition:all 0.2s;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .oral-score-btn:hover { transform:scale(1.08); }
+
+  @media(max-width:480px) {
+    .home-grid { grid-template-columns:1fr; }
+    .unit-card.u5 { grid-column:1; }
+    header h1 { font-size:1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>✨ Audrey's Grammar Review</h1>
+  <p>Ming Der Bilingual · Beethoven · 2026 Spring Final</p>
+</header>
+
+<div id="homeView">
+  <div class="exam-banner">📅 Grammar Exam: June 11 (Thu) · Pathway 2 Unit 3 &amp; Unit 6</div>
+  <div class="home-grid" id="homeGrid">
+    <!-- rendered by JS -->
+  </div>
+</div>
+
+<!-- Section views rendered by JS -->
+<div id="sectionArea"></div>
+<div id="oralArea"></div>
+
+<script>
+// ============================================================
+// QUESTION BANKS — 4 themes + 1 mock exam
+// ============================================================
+
+const units = [
+  // ── 1. Plurals ──────────────────────────────────────────
+  {
+    id: 0, emoji: '🔢', title: 'Plurals', sub: 'Singular & Plural Nouns', color: '#FF7DA0',
+    gradient: 'linear-gradient(135deg,#FF7DA0,#ff5580)',
+    tip: 'Remember: fish/sheep/deer never change! mouse→mice, child→children, foot→feet',
+    questions: [
+      // Regular plurals
+      { type:'fill', q:'one book → two ______', hint:'+s', answer:'books' },
+      { type:'fill', q:'one frog → two ______', hint:'+s', answer:'frogs' },
+      { type:'fill', q:'one guitar → two ______', hint:'+s', answer:'guitars' },
+      { type:'fill', q:'one key → two ______', hint:'vowel + y → just add s', answer:'keys' },
+      { type:'fill', q:'one baby → two ______', hint:'y → ies', answer:'babies' },
+      { type:'fill', q:'one butterfly → two ______', hint:'y → ies', answer:'butterflies' },
+      { type:'fill', q:'one fly → two ______', hint:'y → ies', answer:'flies' },
+      { type:'fill', q:'one tomato → two ______', hint:'+es', answer:'tomatoes' },
+      { type:'fill', q:'one box → two ______', hint:'+es', answer:'boxes' },
+      { type:'fill', q:'one fox → two ______', hint:'+es', answer:'foxes' },
+      { type:'fill', q:'one glass → two ______', hint:'+es', answer:'glasses' },
+      { type:'fill', q:'one brush → two ______', hint:'+es', answer:'brushes' },
+      { type:'fill', q:'one torch → two ______', hint:'+es', answer:'torches' },
+      { type:'fill', q:'one wolf → two ______', hint:'f → ves', answer:'wolves' },
+      { type:'fill', q:'one knife → two ______', hint:'fe → ves', answer:'knives' },
+      { type:'fill', q:'one leaf → two ______', hint:'f → ves', answer:'leaves' },
+      // Irregular plurals
+      { type:'fill', q:'one foot → two ______', hint:'irregular', answer:'feet' },
+      { type:'fill', q:'one tooth → two ______', hint:'irregular', answer:'teeth' },
+      { type:'fill', q:'one man → two ______', hint:'irregular', answer:'men' },
+      { type:'fill', q:'one woman → two ______', hint:'irregular', answer:'women' },
+      { type:'fill', q:'one child → two ______', hint:'irregular', answer:'children' },
+      { type:'fill', q:'one mouse → two ______', hint:'irregular', answer:'mice' },
+      { type:'fill', q:'one person → two ______', hint:'irregular', answer:'people' },
+      { type:'fill', q:'one ox → two ______', hint:'irregular: -en', answer:'oxen' },
+      // Unchanged plurals
+      { type:'fill', q:'one fish → two ______', hint:'no change', answer:'fish' },
+      { type:'fill', q:'one sheep → two ______', hint:'no change', answer:'sheep' },
+      { type:'fill', q:'one deer → two ______', hint:'no change', answer:'deer' },
+      // Sentence fill-ins
+      { type:'fill', q:'The ______ are flying in the sky. (bird)', hint:'plural: +s', answer:'birds' },
+      { type:'fill', q:'My ______ hurt when I eat ice cream. (tooth)', hint:'irregular plural', answer:'teeth' },
+      { type:'fill', q:'Many ______ are standing near the lake. (deer)', hint:'no change', answer:'deer' },
+      { type:'fill', q:'Look at the ______! They are shopping. (woman)', hint:'irregular plural', answer:'women' },
+      { type:'fill', q:'We can see many ______ in the pond. (fish)', hint:'no change', answer:'fish' },
+      { type:'fill', q:'The ______ are reading a storybook. (child)', hint:'irregular plural', answer:'children' },
+      { type:'fill', q:'The ______ are working in the office. (man)', hint:'irregular plural', answer:'men' },
+      { type:'fill', q:'My ______ are wet after walking in the rain. (foot)', hint:'irregular plural', answer:'feet' },
+      { type:'fill', q:'There are twenty ______ hanging on the wall. (guitar)', hint:'+s', answer:'guitars' },
+      { type:'fill', q:'The ______ is hiding behind the box. (mouse)', hint:'singular!', answer:'mouse' },
+      // Multiple choice
+      { type:'mc', q:'The ______ are eating grass in the field.', choices:['sheep','sheeps','sheepes','sheeping'], answer:'sheep' },
+      { type:'mc', q:'The ______ are swimming in the pond.', choices:['duck','ducking','duckes','ducks'], answer:'ducks' },
+      { type:'mc', q:'The ______ are in the kitchen now.', choices:['childrens','childs','children','child'], answer:'children' },
+      { type:'mc', q:'There are ______ running in the drainage.', choices:['mouses','mouse','mices','mice'], answer:'mice' },
+      // True / False
+      { type:'tf', q:'Two mouses are running under the table. (Correct?)', answer:false, correctForm:'Two mice are running under the table.' },
+      { type:'tf', q:'Many deer are in Nara Park. (Correct?)', answer:true },
+      { type:'tf', q:'I see many fishs in the river. (Correct?)', answer:false, correctForm:'I see many fish in the river.' },
+      { type:'tf', q:'The farmer keeps many sheeps on his farm. (Correct?)', answer:false, correctForm:'The farmer keeps many sheep on his farm.' },
+      { type:'tf', q:'There are two white wolves running in the snow. (Correct?)', answer:true },
+      { type:'tf', q:'The childrens are playing in the park. (Correct?)', answer:false, correctForm:'The children are playing in the park.' },
+      // From Beethoven U.3-U.6 Review Worksheet
+      { type:'fill', q:'My ______ are very clean after washing them. (hand)', hint:'+s', answer:'hands' },
+      { type:'fill', q:'Look! Those ______ are dancing in the park. (woman)', hint:'irregular', answer:'women' },
+      { type:'fill', q:'The ______ are singing in the classroom. (student)', hint:'+s', answer:'students' },
+      { type:'fill', q:'The ______ are fixing the cars in the garage. (man)', hint:'irregular', answer:'men' },
+      { type:'fill', q:'There are many ______ lying on the ground. (tiger)', hint:'+s', answer:'tigers' },
+      { type:'fill', q:'We see many ______ swimming in the ocean. (dolphin)', hint:'+s', answer:'dolphins' },
+      { type:'fill', q:'The ______ are jumping from the cabinet. (mouse)', hint:'irregular', answer:'mice' },
+      { type:'fill', q:'My ______ really hurt. I need to see the dentist. (tooth)', hint:'irregular', answer:'teeth' },
+      { type:'fill', q:'Jennifer rides a ______ to school every day. (bike)', hint:'singular, no change', answer:'bike' },
+      { type:'fill', q:'There are five ______ in our house. (piano)', hint:'+s', answer:'pianos' },
+      { type:'tf', q:'Jennifer rides a bikes to school every day. (Correct?)', answer:false, correctForm:'Jennifer rides a bike to school every day. (singular!)' },
+      { type:'tf', q:'We see many dolphins swimming in the ocean. (Correct?)', answer:true },
+    ]
+  },
+
+  // ── 2. Demonstratives ──────────────────────────────────────────
+  {
+    id: 1, emoji: '👆', title: 'Demonstratives', sub: 'This / That / These / Those', color: '#6EC6FF',
+    gradient: 'linear-gradient(135deg,#6EC6FF,#3aabff)',
+    tip: 'Near: this/these · Far: that/those · Singular: this/that · Plural: these/those',
+    questions: [
+      // Rules
+      { type:'mc', q:'Near me, only one →', choices:['this','that','these','those'], answer:'this' },
+      { type:'mc', q:'Far from me, only one →', choices:['this','that','these','those'], answer:'that' },
+      { type:'mc', q:'Near me, more than one →', choices:['this','that','these','those'], answer:'these' },
+      { type:'mc', q:'Far from me, more than one →', choices:['this','that','these','those'], answer:'those' },
+      // Fill in
+      { type:'fill', q:'______ is a computer game. (near · singular)', hint:'this/that/these/those', answer:'This' },
+      { type:'fill', q:'______ are lorries. (far · plural)', hint:'this/that/these/those', answer:'Those' },
+      { type:'fill', q:'______ is a camera. (near · singular)', hint:'this/that/these/those', answer:'This' },
+      { type:'fill', q:'______ is a kite. (near · singular)', hint:'this/that/these/those', answer:'This' },
+      { type:'fill', q:'______ are balls. (near · plural)', hint:'this/that/these/those', answer:'These' },
+      { type:'fill', q:'______ are watches. (far · plural)', hint:'this/that/these/those', answer:'Those' },
+      { type:'fill', q:'______ is a pen. (near · singular)', hint:'this/that/these/those', answer:'This' },
+      { type:'fill', q:'______ is an eraser. (far · singular)', hint:'this/that/these/those', answer:'That' },
+      { type:'fill', q:'______ are chairs. (near · plural)', hint:'this/that/these/those', answer:'These' },
+      { type:'fill', q:'______ are trees. (far · plural)', hint:'this/that/these/those', answer:'Those' },
+      { type:'fill', q:'______ are giraffes. (far · plural)', hint:'far, plural', answer:'Those' },
+      { type:'fill', q:'______ is a frog. (far · singular)', hint:'far, singular', answer:'That' },
+      { type:'fill', q:'______ is an elephant. (near · singular)', hint:'near, singular', answer:'This' },
+      { type:'fill', q:'______ are mice. (near · plural)', hint:'near, plural', answer:'These' },
+      // Multiple choice
+      { type:'mc', q:'______ (is / are) my toys. (far · plural)', choices:['Those are','Those is','That are','This are'], answer:'Those are' },
+      { type:'mc', q:'Are ______ lizards? (near · plural)', choices:['this','that','these','those'], answer:'these' },
+      { type:'mc', q:'Is that (a / an) elephant?', choices:['a','an'], answer:'an' },
+      { type:'mc', q:'Are (these / this) lizards?', choices:['these','this'], answer:'these' },
+      { type:'mc', q:'Those (is / are) my toys.', choices:['is','are'], answer:'are' },
+      // True / False
+      { type:'tf', q:'These is my books. (Correct?)', answer:false, correctForm:'These are my books.' },
+      { type:'tf', q:'That is an elephant. (Correct?)', answer:true },
+      { type:'tf', q:'Those are a camera. (Correct?)', answer:false, correctForm:'That is a camera. (singular → use That)' },
+      { type:'tf', q:'This are balls. (Correct?)', answer:false, correctForm:'These are balls.' },
+      { type:'tf', q:'That are an apple. (Correct?)', answer:false, correctForm:'That is an apple.' },
+      { type:'tf', q:'These are my books. (Correct?)', answer:true },
+      // From Beethoven U.3-U.6 Worksheet — Circle & answer
+      { type:'mc', q:'Is ( this / that ) a frog? — The frog is FAR. Which word is correct?', choices:['this','that','these','those'], answer:'that', hint:'far + singular' },
+      { type:'fill', q:'Is that a frog? → Yes, ______ is a frog.', hint:'that', answer:'that' },
+      { type:'mc', q:'Is ( this / that ) a cat? — The animal is NEAR. Which word is correct?', choices:['this','that','these','those'], answer:'this', hint:'near + singular' },
+      { type:'fill', q:'Is this a cat? No, ______ is a dog.', hint:'this', answer:'this' },
+      { type:'mc', q:'Are ( those / these ) turtles? — The animals are NEAR. Which word is correct?', choices:['those','these'], answer:'these', hint:'near + plural' },
+      { type:'fill', q:'Are these turtles? → No, ______ are fish.', hint:'they', answer:'they' },
+      { type:'tf', q:'Is that a frog? → Yes, this is a frog. (Correct?)', answer:false, correctForm:'Yes, that is a frog. (use the same word as the question)' },
+    ]
+  },
+
+  // ── 3. Modal: Can ──────────────────────────────────────────
+  {
+    id: 2, emoji: '🐾', title: 'Modal: Can', sub: "Can / Can't + Q&A", color: '#7EECC4',
+    gradient: 'linear-gradient(135deg,#7EECC4,#3ddba8)',
+    tip: "Rule: can/can't is ALWAYS followed by the base verb! No -s, no -ing.",
+    questions: [
+      // Basic usage
+      { type:'fill', q:'Can you ______ (sleep) in class?', hint:'base verb', answer:'sleep' },
+      { type:'fill', q:'No, I ______ sleep in class.', hint:'negative', answer:"can't" },
+      { type:'fill', q:'Can giraffes ______ (swim) in the ocean?', hint:'base verb', answer:'swim' },
+      { type:'fill', q:'No, they ______ swim in the ocean.', hint:'negative', answer:"can't" },
+      { type:'fill', q:'Can Grandpa ______ (speak) English?', hint:'base verb', answer:'speak' },
+      { type:'fill', q:'Can Jenny ______ (sing) loudly?', hint:'base verb', answer:'sing' },
+      { type:'fill', q:'Can you ______ (sail) a small boat?', hint:'base verb', answer:'sail' },
+      { type:'fill', q:'How ______ bananas can the monkeys eat?', hint:'how many / much', answer:'many' },
+      { type:'fill', q:'How many carrots ______ the rabbits eat?', hint:'can/do/is', answer:'can' },
+      // From Beethoven U.3-U.6 Worksheet
+      { type:'fill', q:'How many sandwiches can you eat? → I can eat ______ sandwich.', hint:'one / two / three', answer:'one' },
+      { type:'fill', q:'Can monkeys swing between the trees? → Yes, ______ can.', hint:'they', answer:'they' },
+      { type:'fill', q:'Can your father drive a car? → Yes, ______ can drive a car.', hint:'he', answer:'he' },
+      { type:'fill', q:'Where are the watermelons? (on the table) → They ______ on the table.', hint:'are', answer:'are' },
+      { type:'fill', q:'Where are the cookies? (in the jar) → They are ______ the jar.', hint:'in', answer:'in' },
+      { type:'mc', q:'Can monkeys swing between the trees?', choices:["Yes, they can.","No, they can't.",'Yes, it can.',"No, it can't."], answer:'Yes, they can.' },
+      { type:'mc', q:'Can your father drive a car?', choices:['Yes, he can.','Yes, she can.',"No, he can't.",'Yes, they can.'], answer:'Yes, he can.' },
+      { type:'tf', q:'Can monkeys swing between the trees? → Yes, it can. (Correct?)', answer:false, correctForm:'Yes, they can. (monkeys = they)' },
+      { type:'tf', q:'Where are the cookies? → They are in the jar. (Correct?)', answer:true },
+      // Chart Q&A (Tony/Vivian/Joyce/Bill & Peter)
+      { type:'fill', q:'Can Tony surf? → No, he ______, but he can swim.', hint:"can't", answer:"can't" },
+      { type:'fill', q:"Can Tony surf? → No, he can't, but he can ______.", hint:'swim', answer:'swim' },
+      { type:'fill', q:'Can Vivian cook? → No, she ______, but she can drive.', hint:"can't", answer:"can't" },
+      { type:'fill', q:"Can Vivian cook? → No, she can't, but she can ______.", hint:'drive', answer:'drive' },
+      { type:'fill', q:'Can Joyce speak English? → No, she ______, but she can speak Spanish.', hint:"can't", answer:"can't" },
+      { type:'fill', q:'Can Bill and Peter paint? → No, they ______, but they can play tennis.', hint:"can't", answer:"can't" },
+      // Penny/Leo/Cora chart
+      { type:'fill', q:'Penny ______ play basketball. (✓)', hint:"can / can't", answer:'can' },
+      { type:'fill', q:'Leo ______ make a cake. (✗)', hint:"can / can't", answer:"can't" },
+      { type:'fill', q:'Cora ______ swim. (✓)', hint:"can / can't", answer:'can' },
+      { type:'fill', q:'Cora ______ play basketball. (✗)', hint:"can / can't", answer:"can't" },
+      // Multiple choice
+      { type:'mc', q:'My sister can ______ very fast.', choices:['runs','running','run','ran'], answer:'run' },
+      { type:'mc', q:'Can Kevin ______ a horse?', choices:['rides','ride','riding','rode'], answer:'ride' },
+      { type:'mc', q:'A: Can you ______ a horse? B: Yes, I can.', choices:['rides','are riding','ride','riding'], answer:'ride' },
+      { type:'mc', q:'______ you play the piano? — Yes, I can.', choices:['Do','Are','Can','Does'], answer:'Can' },
+      { type:'mc', q:'Can Tony swim?', choices:['Yes, he can.','No, he can\'t.','Yes, she can.','No, she can\'t.'], answer:'Yes, he can.' },
+      { type:'mc', q:'Can Vivian drive?', choices:['No, she can\'t.','Yes, he can.','Yes, she can.','No, he can\'t.'], answer:'Yes, she can.' },
+      { type:'mc', q:'Can Joyce speak Spanish?', choices:['No, she can\'t.','Yes, he can.','No, he can\'t.','Yes, she can.'], answer:'Yes, she can.' },
+      { type:'mc', q:'Can Bill and Peter play tennis?', choices:['No, they can\'t.','Yes, she can.','Yes, they can.','No, he can\'t.'], answer:'Yes, they can.' },
+      // True / False
+      { type:'tf', q:'He can sings well. (Correct?)', answer:false, correctForm:'He can sing well.' },
+      { type:'tf', q:'Can Amy dance well? (Correct?)', answer:true },
+      { type:'tf', q:'Can they playing baseball? (Correct?)', answer:false, correctForm:'Can they play baseball?' },
+      { type:'tf', q:'She can drawing pictures. (Correct?)', answer:false, correctForm:'She can draw pictures.' },
+      { type:'tf', q:'Tony can surf. (Correct?)', answer:false, correctForm:"Tony can't surf." },
+      { type:'tf', q:'Vivian can drive. (Correct?)', answer:true },
+      { type:'tf', q:'Joyce can speak English. (Correct?)', answer:false, correctForm:"Joyce can't speak English." },
+    ]
+  },
+
+  // ── 4. Commands ──────────────────────────────────────────────
+  {
+    id: 3, emoji: '📢', title: 'Commands', sub: 'Commands — Do / Don\'t', color: '#FFAD7D',
+    gradient: 'linear-gradient(135deg,#FFAD7D,#ff8c45)',
+    tip: 'Affirmative: Start with base verb. Negative: Don\'t + base verb.',
+    questions: [
+      // Classroom commands fill-in
+      { type:'fill', q:'______ up. (line)', hint:'Line', answer:'Line' },
+      { type:'fill', q:'______ up. (stand)', hint:'Stand', answer:'Stand' },
+      { type:'fill', q:'______ down. (sit)', hint:'Sit', answer:'Sit' },
+      { type:'fill', q:'Be ______! (quiet)', hint:'quiet', answer:'quiet' },
+      { type:'fill', q:'______ chatting! (stop)', hint:'Stop', answer:'Stop' },
+      { type:'fill', q:'______ to the board. (go)', hint:'Go', answer:'Go' },
+      { type:'fill', q:'______ your hand. (raise)', hint:'Raise', answer:'Raise' },
+      { type:'fill', q:'Don\'t ______! (cheat)', hint:'cheat', answer:'cheat' },
+      { type:'fill', q:'Don\'t ______! (eat)', hint:'eat', answer:'eat' },
+      { type:'fill', q:'______ the door. (knock)', hint:'Knock', answer:'Knock' },
+      { type:'fill', q:'Do your ______. (homework)', hint:'homework', answer:'homework' },
+      { type:'fill', q:'Keep the place ______. (clean)', hint:'clean', answer:'clean' },
+      { type:'fill', q:'Keep your ______ in your schoolbag. (mobile)', hint:'mobile', answer:'mobile' },
+      { type:'fill', q:'Take ______ your book. (out)', hint:'out', answer:'out' },
+      { type:'fill', q:"______ play a game. (let's)", hint:"Let's", answer:"Let's" },
+      // Grammar patterns
+      { type:'fill', q:'______ talk loudly in the library. (negative command)', hint:"Don't", answer:"Don't" },
+      { type:'fill', q:'Please ______ your hands before lunch.', hint:'wash', answer:'wash' },
+      { type:'fill', q:'______ run in the hallway. (negative command)', hint:"Don't", answer:"Don't" },
+      { type:'fill', q:'______ off your shoes before entering the room.', hint:'Take', answer:'Take' },
+      { type:'fill', q:'______ attention in class, please.', hint:'Pay', answer:'Pay' },
+      { type:'fill', q:'______ your book on the table.', hint:'Put', answer:'Put' },
+      // Unscramble
+      { type:'fill', q:'Unscramble: / in / attention / class / Pay / please /', hint:'imperative; please at start or end', answer:'Please pay attention in class.' },
+      { type:'fill', q:'Unscramble: book / Put / table / on / your / the /', hint:'Commands', answer:'Put your book on the table.' },
+      { type:'fill', q:'Unscramble: telling / what / Stop / me / do / to /', hint:'Stop + V-ing', answer:'Stop telling me what to do.' },
+      // Multiple choice
+      { type:'mc', q:"______ play basketball in the living room. (negative command)", choices:["Don't","Doesn't","Not","No"], answer:"Don't" },
+      { type:'mc', q:'Please ______ the window. It\'s cold outside.', choices:['closes','closing','close','closed'], answer:'close' },
+      { type:'mc', q:"______ on the desks! (negative command)", choices:["doesn't draw","don't draw","don't drawing","not draw"], answer:"don't draw" },
+      { type:'mc', q:'______ me what to do! (Stop + V-ing)', choices:['Stop tell','Stop telling','Stop to tell','Stops telling'], answer:'Stop telling' },
+      // True / False
+      { type:'tf', q:"Don't riding your bike on the sidewalk. (Correct?)", answer:false, correctForm:"Don't ride your bike on the sidewalk." },
+      { type:'tf', q:'Please wash your hands before lunch. (Correct?)', answer:true },
+      { type:'tf', q:"Doesn't run in the hallway. (Correct?)", answer:false, correctForm:"Don't run in the hallway." },
+      { type:'tf', q:'Take off your shoes before entering the room. (Correct?)', answer:true },
+      { type:'tf', q:'Don\'t eat in the library! (Correct?)', answer:true },
+    ]
+  },
+
+  // ── 5. Mock Exam ──────────────────────────────────────────
+  {
+    id: 4, emoji: '🎯', title: 'Mock Exam', sub: 'All 4 Topics · Simulate the Real Exam', color: '#BFA9FF',
+    gradient: 'linear-gradient(135deg,#BFA9FF,#9b7eff)',
+    tip: 'Practice all 4 topics! Are you ready for the exam on June 11?',
+    questions: [
+      // --- Plurals ---
+      { type:'mc', q:'The ______ are swimming in the river.', choices:['child','childs','childrens','children'], answer:'children' },
+      { type:'mc', q:'There are ______ running in the drainage.', choices:['mouses','mouse','mices','mice'], answer:'mice' },
+      { type:'fill', q:'one tooth → two ______', hint:'irregular', answer:'teeth' },
+      { type:'fill', q:'one wolf → two ______', hint:'f→ves', answer:'wolves' },
+      { type:'fill', q:'The ______ are eating grass on the farm. (sheep)', hint:'no change', answer:'sheep' },
+      { type:'fill', q:'I have three ______ in my school bag. (book)', hint:'+s', answer:'books' },
+      { type:'tf', q:'There are many deers in Nara Park. (Correct?)', answer:false, correctForm:'There are many deer in Nara Park.' },
+      { type:'tf', q:'Two mice are in the house. (Correct?)', answer:true },
+      // --- Demonstratives ---
+      { type:'mc', q:'Are (these / this) lizards?', choices:['these','this'], answer:'these' },
+      { type:'mc', q:'Is that (a / an) elephant?', choices:['a','an'], answer:'an' },
+      { type:'fill', q:'______ are lorries. (far · plural)', hint:'Those', answer:'Those' },
+      { type:'fill', q:'______ is a camera. (near · singular)', hint:'This', answer:'This' },
+      { type:'tf', q:'These is my books. (Correct?)', answer:false, correctForm:'These are my books.' },
+      { type:'tf', q:'That is an elephant. (Correct?)', answer:true },
+      // --- Can ---
+      { type:'mc', q:'Can Kevin ______ a horse?', choices:['rides','ride','riding','rode'], answer:'ride' },
+      { type:'mc', q:'How many carrots ______ the rabbits eat?', choices:['can','do','is','are'], answer:'can' },
+      { type:'fill', q:'Penny ______ play basketball. (✓)', hint:"can / can't", answer:'can' },
+      { type:'fill', q:'Leo ______ make a cake. (✗)', hint:"can / can't", answer:"can't" },
+      { type:'tf', q:'She can drawing pictures. (Correct?)', answer:false, correctForm:'She can draw pictures.' },
+      { type:'tf', q:'Can Amy dance well? (Correct?)', answer:true },
+      // --- Commands ---
+      { type:'mc', q:"______ play basketball in the living room. (negative command)", choices:["Don't","Doesn't","Not","No"], answer:"Don't" },
+      { type:'mc', q:'Please ______ the window. It\'s cold outside.', choices:['closes','closing','close','closed'], answer:'close' },
+      { type:'fill', q:'Don\'t ______! (eat)', hint:'eat', answer:'eat' },
+      { type:'fill', q:'Be ______! (quiet)', hint:'quiet', answer:'quiet' },
+      { type:'tf', q:"Don't riding your bike. (Correct?)", answer:false, correctForm:"Don't ride your bike." },
+      { type:'tf', q:'Please wash your hands before lunch. (Correct?)', answer:true },
+      // --- Mixed ---
+      { type:'mc', q:'Which sentence is correct?', choices:['She can play the piano.','These is my books.','Can he playing basketball?','That are an apple.'], answer:'She can play the piano.' },
+      { type:'tf', q:'The children are swimming in the river. (Correct?)', answer:true },
+      { type:'fill', q:'Unscramble: friend / a / sing / song / English / Can / in / your / ?', hint:'Can question', answer:'Can your friend sing a song in English?' },
+      { type:'fill', q:'Unscramble: apples / you / How / eat / many / can / ?', hint:'How many + can', answer:'How many apples can you eat?' },
+    ]
+  }
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let state = units.map(u => ({
+  answers: new Array(u.questions.length).fill(null),
+  checked: new Array(u.questions.length).fill(false),
+  submitted: false, score: 0
+}));
+let currentUnit = -1;
+
+// ============================================================
+// HELPERS
+// ============================================================
+function norm(s) { return (s||'').trim().toLowerCase().replace(/[.,!?''']/g,'').replace(/\s+/g,' '); }
+function check(q, userAns) {
+  if (q.type==='tf') return userAns===q.answer;
+  const c=norm(q.answer), u=norm(userAns);
+  if (c===u) return true;
+  // variants
+  if (c==="can't"&&(u==="cant"||u==="cannot")) return true;
+  if (c==="don't"&&(u==="dont"||u==="do not")) return true;
+  if (c==="let's"&&u==="lets") return true;
+  if (c==="don't drive"&&(u==="dont drive"||u==="do not drive")) return true;
+  if (c==="isn't"&&(u==="isnt"||u==="is not")) return true;
+  return false;
+}
+function pct(idx) {
+  const st=state[idx], qs=units[idx].questions;
+  if (!st.submitted) return null;
+  return Math.round(st.score/qs.length*100);
+}
+function scoreLabel(p) {
+  if (p>=90) return {emoji:'🏆',msg:'Outstanding! 🎊',stars:3};
+  if (p>=75) return {emoji:'🌟',msg:'Great work! Keep it up!',stars:2};
+  if (p>=60) return {emoji:'😊',msg:'Good job! Almost there!',stars:1};
+  return {emoji:'📚',msg:'Keep practicing! You can do it!',stars:0};
+}
+
+// ============================================================
+// HOME
+// ============================================================
+function renderHome() {
+  currentUnit=-1;
+  document.getElementById('homeView').style.display='block';
+  document.getElementById('sectionArea').innerHTML='';
+  const grid=document.getElementById('homeGrid');
+  grid.innerHTML='';
+  units.forEach((u,i)=>{
+    const st=state[i];
+    const answered=st.answers.filter(a=>a!==null).length;
+    const total=u.questions.length;
+    const p=pct(i);
+    const card=document.createElement('button');
+    card.className=`unit-card u${i+1}`;
+    card.onclick=()=>renderSection(i);
+    let progressTxt = st.submitted
+      ? `✅ Done! Score ${st.score}/${total} (${p}%)`
+      : answered>0 ? `In progress ${answered}/${total}` : `${total} questions`;
+    card.innerHTML=`
+      <span class="card-count">${progressTxt}</span>
+      <span class="card-emoji">${u.emoji}</span>
+      <div class="card-title">${u.title}</div>
+      <div class="card-sub">${u.sub}</div>
+    `;
+    grid.appendChild(card);
+  });
+
+  // Oral Test card (special)
+  const oralCard=document.createElement('button');
+  oralCard.className='unit-card u6';
+  oralCard.onclick=()=>renderOral();
+  oralCard.innerHTML=`
+    <span class="card-count">6 questions · speak aloud</span>
+    <span class="card-emoji">🎤</span>
+    <div class="card-title">Oral Test</div>
+    <div class="card-sub">Live English · World of Work</div>
+  `;
+  grid.appendChild(oralCard);
+}
+
+// ============================================================
+// SECTION
+// ============================================================
+function renderSection(idx) {
+  currentUnit=idx;
+  document.getElementById('homeView').style.display='none';
+  const u=units[idx], st=state[idx];
+  const area=document.getElementById('sectionArea');
+
+  const answered=st.answers.filter(a=>a!==null).length;
+  const total=u.questions.length;
+
+  let html=`<div class="section-view active" style="background:${u.gradient}">
+    <div class="sec-header">
+      <button class="back-btn" onclick="renderHome()">← Back</button>
+      <div class="sec-title">${u.emoji} ${u.title}</div>
+    </div>
+    <div class="prog-label">Progress ${answered} / ${total}</div>
+    <div class="prog-wrap"><div class="prog-bar" id="progBar" style="width:${answered/total*100}%"></div></div>
+  </div>`;
+  area.innerHTML=html;
+
+  // tip banner
+  const tipDiv=document.createElement('div');
+  tipDiv.style.cssText='margin:12px 14px 4px;background:#fff8e1;border-left:4px solid #f5c400;border-radius:10px;padding:8px 12px;font-size:0.8rem;font-weight:700;color:#7a5800;';
+  tipDiv.textContent='💡 '+u.tip;
+  area.appendChild(tipDiv);
+
+  if(st.submitted){ renderResult(idx,area); return; }
+
+  const mainDiv=document.createElement('main');
+  u.questions.forEach((q,i)=>{
+    const card=document.createElement('div');
+    card.className='q-card';
+    card.style.borderTopColor=u.color;
+    card.id=`qc${i}`;
+    let inner=`<div class="q-num">${u.title} · Q${i+1}</div><div class="q-text">${q.q}</div>`;
+    if(q.hint) inner+=`<div class="q-hint">💡 ${q.hint}</div>`;
+    if(q.type==='mc'){
+      inner+=`<div class="choices">`+q.choices.map((c,ci)=>
+        `<button class="choice-btn" id="cb${i}-${ci}" onclick="selMC(${idx},${i},${ci},'${c.replace(/'/g,"\\'")}',this)">${String.fromCharCode(65+ci)}) ${c}</button>`
+      ).join('')+`</div>`;
+    } else if(q.type==='fill'){
+      inner+=`<input class="fill-input" id="fi${i}" placeholder="Type your answer..."
+        oninput="state[${idx}].answers[${i}]=this.value"
+        onkeydown="if(event.key==='Enter')checkOne(${idx},${i})"
+        value="${st.answers[i]||''}">`;
+    } else {
+      inner+=`<div class="tf-row">
+        <button class="tf-btn t-btn" id="tft${i}" onclick="selTF(${idx},${i},true,this)">✅ True</button>
+        <button class="tf-btn f-btn" id="tff${i}" onclick="selTF(${idx},${i},false,this)">❌ False</button>
+      </div>`;
+    }
+    inner+=`<div class="feedback" id="fb${i}"></div>
+      <div class="ca-box" id="ca${i}">
+        <div class="ca-label">✏️ Correct Answer</div>
+        <div class="ca-value" id="cav${i}"></div>
+        <div class="ca-form" id="caf${i}"></div>
+      </div>
+      <div class="btn-row"><button class="btn btn-check" onclick="checkOne(${idx},${i})">Check Answer</button></div>`;
+    card.innerHTML=inner;
+    mainDiv.appendChild(card);
+    if(st.checked[i]) restoreOne(idx,i,q);
+  });
+
+  const submitBtn=document.createElement('button');
+  submitBtn.className='btn-submit-sec';
+  submitBtn.textContent='📊 Submit & See Results';
+  submitBtn.onclick=()=>submitSection(idx);
+  mainDiv.appendChild(submitBtn);
+  area.appendChild(mainDiv);
+}
+
+function restoreOne(idx,i,q){
+  const st=state[idx], ans=st.answers[i];
+  if(ans===null) return;
+  const correct=check(q,ans);
+  if(q.type==='mc'){
+    q.choices.forEach((c,ci)=>{
+      const b=document.getElementById(`cb${i}-${ci}`);
+      if(!b) return;
+      b.disabled=true;
+      if(c===q.answer) b.classList.add('reveal-correct');
+      if(c===ans&&!correct) b.classList.add('selected-wrong');
+    });
+  } else if(q.type==='fill'){
+    const inp=document.getElementById(`fi${i}`);
+    if(inp){inp.disabled=true;inp.classList.add(correct?'correct':'wrong');}
+  } else {
+    ['t','f'].forEach(k=>{const b=document.getElementById(`tf${k}${i}`);if(b)b.disabled=true;});
+    const tb=document.getElementById(`tft${i}`),fb=document.getElementById(`tff${i}`);
+    if(tb&&q.answer===true) tb.classList.add('reveal-correct');
+    if(fb&&q.answer===false) fb.classList.add('reveal-correct');
+    if(ans!==q.answer){const wb=document.getElementById(`tf${ans?'t':'f'}${i}`);if(wb)wb.classList.add('selected-wrong');}
+  }
+  const fbEl=document.getElementById(`fb${i}`);
+  if(fbEl){ fbEl.className=`feedback show ${correct?'ok':'bad'}`; fbEl.textContent=correct?'🎉 Correct! Great job!':'❌ Wrong! See correct answer below 👇'; }
+  if(!correct){ showCA(i,q); }
+}
+
+function selMC(sIdx,qIdx,ci,val,btn){
+  if(state[sIdx].checked[qIdx]) return;
+  state[sIdx].answers[qIdx]=val;
+  units[sIdx].questions[qIdx].choices.forEach((_,k)=>{const b=document.getElementById(`cb${qIdx}-${k}`);if(b)b.style.background=k===ci?'#cce8ff':'';});
+}
+function selTF(sIdx,qIdx,val,btn){
+  if(state[sIdx].checked[qIdx]) return;
+  state[sIdx].answers[qIdx]=val;
+  ['t','f'].forEach(k=>{const b=document.getElementById(`tf${k}${qIdx}`);if(b)b.style.background='';});
+  btn.style.background='#cce8ff';
+}
+
+function checkOne(sIdx,qIdx){
+  const st=state[sIdx],q=units[sIdx].questions[qIdx];
+  if(st.checked[qIdx]) return;
+  if(q.type==='fill'){const inp=document.getElementById(`fi${qIdx}`);if(inp)st.answers[qIdx]=inp.value;}
+  if(!st.answers[qIdx]&&st.answers[qIdx]!==false){alert('Please select or type your answer first!');return;}
+  st.checked[qIdx]=true;
+  const correct=check(q,st.answers[qIdx]);
+  if(q.type==='mc'){
+    q.choices.forEach((c,ci)=>{
+      const b=document.getElementById(`cb${qIdx}-${ci}`);
+      if(!b) return; b.disabled=true;
+      if(c===q.answer) b.classList.add('reveal-correct');
+      if(c===st.answers[qIdx]&&!correct) b.classList.add('selected-wrong');
+    });
+  } else if(q.type==='fill'){
+    const inp=document.getElementById(`fi${qIdx}`);
+    if(inp){inp.disabled=true;inp.classList.add(correct?'correct':'wrong');}
+  } else {
+    ['t','f'].forEach(k=>{const b=document.getElementById(`tf${k}${qIdx}`);if(b)b.disabled=true;});
+    const tb=document.getElementById(`tft${qIdx}`),fb=document.getElementById(`tff${qIdx}`);
+    if(tb&&q.answer===true) tb.classList.add('reveal-correct');
+    if(fb&&q.answer===false) fb.classList.add('reveal-correct');
+    if(st.answers[qIdx]!==q.answer){const wb=document.getElementById(`tf${st.answers[qIdx]?'t':'f'}${qIdx}`);if(wb)wb.classList.add('selected-wrong');}
+  }
+  const fbEl=document.getElementById(`fb${qIdx}`);
+  if(fbEl){fbEl.className=`feedback show ${correct?'ok':'bad'}`;fbEl.textContent=correct?'🎉 Correct! Great job!':'❌ Wrong! See correct answer below 👇';}
+  if(!correct) showCA(qIdx,q);
+  // update progress
+  const ans2=state[sIdx].answers.filter(a=>a!==null).length;
+  const bar=document.getElementById('progBar'),lbl=document.querySelector('.prog-label');
+  if(bar) bar.style.width=`${ans2/units[sIdx].questions.length*100}%`;
+  if(lbl) lbl.textContent=`Progress ${ans2} / ${units[sIdx].questions.length}`;
+}
+
+function showCA(i,q){
+  const box=document.getElementById(`ca${i}`),val=document.getElementById(`cav${i}`),frm=document.getElementById(`caf${i}`);
+  if(!box||!val) return;
+  box.classList.add('show');
+  val.textContent=q.answer;
+  if(frm) frm.textContent=q.correctForm?'Full sentence: '+q.correctForm:'';
+}
+
+function submitSection(idx){
+  const st=state[idx],qs=units[idx].questions;
+  const unanswered=qs.filter((_,i)=>!st.answers[i]&&st.answers[i]!==false).length;
+  if(unanswered>0&&!confirm(`You have ${unanswered} unanswered questions. Submit anyway?`)) return;
+  let score=0;
+  qs.forEach((q,i)=>{if(st.answers[i]!==null&&st.answers[i]!==''&&check(q,st.answers[i]))score++;});
+  st.score=score; st.submitted=true;
+  renderSection(idx);
+}
+
+function renderResult(idx,area){
+  const st=state[idx],u=units[idx],qs=u.questions;
+  const total=qs.length, p=pct(idx), lb=scoreLabel(p);
+  let stars=''; for(let i=0;i<3;i++) stars+=i<lb.stars?'⭐':'☆';
+
+  const wrongList=[], okList=[];
+  qs.forEach((q,i)=>{ const ans=st.answers[i]; const c=ans!==null&&ans!==''&&check(q,ans); (c?okList:wrongList).push(i); });
+
+  let rHtml=`<div class="result-panel">
+    <div class="result-emoji">${lb.emoji}</div>
+    <div class="result-stars">${stars}</div>
+    <div class="result-score" style="color:${u.color}">${st.score} / ${total}</div>
+    <div class="result-msg">${lb.msg}</div>
+    <div style="color:var(--muted);font-size:0.85rem;margin-bottom:16px;">Accuracy: ${p}%</div>
+    <button class="btn btn-reset" onclick="resetSection(${idx})">🔄 Try Again</button>`;
+
+  if(wrongList.length>0){
+    rHtml+=`<div class="review-title review-wrong">📖 Wrong Answers — Review These (${wrongList.length})</div>`;
+    wrongList.forEach(i=>{
+      const q=qs[i],ans=st.answers[i];
+      rHtml+=`<div class="r-item bad">
+        <div class="r-q">Q${i+1}</div>
+        <div class="r-qtext">${q.q}</div>
+        <div class="r-ans-row">
+          <div class="r-user">Your answer: <span>${ans||'(not answered)'}</span></div>
+          <div class="r-correct">✅ Correct answer: <span>${q.answer}</span>
+            ${q.correctForm?`<div class="r-form">Full sentence: ${q.correctForm}</div>`:''}
+          </div>
+        </div>
+      </div>`;
+    });
+  }
+  if(okList.length>0){
+    rHtml+=`<div class="review-title review-ok">✅ Correct Answers (${okList.length})</div>`;
+    okList.forEach(i=>{
+      const q=qs[i];
+      rHtml+=`<div class="r-item good"><span style="color:#aaa;font-size:0.75rem;">Q${i+1}</span>　<span style="font-weight:700;">${q.q}</span>　<span style="color:#1a7a50;font-weight:800;">→ ${q.answer}</span></div>`;
+    });
+  }
+  rHtml+=`</div>`;
+
+  const div=document.createElement('div');
+  div.style.padding='14px 0';
+  div.innerHTML=rHtml;
+  area.appendChild(div);
+}
+
+function resetSection(idx){
+  state[idx]={answers:new Array(units[idx].questions.length).fill(null),checked:new Array(units[idx].questions.length).fill(false),submitted:false,score:0};
+  renderSection(idx);
+}
+
+// ============================================================
+// ORAL TEST
+// ============================================================
+const oralQuestions = [
+  // Unit 7: can / can't
+  {
+    tag: 'Unit 7 · can / can\'t',
+    q: "Can a penguin swim?",
+    prompt: "Can a penguin swim?",
+    structure: "Yes/No, it can/can't.",
+    sampleAnswer: "Yes, it can.",
+    keywords: ["yes","can","penguin","swim"]
+  },
+  {
+    tag: "Unit 7 · can / can't",
+    q: "Can penguins fly?",
+    prompt: "Can penguins fly?",
+    structure: "Yes/No, they can/can't.",
+    sampleAnswer: "No, they can't.",
+    keywords: ["no","can't","penguins","fly"]
+  },
+  {
+    tag: "Unit 7 · can / can't",
+    q: "Can a kangaroo jump?",
+    prompt: "Can a kangaroo jump?",
+    structure: "Yes/No, it can/can't.",
+    sampleAnswer: "Yes, it can.",
+    keywords: ["yes","can","kangaroo","jump"]
+  },
+  {
+    tag: "Unit 7 · can / can't",
+    q: "Can a monkey fly?",
+    prompt: "Can a monkey fly?",
+    structure: "Yes/No, it can/can't.",
+    sampleAnswer: "No, it can't.",
+    keywords: ["no","can't","monkey","fly"]
+  },
+  {
+    tag: "Unit 7 · can / can't",
+    q: "Can giraffes swing?",
+    prompt: "Can giraffes swing?",
+    structure: "Yes/No, they can/can't.",
+    sampleAnswer: "No, they can't.",
+    keywords: ["no","can't","giraffes","swing"]
+  },
+  {
+    tag: "Unit 7 · can / can't",
+    q: "Can a parrot fly?",
+    prompt: "Can a parrot fly?",
+    structure: "Yes/No, it can/can't.",
+    sampleAnswer: "Yes, it can.",
+    keywords: ["yes","can","parrot","fly"]
+  },
+  // Unit 7: Does ... have?
+  {
+    tag: "Unit 7 · Does ... have?",
+    q: "Does a giraffe have a long neck?",
+    prompt: "Does a giraffe have a long neck?",
+    structure: "Yes/No, it does/doesn't.",
+    sampleAnswer: "Yes, it does.",
+    keywords: ["yes","does","giraffe","neck"]
+  },
+  {
+    tag: "Unit 7 · Does ... have?",
+    q: "Does a tiger have a trunk?",
+    prompt: "Does a tiger have a trunk?",
+    structure: "Yes/No, it does/doesn't.",
+    sampleAnswer: "No, it doesn't.",
+    keywords: ["no","doesn't","tiger","trunk"]
+  },
+  {
+    tag: "Unit 7 · Does ... have?",
+    q: "Do elephants have big ears?",
+    prompt: "Do elephants have big ears?",
+    structure: "Yes/No, they do/don't.",
+    sampleAnswer: "Yes, they do.",
+    keywords: ["yes","do","elephants","ears"]
+  },
+  {
+    tag: "Unit 7 · Does ... have?",
+    q: "Do lions have sharp teeth?",
+    prompt: "Do lions have sharp teeth?",
+    structure: "Yes/No, they do/don't.",
+    sampleAnswer: "Yes, they do.",
+    keywords: ["yes","do","lions","teeth"]
+  },
+  {
+    tag: "Unit 7 · Does ... have?",
+    q: "Do parrots have colorful feathers?",
+    prompt: "Do parrots have colorful feathers?",
+    structure: "Yes/No, they do/don't.",
+    sampleAnswer: "Yes, they do.",
+    keywords: ["yes","do","parrots","feathers"]
+  },
+  // Unit 8: Jobs — What does ... do?
+  {
+    tag: "Unit 8 · Jobs",
+    q: "What does your mother do?",
+    prompt: "What does your mother do?",
+    structure: "She's a [job]. She works in/at a [place].",
+    sampleAnswer: "She's a teacher. She works in a school.",
+    keywords: ["she's","teacher","works","school"]
+  },
+  {
+    tag: "Unit 8 · Jobs",
+    q: "What does your father do?",
+    prompt: "What does your father do?",
+    structure: "He's a [job]. He works in/at a [place].",
+    sampleAnswer: "He's a doctor. He works in a hospital.",
+    keywords: ["he's","doctor","works","hospital"]
+  },
+  {
+    tag: "Unit 8 · Jobs",
+    q: "Where does your mother work?",
+    prompt: "Where does your mother work?",
+    structure: "She works in/at a [place].",
+    sampleAnswer: "She works in a school.",
+    keywords: ["she","works","school"]
+  },
+  {
+    tag: "Unit 8 · Jobs",
+    q: "Where does your father work?",
+    prompt: "Where does your father work?",
+    structure: "He works in/at a [place].",
+    sampleAnswer: "He works in an office.",
+    keywords: ["he","works","office"]
+  },
+  // Unit 8: want to be
+  {
+    tag: "Unit 8 · Want to be",
+    q: "What do you want to be?",
+    prompt: "What do you want to be?",
+    structure: "I want to be a [job].",
+    sampleAnswer: "I want to be a doctor.",
+    keywords: ["want","be","doctor"]
+  },
+  {
+    tag: "Unit 8 · Want to be",
+    q: "What does your brother or sister want to be?",
+    prompt: "What does your brother or sister want to be?",
+    structure: "He/She wants to be a [job].",
+    sampleAnswer: "She wants to be a singer.",
+    keywords: ["wants","be","singer"]
+  },
+  {
+    tag: "🏁 Full Practice",
+    q: "Full Practice!\nAnswer using complete sentences.",
+    prompt: "Full practice. Answer using complete sentences.",
+    structure: "Use all 3 grammar patterns:\n• can/can't  • does/do have  • want(s) to be",
+    sampleAnswer: "A kangaroo can jump. It can't fly. A giraffe has a long neck. My mother is a teacher. She works in a school. I want to be a doctor.",
+    keywords: ["can","have","works","wants","be"]
+  }
+];
+
+// Oral state
+let oralIdx = 0;
+let mediaRecorder = null;
+let audioChunks = [];
+let audioBlob = null;
+let audioURL = null;
+let audioPlayer = null;
+let samplePlayer = null;
+let recognition = null;
+const recordings = {};   // { url, type }
+const scores = {};       // { transcript, matched, total, pct }
+
+function renderOral() {
+  currentUnit = -2;
+  document.getElementById('homeView').style.display = 'none';
+  document.getElementById('sectionArea').innerHTML = '';
+  oralIdx = 0;
+  buildOralView();
+}
+
+function buildOralView() {
+  const q = oralQuestions[oralIdx];
+  const total = oralQuestions.length;
+  const hasRec = !!(recordings[oralIdx] && recordings[oralIdx].url);
+  const sc = scores[oralIdx];
+  const hasSR = !!window.SpeechRecognition || !!window.webkitSpeechRecognition;
+  const area = document.getElementById('oralArea');
+
+  // dot colors: green=recorded, yellow=scored, grey=not done
+  const dots = oralQuestions.map((_,i) => {
+    let bg = '#ddd';
+    if (scores[i]) bg = '#f5c400';
+    if (recordings[i] && recordings[i].url) bg = '#34C98A';
+    return `<div class="oral-dot ${i===oralIdx?'active':''}" style="background:${bg}"></div>`;
+  }).join('');
+
+  // Score badge
+  let scoreBadge = '';
+  if (sc) {
+    const col = sc.pct >= 80 ? '#34C98A' : sc.pct >= 50 ? '#FFAD7D' : '#FF5A7A';
+    const emoji = sc.pct >= 80 ? '🌟' : sc.pct >= 50 ? '👍' : '💪';
+    scoreBadge = `<div class="oral-score-badge" style="border-color:${col};color:${col}">
+      ${emoji} ${sc.pct}% · ${sc.matched}/${sc.total} keywords
+    </div>
+    <div class="oral-transcript">
+      <span class="oral-transcript-label">You said:</span> "${sc.transcript}"
+    </div>`;
+  }
+
+  area.innerHTML = `
+    <div class="oral-view active">
+      <div class="oral-header">
+        <button class="back-btn" onclick="exitOral()">← Back</button>
+        <div class="sec-title">🎤 Oral Test · Unit 7 &amp; 8</div>
+      </div>
+
+      <div class="oral-dots">${dots}</div>
+
+      <div class="oral-card">
+        <div class="oral-tag">${q.tag}</div>
+        <div class="oral-q-num">Question ${oralIdx+1} / ${total}</div>
+        <div class="oral-q-text">${q.q.replace(/\n/g,'<br>')}</div>
+
+        <!-- Answer structure -->
+        <div class="oral-structure-box">
+          <div class="oral-struct-label">📐 Answer structure</div>
+          <div class="oral-struct-text">${q.structure.replace(/\n/g,'<br>')}</div>
+        </div>
+
+        <!-- Keywords -->
+        <div class="oral-kw-box">
+          <div class="oral-kw-label">🔑 Key words to include</div>
+          <div class="oral-kw-chips">
+            ${q.keywords.map(k=>`<span class="kw-chip" id="kw-${k.replace(/'/g,'')}">${k}</span>`).join('')}
+          </div>
+        </div>
+
+        <!-- Score result -->
+        ${scoreBadge}
+
+        <!-- Status -->
+        <div class="oral-rec-status" id="recStatus">${hasRec?'✅ Recorded':'Tap ⏺ to record'}</div>
+
+        <!-- Buttons -->
+        <div class="oral-btn-labels">
+          <div class="oral-btn-col">
+            <button class="oral-speak-btn" id="speakBtn" onclick="speakQuestion()">🔊</button>
+            <div class="oral-rec-label">Hear Q</div>
+          </div>
+          <div class="oral-btn-col">
+            <button class="oral-rec-btn" id="recBtn" onclick="toggleRecord()">⏺</button>
+            <div class="oral-rec-label" id="recLabel">Record</div>
+          </div>
+          <div class="oral-btn-col">
+            <button class="oral-play-btn" id="playBtn" onclick="playRecording()" ${hasRec?'':'disabled'}>▶</button>
+            <div class="oral-rec-label">My Voice</div>
+          </div>
+          ${hasSR ? `<div class="oral-btn-col">
+            <button class="oral-score-btn" id="scoreBtn" onclick="startScoring()">🎯</button>
+            <div class="oral-rec-label">Score Me</div>
+          </div>` : ''}
+        </div>
+
+        <!-- Sample answer -->
+        <div class="oral-sample-box">
+          <div class="oral-sample-label">💡 Sample Answer</div>
+          <div class="oral-sample-text">${q.sampleAnswer}</div>
+          <button class="oral-sample-play" onclick="speakSample()" id="sampleBtn">🔊 Hear Sample</button>
+        </div>
+      </div>
+
+      <div class="oral-nav">
+        <button class="oral-nav-btn oral-prev" onclick="oralNav(-1)" ${oralIdx===0?'disabled style="opacity:0.4"':''}>← Prev</button>
+        <button class="oral-nav-btn oral-next" onclick="oralNav(1)">${oralIdx===total-1?'🏁 Finish':'Next →'}</button>
+      </div>
+    </div>
+  `;
+
+  // Highlight already-matched keywords
+  if (sc && sc.matchedWords) {
+    sc.matchedWords.forEach(w => {
+      const el = document.getElementById('kw-' + w.replace(/'/g,''));
+      if (el) { el.classList.add('kw-matched'); }
+    });
+  }
+}
+
+// ── Speech synthesis ──────────────────────────────────────
+function speakQuestion() {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(oralQuestions[oralIdx].prompt);
+  utter.lang='en-US'; utter.rate=0.85;
+  const btn=document.getElementById('speakBtn');
+  utter.onstart=()=>{if(btn){btn.textContent='🔵';btn.classList.add('speaking');}};
+  utter.onend=()=>{if(btn){btn.textContent='🔊';btn.classList.remove('speaking');}};
+  utter.onerror=()=>{if(btn){btn.textContent='🔊';btn.classList.remove('speaking');}};
+  window.speechSynthesis.speak(utter);
+}
+
+function speakSample() {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(oralQuestions[oralIdx].sampleAnswer);
+  utter.lang='en-US'; utter.rate=0.82;
+  const btn=document.getElementById('sampleBtn');
+  utter.onstart=()=>{if(btn){btn.textContent='🔵 Playing...';btn.style.background='#667eea';}};
+  utter.onend=()=>{if(btn){btn.textContent='🔊 Hear Sample';btn.style.background='';}};
+  utter.onerror=()=>{if(btn){btn.textContent='🔊 Hear Sample';btn.style.background='';}};
+  window.speechSynthesis.speak(utter);
+}
+
+// ── Recording ────────────────────────────────────────────
+async function toggleRecord() {
+  if (mediaRecorder && mediaRecorder.state==='recording') stopRecording();
+  else startRecording();
+}
+
+function getSupportedMimeType() {
+  const types=['audio/mp4','audio/aac','audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/ogg'];
+  for(const t of types) if(MediaRecorder.isTypeSupported(t)) return t;
+  return '';
+}
+
+async function startRecording() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+    audioChunks=[];
+    const mimeType=getSupportedMimeType();
+    mediaRecorder=new MediaRecorder(stream, mimeType?{mimeType}:{});
+    mediaRecorder.ondataavailable=e=>{if(e.data&&e.data.size>0)audioChunks.push(e.data);};
+    mediaRecorder.onstop=()=>{
+      stream.getTracks().forEach(t=>t.stop());
+      const usedType=mediaRecorder.mimeType||mimeType||'audio/webm';
+      audioBlob=new Blob(audioChunks,{type:usedType});
+      if(audioURL)URL.revokeObjectURL(audioURL);
+      audioURL=URL.createObjectURL(audioBlob);
+      recordings[oralIdx]={url:audioURL,type:usedType};
+      buildOralView();
+    };
+    mediaRecorder.start(200);
+    const rb=document.getElementById('recBtn'),rl=document.getElementById('recLabel'),st=document.getElementById('recStatus');
+    if(rb){rb.textContent='⏹';rb.classList.add('recording');}
+    if(rl)rl.textContent='Stop';
+    if(st)st.textContent='🔴 Recording... tap ⏹ to stop';
+  } catch(err) {
+    alert('Microphone access denied. Please allow microphone in browser settings.');
+  }
+}
+
+function stopRecording() {
+  if(mediaRecorder&&mediaRecorder.state==='recording') mediaRecorder.stop();
+}
+
+function playRecording() {
+  const rec=recordings[oralIdx];
+  if(!rec)return;
+  if(audioPlayer){audioPlayer.pause();audioPlayer=null;}
+  audioPlayer=new Audio();
+  audioPlayer.src=rec.url;
+  const pb=document.getElementById('playBtn');
+  audioPlayer.oncanplaythrough=()=>audioPlayer.play().catch(()=>window.open(rec.url,'_blank'));
+  audioPlayer.onplay=()=>{if(pb)pb.textContent='⏸';};
+  audioPlayer.onended=()=>{if(pb)pb.textContent='▶';audioPlayer=null;};
+  audioPlayer.onerror=()=>{window.open(rec.url,'_blank');if(pb)pb.textContent='▶';};
+  audioPlayer.load();
+}
+
+// ── Speech recognition scoring ───────────────────────────
+function startScoring() {
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRec) { alert('Speech recognition not supported on this browser.'); return; }
+
+  if (recognition) { recognition.stop(); recognition=null; return; }
+
+  recognition = new SpeechRec();
+  recognition.lang = 'en-US';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 3;
+
+  const btn = document.getElementById('scoreBtn');
+  const st  = document.getElementById('recStatus');
+  if (btn) { btn.textContent='🔴'; btn.style.background='#FF5A7A'; }
+  if (st)  st.textContent = '🎤 Listening... speak now!';
+
+  recognition.onresult = (event) => {
+    // Collect all alternatives
+    let transcript = '';
+    for (let i=0; i<event.results[0].length; i++) {
+      transcript += ' ' + event.results[0][i].transcript;
+    }
+    transcript = transcript.trim().toLowerCase();
+    scoreAnswer(transcript);
+  };
+
+  recognition.onerror = (e) => {
+    if (btn) { btn.textContent='🎯'; btn.style.background=''; }
+    if (st)  st.textContent = 'Error: ' + e.error + '. Try again.';
+    recognition = null;
+  };
+
+  recognition.onend = () => {
+    if (btn) { btn.textContent='🎯'; btn.style.background=''; }
+    recognition = null;
+  };
+
+  recognition.start();
+}
+
+function scoreAnswer(transcript) {
+  const q = oralQuestions[oralIdx];
+  const kws = q.keywords;
+  const matchedWords = [];
+  const lc = transcript.toLowerCase();
+
+  kws.forEach(kw => {
+    const clean = kw.replace(/'/g,"'").toLowerCase();
+    if (lc.includes(clean) || lc.includes(clean.replace("'",""))) {
+      matchedWords.push(kw);
+    }
+  });
+
+  const pct = Math.round(matchedWords.length / kws.length * 100);
+  scores[oralIdx] = { transcript, matched: matchedWords.length, total: kws.length, pct, matchedWords };
+  buildOralView();
+}
+
+function oralNav(dir) {
+  window.speechSynthesis&&window.speechSynthesis.cancel();
+  if(mediaRecorder&&mediaRecorder.state==='recording')stopRecording();
+  if(audioPlayer){audioPlayer.pause();audioPlayer=null;}
+  if(recognition){recognition.stop();recognition=null;}
+  const next=oralIdx+dir;
+  if(next<0)return;
+  if(next>=oralQuestions.length){exitOral();return;}
+  oralIdx=next;
+  buildOralView();
+}
+
+function exitOral() {
+  window.speechSynthesis&&window.speechSynthesis.cancel();
+  if(mediaRecorder&&mediaRecorder.state==='recording')stopRecording();
+  if(audioPlayer){audioPlayer.pause();audioPlayer=null;}
+  if(recognition){recognition.stop();recognition=null;}
+  document.getElementById('oralArea').innerHTML='';
+  renderHome();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderHome();
+</script>
+</body>
+</html>

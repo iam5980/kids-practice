@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Howard · Science Midterm · CL4C Ch.5</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Georgia,serif;background:#0f172a;min-height:100vh;color:#1e293b}
+:root{
+  --navy:#0c1e3c;--sky:#0891b2;--accent:#6366f1;
+  --max-w:640px;--card-pad:24px 26px 20px;
+  --font-q:17px;--font-btn:14px;--font-choice:14px;
+  --badge-font:11px;--tf-font:15px;
+}
+@media(min-width:768px){:root{
+  --max-w:740px;--card-pad:32px 38px 28px;--font-q:20px;--font-btn:16px;
+  --font-choice:16px;--badge-font:13px;--tf-font:18px;
+}}
+@media(min-width:1024px){:root{
+  --max-w:820px;--card-pad:38px 46px 34px;--font-q:22px;--font-btn:17px;
+  --font-choice:18px;--badge-font:14px;--tf-font:20px;
+}}
+
+/* ── TOP BAR ── */
+#topbar{position:sticky;top:0;z-index:99;background:#0c1e3c;border-bottom:2px solid #1e3a5f;
+  padding:12px 20px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 12px rgba(0,0,0,.4)}
+#topbar .logo{font-size:clamp(20px,3vw,26px)}
+#topbar .title{font-weight:800;color:#e0f2fe;font-size:clamp(13px,1.8vw,17px);letter-spacing:-.2px}
+#homebtn{margin-left:auto;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
+  border-radius:8px;padding:6px 14px;font-size:clamp(11px,1.4vw,13px);color:#bae6fd;
+  cursor:pointer;font-weight:700;display:none;font-family:inherit;transition:background .15s}
+#homebtn:hover{background:rgba(255,255,255,.18)}
+
+/* ── FINISH & SCORE btn ── */
+#finishBtn{position:fixed;top:60px;right:14px;z-index:88;background:#dc2626;color:#fff;
+  border:none;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:800;
+  cursor:pointer;font-family:inherit;box-shadow:0 3px 12px rgba(220,38,38,.4);
+  display:none;letter-spacing:.3px;transition:opacity .15s}
+#finishBtn:hover{opacity:.88}
+
+/* ── TABS ── */
+#tabBar{background:#0c1e3c;border-bottom:2px solid #1e3a5f;padding:0 14px;display:none;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
+.tab-btn{display:inline-block;padding:12px 16px;font-size:clamp(12px,1.6vw,15px);font-weight:700;
+  color:#94a3b8;border-bottom:3px solid transparent;cursor:pointer;font-family:inherit;
+  background:none;border-top:none;border-left:none;border-right:none;transition:color .15s;
+  letter-spacing:.2px;white-space:nowrap}
+.tab-btn.active{color:#38bdf8;border-bottom-color:#38bdf8}
+.tab-btn:hover:not(.active){color:#bae6fd}
+
+/* ── SCREENS ── */
+.screen{display:none;max-width:var(--max-w);margin:0 auto;padding:20px 12px}
+.screen.active{display:block}
+.card{background:#fff;border-radius:18px;padding:var(--card-pad);
+  box-shadow:0 4px 22px rgba(0,0,0,.1);border:1.5px solid #e2e8f0;margin-bottom:14px}
+
+/* ── HOME ── */
+.hero{background:linear-gradient(135deg,#0c4a6e 0%,#0369a1 55%,#0891b2 100%);
+  border-radius:22px;padding:clamp(24px,3.8vw,42px);color:#fff;margin-bottom:20px;
+  box-shadow:0 8px 28px rgba(8,145,178,.3)}
+.hero-emoji{font-size:clamp(34px,5vw,50px);margin-bottom:8px}
+.hero h1{font-size:clamp(22px,3.5vw,32px);font-weight:900;letter-spacing:-.5px;margin-bottom:5px}
+.hero p{font-size:clamp(12px,1.7vw,16px);opacity:.82}
+.hero p.sub{font-size:clamp(11px,1.5vw,13px);opacity:.6;margin-top:3px}
+
+/* ── TOPIC CARDS ── */
+.tab-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+@media(min-width:640px){.tab-grid{grid-template-columns:repeat(3,1fr)}}
+.topic-card{background:#fff;border-radius:16px;padding:clamp(16px,2.4vw,24px);
+  cursor:pointer;text-align:center;transition:all .18s;
+  border:2px solid #e2e8f0;box-shadow:0 2px 10px rgba(0,0,0,.06);font-family:inherit;
+  width:100%}
+.topic-card:hover{transform:translateY(-3px);box-shadow:0 7px 22px rgba(8,145,178,.2);border-color:#0891b2}
+.topic-card.mock{background:linear-gradient(135deg,#1e3a5f,#0c4a6e);color:#fff;border-color:#0891b2}
+.topic-card.oral{background:linear-gradient(135deg,#3b1e5f,#6b21a8);color:#fff;border-color:#9333ea}
+.tc-emoji{font-size:clamp(26px,4vw,38px);margin-bottom:8px}
+.tc-title{font-size:clamp(13px,1.8vw,16px);font-weight:800;color:#1e293b;line-height:1.3}
+.topic-card.mock .tc-title,.topic-card.oral .tc-title{color:#fff}
+.tc-sub{font-size:clamp(10px,1.4vw,12px);color:#64748b;margin-top:3px}
+.topic-card.mock .tc-sub,.topic-card.oral .tc-sub{color:rgba(255,255,255,.7)}
+.tc-type-row{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:6px}
+.tc-tag{padding:2px 7px;border-radius:99px;font-size:clamp(9px,1.2vw,11px);font-weight:700;letter-spacing:.2px}
+.tc-tag-spell{background:#e0f2fe;color:#0c4a6e}
+.tc-tag-mc{background:#fef3c7;color:#78350f}
+.tc-tag-tf{background:#dcfce7;color:#14532d}
+
+/* ── COUNTDOWN ── */
+#countdownBanner{background:linear-gradient(135deg,#7c3aed,#4f46e5);border-radius:18px;
+  padding:20px 24px;color:#fff;margin-top:16px;box-shadow:0 6px 22px rgba(124,58,237,.3)}
+.cd-label{font-size:clamp(10px,1.4vw,13px);font-weight:800;letter-spacing:.8px;
+  text-transform:uppercase;opacity:.75;margin-bottom:6px}
+.cd-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+#cdDays{font-size:clamp(42px,7vw,60px);font-weight:900;line-height:1}
+.cd-unit{font-size:clamp(14px,2vw,18px);opacity:.85}
+#cdMsg{font-size:clamp(12px,1.6vw,14px);opacity:.8;margin-top:6px}
+
+/* ── DRILL SCREEN ── */
+.prog-wrap{margin-bottom:16px}
+.prog-labels{display:flex;justify-content:space-between;align-items:center;
+  font-size:clamp(12px,1.7vw,14px);color:#94a3b8;margin-bottom:4px}
+.prog-track{background:#e2e8f0;border-radius:99px;height:clamp(7px,1.1vw,10px);overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#0891b2,#6366f1);
+  border-radius:99px;transition:width .4s ease}
+.score-live{display:flex;gap:11px}
+.score-c{color:#16a34a;font-weight:800}
+.score-w{color:#dc2626;font-weight:800}
+
+/* ── QUESTION ── */
+.badge{border-radius:99px;padding:3px 11px;font-size:var(--badge-font);font-weight:700;
+  letter-spacing:.5px;text-transform:uppercase;border:1px solid transparent;display:inline-block}
+.badge-L1{background:#e0f2fe;color:#0c4a6e;border-color:#0284c733}
+.badge-L2{background:#fef3c7;color:#78350f;border-color:#d9770633}
+.badge-L3{background:#dcfce7;color:#14532d;border-color:#16a34a33}
+.badge-Oral{background:#f3e8ff;color:#6b21a8;border-color:#9333ea33}
+.badge-Mock{background:#1e3a5f;color:#bae6fd;border-color:#0891b233}
+.q-meta{display:flex;align-items:center;gap:9px;margin-bottom:14px;flex-wrap:wrap}
+.q-type-tag{font-size:clamp(10px,1.3vw,13px);color:#94a3b8;font-weight:600}
+.q-text{font-size:var(--font-q);font-weight:700;color:#1e293b;line-height:1.6;margin-bottom:20px}
+
+/* ── SPELL ── */
+#spellWrap input{width:100%;padding:clamp(11px,1.8vw,16px) clamp(13px,2.2vw,18px);
+  font-size:clamp(14px,2vw,19px);border-radius:12px;border:2px solid #94a3b855;
+  outline:none;font-family:inherit;color:#1e293b;margin-bottom:12px;transition:border .2s,background .2s}
+#spellWrap input:focus{border-color:#0891b2}
+#spellWrap input.correct{border-color:#86efac;background:#f0fdf4}
+#spellWrap input.wrong{border-color:#fca5a5;background:#fff5f5}
+
+/* ── MC ── */
+.choice-btn{width:100%;padding:clamp(11px,1.8vw,16px) clamp(13px,2.2vw,18px);
+  font-size:var(--font-choice);font-weight:600;border-radius:12px;border:2px solid #e2e8f0;
+  background:#fff;text-align:left;cursor:pointer;font-family:inherit;color:#1e293b;
+  margin-bottom:10px;transition:all .14s;display:flex;justify-content:space-between;align-items:center;
+  min-height:50px}
+.choice-btn:hover:not(:disabled){background:rgba(8,145,178,.07);border-color:#0891b2}
+.choice-btn.correct{background:#f0fdf4!important;border-color:#86efac!important;color:#15803d!important}
+.choice-btn.wrong{background:#fff5f5!important;border-color:#fca5a5!important;color:#b91c1c!important}
+.choice-btn.dim{opacity:.38}
+
+/* ── T/F ── */
+#tfWrap{display:flex;gap:14px}
+.tf-btn{flex:1;padding:clamp(13px,2.2vw,20px);font-size:var(--tf-font);font-weight:800;
+  border-radius:14px;cursor:pointer;font-family:inherit;border:2px solid transparent;
+  transition:transform .14s,opacity .18s;min-height:60px}
+.tf-btn:hover:not(:disabled){transform:scale(1.04)}
+.tf-true{background:#dcfce7;color:#166534;border-color:#16a34a44}
+.tf-false{background:#fee2e2;color:#991b1b;border-color:#dc262644}
+.tf-btn.correct{background:#f0fdf4!important;border-color:#16a34a!important}
+.tf-btn.wrong{background:#fff5f5!important;border-color:#dc2626!important}
+.tf-btn.dim{opacity:.33}
+@media(max-width:400px){#tfWrap{flex-direction:column}}
+
+/* ── FEEDBACK ── */
+#feedbackPanel{margin-top:18px;border-radius:16px;padding:clamp(14px,2.2vw,22px);
+  border:2px solid transparent;display:none;animation:fadeUp .24s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+#feedbackPanel.correct{background:#f0fdf4;border-color:#86efac}
+#feedbackPanel.wrong{background:#fffbeb;border-color:#fbbf24}
+.fb-row{display:flex;align-items:center;gap:11px}
+.fb-icon{width:clamp(34px,4.5vw,44px);height:clamp(34px,4.5vw,44px);border-radius:50%;
+  color:#fff;font-size:clamp(16px,2.2vw,20px);font-weight:900;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fb-icon.correct{background:#16a34a}
+.fb-icon.wrong{background:#d97706}
+.fb-label{font-size:clamp(15px,2.3vw,20px);font-weight:800}
+.fb-label.correct{color:#15803d}
+.fb-label.wrong{color:#92400e}
+.fb-ans-reveal{margin-top:12px;background:#fffbeb;border:2px solid #fbbf24;border-radius:12px;
+  padding:14px 16px;display:none}
+.fb-ans-reveal .ans-label{font-size:clamp(10px,1.4vw,12px);font-weight:800;color:#78350f;
+  text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:6px}
+.fb-ans-text{font-size:clamp(15px,2.1vw,20px);font-weight:900;color:#78350f;line-height:1.4}
+.fb-next-row{margin-top:14px;display:flex;justify-content:flex-end}
+
+/* ── ORAL ── */
+#oralWrap{display:none}
+.oral-answer-box{background:#f0fdf4;border:1.5px solid #86efac;border-radius:13px;
+  padding:clamp(13px,1.9vw,20px);font-size:clamp(13px,1.9vw,17px);color:#14532d;
+  line-height:1.85;display:none;margin-top:11px}
+.oral-answer-box .ans-label{font-weight:800;color:#15803d;display:block;margin-bottom:7px;
+  font-size:clamp(12px,1.6vw,15px);text-transform:uppercase;letter-spacing:.4px}
+.ans-sentence{display:block;padding:5px 9px;border-radius:7px;margin-bottom:5px;
+  background:#dcfce7;border-left:4px solid #16a34a;font-size:clamp(13px,1.8vw,16px);line-height:1.58}
+.kw-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.kw-pill{padding:4px 12px;border-radius:99px;font-size:clamp(11px,1.4vw,13px);font-weight:700;
+  background:#e0f2fe;color:#0c4a6e;border:1px solid #0284c733}
+.rec-section{margin-top:13px;background:#fdf4ff;border:1.5px solid #d8b4fe;border-radius:15px;
+  padding:clamp(13px,1.9vw,20px)}
+.rec-title{font-size:clamp(11px,1.5vw,13px);font-weight:800;color:#6b21a8;
+  letter-spacing:.4px;text-transform:uppercase;margin-bottom:11px}
+.rec-webview-note{background:#fef3c7;border:1px solid #fde047;border-radius:9px;
+  padding:8px 12px;font-size:clamp(10px,1.3vw,12px);color:#78350f;margin-bottom:10px}
+.rec-btn-row{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:9px}
+.btn-rec{background:#dc2626}
+.btn-rec.recording{background:#991b1b;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+.rec-timer{font-size:clamp(12px,1.7vw,14px);font-weight:800;color:#dc2626;min-width:38px}
+.rec-status{font-size:clamp(11px,1.5vw,13px);color:#64748b;min-height:17px;margin-bottom:7px}
+#recPlayRow{display:none;align-items:center;gap:9px;margin-top:9px;flex-wrap:wrap}
+audio{flex:1;min-width:170px;height:38px;border-radius:7px}
+.self-check{margin-top:14px;border-top:1px solid #e9d5ff;padding-top:12px;display:none}
+.sc-title{font-size:clamp(11px,1.5vw,13px);font-weight:800;color:#6b21a8;
+  text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
+.sc-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;
+  margin-bottom:7px;cursor:pointer;border:1.5px solid #e9d5ff;background:#faf5ff;
+  font-size:clamp(12px,1.6vw,14px);transition:all .14s;font-family:inherit;width:100%;text-align:left}
+.sc-item.checked{background:#f3e8ff;border-color:#c4b5fd}
+.sc-dot{width:22px;height:22px;border-radius:50%;border:2px solid #c4b5fd;
+  display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.sc-item.checked .sc-dot{background:#9333ea;border-color:#9333ea;color:#fff}
+.star-row{display:flex;gap:4px;margin-top:10px}
+.star{font-size:22px;color:#d1d5db;transition:color .2s}
+.star.on{color:#f59e0b}
+.score-panel{display:none;margin-top:14px;border-radius:13px;padding:16px 18px;
+  border:2px solid transparent;animation:fadeUp .28s ease}
+.score-panel.s-great{background:#f0fdf4;border-color:#86efac}
+.score-panel.s-good{background:#fefce8;border-color:#fde047}
+.score-panel.s-low{background:#fff5f5;border-color:#fca5a5}
+.score-top{display:flex;align-items:center;gap:14px;margin-bottom:13px}
+.score-ring{width:clamp(52px,7.5vw,64px);height:clamp(52px,7.5vw,64px);border-radius:50%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;font-weight:900}
+.score-ring.s-great{background:#16a34a;color:#fff}
+.score-ring.s-good{background:#ca8a04;color:#fff}
+.score-ring.s-low{background:#dc2626;color:#fff}
+.sr-pct{font-size:17px;line-height:1.1}
+.sr-lbl{font-size:7px;letter-spacing:.6px;text-transform:uppercase}
+.score-msg{font-size:clamp(13px,1.9vw,17px);font-weight:800}
+.score-msg.s-great{color:#15803d}
+.score-msg.s-good{color:#92400e}
+.score-msg.s-low{color:#b91c1c}
+.score-sub{font-size:clamp(11px,1.4vw,13px);color:#64748b;margin-top:3px}
+.kw-section{margin-top:11px}
+.kw-sec-title{font-size:clamp(10px,1.4vw,12px);font-weight:800;color:#475569;
+  text-transform:uppercase;letter-spacing:.4px;margin-bottom:7px}
+.kw-row{display:flex;align-items:flex-start;gap:9px;padding:7px 11px;border-radius:9px;
+  margin-bottom:6px;font-size:clamp(12px,1.6vw,14px)}
+.kw-row.hit{background:#f0fdf4;border:1.5px solid #86efac}
+.kw-row.miss{background:#fff5f5;border:1.5px solid #fca5a5}
+.kw-dot{font-size:14px;flex-shrink:0;margin-top:1px}
+.kw-text{flex:1;line-height:1.5}
+.kw-text b{font-weight:800}
+.kw-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.chip{padding:2px 8px;border-radius:99px;font-size:clamp(10px,1.3vw,11px);font-weight:700}
+.chip.found{background:#dcfce7;color:#15803d;border:1px solid #86efac}
+.chip.missing{background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5}
+.transcript-box{margin-top:11px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;
+  padding:9px 13px;font-size:clamp(11px,1.4vw,13px);color:#475569;line-height:1.6}
+.t-lbl{font-weight:800;color:#1e293b;font-size:clamp(10px,1.2vw,11px);text-transform:uppercase;
+  letter-spacing:.4px;display:block;margin-bottom:3px}
+
+/* ── BUTTONS ── */
+.btn{color:#fff;border:none;border-radius:11px;padding:clamp(9px,1.4vw,13px) clamp(16px,2.3vw,24px);
+  font-size:var(--font-btn);font-weight:800;cursor:pointer;font-family:inherit;
+  letter-spacing:.3px;display:inline-flex;align-items:center;gap:7px;
+  transition:opacity .14s,transform .1s;min-height:44px}
+.btn:hover{opacity:.88;transform:translateY(-1px)}
+.btn-blue{background:#0891b2}
+.btn-navy{background:#1d4ed8}
+.btn-green{background:#16a34a}
+.btn-red{background:#dc2626}
+.btn-purple{background:#9333ea}
+.btn-orange{background:#ea580c}
+.btn-gray{background:#f1f5f9;color:#475569!important;border:1.5px solid #e2e8f0}
+.btn-wide{width:100%;justify-content:center;font-size:clamp(15px,2.3vw,19px);
+  padding:clamp(14px,2.3vw,20px);border-radius:16px;box-shadow:0 4px 14px rgba(8,145,178,.2)}
+#skipBtn{display:block;margin:12px auto 0;background:none;border:none;color:#94a3b8;
+  font-size:clamp(12px,1.6vw,14px);cursor:pointer;text-decoration:underline;font-family:inherit}
+
+/* ── RESULTS ── */
+.result-card{background:#fff;border-radius:22px;padding:clamp(26px,3.8vw,42px);
+  box-shadow:0 4px 22px rgba(0,0,0,.08);border:1.5px solid #e2e8f0;
+  text-align:center;margin-bottom:20px}
+.result-pct{font-size:clamp(52px,8vw,76px);font-weight:900;line-height:1}
+.stars-display{font-size:clamp(28px,4.5vw,38px);margin:8px 0}
+.result-label{font-size:clamp(16px,2.5vw,22px);font-weight:700;color:#1e293b;margin:6px 0 3px}
+.result-sub{color:#64748b;font-size:clamp(13px,1.9vw,16px)}
+.result-btns{display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+.review-title{font-size:clamp(13px,1.9vw,16px);font-weight:800;color:#dc2626;
+  letter-spacing:.5px;margin-bottom:13px;text-transform:uppercase}
+.review-item{background:#fff;border-radius:14px;padding:clamp(13px,1.9vw,20px);
+  margin-bottom:12px;border:1.5px solid #fecaca;box-shadow:0 2px 7px rgba(220,38,38,.05)}
+.review-q{font-size:clamp(12px,1.7vw,15px);color:#1e293b;margin-bottom:8px;font-weight:600}
+.review-your{font-size:clamp(11px,1.5vw,14px);color:#dc2626;margin-bottom:3px}
+.review-correct{font-size:clamp(11px,1.5vw,14px);color:#16a34a;font-weight:700}
+.perfect{text-align:center;color:#16a34a;font-size:clamp(14px,2vw,18px);font-weight:700;padding:20px}
+.source-note{font-size:10px;color:#64748b;text-align:center;margin-top:12px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <span class="logo">🌍</span>
+  <span class="title">Howard · Science Midterm · Ch.5 Shaping Earth</span>
+  <button id="homebtn" onclick="goHome()">← Home</button>
+</div>
+
+<button id="finishBtn" onclick="finishEarly()">🏁 Finish &amp; Score</button>
+
+<div id="tabBar">
+  <button class="tab-btn active" data-tab="homeScreen" onclick="switchTab(this,'homeScreen')">🏠 Home</button>
+  <button class="tab-btn" data-tab="L1" onclick="switchTab(this,'drillScreen');startDrill('L1')">📘 Lesson 1</button>
+  <button class="tab-btn" data-tab="L2" onclick="switchTab(this,'drillScreen');startDrill('L2')">📗 Lesson 2</button>
+  <button class="tab-btn" data-tab="L3" onclick="switchTab(this,'drillScreen');startDrill('L3')">📙 Lesson 3</button>
+  <button class="tab-btn" data-tab="Mock" onclick="switchTab(this,'drillScreen');startMockExam()">🎯 Mock Exam</button>
+  <button class="tab-btn" data-tab="Oral" onclick="switchTab(this,'oralScreen')">🎤 Oral Practice</button>
+</div>
+
+<!-- HOME SCREEN -->
+<div id="homeScreen" class="screen active">
+  <div class="hero">
+    <div class="hero-emoji">🌍</div>
+    <h1>Shaping Earth</h1>
+    <p>A Closer Look 4C · Chapter 5 · Midterm Practice</p>
+    <p class="sub" id="totalCount"></p>
+  </div>
+
+  <div class="tab-grid">
+    <button class="topic-card" onclick="switchTabByKey('L1')">
+      <div class="tc-emoji">📘</div>
+      <div class="tc-title">Lesson 1<br>Earth</div>
+      <div class="tc-type-row" id="cnt-L1"></div>
+    </button>
+    <button class="topic-card" onclick="switchTabByKey('L2')">
+      <div class="tc-emoji">📗</div>
+      <div class="tc-title">Lesson 2<br>Moving Crust</div>
+      <div class="tc-type-row" id="cnt-L2"></div>
+    </button>
+    <button class="topic-card" onclick="switchTabByKey('L3')">
+      <div class="tc-emoji">📙</div>
+      <div class="tc-title">Lesson 3<br>Weathering &amp; Erosion</div>
+      <div class="tc-type-row" id="cnt-L3"></div>
+    </button>
+    <button class="topic-card mock" onclick="switchTabByKey('Mock')">
+      <div class="tc-emoji">🎯</div>
+      <div class="tc-title">Mock Exam</div>
+      <div class="tc-sub">30 random questions</div>
+    </button>
+    <button class="topic-card oral" onclick="switchTabByKey('Oral')">
+      <div class="tc-emoji">🎤</div>
+      <div class="tc-title">Oral Practice</div>
+      <div class="tc-sub" id="cnt-Oral"></div>
+    </button>
+  </div>
+
+  <div id="countdownBanner">
+    <div class="cd-label">📅 Science Midterm — 10/21 (Wed)</div>
+    <div class="cd-row">
+      <span id="cdDays">—</span>
+      <span class="cd-unit">days to go!</span>
+    </div>
+    <div id="cdMsg"></div>
+  </div>
+
+  <p class="source-note">All questions based on Chapter 5 worksheets, Q&amp;A practice, and CL4C Oral Test materials.</p>
+</div>
+
+<!-- DRILL SCREEN (Written) -->
+<div id="drillScreen" class="screen">
+  <div class="prog-wrap">
+    <div class="prog-labels">
+      <span id="progText">Q 1 / 10</span>
+      <div class="score-live"><span class="score-c" id="scoreC">✓ 0</span><span class="score-w" id="scoreW">✗ 0</span></div>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  </div>
+  <div class="card">
+    <div class="q-meta"><span id="qBadge" class="badge"></span><span id="qType" class="q-type-tag"></span></div>
+    <p id="qText" class="q-text"></p>
+    <div id="spellWrap" style="display:none">
+      <input type="text" id="spellInput" placeholder="Type your answer…" autocomplete="off">
+      <button class="btn btn-blue" id="checkSpellBtn" onclick="checkSpell()">Check ✓</button>
+    </div>
+    <div id="mcWrap" style="display:none"></div>
+    <div id="tfWrap" style="display:none">
+      <button class="tf-btn tf-true" id="tfTrue" onclick="submitAnswer('true')">✓ True</button>
+      <button class="tf-btn tf-false" id="tfFalse" onclick="submitAnswer('false')">✗ False</button>
+    </div>
+    <div id="feedbackPanel">
+      <div class="fb-row">
+        <div class="fb-icon" id="fbIcon"></div>
+        <span class="fb-label" id="fbLabel"></span>
+      </div>
+      <div class="fb-ans-reveal" id="fbAnsReveal">
+        <span class="ans-label">✓ Correct Answer:</span>
+        <div class="fb-ans-text" id="fbAnsText"></div>
+      </div>
+      <div class="fb-next-row"><button class="btn btn-green" id="nextBtn" onclick="nextQuestion()">Next →</button></div>
+    </div>
+  </div>
+  <button id="skipBtn" onclick="submitAnswer('__skipped__')">Skip this question</button>
+</div>
+
+<!-- ORAL SCREEN -->
+<div id="oralScreen" class="screen">
+  <div class="prog-wrap">
+    <div class="prog-labels">
+      <span id="oProgText">Q 1 / 13</span>
+      <div class="score-live"><span class="score-c" id="oScoreC">✓ 0</span><span class="score-w" id="oScoreW">✗ 0</span></div>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="oProgFill" style="width:0%"></div></div>
+  </div>
+  <div class="card">
+    <div class="q-meta">
+      <span id="oTopic" class="badge badge-Oral"></span>
+      <span class="q-type-tag">Oral Test</span>
+    </div>
+    <p id="oQText" class="q-text"></p>
+    <div class="kw-pills" id="oKwPills"></div>
+    <div style="margin-bottom:13px">
+      <button class="btn btn-purple" id="oQBtn" onclick="speakOralQ()">🔊 Read Question</button>
+    </div>
+    <div class="rec-section">
+      <div class="rec-title">🎙️ Record Your Answer</div>
+      <div class="rec-webview-note">⚠️ On iPad/WebView: tap <b>Start Recording</b>, allow microphone, then speak clearly.</div>
+      <div class="rec-btn-row">
+        <button class="btn btn-rec" id="recBtn" onclick="toggleRecord()">⏺ Start Recording</button>
+        <span class="rec-timer" id="recTimer"></span>
+      </div>
+      <div class="rec-status" id="recStatus">Record your answer — key points will be checked.</div>
+      <div id="recPlayRow"><span style="font-size:12px;font-weight:700;color:#6b21a8;min-width:90px">▶ Your answer:</span><audio id="myRecording" controls></audio></div>
+      <div class="score-panel" id="scorePanel">
+        <div class="score-top">
+          <div class="score-ring" id="scoreRing"><span class="sr-pct" id="scorePct">—</span><span class="sr-lbl">score</span></div>
+          <div><div class="score-msg" id="scoreMsg"></div><div class="score-sub" id="scoreSub"></div></div>
+        </div>
+        <div class="kw-section"><div class="kw-sec-title">Key points checked:</div><div id="kwRows"></div></div>
+        <div class="transcript-box" id="transcriptBox" style="display:none"><span class="t-lbl">What we heard:</span><span id="transcriptText"></span></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:14px">
+      <button class="btn btn-orange" id="revealBtn" onclick="revealOral()" style="display:none">💡 Reveal Answer</button>
+      <button class="btn btn-green" id="oralNextBtn" style="display:none" onclick="nextOral()">Next →</button>
+    </div>
+    <div class="oral-answer-box" id="oralAnswerBox"></div>
+    <div class="self-check" id="selfCheck">
+      <div class="sc-title">⭐ Self-check</div>
+      <div id="scItems"></div>
+      <div class="star-row" id="starRow"></div>
+    </div>
+    <div id="rereadRow" style="display:none;margin-top:11px">
+      <button class="btn btn-blue" id="oABtn" onclick="speakOralA()">🔊 Read Answer Again</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div id="resultScreen" class="screen">
+  <div class="result-card">
+    <div class="result-pct" id="resPct"></div>
+    <div class="stars-display" id="resStars"></div>
+    <div class="result-label" id="resLabel"></div>
+    <div class="result-sub" id="resSub"></div>
+    <div class="result-btns">
+      <button class="btn btn-blue" onclick="retryAll()">🔄 Try Again</button>
+      <button class="btn btn-red" id="retryWrongBtn" onclick="retryWrong()" style="display:none"></button>
+      <button class="btn btn-gray" onclick="goHome()">← Home</button>
+    </div>
+  </div>
+  <div id="reviewSection"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+//  QUESTION BANK
+// ═══════════════════════════════════════════════════════════════════
+const ALL_Q = [
+// ── LESSON 1: EARTH ────────────────────────────────────────────────
+{id:1,topic:"L1",type:"spell",q:"A large land mass surrounded by oceans is called a(n) ___.",a:"continent"},
+{id:2,topic:"L1",type:"spell",q:"A physical feature of the land is called a(n) ___.",a:"landform"},
+{id:3,topic:"L1",type:"spell",q:"Very flat land is called ___.",a:"plains"},
+{id:4,topic:"L1",type:"spell",q:"The gently sloping edge of a continent that connects the shore to the sea is a ___.",a:"continental shelf"},
+{id:5,topic:"L1",type:"spell",q:"Where the continent moves farther into the ocean and becomes steeper, it forms a ___.",a:"continental slope"},
+{id:6,topic:"L1",type:"spell",q:"Underwater mountains that run through an ocean form a(n) ___.",a:"ocean ridge"},
+{id:7,topic:"L1",type:"spell",q:"Canyon-like features on the ocean floor are called ocean ___.",a:"trenches"},
+{id:8,topic:"L1",type:"spell",q:"A region of land where water drains into a river is called a ___.",a:"drainage basin"},
+{id:9,topic:"L1",type:"spell",q:"Triangle-shaped landforms formed by river deposits are called ___.",a:"deltas"},
+{id:10,topic:"L1",type:"spell",q:"The outermost layer of Earth is solid rock called the ___.",a:"crust"},
+{id:11,topic:"L1",type:"spell",q:"Below the crust is a layer of rock called the ___.",a:"mantle"},
+{id:12,topic:"L1",type:"spell",q:"The outer core is probably made of melted ___.",a:"iron"},
+{id:13,topic:"L1",type:"spell",q:"The sphere of solid material at Earth's very center is called the ___.",a:"inner core"},
+{id:14,topic:"L1",type:"spell",q:"Mounds called ___ form where wind blows sand.",a:"sand dunes"},
+{id:15,topic:"L1",type:"mc",q:"A layer of Earth that is probably made of melted iron. What is it?",choices:["A. Continental shelf","B. Outer core","C. Inner core","D. Mantle"],a:"B. Outer core"},
+{id:16,topic:"L1",type:"mc",q:"A region of land where water runs into a river. What is it?",choices:["A. Ocean trench","B. Continental slope","C. Drainage basin","D. Delta"],a:"C. Drainage basin"},
+{id:17,topic:"L1",type:"mc",q:"Solid rock that makes up Earth's outermost layer. What is it?",choices:["A. Mantle","B. Inner core","C. Outer core","D. Crust"],a:"D. Crust"},
+{id:18,topic:"L1",type:"mc",q:"The area where the edge of a continent falls steeply to the ocean floor. What is it?",choices:["A. Continental shelf","B. Continental slope","C. Ocean ridge","D. Plain"],a:"B. Continental slope"},
+{id:19,topic:"L1",type:"mc",q:"The solid layer of Earth that can flow because of great heat and pressure. What is it?",choices:["A. Crust","B. Outer core","C. Inner core","D. Mantle"],a:"D. Mantle"},
+{id:20,topic:"L1",type:"mc",q:"The sphere of solid material at Earth's center. What is it?",choices:["A. Outer core","B. Mantle","C. Inner core","D. Crust"],a:"C. Inner core"},
+{id:21,topic:"L1",type:"mc",q:"The underwater edge of a continent closest to shore. What is it?",choices:["A. Continental slope","B. Ocean trench","C. Continental shelf","D. Ocean ridge"],a:"C. Continental shelf"},
+{id:22,topic:"L1",type:"mc",q:"Very flat land. What is it called?",choices:["A. Delta","B. Canyon","C. Mountain","D. Plain"],a:"D. Plain"},
+{id:23,topic:"L1",type:"tf",q:"The tallest and most visible landforms are mountains.",a:"true"},
+{id:24,topic:"L1",type:"tf",q:"A river delta looks like the shape of a circle.",a:"false"},
+{id:25,topic:"L1",type:"tf",q:"The continental shelf is part of the land covered by the sea.",a:"true"},
+{id:26,topic:"L1",type:"tf",q:"Earth's water drains into rivers, channels, drainage basins, and oceans.",a:"true"},
+{id:27,topic:"L1",type:"tf",q:"The mantle is the outermost layer of Earth.",a:"false"},
+{id:28,topic:"L1",type:"tf",q:"Rock in the mantle can move or slowly flow because of great pressure and high temperature.",a:"true"},
+{id:29,topic:"L1",type:"tf",q:"The inner core is probably made of melted iron.",a:"false"},
+{id:30,topic:"L1",type:"tf",q:"Valleys and canyons are examples of landforms shaped by water.",a:"true"},
+// ── LESSON 2: THE MOVING CRUST ─────────────────────────────────────
+{id:31,topic:"L2",type:"spell",q:"The large sections that make up Earth's crust and upper mantle are called ___.",a:"plates"},
+{id:32,topic:"L2",type:"spell",q:"When plates slowly push into each other they can form bended rock layers called ___.",a:"folds"},
+{id:33,topic:"L2",type:"spell",q:"A long, narrow crack in Earth's crust is called a(n) ___.",a:"fault"},
+{id:34,topic:"L2",type:"spell",q:"Tall landforms caused by folding or faulting are called ___.",a:"mountains"},
+{id:35,topic:"L2",type:"spell",q:"When rock in Earth's crust suddenly moves and shakes, a(n) ___ occurs.",a:"earthquake"},
+{id:36,topic:"L2",type:"spell",q:"Underwater earthquakes can cause huge ocean waves called ___.",a:"tsunamis"},
+{id:37,topic:"L2",type:"spell",q:"An earthquake creates ___ that travel outward from the source.",a:"seismic waves"},
+{id:38,topic:"L2",type:"spell",q:"A tool that detects and records earthquakes is called a(n) ___.",a:"seismograph"},
+{id:39,topic:"L2",type:"spell",q:"A mountain that forms around an opening in Earth's crust is a(n) ___.",a:"volcano"},
+{id:40,topic:"L2",type:"spell",q:"Melted rock produced by a volcano is called ___, which erupts and becomes lava.",a:"magma"},
+{id:41,topic:"L2",type:"spell",q:"Some volcanoes form over thin places in Earth's crust called ___.",a:"hot spots"},
+{id:42,topic:"L2",type:"spell",q:"A high landform with a flat top is called a ___.",a:"plateau"},
+{id:43,topic:"L2",type:"spell",q:"A bend in rock layers caused by plate movement is called a ___.",a:"fold"},
+{id:44,topic:"L2",type:"mc",q:"What tool is used to measure seismic waves in Earth's crust?",choices:["A. A telescope","B. A seismograph","C. A barometer","D. A thermometer"],a:"B. A seismograph"},
+{id:45,topic:"L2",type:"mc",q:"What are plates made of?",choices:["A. Sand and water","B. Outer core and inner core","C. Crust and the upper part of Earth's mantle","D. Mantle and outer core"],a:"C. Crust and the upper part of Earth's mantle"},
+{id:46,topic:"L2",type:"mc",q:"How fast do Earth's plates move?",choices:["A. Very quickly, like running water","B. About as slowly as your fingernails grow","C. As fast as wind","D. They do not move"],a:"B. About as slowly as your fingernails grow"},
+{id:47,topic:"L2",type:"mc",q:"Why can continents like Australia move across Earth's surface?",choices:["A. Because of strong ocean currents","B. Because wind pushes them","C. Because the crust is made up of large moving pieces called plates","D. Because of gravity pulling them"],a:"C. Because the crust is made up of large moving pieces called plates"},
+{id:48,topic:"L2",type:"mc",q:"In the Pacific Ocean, which islands are an example of volcanoes formed over a hot spot?",choices:["A. Canary Islands","B. Hawaiian Islands","C. Galapagos Islands","D. Aleutian Islands"],a:"B. Hawaiian Islands"},
+{id:49,topic:"L2",type:"mc",q:"How do waves of an earthquake travel?",choices:["A. In a straight line only","B. Downward only","C. Out from the source in all directions","D. In a circle around the fault"],a:"C. Out from the source in all directions"},
+{id:50,topic:"L2",type:"tf",q:"A fault is a crack in the crust along which movement takes place.",a:"true"},
+{id:51,topic:"L2",type:"tf",q:"Scientists have successfully predicted major earthquakes many times.",a:"false"},
+{id:52,topic:"L2",type:"tf",q:"A seismograph detects and records earthquakes.",a:"true"},
+{id:53,topic:"L2",type:"tf",q:"Most volcanoes form near plate edges.",a:"true"},
+{id:54,topic:"L2",type:"tf",q:"A plateau is a high landform with a flat top.",a:"true"},
+{id:55,topic:"L2",type:"tf",q:"Seismic waves travel at exactly the same speed along Earth's surface and through Earth's interior.",a:"false"},
+{id:56,topic:"L2",type:"tf",q:"Plates move at about the same speed as your fingernails grow.",a:"true"},
+// ── LESSON 3: WEATHERING AND EROSION ───────────────────────────────
+{id:57,topic:"L3",type:"spell",q:"The slow process that breaks rocks into smaller pieces is called ___.",a:"weathering"},
+{id:58,topic:"L3",type:"spell",q:"When a rock is broken apart without changing its type, that is ___ weathering.",a:"physical"},
+{id:59,topic:"L3",type:"spell",q:"When air and water react with iron in a rock and form rust, that is ___ weathering.",a:"chemical"},
+{id:60,topic:"L3",type:"spell",q:"Weathered pieces of rock moved from one place to another is called ___.",a:"erosion"},
+{id:61,topic:"L3",type:"spell",q:"Glaciers form in very cold places as thick ___ of ice.",a:"sheets"},
+{id:62,topic:"L3",type:"spell",q:"Mounds that form where glacial till builds up are called ___.",a:"moraines"},
+{id:63,topic:"L3",type:"spell",q:"The bottom end of a glacier is called the ___.",a:"terminus"},
+{id:64,topic:"L3",type:"spell",q:"An unsorted mixture of debris dropped by a glacier is called ___.",a:"glacial till"},
+{id:65,topic:"L3",type:"mc",q:"What kind of weathering made the stone shapes in Penghu?",choices:["A. Chemical weathering","B. Physical weathering","C. Glacial erosion","D. Water erosion"],a:"B. Physical weathering"},
+{id:66,topic:"L3",type:"mc",q:"How are hoodoos formed?",choices:["A. By moving water","B. By plate movement","C. By blowing wind","D. By glaciers"],a:"C. By blowing wind"},
+{id:67,topic:"L3",type:"mc",q:"How are glaciers made?",choices:["A. When lava cools quickly","B. When snow piles up and melts slowly, forming large sheets of ice","C. When rivers freeze overnight","D. When earthquakes push ice together"],a:"B. When snow piles up and melts slowly, forming large sheets of ice"},
+{id:68,topic:"L3",type:"mc",q:"When the Colorado River eroded land around it in Arizona, what was formed?",choices:["A. Niagara Falls","B. Rocky Mountains","C. Grand Canyon","D. Mississippi Delta"],a:"C. Grand Canyon"},
+{id:69,topic:"L3",type:"mc",q:"Which of the following is a landform made by MOVING WATER?",choices:["A. Sand dune","B. Moraine","C. Canyon","D. Volcano"],a:"C. Canyon"},
+{id:70,topic:"L3",type:"mc",q:"Which of the following is a landform made by EARTH'S CRUST MOVING?",choices:["A. Delta","B. Cave","C. Beach","D. Plateau"],a:"D. Plateau"},
+{id:71,topic:"L3",type:"mc",q:"Which of the following is a landform made by BLOWING WIND?",choices:["A. Gorge","B. Sand dune","C. Valley","D. Channel"],a:"B. Sand dune"},
+{id:72,topic:"L3",type:"mc",q:"A CHANNEL is a landform created by which process?",choices:["A. Blowing wind","B. Moving water","C. Moving of Earth's crust","D. Glaciers"],a:"B. Moving water"},
+{id:73,topic:"L3",type:"mc",q:"A DELTA is a landform created by which process?",choices:["A. Blowing wind","B. Plate movement","C. Moving water","D. Chemical weathering"],a:"C. Moving water"},
+{id:74,topic:"L3",type:"mc",q:"A VOLCANO is a landform created by which process?",choices:["A. Blowing wind","B. Moving water","C. Moving of Earth's crust","D. Glaciers"],a:"C. Moving of Earth's crust"},
+{id:75,topic:"L3",type:"mc",q:"SMOOTH ROCKS on a beach are shaped by which process?",choices:["A. Blowing wind","B. Moving water","C. Moving of Earth's crust","D. Earthquakes"],a:"B. Moving water"},
+{id:76,topic:"L3",type:"tf",q:"Physical weathering breaks down rock without changing the rock type.",a:"true"},
+{id:77,topic:"L3",type:"tf",q:"Erosion moves weathered rock from one place to another.",a:"true"},
+{id:78,topic:"L3",type:"tf",q:"Glaciers form in very warm, tropical places.",a:"false"},
+{id:79,topic:"L3",type:"tf",q:"Moving glaciers pick up rocks, gravel, and sand as they move.",a:"true"},
+{id:80,topic:"L3",type:"tf",q:"Most natural processes change the land quickly.",a:"false"},
+{id:81,topic:"L3",type:"tf",q:"The Grand Canyon was formed by the Colorado River eroding the land.",a:"true"},
+{id:82,topic:"L3",type:"tf",q:"Chemical weathering changes the type of rock.",a:"true"},
+// ── LESSON 3: PEOPLE CHANGE THE LAND ──────────────────────────────
+{id:83,topic:"L3",type:"spell",q:"___ is digging into the land for useful resources like minerals, metals, or fuel.",a:"Mining"},
+{id:84,topic:"L3",type:"spell",q:"Places where people pile trash are called ___.",a:"landfills"},
+{id:85,topic:"L3",type:"spell",q:"The dropping off of weathered rock is called ___.",a:"deposition"},
+{id:86,topic:"L3",type:"mc",q:"Which of the following is a way people change the land by removing resources?",choices:["A. Building a dam","B. Mining","C. Planting trees","D. Creating a nature reserve"],a:"B. Mining"},
+{id:87,topic:"L3",type:"mc",q:"What happens when people cut down or burn forests to clear land?",choices:["A. Erosion slows down because roots hold soil","B. Erosion easily washes away the soil without tree roots","C. New trees grow back immediately","D. The land becomes more fertile"],a:"B. Erosion easily washes away the soil without tree roots"},
+{id:88,topic:"L3",type:"mc",q:"How do landfills change the land?",choices:["A. They remove minerals from the ground","B. They carve valleys into rock","C. They form large mounds or hills where people pile trash","D. They cause chemical weathering"],a:"C. They form large mounds or hills where people pile trash"},
+{id:89,topic:"L3",type:"mc",q:"Which human activity can HELP the land recover from erosion?",choices:["A. Mining","B. Building landfills","C. Planting and caring for trees","D. Burning forests"],a:"C. Planting and caring for trees"},
+{id:90,topic:"L3",type:"tf",q:"Mining is digging into the land for useful resources like minerals, metals, or fuel.",a:"true"},
+{id:91,topic:"L3",type:"tf",q:"Without trees, erosion easily washes away the soil.",a:"true"},
+{id:92,topic:"L3",type:"tf",q:"People change Earth's land more slowly than natural processes do.",a:"false"},
+{id:93,topic:"L3",type:"tf",q:"Landfills are always harmful and can never blend in with the surrounding land.",a:"false"},
+// ── ORAL ───────────────────────────────────────────────────────────
+{id:100,topic:"Oral",type:"oral",subtopic:"Earth's Layers",emoji:"🪨",
+ q:"What is the layer of Earth under the crust?",
+ a:"The mantle is the layer below the crust.",
+ kw:[{label:"Names the mantle as the layer below the crust",must:["mantle","layer","crust","below"]}]},
+{id:101,topic:"Oral",type:"oral",subtopic:"Earth's Layers",emoji:"🪨",
+ q:"What are some landforms made by moving water?",
+ a:"Canyons and valleys are made by moving water.",
+ kw:[{label:"Names correct landforms made by moving water",must:["canyon","valley","water"]}]},
+{id:102,topic:"Oral",type:"oral",subtopic:"Earth's Layers",emoji:"🪨",
+ q:"What shape does a river delta look like?",
+ a:"A river delta looks like a triangle.",
+ kw:[{label:"Correctly identifies the triangle shape",must:["triangle","delta"]}]},
+{id:103,topic:"Oral",type:"oral",subtopic:"Earth's Layers",emoji:"🪨",
+ q:"What is the continental shelf?",
+ a:"The continental shelf is part of the land that is covered by the sea.",
+ kw:[{label:"Describes it as land covered by the sea",must:["continental","shelf","land","sea"]}]},
+{id:104,topic:"Oral",type:"oral",subtopic:"The Moving Crust",emoji:"⚡",
+ q:"What tool is used to measure seismic waves in Earth's crust?",
+ a:"A seismograph is used to measure seismic waves in Earth's crust.",
+ kw:[{label:"Names seismograph and its function",must:["seismograph","measure","seismic","waves"]}]},
+{id:105,topic:"Oral",type:"oral",subtopic:"The Moving Crust",emoji:"⚡",
+ q:"What is a fault?",
+ a:"A fault is a crack in the crust along which movement takes place.",
+ kw:[{label:"Defines fault as a crack with movement",must:["fault","crack","crust","movement"]}]},
+{id:106,topic:"Oral",type:"oral",subtopic:"The Moving Crust",emoji:"⚡",
+ q:"What do waves of an earthquake travel like?",
+ a:"The waves travel out from the source in all directions.",
+ kw:[{label:"Explains waves travel from source in all directions",must:["source","directions","travel"]}]},
+{id:107,topic:"Oral",type:"oral",subtopic:"The Moving Crust",emoji:"⚡",
+ q:"What is a volcano?",
+ a:"A volcano is a mountain that builds up around an opening in Earth's crust.",
+ kw:[{label:"Defines volcano correctly",must:["volcano","mountain","opening","crust"]}]},
+{id:108,topic:"Oral",type:"oral",subtopic:"The Moving Crust",emoji:"⚡",
+ q:"Why can continents like Australia move across Earth's surface?",
+ a:"Continents can move because the crust is made up of large, moving pieces called plates.",
+ kw:[
+   {label:"Mentions plates as the reason",must:["plates","moving","pieces"]},
+   {label:"Links plates to continent movement",must:["move","continents"]}
+ ]},
+{id:109,topic:"Oral",type:"oral",subtopic:"Weathering & Erosion",emoji:"🌊",
+ q:"How are hoodoos formed?",
+ a:"Hoodoos are formed by blowing wind.",
+ kw:[{label:"Correctly identifies wind as the cause",must:["hoodoos","wind","formed"]}]},
+{id:110,topic:"Oral",type:"oral",subtopic:"Weathering & Erosion",emoji:"🌊",
+ q:"What kind of weathering made the stone shapes in Penghu?",
+ a:"The stone shapes in Penghu were made by physical weathering.",
+ kw:[{label:"Identifies physical weathering",must:["physical","weathering","penghu"]}]},
+{id:111,topic:"Oral",type:"oral",subtopic:"Weathering & Erosion",emoji:"🌊",
+ q:"How are glaciers made?",
+ a:"Glaciers are made when snow piles up and melts slowly, forming large sheets of ice.",
+ kw:[
+   {label:"Snow piles up and melts slowly",must:["snow","piles","melts"]},
+   {label:"Forms large sheets of ice",must:["sheets","ice"]}
+ ]},
+{id:112,topic:"Oral",type:"oral",subtopic:"Weathering & Erosion",emoji:"🌊",
+ q:"What does a seismograph do?",
+ a:"A seismograph detects and records earthquakes.",
+ kw:[{label:"Detects and records earthquakes",must:["seismograph","detects","records","earthquakes"]}]},
+];
+
+// ═══════════════════════════════════════════════════════════════════
+//  TTS — skill-spec speak() helper
+// ═══════════════════════════════════════════════════════════════════
+function speak(text, rate, onDone) {
+  if (!window.speechSynthesis) { if(typeof onDone==="function") onDone(); return; }
+  rate = (typeof rate === "number") ? rate : 0.88;
+  window.speechSynthesis.cancel();
+  var utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "en-US";
+  utter.rate = rate;
+  utter.pitch = 1.0;
+  if (typeof onDone === "function") {
+    utter.onend = onDone;
+    utter.onerror = onDone;
+  }
+  function setVoiceAndSpeak() {
+    var voices = window.speechSynthesis.getVoices();
+    var preferred = ["Samantha","Karen","Google US English","Microsoft Aria Online (Natural)"];
+    var chosen = null;
+    for (var i = 0; i < preferred.length; i++) {
+      var n = preferred[i];
+      for (var j = 0; j < voices.length; j++) {
+        if (voices[j].name === n) { chosen = voices[j]; break; }
+      }
+      if (chosen) break;
+    }
+    if (!chosen) chosen = voices.find(function(v){return v.lang==="en-US";}) || voices[0] || null;
+    if (chosen) utter.voice = chosen;
+    window.speechSynthesis.speak(utter);
+  }
+  var v = window.speechSynthesis.getVoices();
+  if (v.length > 0) { setVoiceAndSpeak(); }
+  else { window.speechSynthesis.onvoiceschanged = function(){ window.speechSynthesis.onvoiceschanged=null; setVoiceAndSpeak(); }; }
+}
+function stopSpeech(){
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  // reset any stuck oral buttons
+  setSpeakBtnO("oQBtn","q");
+  setSpeakBtnO("oABtn","a");
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  SHUFFLE & HELPERS
+// ═══════════════════════════════════════════════════════════════════
+function shuffle(arr) {
+  var b = arr.slice();
+  for (var i = b.length-1; i > 0; i--) {
+    var j = Math.floor(Math.random()*(i+1));
+    var t = b[i]; b[i] = b[j]; b[j] = t;
+  }
+  return b;
+}
+function norm(s){ return (s||"").toLowerCase().trim().replace(/\s+/g," "); }
+function starsHTML(pct) {
+  var n = pct>=90?5:pct>=75?4:pct>=55?3:pct>=40?2:1;
+  var s = "";
+  for (var i=1;i<=5;i++) s += '<span class="star'+(i<=n?" on":"")+'">★</span>';
+  return s;
+}
+function starsEmoji(pct) {
+  var n = pct>=90?5:pct>=75?4:pct>=55?3:pct>=40?2:1;
+  return "★".repeat(n)+"☆".repeat(5-n);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  NAV
+// ═══════════════════════════════════════════════════════════════════
+var currentMode = "home";
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(function(s){ s.classList.remove("active"); });
+  document.getElementById(id).classList.add("active");
+  document.getElementById("homebtn").style.display = id==="homeScreen"?"none":"block";
+  document.getElementById("tabBar").style.display = "block";
+  document.getElementById("finishBtn").style.display = (id==="drillScreen"||id==="oralScreen")?"block":"none";
+  stopSpeech();
+  resetRecorder();
+}
+
+function goHome() {
+  document.querySelectorAll(".tab-btn").forEach(function(b){ b.classList.remove("active"); });
+  document.querySelector(".tab-btn[data-tab='homeScreen']").classList.add("active");
+  showScreen("homeScreen");
+  buildHomeCounts();
+}
+
+function switchTab(btn, screenId) {
+  document.querySelectorAll(".tab-btn").forEach(function(b){ b.classList.remove("active"); });
+  btn.classList.add("active");
+  if (screenId === "homeScreen") { showScreen("homeScreen"); buildHomeCounts(); }
+  else if (screenId === "oralScreen") { showScreen("oralScreen"); startOral(); }
+  else if (screenId !== "drillScreen") { showScreen(screenId); }
+}
+
+function switchTabByKey(key) {
+  var map = {L1:"L1",L2:"L2",L3:"L3",Mock:"Mock",Oral:"Oral"};
+  var tabBtn = document.querySelector(".tab-btn[data-tab='"+key+"']");
+  if (tabBtn) tabBtn.click();
+  else {
+    if (key==="Oral") { showScreen("oralScreen"); startOral(); }
+    else if (key==="Mock") { showScreen("drillScreen"); startMockExam(); }
+    else { showScreen("drillScreen"); startDrill(key); }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  HOME
+// ═══════════════════════════════════════════════════════════════════
+function buildHomeCounts() {
+  var w = ALL_Q.filter(function(q){return q.type!=="oral";}).length;
+  var o = ALL_Q.filter(function(q){return q.type==="oral";}).length;
+  document.getElementById("totalCount").textContent = w+" written · "+o+" oral questions";
+  ["L1","L2","L3"].forEach(function(t){
+    var pool = ALL_Q.filter(function(q){return q.topic===t;});
+    var nS = pool.filter(function(q){return q.type==="spell";}).length;
+    var nM = pool.filter(function(q){return q.type==="mc";}).length;
+    var nT = pool.filter(function(q){return q.type==="tf";}).length;
+    var el = document.getElementById("cnt-"+t);
+    if(el) el.innerHTML =
+      (nS?'<span class="tc-tag tc-tag-spell">✏️ Fill×'+nS+'</span>':'')+
+      (nM?'<span class="tc-tag tc-tag-mc">🔘 MC×'+nM+'</span>':'')+
+      (nT?'<span class="tc-tag tc-tag-tf">✓✗ T/F×'+nT+'</span>':'');
+  });
+  var oEl = document.getElementById("cnt-Oral");
+  if(oEl) oEl.textContent = o+" questions";
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  WRITTEN DRILL
+// ═══════════════════════════════════════════════════════════════════
+var quiz=[], qIdx=0, answers={}, scoreC=0, scoreW=0, answered=false, currentQ=null;
+
+function startDrill(topic) {
+  var pool = shuffle(ALL_Q.filter(function(q){ return q.topic===topic; }));
+  launchDrill(pool);
+}
+
+function startMockExam() {
+  var written = ALL_Q.filter(function(q){ return q.type!=="oral"; });
+  var pool = shuffle(written).slice(0,30);
+  launchDrill(pool, true);
+}
+
+function launchDrill(pool, isMock) {
+  quiz = pool; qIdx = 0; answers = {}; scoreC = 0; scoreW = 0; answered = false;
+  currentMode = isMock ? "mock" : "drill";
+  showScreen("drillScreen");
+  renderQuestion();
+}
+
+function retryAll() { launchDrill(shuffle(quiz), currentMode==="mock"); }
+function retryWrong() {
+  var w = quiz.filter(function(q){ return norm(answers[q.id]||"")!==norm(q.a); });
+  if(w.length) launchDrill(shuffle(w));
+}
+
+function renderQuestion() {
+  answered = false; stopSpeech();
+  var q = quiz[qIdx]; currentQ = q;
+  var total = quiz.length;
+  document.getElementById("progText").textContent = "Q "+(qIdx+1)+" / "+total;
+  document.getElementById("scoreC").textContent = "✓ "+scoreC;
+  document.getElementById("scoreW").textContent = "✗ "+scoreW;
+  document.getElementById("progFill").style.width = (qIdx/total*100)+"%";
+
+  var badge = document.getElementById("qBadge");
+  badge.textContent = currentMode==="mock"?"Mock":q.topic;
+  badge.className = "badge "+(currentMode==="mock"?"badge-Mock":"badge-"+q.topic);
+  document.getElementById("qType").textContent = {spell:"Fill in the Blank",mc:"Multiple Choice",tf:"True / False"}[q.type]||q.type;
+  document.getElementById("qText").textContent = q.q;
+
+  ["spellWrap","mcWrap","tfWrap"].forEach(function(id){ document.getElementById(id).style.display="none"; });
+  var fb = document.getElementById("feedbackPanel"); fb.style.display="none"; fb.className="";
+  document.getElementById("fbAnsReveal").style.display="none";
+  document.getElementById("skipBtn").style.display="block";
+
+  if (q.type==="spell") {
+    document.getElementById("spellWrap").style.display="block";
+    var inp = document.getElementById("spellInput"); inp.value=""; inp.className=""; inp.disabled=false;
+    document.getElementById("checkSpellBtn").style.display="inline-flex";
+    setTimeout(function(){ inp.focus(); },80);
+    inp.onkeydown = function(e){ if(e.key==="Enter"&&inp.value.trim()) checkSpell(); };
+  }
+  if (q.type==="mc") {
+    var w = document.getElementById("mcWrap"); w.style.display="block"; w.innerHTML="";
+    var shuffledChoices = shuffle(q.choices);
+    shuffledChoices.forEach(function(ch){
+      var b = document.createElement("button"); b.className="choice-btn"; b.textContent=ch;
+      b.onclick = function(){ submitAnswer(ch); }; w.appendChild(b);
+    });
+  }
+  if (q.type==="tf") {
+    document.getElementById("tfWrap").style.display="flex";
+    ["tfTrue","tfFalse"].forEach(function(id){
+      var btn = document.getElementById(id); btn.disabled=false;
+      btn.className="tf-btn tf-"+id.replace("tf","").toLowerCase();
+    });
+  }
+}
+
+function checkSpell() {
+  if(answered) return;
+  var v = document.getElementById("spellInput").value.trim();
+  if(!v) return;
+  submitAnswer(v);
+}
+
+function submitAnswer(val) {
+  if(answered) return; answered=true;
+  var q = quiz[qIdx];
+  var correct = norm(val)===norm(q.a);
+  answers[q.id]=val;
+  if(val==="__skipped__"){ scoreW++; }
+  else if(correct){ scoreC++; }
+  else{ scoreW++; }
+  document.getElementById("skipBtn").style.display="none";
+
+  if(q.type==="spell"){
+    var inp=document.getElementById("spellInput"); inp.disabled=true;
+    inp.className=correct?"correct":"wrong";
+    document.getElementById("checkSpellBtn").style.display="none";
+  }
+  if(q.type==="mc"){
+    document.querySelectorAll("#mcWrap .choice-btn").forEach(function(btn){
+      btn.disabled=true;
+      var isSelected = btn.textContent===val;
+      var isCorrect  = norm(btn.textContent)===norm(q.a);
+      if(isCorrect){ btn.classList.add("correct"); btn.innerHTML+=" ✓"; }
+      else if(isSelected){ btn.classList.add("wrong"); btn.innerHTML+=" ✗"; }
+      else btn.classList.add("dim");
+    });
+  }
+  if(q.type==="tf"){
+    document.getElementById("tfTrue").disabled=true;
+    document.getElementById("tfFalse").disabled=true;
+    ["true","false"].forEach(function(o){
+      var b=document.getElementById("tf"+o.charAt(0).toUpperCase()+o.slice(1));
+      if(o===norm(q.a)) b.classList.add("correct");
+      else if(o===val) b.classList.add("wrong");
+      else b.classList.add("dim");
+    });
+  }
+
+  var fb=document.getElementById("feedbackPanel");
+  fb.style.display="block";
+  fb.className=correct?"correct":"wrong";
+  var ic=document.getElementById("fbIcon");
+  ic.textContent=correct?"✓":"✗";
+  ic.className="fb-icon "+(correct?"correct":"wrong");
+  var lb=document.getElementById("fbLabel");
+  lb.textContent=correct?"Correct! Great job! 🎉":"Not quite…";
+  lb.className="fb-label "+(correct?"correct":"wrong");
+
+  // Show answer reveal ONLY when wrong (NO HINTS rule)
+  if(!correct){
+    document.getElementById("fbAnsReveal").style.display="block";
+    document.getElementById("fbAnsText").textContent=q.a;
+  }
+
+  var last=qIdx===quiz.length-1;
+  document.getElementById("nextBtn").textContent=last?"See Results 🏁":"Next →";
+  document.getElementById("progFill").style.width=((qIdx+1)/quiz.length*100)+"%";
+  document.getElementById("scoreC").textContent="✓ "+scoreC;
+  document.getElementById("scoreW").textContent="✗ "+scoreW;
+}
+
+function nextQuestion() {
+  stopSpeech();
+  if(qIdx===quiz.length-1) showResults();
+  else { qIdx++; renderQuestion(); }
+}
+
+function finishEarly() {
+  var screen = document.querySelector(".screen.active");
+  if(!screen) return;
+  if(screen.id==="drillScreen") {
+    // count answered so far
+    var answered_count = Object.keys(answers).length;
+    if(answered_count===0){ alert("Answer at least one question first!"); return; }
+    showResults();
+  } else if(screen.id==="oralScreen") {
+    showOralResults();
+  }
+}
+
+function showResults() {
+  showScreen("resultScreen");
+  var total=quiz.length, done=Object.keys(answers).length;
+  var pct = done>0 ? Math.round(scoreC/done*100) : 0;
+  var g = pct>=90?{l:"Excellent! 🌟",c:"#16a34a"}:pct>=75?{l:"Good Job! 👍",c:"#0284c7"}:pct>=60?{l:"Keep Practising 📚",c:"#d97706"}:{l:"Need More Review 💪",c:"#dc2626"};
+  document.getElementById("resPct").textContent=pct+"%";
+  document.getElementById("resPct").style.color=g.c;
+  document.getElementById("resStars").innerHTML=starsHTML(pct);
+  document.getElementById("resLabel").textContent=g.l;
+  document.getElementById("resSub").textContent="Answered "+done+" of "+total+" · "+scoreC+" correct";
+  document.getElementById("finishBtn").style.display="none";
+
+  var wrong=quiz.slice(0,done).filter(function(q){ return norm(answers[q.id]||"")!==norm(q.a); });
+  var rb=document.getElementById("retryWrongBtn");
+  if(wrong.length>0){ rb.style.display="inline-flex"; rb.textContent="Retry Wrong ("+wrong.length+")"; }
+  else rb.style.display="none";
+
+  var sec=document.getElementById("reviewSection");
+  if(wrong.length===0){ sec.innerHTML="<div class=\"perfect\">🎉 Perfect — all answered correctly!</div>"; return; }
+  var html="<div class=\"review-title\">✗ Review These ("+wrong.length+")</div>";
+  wrong.forEach(function(q){
+    var u=answers[q.id]||"__skipped__";
+    html+="<div class=\"review-item\"><div class=\"q-meta\"><span class=\"badge badge-"+q.topic+"\">"+q.topic+"</span></div><div class=\"review-q\">"+q.q+"</div><div class=\"review-your\">✗ Your answer: <b>"+(u==="__skipped__"?"(skipped)":u)+"</b></div><div class=\"review-correct\">✓ Correct: <b>"+q.a+"</b></div></div>";
+  });
+  sec.innerHTML=html;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  ORAL DRILL
+// ═══════════════════════════════════════════════════════════════════
+var oralQuiz=[], oIdx=0, oScoreC=0, oScoreW=0, oAnswered=false, currentOQ=null;
+
+function startOral() {
+  oralQuiz = shuffle(ALL_Q.filter(function(q){ return q.type==="oral"; }));
+  oIdx=0; oScoreC=0; oScoreW=0; oAnswered=false;
+  renderOralQuestion();
+}
+
+function renderOralQuestion() {
+  oAnswered=false; stopSpeech(); resetRecorder();
+  var q=oralQuiz[oIdx]; currentOQ=q;
+  var total=oralQuiz.length;
+  document.getElementById("oProgText").textContent="Q "+(oIdx+1)+" / "+total;
+  document.getElementById("oScoreC").textContent="✓ "+oScoreC;
+  document.getElementById("oScoreW").textContent="✗ "+oScoreW;
+  document.getElementById("oProgFill").style.width=(oIdx/total*100)+"%";
+  document.getElementById("oTopic").textContent=(q.emoji||"")+" "+(q.subtopic||"Oral");
+  document.getElementById("oQText").textContent=q.q;
+  // key word pills
+  var pills=document.getElementById("oKwPills"); pills.innerHTML="";
+  if(q.kw) q.kw.forEach(function(entry){
+    entry.must.forEach(function(w){
+      var span=document.createElement("span"); span.className="kw-pill"; span.textContent=w; pills.appendChild(span);
+    });
+  });
+  document.getElementById("oralAnswerBox").style.display="none";
+  document.getElementById("oralAnswerBox").innerHTML="";
+  document.getElementById("oralNextBtn").style.display="none";
+  document.getElementById("rereadRow").style.display="none";
+  document.getElementById("revealBtn").style.display="none";
+  document.getElementById("selfCheck").style.display="none";
+  document.getElementById("scorePanel").style.display="none";
+  setSpeakBtnO("oQBtn","q");
+}
+
+function speakOralQ(){
+  if(!currentOQ)return;
+  setSpeakBtnO("oQBtn","stop");
+  speak(currentOQ.q,0.88,function(){ setSpeakBtnO("oQBtn","q"); });
+}
+function speakOralA(){
+  if(!currentOQ)return;
+  setSpeakBtnO("oABtn","stop");
+  speak(currentOQ.a,0.82,function(){ setSpeakBtnO("oABtn","a"); });
+}
+function setSpeakBtnO(id,mode){
+  var b=document.getElementById(id); if(!b)return;
+  if(mode==="stop"){ b.textContent="⏹ Stop"; b.onclick=stopSpeech; b.style.background="#dc2626"; }
+  else if(mode==="q"){ b.textContent="🔊 Read Question"; b.onclick=speakOralQ; b.style.background="#9333ea"; }
+  else{ b.textContent="🔊 Read Answer Again"; b.onclick=speakOralA; b.style.background="#0891b2"; }
+}
+
+function revealOral(){
+  var q=oralQuiz[oIdx];
+  var box=document.getElementById("oralAnswerBox");
+  var sentences=q.a.match(/[^.!?]+[.!?]+/g)||[q.a];
+  box.innerHTML="<span class=\"ans-label\">📖 Model Answer:</span>"+sentences.map(function(s){return "<span class=\"ans-sentence\">"+s.trim()+"</span>";}).join("");
+  box.style.display="block";
+  document.getElementById("oralNextBtn").style.display="inline-flex";
+  document.getElementById("rereadRow").style.display="block";
+  setSpeakBtnO("oABtn","stop");
+  speak(q.a,0.82,function(){ setSpeakBtnO("oABtn","a"); });
+  // self-check
+  if(q.kw){
+    var sc=document.getElementById("selfCheck"); sc.style.display="block";
+    var items=document.getElementById("scItems"); items.innerHTML="";
+    q.kw.forEach(function(entry,i){
+      var btn=document.createElement("button"); btn.className="sc-item"; btn.id="sci"+i;
+      btn.innerHTML="<span class=\"sc-dot\" id=\"scd"+i+"\"></span><span>"+entry.label+"</span>";
+      btn.onclick=function(){
+        btn.classList.toggle("checked");
+        document.getElementById("scd"+i).textContent=btn.classList.contains("checked")?"✓":"";
+        updateStars();
+      };
+      items.appendChild(btn);
+    });
+    updateStars();
+  }
+  if(!oAnswered){ oAnswered=true; document.getElementById("oProgFill").style.width=((oIdx+1)/oralQuiz.length*100)+"%"; }
+}
+
+function updateStars(){
+  var total=oralQuiz[oIdx].kw?oralQuiz[oIdx].kw.length:0;
+  var checked=document.querySelectorAll("#scItems .sc-item.checked").length;
+  var pct=total>0?Math.round(checked/total*100):0;
+  document.getElementById("starRow").innerHTML=starsHTML(pct);
+}
+
+function nextOral(){
+  stopSpeech();
+  if(oIdx===oralQuiz.length-1) showOralResults();
+  else{ oIdx++; renderOralQuestion(); }
+}
+
+function showOralResults(){
+  showScreen("resultScreen");
+  var total=oralQuiz.length;
+  var pct=Math.round(oScoreC/Math.max(total,1)*100);
+  document.getElementById("resPct").textContent="Done!";
+  document.getElementById("resPct").style.color="#6366f1";
+  document.getElementById("resStars").innerHTML="🎤 "+total+" oral questions completed";
+  document.getElementById("resLabel").textContent="Oral Practice Complete!";
+  document.getElementById("resSub").textContent="Great work practising your spoken answers.";
+  document.getElementById("retryWrongBtn").style.display="none";
+  document.getElementById("reviewSection").innerHTML="<div class=\"perfect\">Keep practising — aim to answer in complete sentences! 💪</div>";
+  document.getElementById("finishBtn").style.display="none";
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  RECORDER
+// ═══════════════════════════════════════════════════════════════════
+var mediaRecorder=null,recChunks=[],recTimerInt=null,recSecs=0,recBlob=null,recURL=null,micStream=null,recognition=null,liveTranscript="";
+
+function getBestMime(){
+  var types=["audio/mp4","audio/aac","audio/webm;codecs=opus","audio/webm","audio/ogg;codecs=opus","audio/ogg"];
+  for(var i=0;i<types.length;i++) if(typeof MediaRecorder!=="undefined"&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(types[i])) return types[i];
+  return "";
+}
+function setRecStatus(msg,color){ var el=document.getElementById("recStatus"); if(el){el.textContent=msg;el.style.color=color||"#64748b";} }
+function setRecBtn(label,isRec){ var b=document.getElementById("recBtn"); if(!b)return; b.textContent=label; b.className="btn btn-rec"+(isRec?" recording":""); }
+
+function resetRecorder(){
+  try{if(mediaRecorder&&mediaRecorder.state!=="inactive")mediaRecorder.stop();}catch(e){}
+  try{if(micStream)micStream.getTracks().forEach(function(t){t.stop();});}catch(e){}
+  try{if(recognition)recognition.stop();}catch(e){}
+  clearInterval(recTimerInt);
+  mediaRecorder=null;micStream=null;recognition=null;recChunks=[];recSecs=0;recBlob=null;liveTranscript="";
+  if(recURL){URL.revokeObjectURL(recURL);recURL=null;}
+  setRecBtn("⏺ Start Recording");
+  var rt=document.getElementById("recTimer"); if(rt)rt.textContent="";
+  setRecStatus("Record your answer — key points will be checked.");
+  var a=document.getElementById("myRecording"); if(a){a.pause();a.removeAttribute("src");a.load();}
+  var rpr=document.getElementById("recPlayRow"); if(rpr)rpr.style.display="none";
+  var sp=document.getElementById("scorePanel"); if(sp)sp.style.display="none";
+}
+
+function scoreTranscript(transcript,kwList){
+  var t=transcript.toLowerCase();
+  return kwList.map(function(entry){ return {label:entry.label,hit:entry.must.some(function(w){return t.includes(w.toLowerCase());}),must:entry.must}; });
+}
+
+function showScorePanel(results,transcript){
+  var hits=results.filter(function(r){return r.hit;}).length,total=results.length;
+  var pct=Math.round(hits/total*100);
+  var tier=pct>=80?"s-great":pct>=50?"s-good":"s-low";
+  var msg=pct>=80?"Great answer! 🌟":pct>=50?"Good try — check missing points 📚":"Keep practising! 💪";
+  var ring=document.getElementById("scoreRing"); ring.className="score-ring "+tier;
+  document.getElementById("scorePct").textContent=pct+"%";
+  var msgEl=document.getElementById("scoreMsg"); msgEl.textContent=msg; msgEl.className="score-msg "+tier;
+  document.getElementById("scoreSub").textContent=hits+" / "+total+" key points said";
+  var rows=document.getElementById("kwRows"); rows.innerHTML="";
+  results.forEach(function(r){
+    var div=document.createElement("div"); div.className="kw-row "+(r.hit?"hit":"miss");
+    var chips=r.must.map(function(w){ var found=transcript.toLowerCase().includes(w.toLowerCase()); return "<span class=\"chip "+(found?"found":"missing")+"\">"+w+"</span>"; }).join("");
+    div.innerHTML="<span class=\"kw-dot\">"+(r.hit?"✅":"❌")+"</span><div class=\"kw-text\"><b>"+r.label+"</b><div class=\"kw-chips\">"+chips+"</div></div>";
+    rows.appendChild(div);
+  });
+  if(transcript.trim()){document.getElementById("transcriptText").textContent=transcript;document.getElementById("transcriptBox").style.display="block";}
+  else{document.getElementById("transcriptBox").style.display="none";}
+  var panel=document.getElementById("scorePanel"); panel.className="score-panel "+tier; panel.style.display="block";
+  // show reveal button after recording
+  document.getElementById("revealBtn").style.display="inline-flex";
+}
+
+async function toggleRecord(){
+  if(mediaRecorder&&mediaRecorder.state==="recording"){
+    mediaRecorder.stop();
+    try{if(recognition)recognition.stop();}catch(e){}
+    clearInterval(recTimerInt);
+    setRecBtn("⏺ Record Again");
+    setRecStatus("Processing…","#d97706");
+  } else {
+    var sp=document.getElementById("scorePanel"); if(sp)sp.style.display="none";
+    var a=document.getElementById("myRecording"); if(a){a.pause();a.removeAttribute("src");a.load();}
+    document.getElementById("recPlayRow").style.display="none";
+    recChunks=[];recSecs=0;recBlob=null;liveTranscript="";
+    if(recURL){URL.revokeObjectURL(recURL);recURL=null;}
+    try{
+      micStream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+    } catch(err){
+      setRecStatus(err.name==="NotAllowedError"?"⚠️ Microphone permission denied.":"⚠️ Cannot access microphone: "+err.message,"#dc2626");
+      return;
+    }
+    var mime=getBestMime();
+    try{mediaRecorder=new MediaRecorder(micStream,mime?{mimeType:mime}:{});}
+    catch(e){mediaRecorder=new MediaRecorder(micStream);}
+    mediaRecorder.ondataavailable=function(e){if(e.data&&e.data.size>0)recChunks.push(e.data);};
+    mediaRecorder.onstop=function(){
+      try{micStream.getTracks().forEach(function(t){t.stop();});}catch(e){}
+      if(!recChunks.length){setRecStatus("⚠️ No audio captured. Try again.","#dc2626");return;}
+      var bType=mediaRecorder.mimeType||mime||"audio/webm";
+      recBlob=new Blob(recChunks,{type:bType});recURL=URL.createObjectURL(recBlob);
+      var a=document.getElementById("myRecording"); a.src=recURL; a.load();
+      document.getElementById("recPlayRow").style.display="flex";
+      setRecStatus("✅ Recording ready — press ▶ to listen.","#16a34a");
+      if(currentOQ&&currentOQ.kw){
+        var results=scoreTranscript(liveTranscript,currentOQ.kw);
+        showScorePanel(results,liveTranscript);
+        oAnswered=true;
+        document.getElementById("oProgFill").style.width=((oIdx+1)/oralQuiz.length*100)+"%";
+      }
+    };
+    mediaRecorder.onerror=function(){setRecStatus("⚠️ Recording error.","#dc2626");clearInterval(recTimerInt);setRecBtn("⏺ Start Recording");};
+    mediaRecorder.start(100);
+    var SRClass=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(SRClass){
+      try{
+        recognition=new SRClass();recognition.lang="en-US";recognition.continuous=true;recognition.interimResults=true;
+        recognition.onresult=function(e){
+          var final="";
+          for(var i=0;i<e.results.length;i++){if(e.results[i].isFinal)final+=e.results[i][0].transcript+" ";}
+          if(final)liveTranscript=(liveTranscript+" "+final).trim();
+          setRecStatus("🔴 Recording… "+liveTranscript.slice(-50)+"…","#dc2626");
+        };
+        recognition.onerror=function(){};
+        recognition.start();
+      }catch(e){}
+    } else { setRecStatus("🔴 Recording… speak your answer now.","#dc2626"); }
+    setRecBtn("⏹ Stop Recording",true);
+    recSecs=0;
+    recTimerInt=setInterval(function(){
+      recSecs++;
+      var m=Math.floor(recSecs/60),s=String(recSecs%60).padStart(2,"0");
+      document.getElementById("recTimer").textContent=(m>0?m+":":"")+s+"s";
+      if(recSecs>=60){ mediaRecorder&&mediaRecorder.state==="recording"&&mediaRecorder.stop(); clearInterval(recTimerInt); }
+    },1000);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  COUNTDOWN
+// ═══════════════════════════════════════════════════════════════════
+(function(){
+  var examDate=new Date("2026-10-21T08:00:00+08:00");
+  function tick(){
+    var now=new Date(), diff=examDate-now;
+    var el=document.getElementById("cdDays"), msg=document.getElementById("cdMsg");
+    if(!el)return;
+    if(diff<=0){ el.textContent="0"; if(msg)msg.textContent="🎯 Exam day! You've got this, Howard!"; return; }
+    var days=Math.floor(diff/86400000), hrs=Math.floor((diff%86400000)/3600000), mins=Math.floor((diff%3600000)/60000);
+    el.textContent=days;
+    if(!msg)return;
+    if(days===0) msg.textContent="⚡ Today is the day! Last review time!";
+    else if(days===1) msg.textContent="🔥 One more day — go through all topics tonight!";
+    else if(days<=3) msg.textContent="📚 "+hrs+"h "+mins+"m left — keep practising!";
+    else msg.textContent="🌍 "+hrs+"h "+mins+"m remaining — steady progress wins!";
+  }
+  tick(); setInterval(tick,30000);
+})();
+
+// ═══════════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════════
+buildHomeCounts();
+document.getElementById("tabBar").style.display="block";
+</script>
+</body>
+</html>

@@ -1,0 +1,1771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#8E44AD">
+<title>Howard English Midterm 1151 ・ Grammar 筆試 + Live English 口試</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Nunito", system-ui, -apple-system, sans-serif;
+    background-color: #F5F0FA;
+    color: #222;
+    line-height: 1.5;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    font-size: 1.05rem;
+  }
+  button { font-family: inherit; cursor: pointer; border: none; }
+  input, textarea { font-family: inherit; font-size: 1.05rem; }
+  input:focus, textarea:focus { outline: none; }
+
+  .hero {
+    background: linear-gradient(135deg, #8E44AD 0%, #B06AC9 100%);
+    padding: 24px 20px 20px;
+    color: #FFF;
+    text-align: center;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 20px rgba(142, 68, 173, 0.25);
+  }
+  .hero-title {
+    font-family: "Fredoka", sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 4px;
+  }
+  .hero-sub { font-size: 13px; opacity: 0.95; font-weight: 600; }
+  .exam-date {
+    display: inline-block;
+    background: rgba(255,255,255,0.25);
+    padding: 6px 14px;
+    border-radius: 12px;
+    margin-top: 10px;
+    font-weight: 700;
+    font-size: 12.5px;
+  }
+
+  /* ------- HOME SCREEN GRID ------- */
+  .home-wrap { padding: 18px 14px 40px; max-width: 760px; margin: 0 auto; }
+  .home-intro {
+    text-align: center;
+    color: #6A2A8E;
+    font-weight: 700;
+    font-family: "Fredoka", sans-serif;
+    font-size: 18px;
+    margin: 6px 0 18px;
+  }
+  .home-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (min-width: 620px) {
+    .home-grid { grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  }
+  .home-card {
+    background: #FFF;
+    border: 2.5px solid #E8DAF2;
+    border-radius: 18px;
+    padding: 18px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    min-height: 140px;
+    text-align: center;
+    transition: transform 0.12s, box-shadow 0.12s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    position: relative;
+    overflow: hidden;
+  }
+  .home-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: var(--card-color, #8E44AD);
+  }
+  .home-card:active {
+    transform: scale(0.97);
+    box-shadow: 0 6px 16px rgba(142,68,173,0.18);
+  }
+  .home-card .icon {
+    font-size: 36px;
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--card-tint, #F3E8FA);
+    margin-top: 4px;
+  }
+  .home-card .label {
+    font-family: "Fredoka", sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #333;
+    line-height: 1.2;
+  }
+  .home-card .count {
+    font-size: 11.5px;
+    color: #888;
+    font-weight: 700;
+    background: #F5F0FA;
+    padding: 2px 10px;
+    border-radius: 10px;
+  }
+  .home-card.featured {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    justify-content: flex-start;
+    text-align: left;
+    gap: 14px;
+    min-height: 90px;
+    padding: 14px 18px;
+  }
+  .home-card.featured .icon { margin-top: 0; width: 54px; height: 54px; font-size: 30px; }
+  .home-card.featured .text-col {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+  }
+  .home-card.featured .sub {
+    font-size: 12.5px;
+    color: #666;
+    font-weight: 600;
+  }
+  .home-card.featured .arrow {
+    color: var(--card-color, #8E44AD);
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  /* ------- DRILL TOP BAR (replaces tab bar when in drill) ------- */
+  .drill-topbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: #FFF;
+    border-bottom: 2px solid #E8DAF2;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .back-btn {
+    background: #F3E8FA;
+    color: #6A2A8E;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 14px;
+    font-family: "Fredoka", sans-serif;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .drill-title {
+    font-family: "Fredoka", sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: #333;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .drill-header {
+    position: sticky;
+    top: 62px;
+    z-index: 40;
+    background: rgba(245, 240, 250, 0.95);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid #E8DAF2;
+  }
+  .progress-pill {
+    background: #FFF;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 12.5px;
+    color: #666;
+    border: 2px solid #E8DAF2;
+  }
+  .btn-finish {
+    background: #27AE60;
+    color: #FFF;
+    padding: 8px 14px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 13px;
+    min-height: 40px;
+    font-family: "Fredoka", sans-serif;
+    box-shadow: 0 2px 8px rgba(39,174,96,0.3);
+  }
+
+  .container { max-width: 760px; margin: 0 auto; padding: 16px; }
+
+  .question-card {
+    background: #FFF;
+    padding: 20px 18px;
+    border-radius: 16px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+    border: 2.5px solid #E8DAF2;
+    margin-bottom: 16px;
+  }
+  .q-type-tag {
+    display: inline-block;
+    background: #F3E8FA;
+    color: #6A2A8E;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    font-family: "Fredoka", sans-serif;
+    letter-spacing: 0.3px;
+  }
+  .q-prompt {
+    font-size: 16.5px;
+    line-height: 1.65;
+    font-weight: 500;
+    color: #222;
+    margin-bottom: 16px;
+    white-space: pre-wrap;
+  }
+
+  .match-opts-box {
+    background: #FFF9E8;
+    border: 2px dashed #E8C860;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    line-height: 1.85;
+    font-weight: 600;
+  }
+
+  .choices { display: flex; flex-direction: column; gap: 9px; }
+  .choice-btn {
+    text-align: left;
+    padding: 13px 15px;
+    border-radius: 12px;
+    border: 2.5px solid #E5E5E5;
+    background: #FFF;
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.15s;
+    width: 100%;
+  }
+  .choice-btn:not(:disabled):hover {
+    border-color: #B06AC9;
+    background: #F9F2FD;
+  }
+  .choice-btn:disabled { cursor: default; }
+  .choice-btn.picked { border-color: #8E44AD; background: #F3E8FA; }
+  .choice-btn.correct { border-color: #27AE60; background: #E8F8E8; }
+  .choice-btn.wrong { border-color: #E74C3C; background: #FFE4E4; }
+
+  .text-input {
+    width: 100%;
+    padding: 13px 15px;
+    border: 2.5px solid #CDB4E0;
+    border-radius: 12px;
+    background: #FEFBFF;
+    color: #333;
+    font-weight: 600;
+    font-size: 15.5px;
+    min-height: 50px;
+  }
+  .text-input.correct { border-color: #27AE60; background: #E8F8E8; }
+  .text-input.wrong { border-color: #E74C3C; background: #FFE4E4; }
+  .text-area {
+    width: 100%;
+    padding: 13px 15px;
+    border: 2.5px solid #CDB4E0;
+    border-radius: 12px;
+    background: #FEFBFF;
+    font-size: 15.5px;
+    font-weight: 500;
+    color: #333;
+    line-height: 1.6;
+    resize: vertical;
+    min-height: 65px;
+  }
+  .text-area.correct { border-color: #27AE60; background: #E8F8E8; }
+  .text-area.wrong { border-color: #E74C3C; background: #FFE4E4; }
+
+  .action-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(245, 240, 250, 0.97);
+    border-top: 2px solid #E8DAF2;
+    padding: 12px 14px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 20;
+  }
+  .action-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    gap: 8px;
+  }
+  .btn-main {
+    flex: 1;
+    padding: 14px;
+    color: #FFF;
+    border-radius: 12px;
+    font-size: 15.5px;
+    font-weight: 800;
+    font-family: "Fredoka", sans-serif;
+    min-height: 48px;
+  }
+  .btn-check { background: #8E44AD; box-shadow: 0 4px 14px rgba(142,68,173,0.3); }
+  .btn-check:disabled { opacity: 0.35; }
+  .btn-next { background: #27AE60; box-shadow: 0 4px 14px rgba(39,174,96,0.3); }
+  .btn-nav {
+    background: #FFF;
+    color: #8E44AD;
+    border: 2px solid #CDB4E0;
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 14.5px;
+    font-weight: 700;
+    min-height: 48px;
+    font-family: "Fredoka", sans-serif;
+    flex: 0 0 auto;
+  }
+  .btn-nav:disabled { opacity: 0.35; }
+
+  .feedback {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border-left: 5px solid;
+  }
+  .feedback.ok { background: #E8F8E8; border-left-color: #27AE60; }
+  .feedback.bad { background: #FFE4E4; border-left-color: #E74C3C; }
+  .feedback-title {
+    font-size: 16.5px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    font-family: "Fredoka", sans-serif;
+  }
+  .feedback.ok .feedback-title { color: #1B7A40; }
+  .feedback.bad .feedback-title { color: #C0392B; }
+  .ans-box {
+    background: #FFF4D6;
+    border: 2px solid #F5C518;
+    border-radius: 10px;
+    padding: 11px 13px;
+    margin-top: 8px;
+    font-weight: 700;
+    color: #7A5410;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* Mock exam dot bar */
+  .dot-bar {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    padding: 6px 10px;
+    flex-wrap: wrap;
+  }
+  .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #E8DAF2;
+  }
+  .dot.answered { background: #B06AC9; }
+  .dot.current { background: #8E44AD; transform: scale(1.3); box-shadow: 0 0 0 3px rgba(142,68,173,0.2); }
+
+  /* Result screen */
+  .result-card {
+    background: linear-gradient(135deg, #8E44AD 0%, #B06AC9 100%);
+    color: #FFF;
+    border-radius: 18px;
+    padding: 24px 20px;
+    text-align: center;
+    margin-bottom: 18px;
+  }
+  .result-stars { font-size: 32px; margin: 10px 0; }
+  .result-score {
+    font-family: "Fredoka", sans-serif;
+    font-size: 50px;
+    font-weight: 700;
+    line-height: 1;
+    margin: 6px 0;
+  }
+  .result-pct { font-size: 20px; font-weight: 700; }
+
+  .review-section {
+    margin-top: 20px;
+  }
+  .review-item {
+    background: #FFF;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 2px solid;
+    margin-bottom: 10px;
+  }
+  .review-item.wrong { border-color: #FFD0D0; }
+  .review-item.right { border-color: #D6F5E8; }
+  .review-q { font-size: 14px; color: #333; margin-bottom: 6px; white-space: pre-wrap; font-weight: 500; }
+  .review-your { font-size: 12.5px; padding: 5px 10px; border-radius: 8px; margin-bottom: 4px; background: #FFE4E4; }
+  .review-correct { font-size: 12.5px; padding: 5px 10px; border-radius: 8px; background: #E8F8E8; }
+
+  .btn-try-again {
+    display: block;
+    margin: 20px auto 0;
+    padding: 14px 28px;
+    background: #27AE60;
+    color: #FFF;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 800;
+    font-family: "Fredoka", sans-serif;
+    box-shadow: 0 4px 14px rgba(39,174,96,0.3);
+    min-height: 50px;
+  }
+
+  /* Oral styles */
+  .oral-warning {
+    background:#1a0a2a;
+    border:2px solid #a855f7;
+    color:#e9d5ff;
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:16px;
+    font-size:0.85rem;
+    line-height:1.7;
+  }
+  .oral-warning strong { color: #c084fc; }
+  .oral-card {
+    background: #FFF;
+    padding: 20px 18px;
+    border-radius: 16px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+    border: 2.5px solid #E8DAF2;
+    margin-bottom: 16px;
+  }
+  .oral-q {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    color: #222;
+    line-height: 1.6;
+  }
+  .oral-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .oral-btn {
+    background: #FFF;
+    color: #8E44AD;
+    border: 2px solid #CDB4E0;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 13.5px;
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .oral-btn.recording {
+    background: #E74C3C;
+    color: #FFF;
+    border-color: #C0392B;
+  }
+  .oral-btn:disabled { opacity: 0.4; }
+  .oral-status {
+    font-size: 12.5px;
+    color: #666;
+    margin-top: 4px;
+    min-height: 18px;
+  }
+  .oral-model {
+    background: #FFF9E8;
+    border-left: 4px solid #F5C518;
+    padding: 11px 14px;
+    border-radius: 10px;
+    margin-top: 10px;
+    font-style: italic;
+    color: #7A5410;
+    font-size: 14px;
+    line-height: 1.6;
+    display: none;
+  }
+  .oral-model.show { display: block; }
+</style>
+</head>
+<body>
+
+<div id="homeView">
+  <div class="hero">
+    <h1 class="hero-title">Howard's English Midterm Prep</h1>
+    <div class="hero-sub">Grammar 筆試 80% ・ Live English 口試 20% ・ Class Orchid</div>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px;">
+      <div class="exam-date">📝 Grammar 筆試 10/22 (Thu)</div>
+      <div class="exam-date">🗣️ Live English 口試 Week 8-9</div>
+    </div>
+  </div>
+  <div class="home-wrap">
+    <div class="home-intro">Pick a topic to practice ✨</div>
+    <div style="background:#FFF;border:2px dashed #CDB4E0;border-radius:12px;padding:10px 14px;margin:0 0 14px;font-size:12.5px;line-height:1.7;color:#555;">
+      📝 <strong style="color:#8E44AD;">Grammar 筆試 (80%)</strong> → Conditionals / Wish / Relative / Passive / Present Perfect / Reading / Mock Exam<br>
+      🗣️ <strong style="color:#9B59B6;">Live English 口試 (20%)</strong> → Live English Oral (Our World 6 U1-2)
+    </div>
+    <div class="home-grid" id="homeGrid"></div>
+  </div>
+</div>
+
+<div id="drillView" style="display:none;">
+  <div class="drill-topbar">
+    <button class="back-btn" id="backBtn">← Home</button>
+    <div class="drill-title" id="drillTitle">—</div>
+  </div>
+  <div class="drill-header" id="drillHeader">
+    <div class="progress-pill" id="progress">—</div>
+    <button class="btn-finish" id="btnFinish">⏹ Finish & Score</button>
+  </div>
+  <div class="container" id="container"></div>
+</div>
+
+<div class="action-bar" id="actionBar" style="display:none;">
+  <div class="action-inner" id="actionInner"></div>
+</div>
+
+<script>
+"use strict";
+
+// ============================================================
+// HELPERS
+// ============================================================
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+function buildMc(correct, wrongs) {
+  var slot = Math.floor(Math.random() * 3);
+  var texts = wrongs.slice();
+  texts.splice(slot, 0, correct);
+  return {
+    choices: ["A) " + texts[0], "B) " + texts[1], "C) " + texts[2]],
+    answer: ["A","B","C"][slot]
+  };
+}
+function norm(s) {
+  if (!s) return "";
+  var r = s.toLowerCase().trim();
+  r = r.replace(/[‘’`]/g, "'").replace(/[“”]/g, '"');
+  r = r.replace(/won't/g, "will not").replace(/can't/g, "cannot")
+       .replace(/isn't/g, "is not").replace(/aren't/g, "are not")
+       .replace(/wasn't/g, "was not").replace(/weren't/g, "were not")
+       .replace(/doesn't/g, "does not").replace(/don't/g, "do not")
+       .replace(/didn't/g, "did not").replace(/wouldn't/g, "would not")
+       .replace(/couldn't/g, "could not").replace(/shouldn't/g, "should not")
+       .replace(/hasn't/g, "has not").replace(/haven't/g, "have not")
+       .replace(/hadn't/g, "had not")
+       .replace(/it's/g, "it is").replace(/he's/g, "he is").replace(/she's/g, "she is")
+       .replace(/that's/g, "that is").replace(/there's/g, "there is")
+       .replace(/i'm/g, "i am").replace(/you're/g, "you are").replace(/they're/g, "they are")
+       .replace(/we're/g, "we are")
+       .replace(/'ll/g, " will").replace(/'ve/g, " have").replace(/'d/g, " would");
+  r = r.replace(/[.,!?;:]/g, "").replace(/\s+/g, " ").trim();
+  return r;
+}
+function matchAny(user, answers) {
+  var u = norm(user);
+  for (var i = 0; i < answers.length; i++) {
+    if (norm(answers[i]) === u) return true;
+  }
+  return false;
+}
+function esc(s) {
+  if (s === null || s === undefined) return "";
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+// ============================================================
+// QUESTION BANK — all drawn from Howard's uploaded materials
+// ============================================================
+var QBANK = [
+
+  // === CONDITIONALS (Pathway 6 U2) ===
+  // Picture-match from Book 6 U2 Part 1
+  { tab: "conditionals", type: "match", qType: "Match ending",
+    prompt: "If Holly is home, ___ .",
+    options: ["I would visit the pyramids", "it becomes caramel", "I'll invite her to the party", "I would take an umbrella"],
+    answer: "I'll invite her to the party" },
+  { tab: "conditionals", type: "match", qType: "Match ending",
+    prompt: "If I went to Egypt, ___ .",
+    options: ["I would visit the pyramids", "it becomes caramel", "I'll invite her to the party", "I would take an umbrella"],
+    answer: "I would visit the pyramids" },
+  { tab: "conditionals", type: "match", qType: "Match ending",
+    prompt: "If I were you (it's raining), ___ .",
+    options: ["I would visit the pyramids", "it becomes caramel", "I'll invite her to the party", "I would take an umbrella"],
+    answer: "I would take an umbrella" },
+  { tab: "conditionals", type: "match", qType: "Match ending",
+    prompt: "If you burn sugar, ___ .",
+    options: ["I would visit the pyramids", "it becomes caramel", "I'll invite her to the party", "I would take an umbrella"],
+    answer: "it becomes caramel" },
+
+  // Fill will/would/were/was/X from Book 6 U2 Part 2
+  { tab: "conditionals", type: "fill", qType: "Fill (will/would/were/was/X)",
+    prompt: "If you ___ drop an egg, it breaks.", answers: ["X", "x"] },
+  { tab: "conditionals", type: "fill", qType: "Fill (will/would/were/was/X)",
+    prompt: "I ___ make dinner for you if you come here tonight.", answers: ["will"] },
+  { tab: "conditionals", type: "fill", qType: "Fill (will/would/were/was/X)",
+    prompt: "If I ___ you, I would take a jacket.", answers: ["were"] },
+  { tab: "conditionals", type: "fill", qType: "Fill (will/would/were/was/X)",
+    prompt: "If Lisa ___ in France, she would see the Eiffel Tower!", answers: ["were"] },
+  { tab: "conditionals", type: "fill", qType: "Fill (will/would/were/was/X)",
+    prompt: "If my brother went to Scotland, he ___ learn to play bagpipes.", answers: ["would"] },
+
+  // Find & Fix (Book 6 U2 Part 3)
+  { tab: "conditionals", type: "fix", qType: "Find & Fix wrong word",
+    prompt: "If Paul went to Kenya, he GOES on a safari!\n(Correct the word: GOES → ?)",
+    answers: ["would go"] },
+  { tab: "conditionals", type: "fix", qType: "Find & Fix wrong word",
+    prompt: "She would do her homework if the power COMES back.\n(Correct the word: COMES → ?)",
+    answers: ["came"] },
+  { tab: "conditionals", type: "fix", qType: "Find & Fix wrong word",
+    prompt: "Ice MELT if you leave it in the sun.\n(Correct the word: MELT → ?)",
+    answers: ["melts"] },
+  { tab: "conditionals", type: "fix", qType: "Find & Fix wrong word",
+    prompt: "If I win the lottery, I WOULD spend all the money on myself.\n(Correct the word: WOULD → ?)",
+    answers: ["will"] },
+
+  // Unscramble (Book 6 U2 Part 4)
+  { tab: "conditionals", type: "unscramble", qType: "Unscramble",
+    prompt: "vegetables / If / ate / you / , / more / you / healthier / would / be / .",
+    answers: ["If you ate more vegetables, you would be healthier."] },
+  { tab: "conditionals", type: "unscramble", qType: "Unscramble",
+    prompt: "every / day / if / You / have / want / to / play / to / practice / you / well / .",
+    answers: ["You have to practice every day if you want to play well."] },
+  { tab: "conditionals", type: "unscramble", qType: "Unscramble",
+    prompt: "in the pool / We / swim / will / if / we / day / have / at my house / all / the / party / .",
+    answers: ["We will swim in the pool all day if we have the party at my house."] },
+  { tab: "conditionals", type: "unscramble", qType: "Unscramble",
+    prompt: "eat / the / great / if / they / burgers / lived / in / United / States / They / would / .",
+    answers: ["They would eat the great burgers if they lived in the United States."] },
+
+  // MC from Review sheet (restaurant MCQ 5-7)
+  (function(){ var r = buildMc("were", ["was", "have been"]);
+    return { tab: "conditionals", type: "mc", qType: "MC",
+      prompt: "If I ___ in New York, I would visit Times Square every weekend.",
+      choices: r.choices, answer: r.answer }; })(),
+  (function(){ var r = buildMc("misses", ["missed", "will miss"]);
+    return { tab: "conditionals", type: "mc", qType: "MC",
+      prompt: "If she ___ the train, she will be late for work.",
+      choices: r.choices, answer: r.answer }; })(),
+  (function(){ var r = buildMc("will get", ["got", "are getting"]);
+    return { tab: "conditionals", type: "mc", qType: "MC",
+      prompt: "If you study hard, you ___ much better results on the test.",
+      choices: r.choices, answer: r.answer }; })(),
+
+  // === WISH ===
+  { tab: "wish", type: "wish", qType: "Wish sentence",
+    prompt: "Fact: I am not the president.\n→ Use \"I wish ...\"",
+    answers: ["I wish I were the president.", "I wish I was the president."] },
+  { tab: "wish", type: "wish", qType: "Wish sentence",
+    prompt: "Fact: She doesn't live in Japan.\n→ Use \"She wishes ...\"",
+    answers: ["She wishes she lived in Japan."] },
+  { tab: "wish", type: "wish", qType: "Wish sentence",
+    prompt: "Fact: He was late for school.\n→ Use \"He wishes ...\"",
+    answers: ["He wishes he weren't late for school.", "He wishes he wasn't late for school.", "He wishes he hadn't been late for school."] },
+  { tab: "wish", type: "wish", qType: "Wish sentence",
+    prompt: "Fact: They can't speak French.\n→ Use \"They wish ...\"",
+    answers: ["They wish they could speak French."] },
+  { tab: "wish", type: "wish", qType: "Wish sentence",
+    prompt: "Fact: They don't have enough tissue.\n→ Use \"They wish ...\"",
+    answers: ["They wish they had enough tissue."] },
+  { tab: "wish", type: "wish", qType: "Wish sentence",
+    prompt: "Fact: I am not an astronaut.\n→ Use \"I wish ...\"",
+    answers: ["I wish I were an astronaut.", "I wish I was an astronaut."] },
+  { tab: "wish", type: "wish", qType: "Wish sentence",
+    prompt: "Fact: Tina is tall.\n→ Use \"Tina wishes ...\"",
+    answers: ["Tina wishes she weren't tall.", "Tina wishes she wasn't tall.", "Tina wishes she were shorter.", "Tina wishes she was shorter."] },
+  { tab: "wish", type: "wish", qType: "Wish sentence",
+    prompt: "Fact: John doesn't have a piano.\n→ Use \"John wishes ...\"",
+    answers: ["John wishes he had a piano."] },
+  { tab: "wish", type: "wish", qType: "Wish sentence",
+    prompt: "Fact: The children have too much trash.\n→ Use \"The children wish ...\"",
+    answers: ["The children wish they didn't have too much trash."] },
+  { tab: "wish", type: "wish", qType: "Wish sentence",
+    prompt: "Fact: Sandy is a teacher.\n→ Use \"Sandy wishes ...\"",
+    answers: ["Sandy wishes she weren't a teacher.", "Sandy wishes she wasn't a teacher."] },
+  { tab: "wish", type: "wish", qType: "Wish sentence",
+    prompt: "Fact: Tom isn't strong.\n→ Use \"Tom wishes ...\"",
+    answers: ["Tom wishes he were strong.", "Tom wishes he was strong."] },
+  { tab: "wish", type: "wish", qType: "Wish sentence",
+    prompt: "Fact: The children don't have a park.\n→ Use \"The children wish ...\"",
+    answers: ["The children wish they had a park."] },
+  { tab: "wish", type: "wish", qType: "Wish sentence",
+    prompt: "Fact: The teachers don't have a longer vacation.\n→ Use \"The teachers wish ...\"",
+    answers: ["The teachers wish they had a longer vacation."] },
+  { tab: "wish", type: "wish", qType: "Wish sentence",
+    prompt: "Fact: The scientists have a lot of problems.\n→ Use \"The scientists wish ...\"",
+    answers: ["The scientists wish they didn't have a lot of problems."] },
+  { tab: "wish", type: "wish", qType: "Wish sentence",
+    prompt: "Fact: Zoey doesn't have a nice bike.\n→ Use \"Zoey wishes ...\"",
+    answers: ["Zoey wishes she had a nice bike."] },
+  { tab: "wish", type: "wish", qType: "Wish sentence",
+    prompt: "Fact: Sam is too tall.\n→ Use \"Sam wishes ...\"",
+    answers: ["Sam wishes he weren't too tall.", "Sam wishes he wasn't too tall."] },
+  { tab: "wish", type: "wish", qType: "Wish sentence",
+    prompt: "Fact: I am not a zoologist.\n→ Use \"I wish ...\"",
+    answers: ["I wish I were a zoologist.", "I wish I was a zoologist."] },
+  { tab: "wish", type: "wish", qType: "Wish sentence",
+    prompt: "Fact: The teachers have a lot of work.\n→ Use \"The teachers wish ...\"",
+    answers: ["The teachers wish they didn't have a lot of work."] },
+  { tab: "wish", type: "wish", qType: "Wish sentence",
+    prompt: "Fact: Bella doesn't have a huge house.\n→ Use \"Bella wishes ...\"",
+    answers: ["Bella wishes she had a huge house."] },
+  { tab: "wish", type: "wish", qType: "Wish sentence",
+    prompt: "Fact: Jeff is thin.\n→ Use \"Jeff wishes ...\"",
+    answers: ["Jeff wishes he weren't thin.", "Jeff wishes he wasn't thin."] },
+  { tab: "wish", type: "wish", qType: "Wish sentence",
+    prompt: "Fact: I am not a musician.\n→ Use \"I wish ...\"",
+    answers: ["I wish I were a musician.", "I wish I was a musician."] },
+  { tab: "wish", type: "unscramble", qType: "Unscramble wish",
+    prompt: "think / nothing / you / there / was / do / I / wish / could / you / didn't / .",
+    answers: ["I wish you didn't think there was nothing you could do."] },
+  { tab: "wish", type: "fix", qType: "Find & Fix wrong word",
+    prompt: "I wish my dad IS a famous movie star.\n(Correct: IS → ?)",
+    answers: ["were", "was"] },
+
+  // === RELATIVE PRONOUNS ===
+  (function(){ var r = buildMc("which", ["where", "who"]);
+    return { tab: "relative", type: "mc", qType: "MC relative pronoun",
+      prompt: "The movie ___ was directed by Spielberg won several awards.",
+      choices: r.choices, answer: r.answer }; })(),
+  (function(){ var r = buildMc("where", ["which", "what"]);
+    return { tab: "relative", type: "mc", qType: "MC relative pronoun",
+      prompt: "The hotel ___ we stayed during our trip was very expensive.",
+      choices: r.choices, answer: r.answer }; })(),
+  { tab: "relative", type: "combine", qType: "Combine with relative pronoun",
+    prompt: "The apple pie was delicious. / My grandma baked the apple pie for my birthday.",
+    answers: [
+      "The apple pie which my grandma baked for my birthday was delicious.",
+      "The apple pie that my grandma baked for my birthday was delicious."
+    ] },
+  { tab: "relative", type: "combine", qType: "Combine with relative pronoun",
+    prompt: "This is a stadium. / People hold sports events and musical concerts there.",
+    answers: ["This is a stadium where people hold sports events and musical concerts."] },
+  { tab: "relative", type: "combine", qType: "Combine with relative pronoun",
+    prompt: "Tim Cook is a chief executive officer. / He makes major decisions for Apple Inc.",
+    answers: [
+      "Tim Cook is a chief executive officer who makes major decisions for Apple Inc.",
+      "Tim Cook is a chief executive officer that makes major decisions for Apple Inc."
+    ] },
+  { tab: "relative", type: "combine", qType: "Combine with relative pronoun",
+    prompt: "The doctor was nice. / I met the doctor yesterday.",
+    answers: [
+      "The doctor who I met yesterday was nice.",
+      "The doctor whom I met yesterday was nice.",
+      "The doctor that I met yesterday was nice."
+    ] },
+  { tab: "relative", type: "combine", qType: "Combine with relative pronoun",
+    prompt: "Japan is the country. / Japan has a lot of cherry blossom trees.",
+    answers: [
+      "Japan is the country which has a lot of cherry blossom trees.",
+      "Japan is the country that has a lot of cherry blossom trees."
+    ] },
+  { tab: "relative", type: "combine", qType: "Combine with relative pronoun",
+    prompt: "Donald Trump is a man. / Donald Trump has a lot of military power.",
+    answers: [
+      "Donald Trump is a man who has a lot of military power.",
+      "Donald Trump is a man that has a lot of military power."
+    ] },
+  { tab: "relative", type: "combine", qType: "Combine with relative pronoun",
+    prompt: "This is the tea house. / I tasted the best green tea in this tea house.",
+    answers: ["This is the tea house where I tasted the best green tea."] },
+  { tab: "relative", type: "combine", qType: "Combine with relative pronoun",
+    prompt: "Michael is a boy. / Michael built a huge Lego model.",
+    answers: [
+      "Michael is a boy who built a huge Lego model.",
+      "Michael is a boy that built a huge Lego model."
+    ] },
+  { tab: "relative", type: "combine", qType: "Combine with relative pronoun",
+    prompt: "Brazil is the country. / Brazil grows a lot of coffee shrubs.",
+    answers: [
+      "Brazil is the country which grows a lot of coffee shrubs.",
+      "Brazil is the country that grows a lot of coffee shrubs."
+    ] },
+  { tab: "relative", type: "combine", qType: "Combine with relative pronoun",
+    prompt: "William Lai is a man. / William Lai gave a speech on Double Tenth.",
+    answers: [
+      "William Lai is a man who gave a speech on Double Tenth.",
+      "William Lai is a man that gave a speech on Double Tenth."
+    ] },
+  { tab: "relative", type: "combine", qType: "Combine with relative pronoun",
+    prompt: "This is the school. / I met my best friends here.",
+    answers: ["This is the school where I met my best friends."] },
+  { tab: "relative", type: "combine", qType: "Combine with relative pronoun",
+    prompt: "Tina is a girl. / Tina won several medals.",
+    answers: [
+      "Tina is a girl who won several medals.",
+      "Tina is a girl that won several medals."
+    ] },
+  { tab: "relative", type: "combine", qType: "Combine with relative pronoun",
+    prompt: "Lisa is a college student. / She writes and publishes traveling journals.",
+    answers: [
+      "Lisa is a college student who writes and publishes traveling journals.",
+      "Lisa is a college student that writes and publishes traveling journals."
+    ] },
+  { tab: "relative", type: "combine", qType: "Combine with relative pronoun",
+    prompt: "This is the park. / I learned to ride my first bicycle in the park.",
+    answers: ["This is the park where I learned to ride my first bicycle."] },
+  { tab: "relative", type: "combine", qType: "Combine with relative pronoun",
+    prompt: "This is the restaurant. / I ate pasta for the first time in the restaurant.",
+    answers: ["This is the restaurant where I ate pasta for the first time."] },
+  { tab: "relative", type: "combine", qType: "Combine with relative pronoun",
+    prompt: "Bill Gates is a computer genius. / Bill Gates started a company.",
+    answers: [
+      "Bill Gates is a computer genius who started a company.",
+      "Bill Gates is a computer genius that started a company."
+    ] },
+  { tab: "relative", type: "combine", qType: "Combine with relative pronoun",
+    prompt: "Taiwan is the country. / Taiwan has the most friendly people in Asia.",
+    answers: [
+      "Taiwan is the country which has the most friendly people in Asia.",
+      "Taiwan is the country that has the most friendly people in Asia."
+    ] },
+  { tab: "relative", type: "combine", qType: "Combine with relative pronoun",
+    prompt: "Kevin is the student. / He has a lot of brilliant ideas.",
+    answers: [
+      "Kevin is the student who has a lot of brilliant ideas.",
+      "Kevin is the student that has a lot of brilliant ideas."
+    ] },
+
+  // === PASSIVE VOICE ===
+  (function(){ var r = buildMc("has been translated", ["was translated", "translated"]);
+    return { tab: "passive", type: "mc", qType: "MC passive voice",
+      prompt: "This novel ___ into many languages over the years.",
+      choices: r.choices, answer: r.answer }; })(),
+  (function(){ var r = buildMc("was shared", ["shared", "had share"]);
+    return { tab: "passive", type: "mc", qType: "MC passive voice",
+      prompt: "A lot of useful information ___ during the meeting yesterday.",
+      choices: r.choices, answer: r.answer }; })(),
+  { tab: "passive", type: "rewrite_passive", qType: "Rewrite in passive",
+    prompt: "Rewrite in passive voice:\nThe waiter brought a giant menu that looked heavier than the table.",
+    answers: ["A giant menu that looked heavier than the table was brought by the waiter."] },
+  { tab: "passive", type: "rewrite_passive", qType: "Rewrite in passive",
+    prompt: "Rewrite in passive voice:\nMy friend ordered spaghetti and some meatballs.",
+    answers: ["Spaghetti and some meatballs were ordered by my friend."] },
+  { tab: "passive", type: "rewrite_passive", qType: "Rewrite in passive",
+    prompt: "Rewrite in passive voice:\nI ate a whole cheese pizza.",
+    answers: ["A whole cheese pizza was eaten by me."] },
+  { tab: "passive", type: "rewrite_passive", qType: "Rewrite in passive",
+    prompt: "Rewrite in passive voice:\nThe manager gave us some free chicken fingers.",
+    answers: [
+      "Some free chicken fingers were given to us by the manager.",
+      "We were given some free chicken fingers by the manager."
+    ] },
+  (function(){ var r = buildMc("is spoken", ["spoke", "speaks"]);
+    return { tab: "passive", type: "mc", qType: "MC passive voice",
+      prompt: "English ___ in many countries around the world.",
+      choices: r.choices, answer: r.answer }; })(),
+  (function(){ var r = buildMc("were built", ["built", "are built"]);
+    return { tab: "passive", type: "mc", qType: "MC passive voice",
+      prompt: "The pyramids ___ thousands of years ago.",
+      choices: r.choices, answer: r.answer }; })(),
+  { tab: "passive", type: "rewrite_passive", qType: "Rewrite in passive",
+    prompt: "Rewrite in passive voice:\nMy grandma baked the apple pie for my birthday.",
+    answers: ["The apple pie was baked by my grandma for my birthday."] },
+  { tab: "passive", type: "rewrite_passive", qType: "Rewrite in passive",
+    prompt: "Rewrite in passive voice:\nSpielberg directed the movie.",
+    answers: ["The movie was directed by Spielberg."] },
+
+  // Passive + by + agent (from Terracotta Army oral worksheet)
+  { tab: "passive", type: "fill", qType: "Fill passive (+by)",
+    prompt: "Around 246 BCE, about 700,000 men ___ (hire) by the Chinese ruler Qin Shihuang to make an army.",
+    answers: ["were hired"] },
+  { tab: "passive", type: "fill", qType: "Fill passive (+by)",
+    prompt: "Thousands of statues ___ (make) by the men.",
+    answers: ["were made"] },
+  { tab: "passive", type: "fill", qType: "Fill passive (+by)",
+    prompt: "When he died in 210 BCE, the statues ___ (bury) with him in a tomb.",
+    answers: ["were buried"] },
+  { tab: "passive", type: "fill", qType: "Fill passive (+by)",
+    prompt: "This treasure ___ (forget) for centuries.",
+    answers: ["was forgotten"] },
+  { tab: "passive", type: "fill", qType: "Fill passive (+by)",
+    prompt: "But in 1974 it ___ (find) by Chinese farmers!",
+    answers: ["was found"] },
+  { tab: "passive", type: "fill", qType: "Fill passive (+by)",
+    prompt: "When the site ___ (excavate) by archaeologists, more than 6,000 statues ___ (discover).",
+    answers: ["was excavated / were discovered", "was excavated/were discovered"] },
+  { tab: "passive", type: "fill", qType: "Fill passive (+by)",
+    prompt: "The statues ___ (paint) in different colors, but now the colors are gone.",
+    answers: ["were painted"] },
+
+  // === READING (Pip & Flicker) ===
+  { tab: "reading", type: "rc_sentence", qType: "Reading comprehension",
+    prompt: "What did Pip pack for his lunch?",
+    answers: [
+      "Pip packed a small lunch of clover leaves.",
+      "He packed a small lunch of clover leaves.",
+      "Pip packed clover leaves for his lunch.",
+      "He packed clover leaves."
+    ] },
+  { tab: "reading", type: "rc_sentence", qType: "Reading comprehension",
+    prompt: "Why couldn't Flicker fly back to her nest?",
+    answers: [
+      "Flicker had a broken wing.",
+      "Flicker couldn't fly back because she had a broken wing.",
+      "She couldn't fly back because she had a broken wing.",
+      "Flicker had fallen from her nest and her wing was broken."
+    ] },
+  { tab: "reading", type: "rc_sentence", qType: "Reading comprehension",
+    prompt: "How did Pip manage to climb the tree to reach Flicker?",
+    answers: [
+      "Pip climbed the tree using his strong back legs to push himself up.",
+      "He climbed the tree using his strong back legs.",
+      "He used his strong back legs to push himself up.",
+      "He carefully climbed the tree using his strong back legs."
+    ] },
+  { tab: "reading", type: "rc_sentence", qType: "Reading comprehension",
+    prompt: "Why do you think Pip showed Flicker her reflection in the pond?",
+    answers: [
+      "Pip wanted to show Flicker that she was a beautiful bird.",
+      "He wanted to cheer her up.",
+      "He wanted her to see she was a beautiful bird.",
+      "He wanted to make Flicker feel better about herself."
+    ] },
+  { tab: "reading", type: "rc_sentence", qType: "Reading comprehension",
+    prompt: "What is the main lesson Pip learned at the end of his adventure?",
+    answers: [
+      "Pip learned that helping others was the most rewarding adventure of all.",
+      "Helping others was the most rewarding adventure.",
+      "He learned that helping others is the most rewarding adventure of all."
+    ] },
+
+  // === PRESENT PERFECT (Our World 6 U1-2 Oral support) ===
+  { tab: "pp", type: "fill", qType: "Fill present perfect (for/since)",
+    prompt: "They ___ skateboarding ___ three o'clock.\n(Fill both blanks: have/has verb + for/since)",
+    answers: ["have been / since", "have been/since"] },
+  { tab: "pp", type: "fill", qType: "Fill present perfect (for/since)",
+    prompt: "He ___ English ___ two years.\n(Fill both blanks)",
+    answers: ["has studied / for", "has studied/for"] },
+  { tab: "pp", type: "fill", qType: "Fill present perfect (for/since)",
+    prompt: "I ___ how to ride a bike ___ I was three.\n(Fill both blanks)",
+    answers: ["have known / since", "have known/since"] },
+  { tab: "pp", type: "fill", qType: "Fill present perfect (for/since)",
+    prompt: "They stopped doing extreme sports. They ___ kitesurfing ___ last July.\n(Fill both blanks)",
+    answers: ["have not been / since", "haven't been / since", "have not been/since", "haven't been/since"] },
+  { tab: "pp", type: "fill", qType: "Fill present perfect (for/since)",
+    prompt: "He ___ skiing ___ several winters.\n(Fill both blanks — he hasn't gone skiing)",
+    answers: ["has not gone / for", "hasn't gone / for", "has not gone/for", "hasn't gone/for"] },
+  (function(){ var r = buildMc("for", ["since", "from"]);
+    return { tab: "pp", type: "mc", qType: "MC for or since",
+      prompt: "I have lived in Taichung ___ ten years.",
+      choices: r.choices, answer: r.answer }; })(),
+  (function(){ var r = buildMc("since", ["for", "in"]);
+    return { tab: "pp", type: "mc", qType: "MC for or since",
+      prompt: "She has studied piano ___ 2020.",
+      choices: r.choices, answer: r.answer }; })(),
+  (function(){ var r = buildMc("has lived", ["lived", "lives"]);
+    return { tab: "pp", type: "mc", qType: "MC present perfect",
+      prompt: "He ___ in Taipei for five years.",
+      choices: r.choices, answer: r.answer }; })(),
+  (function(){ var r = buildMc("have known", ["knew", "know"]);
+    return { tab: "pp", type: "mc", qType: "MC present perfect",
+      prompt: "I ___ my best friend since kindergarten.",
+      choices: r.choices, answer: r.answer }; })()
+];
+
+// Reading passage shown in reading tab
+var READING_PASSAGE = "Once upon a time, in a cozy little burrow, lived a small, fluffy bunny named Pip. Pip loved to munch on crunchy carrots and hop through fields of dandelions. One sunny morning, he decided to explore a part of the forest he had never seen before. He packed a small lunch of clover leaves and began his adventure.\n\nAs Pip hopped along, he noticed a tiny bird with a broken wing chirping sadly on a branch. The bird, whose name was Flicker, had fallen from her nest and couldn't fly back up. Pip's heart ached with sadness. He knew he had to help. He carefully climbed the tree, using his strong back legs to push himself up. It was tricky, but he didn't give up.\n\nFinally, he reached Flicker. He gently nudged her onto his back. With great care, he slowly made his way down the tree. Once on the ground, he hopped to a nearby pond and showed Flicker a reflection of herself. \"You're a beautiful bird, Flicker,\" he whispered. \"We'll get you home.\" With a bit of teamwork, they found a way to help Flicker fly again. Pip learned that helping others was the most rewarding adventure of all.";
+
+// Oral prompts — from Our World 6 Units 1 & 2 Oral Exam Notes (student's actual sheet)
+var ORAL_PROMPTS = [
+  { prompt: "How long have you known your teacher?",
+    model: "I have known Tr. Maple for one year." },
+  { prompt: "How long have you been at Ming Der?",
+    model: "I have been at Ming Der for five years." },
+  { prompt: "How long have you known how to write the English alphabet?",
+    model: "I've known how to write the English alphabet since I was in kindergarten." },
+  { prompt: "What sport or activity do you do? How long have you done it?",
+    model: "I play volleyball. I've played it for two years." },
+  { prompt: "How long have you lived in your house?",
+    model: "I have lived in my house for about ten years." },
+  { prompt: "How long have you studied English?",
+    model: "I have studied English since I was in kindergarten." },
+  // Passive voice oral (from Terracotta Army + Iceman sheet)
+  { prompt: "When was the Iceman discovered by hikers?",
+    model: "The Iceman was discovered by hikers in 1991." },
+  { prompt: "How long was the Iceman preserved by ice?",
+    model: "He was preserved by ice for 5,000 years." },
+  { prompt: "Who was the Iceman's body analyzed by for ten years?",
+    model: "His body was analyzed by scientists for ten years." },
+  { prompt: "Where was the injury found on the Iceman's body?",
+    model: "It was found on his arm." },
+  { prompt: "When was the Iceman checked by doctors using a new CT scan machine?",
+    model: "He was checked by doctors using a new CT scan machine in 2005." },
+  { prompt: "Who were the Terracotta Army statues made by?",
+    model: "They were made by about 700,000 men who were hired by the Chinese ruler Qin Shihuang." }
+];
+
+// ============================================================
+// STATE
+// ============================================================
+var TABS = [
+  { id: "conditionals", label: "Conditionals",      icon: "🔀", color: "#8E44AD", tint: "#F3E8FA", sub: "If-sentences (Zero/First/Second)" },
+  { id: "wish",         label: "Wish",              icon: "🌟", color: "#E67E22", tint: "#FDEBD6", sub: "Fact → Wish sentences" },
+  { id: "relative",     label: "Relative",          icon: "🔗", color: "#3498DB", tint: "#D7EBF8", sub: "who / which / that / where" },
+  { id: "passive",      label: "Passive",           icon: "🔄", color: "#27AE60", tint: "#D5F2E0", sub: "Rewrite in passive voice" },
+  { id: "pp",           label: "Present Perfect",   icon: "⏰", color: "#16A085", tint: "#D0F0E8", sub: "for / since (Our World U1-2)" },
+  { id: "reading",      label: "Reading",           icon: "📖", color: "#D35400", tint: "#FADFC9", sub: "Pip & Flicker passage" },
+  { id: "mock",         label: "Mock Exam",         icon: "🎯", color: "#C0392B", tint: "#FADBD8", sub: "30 random questions ・ one-per-page", featured: true },
+  { id: "oral",         label: "Live English Oral", icon: "🗣️", color: "#9B59B6", tint: "#EEDAF7", sub: "Our World 6 U1 Sports + U2 Mystery ・ 20%", featured: true }
+];
+
+var state = {
+  currentTab: null,   // null = home screen
+  queue: [],
+  index: 0,
+  userAnswer: null,
+  checked: false,
+  isCorrect: false,
+  results: [],      // for mock & topic drills
+  mockAnswers: {},  // index → user answer (so Prev/Next preserves)
+  done: false
+};
+
+function tabQuestionCount(id) {
+  if (id === "mock") return "30 Qs";
+  if (id === "oral") return ORAL_PROMPTS.length + " Qs";
+  var n = QBANK.filter(function(q) { return q.tab === id; }).length;
+  return n + " Qs";
+}
+
+// Oral state (separate from drill)
+var oralState = {
+  queue: [],
+  idx: 0,
+  mediaRecorder: null,
+  audioChunks: [],
+  mime: "",
+  recordings: {}   // idx → blob URL
+};
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderHome() {
+  document.getElementById("homeView").style.display = "block";
+  document.getElementById("drillView").style.display = "none";
+  var grid = document.getElementById("homeGrid");
+  grid.innerHTML = "";
+  TABS.forEach(function(t) {
+    var card = document.createElement("div");
+    card.className = "home-card" + (t.featured ? " featured" : "");
+    card.style.setProperty("--card-color", t.color);
+    card.style.setProperty("--card-tint", t.tint);
+
+    if (t.featured) {
+      card.innerHTML =
+        "<div class='icon'>" + t.icon + "</div>" +
+        "<div class='text-col'>" +
+          "<div class='label' style='font-size:16px;'>" + esc(t.label) + "</div>" +
+          "<div class='sub'>" + esc(t.sub) + " ・ " + tabQuestionCount(t.id) + "</div>" +
+        "</div>" +
+        "<div class='arrow'>›</div>";
+    } else {
+      card.innerHTML =
+        "<div class='icon'>" + t.icon + "</div>" +
+        "<div class='label'>" + esc(t.label) + "</div>" +
+        "<div class='count'>" + tabQuestionCount(t.id) + "</div>";
+    }
+    card.onclick = function() { switchTab(t.id); };
+    grid.appendChild(card);
+  });
+  // scroll to top when returning home
+  window.scrollTo(0, 0);
+}
+
+function switchTab(id) {
+  state.currentTab = id;
+  loadTab();
+  // show drill view
+  document.getElementById("homeView").style.display = "none";
+  document.getElementById("drillView").style.display = "block";
+  // update drill title
+  var meta = TABS.find(function(t) { return t.id === id; });
+  document.getElementById("drillTitle").textContent = (meta ? meta.icon + " " + meta.label : "");
+  renderMain();
+  window.scrollTo(0, 0);
+}
+
+function goHome() {
+  state.currentTab = null;
+  renderHome();
+}
+
+function loadTab() {
+  state.index = 0;
+  state.userAnswer = null;
+  state.checked = false;
+  state.isCorrect = false;
+  state.results = [];
+  state.mockAnswers = {};
+  state.done = false;
+
+  if (state.currentTab === "mock") {
+    var pool = QBANK.filter(function(q) { return q.tab !== "oral" && q.tab !== "reading"; });
+    state.queue = shuffle(pool).slice(0, Math.min(30, pool.length));
+  } else if (state.currentTab === "oral") {
+    oralState.queue = shuffle(ORAL_PROMPTS);
+    oralState.idx = 0;
+    oralState.recordings = {};
+  } else {
+    state.queue = shuffle(QBANK.filter(function(q) { return q.tab === state.currentTab; }));
+  }
+}
+
+function renderMain() {
+  var container = document.getElementById("container");
+  var drillHeader = document.getElementById("drillHeader");
+  var actionBar = document.getElementById("actionBar");
+  var progress = document.getElementById("progress");
+  var btnFinish = document.getElementById("btnFinish");
+
+  if (state.currentTab === "oral") {
+    drillHeader.style.display = "none";
+    actionBar.style.display = "none";
+    renderOral();
+    return;
+  }
+
+  if (state.done) {
+    drillHeader.style.display = "none";
+    actionBar.style.display = "none";
+    renderResults();
+    return;
+  }
+
+  drillHeader.style.display = "flex";
+  btnFinish.onclick = function() {
+    if (confirm("Finish now? You'll see your score for the questions you've answered so far.")) {
+      state.done = true;
+      renderMain();
+    }
+  };
+
+  if (state.queue.length === 0) {
+    container.innerHTML = "<div class='question-card'>No questions in this tab.</div>";
+    actionBar.style.display = "none";
+    return;
+  }
+
+  var q = state.queue[state.index];
+  var isMock = state.currentTab === "mock";
+
+  // Mock: show dot bar + progress
+  progress.textContent = (state.index + 1) + " / " + state.queue.length +
+    (isMock ? " (Mock Exam)" : "");
+
+  container.innerHTML = "";
+
+  if (isMock) {
+    // Dot bar
+    var dots = document.createElement("div");
+    dots.className = "dot-bar";
+    for (var i = 0; i < state.queue.length; i++) {
+      var dot = document.createElement("div");
+      dot.className = "dot" + (i === state.index ? " current" : (state.mockAnswers[i] !== undefined ? " answered" : ""));
+      dots.appendChild(dot);
+    }
+    container.appendChild(dots);
+    // In mock mode, restore any saved answer
+    if (state.mockAnswers[state.index] !== undefined) {
+      state.userAnswer = state.mockAnswers[state.index];
+    } else {
+      state.userAnswer = null;
+    }
+    state.checked = false;
+    state.isCorrect = false;
+  }
+
+  container.appendChild(renderCard(q));
+
+  // Action bar
+  actionBar.style.display = "block";
+  var inner = document.getElementById("actionInner");
+  inner.innerHTML = "";
+
+  if (isMock) {
+    // Prev + Next
+    var prevBtn = document.createElement("button");
+    prevBtn.className = "btn-nav";
+    prevBtn.textContent = "← Prev";
+    prevBtn.disabled = state.index === 0;
+    prevBtn.onclick = function() {
+      saveMockAnswer();
+      state.index--;
+      renderMain();
+    };
+    inner.appendChild(prevBtn);
+
+    var nextBtn = document.createElement("button");
+    nextBtn.className = "btn-main btn-check";
+    if (state.index === state.queue.length - 1) {
+      nextBtn.textContent = "Submit & Score 🏆";
+      nextBtn.className = "btn-main btn-next";
+      nextBtn.onclick = function() {
+        saveMockAnswer();
+        state.done = true;
+        renderMain();
+      };
+    } else {
+      nextBtn.textContent = "Next →";
+      nextBtn.onclick = function() {
+        saveMockAnswer();
+        state.index++;
+        renderMain();
+      };
+    }
+    inner.appendChild(nextBtn);
+  } else {
+    // Normal drill: Check then Next
+    if (!state.checked) {
+      var checkBtn = document.createElement("button");
+      checkBtn.className = "btn-main btn-check";
+      checkBtn.textContent = "Check Answer";
+      checkBtn.id = "btnCheck";
+      checkBtn.disabled = !hasAnswer();
+      checkBtn.onclick = checkAnswer;
+      inner.appendChild(checkBtn);
+    } else {
+      var nextBtn2 = document.createElement("button");
+      nextBtn2.className = "btn-main btn-next";
+      nextBtn2.textContent = (state.index === state.queue.length - 1) ? "Finish & Score 🏆" : "Next →";
+      nextBtn2.onclick = function() {
+        if (state.index === state.queue.length - 1) {
+          state.done = true;
+          renderMain();
+        } else {
+          state.index++;
+          state.userAnswer = null;
+          state.checked = false;
+          state.isCorrect = false;
+          renderMain();
+        }
+      };
+      inner.appendChild(nextBtn2);
+    }
+  }
+}
+
+function hasAnswer() {
+  if (state.userAnswer === null || state.userAnswer === undefined) return false;
+  if (typeof state.userAnswer === "string") return state.userAnswer.trim() !== "";
+  return true;
+}
+
+function renderCard(q) {
+  var card = document.createElement("div");
+  card.className = "question-card";
+
+  // Reading passage
+  if (state.currentTab === "reading" && state.index === 0 && !state.checked) {
+    var p = document.createElement("div");
+    p.style.cssText = "background:#FFF9E8;border:2px dashed #E8C860;padding:14px 16px;border-radius:12px;margin-bottom:14px;font-size:14px;line-height:1.7;white-space:pre-wrap;";
+    p.innerHTML = "<strong style='color:#8E44AD;'>📖 Pip the Bunny</strong><br><br>" + esc(READING_PASSAGE);
+    card.appendChild(p);
+  } else if (state.currentTab === "reading" && state.index > 0) {
+    var hint = document.createElement("div");
+    hint.style.cssText = "background:#F3E8FA;padding:7px 11px;border-radius:9px;margin-bottom:10px;font-size:12px;color:#6A2A8E;";
+    hint.textContent = "💡 Scroll to Q1 to re-read the passage.";
+    card.appendChild(hint);
+  }
+
+  var tag = document.createElement("div");
+  tag.className = "q-type-tag";
+  tag.textContent = q.qType;
+  card.appendChild(tag);
+
+  var prompt = document.createElement("div");
+  prompt.className = "q-prompt";
+  prompt.textContent = q.prompt;
+  card.appendChild(prompt);
+
+  // Input
+  if (q.type === "mc") {
+    var cs = document.createElement("div");
+    cs.className = "choices";
+    q.choices.forEach(function(choiceText) {
+      var btn = document.createElement("button");
+      btn.className = "choice-btn";
+      btn.textContent = choiceText;
+      var letter = choiceText.charAt(0);
+      if (state.userAnswer === letter) btn.classList.add("picked");
+      if (state.checked) {
+        btn.disabled = true;
+        if (letter === q.answer) btn.classList.add("correct");
+        else if (state.userAnswer === letter) btn.classList.add("wrong");
+      }
+      btn.onclick = function() {
+        if (state.checked) return;
+        state.userAnswer = letter;
+        if (state.currentTab === "mock") saveMockAnswer();
+        renderMain();
+      };
+      cs.appendChild(btn);
+    });
+    card.appendChild(cs);
+  }
+  else if (q.type === "match") {
+    var box = document.createElement("div");
+    box.className = "match-opts-box";
+    box.textContent = "a) " + q.options[0] + "    b) " + q.options[1] + "    c) " + q.options[2] + "    d) " + q.options[3];
+    card.appendChild(box);
+    var cs2 = document.createElement("div");
+    cs2.className = "choices";
+    var labels = ["a","b","c","d"];
+    q.options.forEach(function(opt, i) {
+      var btn = document.createElement("button");
+      btn.className = "choice-btn";
+      btn.textContent = labels[i] + ") " + opt;
+      if (state.userAnswer === opt) btn.classList.add("picked");
+      if (state.checked) {
+        btn.disabled = true;
+        if (opt === q.answer) btn.classList.add("correct");
+        else if (state.userAnswer === opt) btn.classList.add("wrong");
+      }
+      btn.onclick = function() {
+        if (state.checked) return;
+        state.userAnswer = opt;
+        if (state.currentTab === "mock") saveMockAnswer();
+        renderMain();
+      };
+      cs2.appendChild(btn);
+    });
+    card.appendChild(cs2);
+  }
+  else if (q.type === "fill" || q.type === "fix") {
+    var inp = document.createElement("input");
+    inp.type = "text";
+    inp.className = "text-input";
+    inp.placeholder = "Type your answer here...";
+    inp.value = state.userAnswer || "";
+    inp.autocomplete = "off";
+    inp.autocapitalize = "off";
+    inp.spellcheck = false;
+    if (state.checked) {
+      inp.disabled = true;
+      inp.classList.add(state.isCorrect ? "correct" : "wrong");
+    }
+    inp.oninput = function(e) {
+      state.userAnswer = e.target.value;
+      if (state.currentTab === "mock") saveMockAnswer();
+      var cb = document.getElementById("btnCheck");
+      if (cb) cb.disabled = !hasAnswer();
+    };
+    card.appendChild(inp);
+  }
+  else {
+    // unscramble, wish, combine, rewrite_passive, rc_sentence → textarea
+    var ta = document.createElement("textarea");
+    ta.className = "text-area";
+    ta.rows = 3;
+    ta.placeholder = "Type the full sentence here...";
+    ta.value = state.userAnswer || "";
+    ta.autocomplete = "off";
+    ta.autocapitalize = "sentences";
+    ta.spellcheck = false;
+    if (state.checked) {
+      ta.disabled = true;
+      ta.classList.add(state.isCorrect ? "correct" : "wrong");
+    }
+    ta.oninput = function(e) {
+      state.userAnswer = e.target.value;
+      if (state.currentTab === "mock") saveMockAnswer();
+      var cb = document.getElementById("btnCheck");
+      if (cb) cb.disabled = !hasAnswer();
+    };
+    card.appendChild(ta);
+  }
+
+  // Feedback (only after check in drill mode)
+  if (state.checked && state.currentTab !== "mock") {
+    var fb = document.createElement("div");
+    fb.className = "feedback " + (state.isCorrect ? "ok" : "bad");
+    var fbt = document.createElement("div");
+    fbt.className = "feedback-title";
+    fbt.textContent = state.isCorrect ? "🎉 Correct! Great job! ✓" : "❌ Not quite — let's learn it!";
+    fb.appendChild(fbt);
+    if (!state.isCorrect) {
+      var ans = document.createElement("div");
+      ans.className = "ans-box";
+      ans.innerHTML = "<strong>Correct answer:</strong><br>" + esc(getCorrectText(q));
+      fb.appendChild(ans);
+    }
+    card.appendChild(fb);
+  }
+
+  return card;
+}
+
+function getCorrectText(q) {
+  if (q.type === "mc") {
+    for (var i = 0; i < q.choices.length; i++) {
+      if (q.choices[i].charAt(0) === q.answer) return q.choices[i];
+    }
+    return q.answer;
+  }
+  if (q.type === "match") return q.answer;
+  return (q.answers && q.answers[0]) || "";
+}
+
+function checkAnswer() {
+  var q = state.queue[state.index];
+  var ok = false;
+  if (q.type === "mc") ok = state.userAnswer === q.answer;
+  else if (q.type === "match") ok = state.userAnswer === q.answer;
+  else ok = matchAny(state.userAnswer || "", q.answers);
+  state.checked = true;
+  state.isCorrect = ok;
+  state.results.push({
+    prompt: q.prompt,
+    userAnswer: typeof state.userAnswer === "string" ? state.userAnswer : (state.userAnswer || ""),
+    correctAnswer: getCorrectText(q),
+    correct: ok
+  });
+  renderMain();
+}
+
+function saveMockAnswer() {
+  if (state.userAnswer !== null && state.userAnswer !== undefined &&
+      !(typeof state.userAnswer === "string" && state.userAnswer.trim() === "")) {
+    state.mockAnswers[state.index] = state.userAnswer;
+  } else {
+    delete state.mockAnswers[state.index];
+  }
+}
+
+// ============================================================
+// RESULTS
+// ============================================================
+function renderResults() {
+  var container = document.getElementById("container");
+  container.innerHTML = "";
+
+  var results;
+  if (state.currentTab === "mock") {
+    // Score mock answers
+    results = [];
+    Object.keys(state.mockAnswers).forEach(function(k) {
+      var i = parseInt(k, 10);
+      var q = state.queue[i];
+      var ans = state.mockAnswers[i];
+      var ok;
+      if (q.type === "mc") ok = ans === q.answer;
+      else if (q.type === "match") ok = ans === q.answer;
+      else ok = matchAny(ans || "", q.answers);
+      results.push({
+        prompt: q.prompt,
+        userAnswer: typeof ans === "string" ? ans : (ans || ""),
+        correctAnswer: getCorrectText(q),
+        correct: ok
+      });
+    });
+  } else {
+    results = state.results;
+  }
+
+  var total = results.length;
+  var correct = results.filter(function(r) { return r.correct; }).length;
+
+  if (total === 0) {
+    container.innerHTML = "<div class='result-card'><div style='font-size:16px;'>No questions answered yet.</div></div>";
+    var tryBtn0 = document.createElement("button");
+    tryBtn0.className = "btn-try-again";
+    tryBtn0.textContent = "🔄 Start Again";
+    tryBtn0.onclick = function() { loadTab(); renderMain(); };
+    container.appendChild(tryBtn0);
+    return;
+  }
+
+  var pct = Math.round((correct / total) * 100);
+  var stars = pct >= 90 ? "⭐⭐⭐⭐⭐" : pct >= 75 ? "⭐⭐⭐⭐" : pct >= 55 ? "⭐⭐⭐" : pct >= 40 ? "⭐⭐" : "⭐";
+  var msg = pct >= 90 ? "Perfect! You're ready, Howard!" :
+            pct >= 75 ? "Great job! Just review the misses!" :
+            pct >= 55 ? "Good effort! Keep practicing!" :
+            pct >= 40 ? "Keep going — you'll get there!" :
+            "Practice more — you can do it!";
+
+  var card = document.createElement("div");
+  card.className = "result-card";
+  card.innerHTML =
+    "<div style='font-size:13px;opacity:0.9;font-weight:700;'>" +
+    (state.currentTab === "mock" ? "MOCK EXAM RESULT" : "DRILL RESULT") + "</div>" +
+    "<div class='result-score'>" + correct + " / " + total + "</div>" +
+    "<div class='result-pct'>" + pct + "%</div>" +
+    "<div class='result-stars'>" + stars + "</div>" +
+    "<div style='font-size:14px;opacity:0.95;'>" + msg + "</div>";
+  container.appendChild(card);
+
+  var tryBtn = document.createElement("button");
+  tryBtn.className = "btn-try-again";
+  tryBtn.textContent = "🔄 Try Again";
+  tryBtn.onclick = function() { loadTab(); renderMain(); };
+  container.appendChild(tryBtn);
+
+  var wrongs = results.filter(function(r) { return !r.correct; });
+  var rights = results.filter(function(r) { return r.correct; });
+
+  if (wrongs.length > 0) {
+    var h1 = document.createElement("h3");
+    h1.style.cssText = "font-family:Fredoka,sans-serif;color:#C0392B;font-size:16px;margin:22px 0 10px;";
+    h1.textContent = "📝 Review wrong (" + wrongs.length + ")";
+    container.appendChild(h1);
+    wrongs.forEach(function(r) { container.appendChild(renderReviewItem(r, false)); });
+  }
+  if (rights.length > 0) {
+    var h2 = document.createElement("h3");
+    h2.style.cssText = "font-family:Fredoka,sans-serif;color:#1B7A40;font-size:16px;margin:22px 0 10px;";
+    h2.textContent = "✓ Got right (" + rights.length + ")";
+    container.appendChild(h2);
+    rights.forEach(function(r) { container.appendChild(renderReviewItem(r, true)); });
+  }
+}
+
+function renderReviewItem(r, isCorrect) {
+  var box = document.createElement("div");
+  box.className = "review-item " + (isCorrect ? "right" : "wrong");
+  var q = document.createElement("div");
+  q.className = "review-q";
+  q.textContent = r.prompt;
+  box.appendChild(q);
+  var ya = document.createElement("div");
+  ya.className = "review-your";
+  ya.innerHTML = "<strong>Your:</strong> " + esc(r.userAnswer || "(blank)");
+  box.appendChild(ya);
+  var ca = document.createElement("div");
+  ca.className = "review-correct";
+  ca.innerHTML = "<strong>Correct:</strong> " + esc(r.correctAnswer);
+  box.appendChild(ca);
+  return box;
+}
+
+// ============================================================
+// ORAL
+// ============================================================
+function renderOral() {
+  var container = document.getElementById("container");
+  container.innerHTML = "";
+
+  // Warning
+  var warn = document.createElement("div");
+  warn.className = "oral-warning";
+  warn.innerHTML = "<strong>Recording requires Safari or Chrome</strong><br>Open this page in Safari (iOS) or Chrome — not inside another app.<br>iOS: tap ⋯ → Open in Safari";
+  container.appendChild(warn);
+
+  // Progress + prev/next
+  var nav = document.createElement("div");
+  nav.style.cssText = "display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;";
+  var prevBtn = document.createElement("button");
+  prevBtn.className = "btn-nav";
+  prevBtn.textContent = "← Prev";
+  prevBtn.disabled = oralState.idx === 0;
+  prevBtn.onclick = function() { if (oralState.idx > 0) { oralState.idx--; renderOral(); } };
+  nav.appendChild(prevBtn);
+
+  var count = document.createElement("div");
+  count.className = "progress-pill";
+  count.textContent = (oralState.idx + 1) + " / " + oralState.queue.length;
+  nav.appendChild(count);
+
+  var nextBtn = document.createElement("button");
+  nextBtn.className = "btn-nav";
+  nextBtn.textContent = "Next →";
+  nextBtn.disabled = oralState.idx === oralState.queue.length - 1;
+  nextBtn.onclick = function() { if (oralState.idx < oralState.queue.length - 1) { oralState.idx++; renderOral(); } };
+  nav.appendChild(nextBtn);
+  container.appendChild(nav);
+
+  var p = oralState.queue[oralState.idx];
+  var card = document.createElement("div");
+  card.className = "oral-card";
+
+  var qEl = document.createElement("div");
+  qEl.className = "oral-q";
+  qEl.textContent = "Q: " + p.prompt;
+  card.appendChild(qEl);
+
+  // Button row: Hear Q → Record → My Voice → Show Model
+  var btns = document.createElement("div");
+  btns.className = "oral-btns";
+
+  // Hear Q (TTS)
+  var hearBtn = document.createElement("button");
+  hearBtn.className = "oral-btn";
+  hearBtn.innerHTML = "🔊 Hear Q";
+  hearBtn.addEventListener("click", function() {
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(p.prompt);
+      u.lang = "en-US";
+      u.rate = 0.9;
+      window.speechSynthesis.speak(u);
+    }
+  });
+  btns.appendChild(hearBtn);
+
+  // Record
+  var recBtn = document.createElement("button");
+  recBtn.className = "oral-btn";
+  recBtn.innerHTML = "🎙 Record";
+  recBtn.addEventListener("click", function() {
+    if (oralState.mediaRecorder && oralState.mediaRecorder.state === "recording") {
+      oralState.mediaRecorder.stop();
+      return;
+    }
+    if (!navigator.mediaDevices) {
+      statusEl.textContent = "⚠️ Microphone API not available. Try Safari or Chrome.";
+      return;
+    }
+    navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function(stream) {
+      oralState.audioChunks = [];
+      var types = ["audio/mp4","audio/aac","audio/webm;codecs=opus","audio/webm","audio/ogg"];
+      oralState.mime = "";
+      for (var i = 0; i < types.length; i++) {
+        if (MediaRecorder.isTypeSupported(types[i])) { oralState.mime = types[i]; break; }
+      }
+      oralState.mediaRecorder = oralState.mime
+        ? new MediaRecorder(stream, { mimeType: oralState.mime })
+        : new MediaRecorder(stream);
+      var capturedIdx = oralState.idx;
+      oralState.mediaRecorder.ondataavailable = function(e) {
+        if (e.data && e.data.size > 0) oralState.audioChunks.push(e.data);
+      };
+      oralState.mediaRecorder.onstop = function() {
+        stream.getTracks().forEach(function(t) { t.stop(); });
+        var blob = new Blob(oralState.audioChunks, { type: oralState.mime || "audio/webm" });
+        oralState.recordings[capturedIdx] = URL.createObjectURL(blob);
+        recBtn.classList.remove("recording");
+        recBtn.innerHTML = "🎙 Record Again";
+        statusEl.textContent = "✓ Recorded! Tap 'My Voice' to play.";
+        playBtn.disabled = false;
+      };
+      oralState.mediaRecorder.start(200);
+      recBtn.classList.add("recording");
+      recBtn.innerHTML = "⏹ Stop";
+      statusEl.textContent = "🔴 Recording...";
+    }).catch(function(err) {
+      var msg = "Error: " + err.name;
+      if (err.name === "NotAllowedError") msg = "⚠️ Microphone permission denied. Allow access in browser settings.";
+      else if (err.name === "NotFoundError") msg = "⚠️ No microphone found.";
+      statusEl.textContent = msg;
+    });
+  });
+  btns.appendChild(recBtn);
+
+  // My Voice (play)
+  var playBtn = document.createElement("button");
+  playBtn.className = "oral-btn";
+  playBtn.innerHTML = "▶️ My Voice";
+  playBtn.disabled = !oralState.recordings[oralState.idx];
+  playBtn.addEventListener("click", function() {
+    var url = oralState.recordings[oralState.idx];
+    if (!url) {
+      statusEl.textContent = "No recording yet.";
+      return;
+    }
+    var audio = new Audio();
+    audio.src = url;
+    var pr = audio.play();
+    if (pr !== undefined) pr.catch(function(err) {
+      statusEl.textContent = "Playback error: " + err.message;
+    });
+  });
+  btns.appendChild(playBtn);
+
+  // Show Model
+  var modelBox = document.createElement("div");
+  modelBox.className = "oral-model";
+  modelBox.innerHTML = "<strong>Model answer:</strong><br>" + esc(p.model);
+
+  var modelBtn = document.createElement("button");
+  modelBtn.className = "oral-btn";
+  modelBtn.innerHTML = "👁 Show Model";
+  modelBtn.addEventListener("click", function() {
+    modelBox.classList.toggle("show");
+    modelBtn.innerHTML = modelBox.classList.contains("show") ? "🙈 Hide Model" : "👁 Show Model";
+  });
+  btns.appendChild(modelBtn);
+
+  // Hear Model (TTS)
+  var hearMBtn = document.createElement("button");
+  hearMBtn.className = "oral-btn";
+  hearMBtn.innerHTML = "🔊 Hear Model";
+  hearMBtn.addEventListener("click", function() {
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(p.model);
+      u.lang = "en-US";
+      u.rate = 0.85;
+      window.speechSynthesis.speak(u);
+    }
+  });
+  btns.appendChild(hearMBtn);
+
+  card.appendChild(btns);
+
+  var statusEl = document.createElement("div");
+  statusEl.className = "oral-status";
+  statusEl.textContent = oralState.recordings[oralState.idx] ? "✓ Recording saved for this question" : "";
+  card.appendChild(statusEl);
+
+  card.appendChild(modelBox);
+  container.appendChild(card);
+}
+
+// Preload TTS voices
+if ("speechSynthesis" in window) {
+  speechSynthesis.onvoiceschanged = function() { /* voices ready */ };
+  speechSynthesis.getVoices();
+}
+
+// Wire up back button
+document.getElementById("backBtn").addEventListener("click", goHome);
+
+// Init: show home
+renderHome();
+</script>
+</body>
+</html>

@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Howard Reading 115-1 期中考</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f0f4ff;--surface:#fff;--raised:#f8f9ff;--border:#c5cae9;--fg:#1a237e;--muted:#5c6bc0;--navy:#1565c0;--accent:#1976d2;--chip:#e3f2fd;--chipfg:#0d47a1;--correct:#2e7d32;--wrong:#c62828;--gold:#f57f17;--purple:#6a1b9a;color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1117;--surface:#161b2e;--raised:#1e2440;--border:#2e3560;--fg:#e8eaf6;--muted:#9fa8da;--navy:#90caf9;--accent:#64b5f6;--chip:#1e2a4a;--chipfg:#90caf9;--correct:#81c784;--wrong:#ef9a9a;--gold:#ffd54f;--purple:#ce93d8;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d1117;--surface:#161b2e;--raised:#1e2440;--border:#2e3560;--fg:#e8eaf6;--muted:#9fa8da;--navy:#90caf9;--accent:#64b5f6;--chip:#1e2a4a;--chipfg:#90caf9;--correct:#81c784;--wrong:#ef9a9a;--gold:#ffd54f;--purple:#ce93d8;color-scheme:dark}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:'Nunito',sans-serif;font-size:16px}
+#home{display:block}
+.topbar{background:var(--navy);color:#fff;padding:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.topbar h1{font-family:'Fredoka One',cursive;font-size:1.5rem}
+.topbar p{font-size:.8rem;opacity:.85}
+.themeBtn{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:20px;padding:6px 14px;font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer}
+.unlock{background:#fff8e1;border:2px solid #f9a825;border-radius:12px;padding:14px;margin:16px;text-align:center;display:none}
+.unlock p{color:#e65100;font-weight:800;margin-bottom:8px}
+.unlock button{background:#f9a825;color:#1a1000;border:none;border-radius:22px;padding:10px 24px;font-size:.95rem;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;min-height:48px}
+@media(prefers-color-scheme:dark){.unlock{background:#1a1000;border-color:#f9a825}.unlock p{color:#fbbf24}.unlock button{background:#f9a825}}
+:root[data-theme="dark"] .unlock{background:#1a1000;border-color:#f9a825}
+:root[data-theme="dark"] .unlock p{color:#fbbf24}
+.homeInner{max-width:700px;margin:0 auto;padding:20px 16px}
+.zone{margin-bottom:28px}
+.zoneLabel{font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--border)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--chip);color:var(--chipfg);border:2px solid var(--border);border-radius:20px;padding:10px 18px;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;min-height:48px;display:flex;align-items:center;gap:6px;transition:.15s}
+.chip:hover{border-color:var(--accent);background:var(--accent);color:#fff}
+.chip.mock{background:var(--navy);color:#fff;border-color:var(--navy)}
+.chip.oral{background:var(--purple);color:#fff;border-color:var(--purple)}
+#panel{display:none;min-height:100vh}
+.panelBar{background:var(--navy);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10;flex-wrap:wrap}
+.backBtn{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:20px;padding:8px 16px;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;min-height:44px}
+.panelTitle{font-family:'Fredoka One',cursive;font-size:1.1rem;flex:1}
+.finishBtn{background:#ef9a9a;color:#7f0000;border:none;border-radius:20px;padding:8px 16px;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;min-height:44px}
+.panelInner{max-width:700px;margin:0 auto;padding:16px}
+.newSetBtn{background:var(--navy);color:#fff;border:none;border-radius:22px;padding:10px 24px;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;margin-bottom:16px;min-height:48px}
+.qCard{background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px}
+.qNum{font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:4px}
+.qText{font-size:1.05rem;font-weight:700;line-height:1.5;margin-bottom:16px}
+.choices{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.choice{background:var(--raised);border:2px solid var(--border);border-radius:10px;padding:12px 16px;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;text-align:left;color:var(--fg);transition:.15s;min-height:48px}
+.choice:hover:not(:disabled){border-color:var(--accent)}
+.choice.selected{border-color:var(--accent);background:var(--chip)}
+.choice:disabled{cursor:default}
+.checkBtn{background:var(--navy);color:#fff;border:none;border-radius:22px;padding:10px 24px;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;margin-right:8px;min-height:46px}
+.nextBtn{background:var(--accent);color:#fff;border:none;border-radius:22px;padding:10px 24px;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;display:none;min-height:46px}
+.speakBtn{background:transparent;border:2px solid var(--muted);color:var(--muted);border-radius:20px;padding:7px 14px;font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;margin-bottom:12px;min-height:44px}
+.feedback{border-radius:10px;padding:12px;margin-top:10px;font-weight:700;font-size:.95rem;display:none}
+.feedback.correct{background:#e8f5e9;color:#1b5e20;border:2px solid #81c784;display:block}
+.feedback.wrong{background:#ffebee;color:#7f0000;border:2px solid #ef9a9a;display:block}
+@media(prefers-color-scheme:dark){.feedback.correct{background:rgba(46,125,50,.2);color:#a5d6a7}.feedback.wrong{background:rgba(183,28,28,.2);color:#ffcdd2}}
+:root[data-theme="dark"] .feedback.correct{background:rgba(46,125,50,.2);color:#a5d6a7}
+:root[data-theme="dark"] .feedback.wrong{background:rgba(183,28,28,.2);color:#ffcdd2}
+.answerBox{background:#fff9c4;color:#4a0;border:2px solid #f9a825;border-radius:8px;padding:12px;margin-top:8px;font-size:1.05rem;font-weight:800}
+@media(prefers-color-scheme:dark){.answerBox{background:#1a1400;color:#ffd54f;border-color:#f9a825}}
+:root[data-theme="dark"] .answerBox{background:#1a1400;color:#ffd54f;border-color:#f9a825}
+.oralCard{background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px}
+.badge{display:inline-block;background:#c62828;color:#fff;font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:12px;margin-bottom:8px;letter-spacing:.06em}
+.btnRow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.btn{padding:9px 16px;border-radius:22px;border:2px solid var(--border);background:var(--raised);color:var(--fg);font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;min-height:46px}
+.btn:disabled{opacity:.35;cursor:default}
+.btn.teal{border-color:#4dd0e1;color:#4dd0e1}
+.btn.red{border-color:#ef9a9a;color:#ef9a9a}
+.btn.red.active{background:#c62828;color:#fff;border-color:#c62828}
+.btn.green{border-color:var(--correct);color:var(--correct)}
+.btn.purple{border-color:var(--purple);color:var(--purple)}
+.recInfo{font-size:.8rem;color:var(--muted);font-weight:700;min-height:20px;margin:4px 0 8px}
+.modelBox{background:rgba(46,125,50,.1);border:2px solid #81c784;border-radius:10px;padding:14px;margin-top:10px;display:none}
+.modelBox.show{display:block}
+.modelLabel{font-size:.75rem;color:var(--correct);font-weight:700;margin-bottom:6px}
+.modelText{font-size:.95rem;line-height:1.6}
+.scoreScreen{background:var(--surface);border-radius:16px;padding:28px;text-align:center;display:none}
+.scoreScreen.show{display:block}
+.scoreStar{font-size:2.5rem;margin-bottom:8px}
+.scorePct{font-size:2.2rem;font-weight:800;color:var(--navy);margin-bottom:4px}
+.scoreDetail{font-size:1rem;color:var(--muted);margin-bottom:20px}
+.retryBtn{background:var(--navy);color:#fff;border:none;border-radius:22px;padding:12px 28px;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;min-height:48px}
+.reviewList{text-align:left;margin-top:24px}
+.reviewItem{background:var(--raised);border:2px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px}
+.reviewItem.wrong{border-color:#ef9a9a}
+.reviewLabel{font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:4px}
+.reviewQ{font-size:.9rem;font-weight:700;margin-bottom:6px}
+.reviewA{font-size:.85rem}
+.correct-a{color:var(--correct);font-weight:700}
+.wrong-a{color:var(--wrong);font-weight:700}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home">
+  <div class="topbar">
+    <div>
+      <h1>📚 Howard 115-1 期中考</h1>
+      <p>Egypt + Old Yeller · Reading Street 6.1</p>
+    </div>
+    <button class="themeBtn" id="themeToggle">🌙 Dark</button>
+  </div>
+  <div class="unlock" id="unlockBar">
+    <p>🔇 Tap to enable voice (iOS)</p>
+    <button id="unlockBtn">🔊 Enable Voice</button>
+  </div>
+  <div class="homeInner">
+    <div class="zone">
+      <div class="zoneLabel">Practice by Question Type</div>
+      <div class="chips">
+        <button class="chip" data-drill="vocab">📖 Vocabulary</button>
+        <button class="chip" data-drill="fill">✏️ Fill in Blank</button>
+        <button class="chip" data-drill="tf">✅ True / False</button>
+        <button class="chip" data-drill="mc">🔤 Multiple Choice</button>
+        <button class="chip" data-drill="fo">💡 Fact or Opinion</button>
+        <button class="chip" data-drill="genre">📚 Genre</button>
+        <button class="chip" data-drill="detail">🔍 Reading for Details</button>
+      </div>
+    </div>
+    <div class="zone">
+      <div class="zoneLabel">Practice by Story</div>
+      <div class="chips">
+        <button class="chip" data-drill="egypt">🏺 Egypt</button>
+        <button class="chip" data-drill="yeller">🐶 Old Yeller</button>
+      </div>
+    </div>
+    <div class="zone">
+      <div class="zoneLabel">Mock Exam &amp; Oral</div>
+      <div class="chips">
+        <button class="chip oral" data-drill="oral">🗣️ Oral Must-Know</button>
+        <button class="chip mock" data-drill="mock">🎯 Full Mock Exam (30Q)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DRILL PANEL -->
+<div id="panel">
+  <div class="panelBar">
+    <button class="backBtn" id="backBtn">← Home</button>
+    <span class="panelTitle" id="panelTitle"></span>
+    <button class="finishBtn" id="finishBtn">🏁 Finish &amp; Score</button>
+  </div>
+  <div class="panelInner" id="panelInner"></div>
+</div>
+
+<script>
+/* ── THEME ── */
+(function(){
+  const saved = localStorage.getItem('theme');
+  if(saved) document.documentElement.setAttribute('data-theme', saved);
+})();
+document.getElementById('themeToggle').addEventListener('click', function(){
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  this.textContent = next === 'dark' ? '☀️ Light' : '🌙 Dark';
+});
+
+/* ── TTS ── */
+let _voices = [];
+function _loadVoices(){ const v=window.speechSynthesis.getVoices(); if(v.length) _voices=v; }
+window.speechSynthesis.addEventListener('voiceschanged', _loadVoices);
+_loadVoices(); setTimeout(_loadVoices,500); setTimeout(_loadVoices,1500);
+
+function bestVoice(){
+  const vv=_voices.length?_voices:window.speechSynthesis.getVoices();
+  const tests=[
+    v=>v.name==='Samantha',v=>v.name==='Karen',v=>v.name==='Daniel',
+    v=>v.name.includes('Google US English'),v=>v.name.includes('Google UK English'),
+    v=>v.lang==='en-US'&&v.localService,v=>v.lang==='en-GB'&&v.localService,
+    v=>v.lang.startsWith('en')&&v.localService,v=>v.lang.startsWith('en')
+  ];
+  for(const t of tests){ const m=vv.find(t); if(m) return m; }
+  return null;
+}
+function speak(text){
+  window.speechSynthesis.cancel();
+  if(!_voices.length) _voices=window.speechSynthesis.getVoices();
+  const u=new SpeechSynthesisUtterance(text);
+  const v=bestVoice(); if(v) u.voice=v;
+  u.lang='en-US'; u.rate=0.88; u.pitch=1.0;
+  window.speechSynthesis.speak(u);
+}
+
+/* iOS unlock */
+const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+if(isIOS) document.getElementById('unlockBar').style.display='block';
+document.getElementById('unlockBtn').addEventListener('click',function(){
+  speak('Voice enabled');
+  const bar=document.getElementById('unlockBar');
+  bar.style.borderColor='#81c784';
+  bar.querySelector('p').textContent='✅ Voice enabled!';
+  this.style.display='none';
+  setTimeout(()=>{ bar.style.display='none'; },1500);
+});
+
+/* ══════════════════════════════════════════════
+   QUESTION BANK — based on actual exam content
+   Egypt (Reading Street 6.1) + Old Yeller
+   ══════════════════════════════════════════════ */
+const BANK = [
+
+  /* ── VOCAB: Egypt word bank (Section D) ──
+     reign, inherit, artisan, ancient, ornaments, pharaohs,
+     luxury, divorce, drenching, exotic               */
+  {id:"ve01",ty:"vocab",st:"egypt",
+   q:"Word: REIGN. Which sentence uses 'reign' correctly?",
+   a:"The pharaoh's reign lasted forty years.",
+   choices:["The pharaoh's reign lasted forty years.","She reigned her horse to slow down.","The rain reigned down hard.","He reigned the class with a loud voice."]},
+  {id:"ve02",ty:"vocab",st:"egypt",
+   q:"Word: INHERIT. What does 'inherit' mean?",
+   a:"To receive something from a parent or relative who has died",
+   choices:["To receive something from a parent or relative who has died","To give something away to charity","To borrow money from the bank","To buy something at a low price"]},
+  {id:"ve03",ty:"vocab",st:"egypt",
+   q:"Word: ARTISAN. An artisan is someone who ________.",
+   a:"makes things skillfully by hand",
+   choices:["makes things skillfully by hand","sells goods at the market","studies ancient history","rules over a kingdom"]},
+  {id:"ve04",ty:"vocab",st:"egypt",
+   q:"Word: ANCIENT. Which word means the OPPOSITE of 'ancient'?",
+   a:"modern",
+   choices:["modern","old","historic","antique"]},
+  {id:"ve05",ty:"vocab",st:"egypt",
+   q:"Word: ORNAMENTS. In ancient Egypt, women wore ornaments made of gold. What are ornaments?",
+   a:"Decorative objects worn or displayed for beauty",
+   choices:["Decorative objects worn or displayed for beauty","Tools used for farming","Weapons used in battle","Documents written on papyrus"]},
+  {id:"ve06",ty:"vocab",st:"egypt",
+   q:"Word: PHARAOHS. The pharaohs ruled ancient Egypt. A pharaoh was ________.",
+   a:"a king or ruler of ancient Egypt",
+   choices:["a king or ruler of ancient Egypt","a priest in a temple","a soldier in the army","a builder of pyramids"]},
+  {id:"ve07",ty:"vocab",st:"egypt",
+   q:"Word: LUXURY. Which of these is a luxury?",
+   a:"Fine silk clothing",
+   choices:["Fine silk clothing","A bowl of rice","A cup of water","A mud brick house"]},
+  {id:"ve08",ty:"vocab",st:"egypt",
+   q:"Word: DIVORCE. In ancient Egypt, both men and women could get a divorce. What does 'divorce' mean?",
+   a:"To legally end a marriage",
+   choices:["To legally end a marriage","To get married in a ceremony","To argue with a neighbor","To share property equally"]},
+  {id:"ve09",ty:"vocab",st:"egypt",
+   q:"Word: DRENCHING. The Nile flood was a drenching rain. 'Drenching' means ________.",
+   a:"making something completely wet",
+   choices:["making something completely wet","drying something out","freezing something solid","warming something gently"]},
+  {id:"ve10",ty:"vocab",st:"egypt",
+   q:"Word: EXOTIC. Egypt imported exotic goods from other lands. 'Exotic' means ________.",
+   a:"unusual and from a faraway place",
+   choices:["unusual and from a faraway place","cheap and easy to find","old and broken","local and common"]},
+
+  /* ── VOCAB: Old Yeller word bank (Section E) ──
+     sulked, tortilla, shallow, possums, frontier,
+     speckled, drowned, romping, prickly, spasm      */
+  {id:"vy01",ty:"vocab",st:"yeller",
+   q:"Word: SULKED. Travis sulked because his father gave Arliss the dog. 'Sulked' means ________.",
+   a:"was silent and in a bad mood",
+   choices:["was silent and in a bad mood","was happy and excited","was busy working","was confused and lost"]},
+  {id:"vy02",ty:"vocab",st:"yeller",
+   q:"Word: TORTILLA. A tortilla is ________.",
+   a:"a thin flat bread made from cornmeal",
+   choices:["a thin flat bread made from cornmeal","a type of stew","a sweet dessert","a spicy drink"]},
+  {id:"vy03",ty:"vocab",st:"yeller",
+   q:"Word: SHALLOW. The spring hole was shallow. 'Shallow' means ________.",
+   a:"not deep",
+   choices:["not deep","very cold","very wide","fast-moving"]},
+  {id:"vy04",ty:"vocab",st:"yeller",
+   q:"Word: POSSUMS. Old Yeller chased possums at night. Possums are ________.",
+   a:"small animals that play dead when scared",
+   choices:["small animals that play dead when scared","large wild birds","dangerous snakes","fast-running deer"]},
+  {id:"vy05",ty:"vocab",st:"yeller",
+   q:"Word: FRONTIER. The story is set on the Texas frontier. 'Frontier' means ________.",
+   a:"a wild, unsettled area at the edge of civilization",
+   choices:["a wild, unsettled area at the edge of civilization","a busy city street","a farm near a town","a military base"]},
+  {id:"vy06",ty:"vocab",st:"yeller",
+   q:"Word: SPECKLED. Old Yeller was a big, speckled dog. 'Speckled' means ________.",
+   a:"covered with small spots",
+   choices:["covered with small spots","completely white","dark and shiny","striped like a zebra"]},
+  {id:"vy07",ty:"vocab",st:"yeller",
+   q:"Word: ROMPING. The puppy was romping in the yard. 'Romping' means ________.",
+   a:"playing in a rough, lively way",
+   choices:["playing in a rough, lively way","sleeping in the sun","eating quickly","running away from danger"]},
+  {id:"vy08",ty:"vocab",st:"yeller",
+   q:"Word: PRICKLY. Travis grabbed a prickly pear. 'Prickly' means ________.",
+   a:"covered with sharp points",
+   choices:["covered with sharp points","soft and smooth","wet and slippery","hard and heavy"]},
+  {id:"vy09",ty:"vocab",st:"yeller",
+   q:"Word: SPASM. Old Yeller went into a spasm after the fight. A 'spasm' is ________.",
+   a:"a sudden, uncontrolled movement of a muscle",
+   choices:["a sudden, uncontrolled movement of a muscle","a long, deep sleep","a sharp pain in the chest","a loud cry of anger"]},
+  {id:"vy10",ty:"vocab",st:"yeller",
+   q:"Word: DROWNED. Which sentence uses 'drowned' correctly?",
+   a:"The campfire was drowned out by the heavy rain.",
+   choices:["The campfire was drowned out by the heavy rain.","She drowned her hair in the mirror.","He drowned the book on the table.","They drowned their shoes at the store."]},
+
+  /* ── FILL IN BLANK: Egypt (Section D answers) ── */
+  {id:"fi01",ty:"fill",st:"egypt",
+   q:"Fill in: The pharaoh's ________ over Egypt lasted many years.",
+   a:"reign",
+   choices:["reign","rule","time","era"]},
+  {id:"fi02",ty:"fill",st:"egypt",
+   q:"Fill in: In ancient Egypt, the eldest son would ________ the throne from his father.",
+   a:"inherit",
+   choices:["inherit","take","earn","steal"]},
+  {id:"fi03",ty:"fill",st:"egypt",
+   q:"Fill in: Ancient Egyptians could get a ________ if they were unhappy in their marriage.",
+   a:"divorce",
+   choices:["divorce","break","rest","holiday"]},
+  {id:"fi04",ty:"fill",st:"egypt",
+   q:"Fill in: A skilled ________ made beautiful jewelry and pottery by hand.",
+   a:"artisan",
+   choices:["artisan","merchant","soldier","priest"]},
+  {id:"fi05",ty:"fill",st:"egypt",
+   q:"Fill in: Rich Egyptians enjoyed ________ goods such as fine oils and rare spices.",
+   a:"luxury",
+   choices:["luxury","common","cheap","heavy"]},
+
+  /* ── FILL IN BLANK: Old Yeller (Section E answers) ── */
+  {id:"fi06",ty:"fill",st:"yeller",
+   q:"Fill in: Travis ________ around the house because he did not want a new dog.",
+   a:"sulked",
+   choices:["sulked","played","worked","slept"]},
+  {id:"fi07",ty:"fill",st:"yeller",
+   q:"Fill in: The water at the spring hole was too ________ for fish to live in.",
+   a:"shallow",
+   choices:["shallow","cold","dirty","deep"]},
+  {id:"fi08",ty:"fill",st:"yeller",
+   q:"Fill in: Mama made ________ bread to eat with the beans.",
+   a:"tortilla",
+   choices:["tortilla","corn","wheat","flat"]},
+  {id:"fi09",ty:"fill",st:"yeller",
+   q:"Fill in: The dog had a ________ of pain and could not stand up after the fight.",
+   a:"spasm",
+   choices:["spasm","fit","cry","bark"]},
+  {id:"fi10",ty:"fill",st:"yeller",
+   q:"Fill in: Living on the Texas ________ was hard and dangerous.",
+   a:"frontier",
+   choices:["frontier","farm","border","town"]},
+
+  /* ── FILL IN BLANK: Mixed vocab in context (Section F) ── */
+  {id:"fi11",ty:"fill",st:"egypt",
+   q:"Section F — Choose the best word: Egypt was a ________ land to people from other countries because of its great pyramids and rivers.",
+   a:"foreign",
+   choices:["foreign","ancient","shallow","luxury"]},
+  {id:"fi12",ty:"fill",st:"egypt",
+   q:"Section F — Choose the best word: The ruins are ________, dating back thousands of years.",
+   a:"ancient",
+   choices:["ancient","foreign","immortal","shallow"]},
+  {id:"fi13",ty:"fill",st:"yeller",
+   q:"Section F — Choose the best word: Travis was ________ when he saw the mama bear charging at Arliss.",
+   a:"frantic",
+   choices:["frantic","sulked","sweaty","shallow"]},
+  {id:"fi14",ty:"fill",st:"egypt",
+   q:"Section F — Choose the best word: In ancient Egypt, a wife could get ________ if her husband treated her badly.",
+   a:"divorced",
+   choices:["divorced","ancient","foreign","immortal"]},
+  {id:"fi15",ty:"fill",st:"yeller",
+   q:"Section F — Choose the best word: Travis ________ all day because he did not get what he wanted.",
+   a:"sulked",
+   choices:["sulked","drowned","romped","speckled"]},
+  {id:"fi16",ty:"fill",st:"egypt",
+   q:"Section F — Choose the best word: Only the very wealthy could afford ________ items like fine jewelry.",
+   a:"luxury",
+   choices:["luxury","shallow","sweaty","foreign"]},
+  {id:"fi17",ty:"fill",st:"yeller",
+   q:"Section F — Choose the best word: Travis was hot and ________ after running through the fields.",
+   a:"sweaty",
+   choices:["sweaty","shallow","frantic","sulked"]},
+  {id:"fi18",ty:"fill",st:"yeller",
+   q:"Section F — Choose the best word: The spring hole was too ________ for big fish.",
+   a:"shallow",
+   choices:["shallow","ancient","luxury","frantic"]},
+
+  /* ── TRUE / FALSE (Section B — exact exam statements) ── */
+  {id:"tf01",ty:"tf",st:"egypt",
+   q:"TRUE or FALSE: In ancient Egypt, wives could sue for divorce.",
+   a:"TRUE",
+   choices:["TRUE","FALSE"]},
+  {id:"tf02",ty:"tf",st:"egypt",
+   q:"TRUE or FALSE: The story 'Old Yeller' is set in 1967.",
+   a:"FALSE",
+   choices:["TRUE","FALSE"]},
+  {id:"tf03",ty:"tf",st:"egypt",
+   q:"TRUE or FALSE: Ancient Egyptians were one of the first people to use cosmetics.",
+   a:"TRUE",
+   choices:["TRUE","FALSE"]},
+  {id:"tf04",ty:"tf",st:"egypt",
+   q:"TRUE or FALSE: In ancient Egypt, women had the same rights as men in all areas of life.",
+   a:"FALSE",
+   choices:["TRUE","FALSE"]},
+
+  /* ── MULTIPLE CHOICE (Section C — exact exam questions) ── */
+  {id:"mc01",ty:"mc",st:"egypt",
+   q:"What is a GRANARY?",
+   a:"c. A place where grain is stored",
+   choices:["a. A type of ancient tomb","b. A river boat used on the Nile","c. A place where grain is stored","d. A kind of Egyptian bread"]},
+  {id:"mc02",ty:"mc",st:"egypt",
+   q:"What does IMMORTAL mean?",
+   a:"b. Living forever and never dying",
+   choices:["a. Very old and ancient","b. Living forever and never dying","c. Brave in battle","d. Respected by everyone"]},
+  {id:"mc03",ty:"mc",st:"yeller",
+   q:"Who was left in charge of the farm while Papa was away on the cattle drive?",
+   a:"b. Travis",
+   choices:["a. Arliss","b. Travis","c. Mama","d. Old Yeller"]},
+  {id:"mc04",ty:"mc",st:"yeller",
+   q:"Why did Papa want Travis to hunt bigger game?",
+   a:"b. The family needed more meat for food",
+   choices:["a. To show off his hunting skills","b. The family needed more meat for food","c. To protect the farm from wild animals","d. Because Arliss was too young to hunt"]},
+  {id:"mc05",ty:"mc",st:"yeller",
+   q:"What do fish use to breathe underwater?",
+   a:"b. Fins",
+   choices:["a. Lungs","b. Fins","c. Gills","d. Scales"]},
+
+  /* ── GENRE / STORY TYPE (Section A) ── */
+  {id:"ge01",ty:"genre",st:"egypt",
+   q:"What is the story type of 'Egypt' by Ann Heinrichs?",
+   a:"c. Expository text",
+   choices:["a. Historical fiction","b. Realistic fiction","c. Expository text","d. Biography"]},
+  {id:"ge02",ty:"genre",st:"yeller",
+   q:"What is the story type of 'Old Yeller' by Fred Gipson?",
+   a:"b. Historical fiction",
+   choices:["a. Expository text","b. Historical fiction","c. Fantasy","d. Mystery"]},
+  {id:"ge03",ty:"genre",st:"egypt",
+   q:"Expository text gives the reader ________.",
+   a:"facts and information about a real topic",
+   choices:["facts and information about a real topic","a made-up story set in the past","the author's personal feelings","rhymes and poems"]},
+  {id:"ge04",ty:"genre",st:"yeller",
+   q:"Historical fiction is a story that ________.",
+   a:"mixes a real historical setting with made-up characters and events",
+   choices:["mixes a real historical setting with made-up characters and events","is completely true with no made-up parts","is set in the future","is written in poem form"]},
+  {id:"ge05",ty:"genre",st:"egypt",
+   q:"Which is a feature you would find in expository text but NOT in historical fiction?",
+   a:"Headings, captions, and diagrams",
+   choices:["Headings, captions, and diagrams","Dialogue between characters","A main character with feelings","A story problem and solution"]},
+
+  /* ── FACT OR OPINION (Section G — exact PDF statements) ── */
+  {id:"fo01",ty:"fo",st:"egypt",
+   q:"FACT or OPINION: 'The Egyptian people had well-preserved homes compared to all other ancient civilizations.'",
+   a:"OPINION",
+   choices:["FACT","OPINION"]},
+  {id:"fo02",ty:"fo",st:"egypt",
+   q:"FACT or OPINION: 'Both poor and wealthy ancient Egyptians lived in homes made of the same materials.'",
+   a:"FACT",
+   choices:["FACT","OPINION"]},
+  {id:"fo03",ty:"fo",st:"egypt",
+   q:"FACT or OPINION: 'Ancient Egyptians invented the first cosmetics.'",
+   a:"FACT",
+   choices:["FACT","OPINION"]},
+  {id:"fo04",ty:"fo",st:"egypt",
+   q:"FACT or OPINION: 'Ancient Egyptians loved to have fun more than any other ancient people.'",
+   a:"OPINION",
+   choices:["FACT","OPINION"]},
+
+  /* ── READING FOR DETAILS (Section I) ── */
+  {id:"rd01",ty:"detail",st:"egypt",
+   q:"Reading for Details: When was the Great Pyramid of Giza built?",
+   a:"2540 B.C.",
+   choices:["2540 B.C.","1540 B.C.","3200 B.C.","1067 B.C."]},
+  {id:"rd02",ty:"detail",st:"egypt",
+   q:"Reading for Details: What two materials were used to build the Great Pyramid?",
+   a:"Limestone and granite",
+   choices:["Limestone and granite","Sandstone and marble","Mud bricks and wood","Clay and stone"]},
+  {id:"rd03",ty:"detail",st:"egypt",
+   q:"Reading for Details: How many workers built the Great Pyramid, and how long did it take?",
+   a:"100,000 workers / 20 years",
+   choices:["100,000 workers / 20 years","50,000 workers / 10 years","10,000 workers / 50 years","200,000 workers / 5 years"]},
+  {id:"rd04",ty:"detail",st:"yeller",
+   q:"Reading for Details: Where did Travis and his family live?",
+   a:"A homestead in Texas",
+   choices:["A homestead in Texas","A farm in Georgia","A ranch in Colorado","A cabin in Tennessee"]},
+  {id:"rd05",ty:"detail",st:"yeller",
+   q:"Reading for Details: How did Old Yeller come to the family?",
+   a:"He was a stray dog",
+   choices:["He was a stray dog","Papa bought him","A neighbor gave him","Travis found him hurt"]},
+  {id:"rd06",ty:"detail",st:"yeller",
+   q:"Reading for Details: How did Mama treat Old Yeller's wounds after the bear fight?",
+   a:"With catfish poultice",
+   choices:["With catfish poultice","With honey and herbs","With cloth bandages","With salt water"]},
+];
+
+/* ── ORAL DATA ── */
+const ORAL = [
+  {q:"What is the genre of 'Egypt' and what does it mean?",
+   model:"The genre of 'Egypt' is expository text. Expository text gives facts and information about a real topic.",exam:true},
+  {q:"What is the genre of 'Old Yeller' and what does it mean?",
+   model:"The genre of 'Old Yeller' is historical fiction. Historical fiction is a story set in the past that mixes real historical events with made-up characters and events.",exam:true},
+  {q:"Describe what happened during the bear attack in 'Old Yeller'.",
+   model:"Arliss grabbed a bear cub at the spring hole. The mama bear charged to protect her cub. Old Yeller jumped in and fought the mama bear to save Arliss. After the fight, Mama treated Old Yeller's wounds with catfish poultice.",exam:true},
+  {q:"What were two rights that ancient Egyptian women had?",
+   model:"Ancient Egyptian women could sue for divorce, and they could also own property and inherit from their families. They had more rights than women in many other ancient civilizations.",exam:true},
+  {q:"What is a FACT? What is an OPINION? Give one example of each from the texts.",
+   model:"A fact is a statement that can be proven true. For example: 'Ancient Egyptians invented the first cosmetics.' An opinion is what someone thinks or believes and cannot be proven. For example: 'Ancient Egyptians loved to have fun more than any other ancient people.'",exam:true},
+  {q:"How were the Great Pyramid of Giza built? Give details.",
+   model:"The Great Pyramid of Giza was built around 2540 B.C. It was made of limestone and granite. About 100,000 workers built it over 20 years. It was built as a tomb for Pharaoh Khufu.",exam:true},
+];
+
+/* ── SHUFFLE ── */
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+/* ── DRILL STATE ── */
+let drillQ=[], drillIdx=0, drillResults=[], currentDrill='';
+const oralState=ORAL.map(()=>({recorder:null,chunks:[],blob:null,timer:null}));
+
+/* ── HOME NAVIGATION ── */
+document.querySelectorAll('[data-drill]').forEach(btn=>{
+  btn.addEventListener('click',()=>startDrill(btn.dataset.drill));
+});
+document.getElementById('backBtn').addEventListener('click',goHome);
+document.getElementById('finishBtn').addEventListener('click',finishEarly);
+
+function goHome(){
+  document.getElementById('home').style.display='';
+  document.getElementById('panel').style.display='none';
+  window.speechSynthesis.cancel();
+}
+
+function startDrill(type){
+  currentDrill=type; drillIdx=0; drillResults=[];
+  document.getElementById('home').style.display='none';
+  document.getElementById('panel').style.display='block';
+  const TITLES={
+    vocab:'📖 Vocabulary',fill:'✏️ Fill in Blank',tf:'✅ True / False',
+    mc:'🔤 Multiple Choice',fo:'💡 Fact or Opinion',genre:'📚 Genre',
+    detail:'🔍 Reading for Details',egypt:'🏺 Egypt',yeller:'🐶 Old Yeller',
+    oral:'🗣️ Oral Must-Know',mock:'🎯 Full Mock Exam'
+  };
+  document.getElementById('panelTitle').textContent=TITLES[type]||type;
+  if(type==='oral'){
+    document.getElementById('finishBtn').style.display='none';
+    renderOral(); return;
+  }
+  document.getElementById('finishBtn').style.display='inline-block';
+  let pool;
+  if(type==='mock') pool=shuffle(BANK).slice(0,30);
+  else if(type==='egypt') pool=shuffle(BANK.filter(q=>q.st==='egypt'));
+  else if(type==='yeller') pool=shuffle(BANK.filter(q=>q.st==='yeller'));
+  else pool=shuffle(BANK.filter(q=>q.ty===type));
+  drillQ=pool;
+  renderQ();
+}
+
+/* ── RENDER QUESTION ── */
+function renderQ(){
+  const cont=document.getElementById('panelInner');
+  if(drillIdx>=drillQ.length){ showScore(); return; }
+  const q=drillQ[drillIdx];
+  const isMock=currentDrill==='mock';
+  const choices=shuffle(q.choices);
+  let html='';
+  if(isMock) html+=`<button class="newSetBtn" id="newSetBtn">🔀 New Random Set</button>`;
+  html+=`<div class="qCard">
+    <div class="qNum">Question ${drillIdx+1} / ${drillQ.length}</div>
+    <div class="qText" id="qText">${q.q}</div>
+    <button class="speakBtn" id="speakQBtn">🔊 Hear Question</button>
+    <div class="choices" id="choices">
+      ${choices.map((c,ci)=>`<button class="choice" data-c="${ci}" data-val="${c}">${c}</button>`).join('')}
+    </div>
+    <div>
+      <button class="checkBtn" id="checkBtn">Check Answer</button>
+      <button class="nextBtn" id="nextBtn">${drillIdx+1<drillQ.length?'Next →':'Finish!'}</button>
+    </div>
+    <div class="feedback" id="feedback"></div>
+  </div>`;
+  cont.innerHTML=html;
+  if(isMock) document.getElementById('newSetBtn').addEventListener('click',()=>startDrill('mock'));
+  document.getElementById('speakQBtn').addEventListener('click',()=>speak(q.q));
+  document.querySelectorAll('.choice').forEach(btn=>{
+    btn.addEventListener('click',function(){
+      if(this.disabled) return;
+      document.querySelectorAll('.choice').forEach(b=>b.classList.remove('selected'));
+      this.classList.add('selected');
+    });
+  });
+  document.getElementById('checkBtn').addEventListener('click',()=>checkAnswer(q));
+  document.getElementById('nextBtn').addEventListener('click',()=>{ drillIdx++; renderQ(); });
+}
+
+function checkAnswer(q){
+  const sel=document.querySelector('.choice.selected');
+  if(!sel){ alert('Please select an answer first.'); return; }
+  const given=sel.dataset.val;
+  const correct=q.a;
+  const isRight=given.toLowerCase()===correct.toLowerCase();
+  document.querySelectorAll('.choice').forEach(b=>b.disabled=true);
+  document.getElementById('checkBtn').style.display='none';
+  document.getElementById('nextBtn').style.display='inline-block';
+  drillResults.push({q:q.q,given,correct,ok:isRight});
+  const fb=document.getElementById('feedback');
+  if(isRight){
+    fb.className='feedback correct';
+    fb.textContent='✅ Correct! Great job!';
+  } else {
+    fb.className='feedback wrong';
+    fb.innerHTML='❌ Not quite.<div class="answerBox">✅ Correct answer: '+correct+'</div>';
+  }
+  sel.style.background=isRight?'rgba(46,125,50,.15)':'rgba(183,28,28,.15)';
+  sel.style.borderColor=isRight?'#81c784':'#ef9a9a';
+}
+
+function finishEarly(){ showScore(); }
+
+/* ── SCORE SCREEN ── */
+function showScore(){
+  const cont=document.getElementById('panelInner');
+  const answered=drillResults.length;
+  const correct=drillResults.filter(r=>r.ok).length;
+  const pct=answered>0?Math.round(correct/answered*100):0;
+  const stars=pct>=90?'⭐⭐⭐⭐⭐':pct>=75?'⭐⭐⭐⭐':pct>=55?'⭐⭐⭐':pct>=40?'⭐⭐':'⭐';
+  const label=pct>=90?'Outstanding! 🏆':pct>=75?'Good job! 😊':pct>=55?'Getting there! 💪':'Keep practising! 📖';
+  const wrong=drillResults.filter(r=>!r.ok);
+  const right=drillResults.filter(r=>r.ok);
+  let review='';
+  if(wrong.length){
+    review+='<div style="font-weight:800;margin-bottom:8px;color:var(--wrong)">❌ Review — wrong answers:</div>';
+    wrong.forEach(r=>{
+      review+=`<div class="reviewItem wrong">
+        <div class="reviewQ">${r.q}</div>
+        <div class="reviewA"><span class="wrong-a">Your answer: ${r.given}</span></div>
+        <div class="reviewA"><span class="correct-a">✅ Correct: ${r.correct}</span></div>
+      </div>`;
+    });
+  }
+  if(right.length){
+    review+='<div style="font-weight:800;margin:12px 0 8px;color:var(--correct)">✅ Correct answers:</div>';
+    right.forEach(r=>{
+      review+=`<div class="reviewItem">
+        <div class="reviewQ">${r.q}</div>
+        <div class="reviewA"><span class="correct-a">✅ ${r.correct}</span></div>
+      </div>`;
+    });
+  }
+  cont.innerHTML=`
+    <div class="scoreScreen show">
+      <div class="scoreStar">${stars}</div>
+      <div class="scorePct">${pct}%</div>
+      <div class="scoreDetail">${correct} / ${answered} correct · ${label}</div>
+      <button class="retryBtn" id="retryBtn">🔄 Try Again</button>
+    </div>
+    <div class="reviewList">${review}</div>`;
+  document.getElementById('retryBtn').addEventListener('click',()=>startDrill(currentDrill));
+}
+
+/* ── ORAL ── */
+function renderOral(){
+  const cont=document.getElementById('panelInner');
+  cont.innerHTML=`
+  <div style="background:#1a0a2a;border:2px solid #a855f7;color:#e9d5ff;border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:.9rem;line-height:1.7">
+    <strong style="color:#c084fc">Recording requires Safari or Chrome</strong><br>
+    Open this file in Safari (iOS) or Chrome — not inside another app.<br>
+    iOS: tap ··· → <em>Open in Safari</em>
+  </div>
+  ${ORAL.map((item,i)=>`
+  <div class="oralCard">
+    ${item.exam?'<div class="badge">★ EXAM MUST-KNOW</div>':''}
+    <div class="qNum">Oral Question ${i+1}</div>
+    <div class="qText" id="oq-${i}">${item.q}</div>
+    <div class="btnRow">
+      <button class="btn teal" data-oq="${i}">🔊 Hear Question</button>
+      <button class="btn red" id="orec-${i}">⏺ Record Answer</button>
+      <button class="btn green" id="oplay-${i}" disabled>▶ Play Back</button>
+    </div>
+    <div class="recInfo" id="ori-${i}"></div>
+    <div id="orw-${i}" style="display:none">
+      <button class="btn purple" data-orev="${i}">👁 Reveal Answer</button>
+    </div>
+    <div class="modelBox" id="omb-${i}">
+      <div class="modelLabel">✅ Model Answer</div>
+      <div class="modelText">${item.model}</div>
+      <div style="margin-top:10px">
+        <button class="btn teal" data-om="${i}">🔊 Hear Model Answer</button>
+      </div>
+    </div>
+  </div>`).join('')}`;
+
+  document.querySelectorAll('[data-oq]').forEach(btn=>{
+    const i=+btn.dataset.oq;
+    btn.addEventListener('click',()=>speak(ORAL[i].q));
+  });
+  document.querySelectorAll('[data-om]').forEach(btn=>{
+    const i=+btn.dataset.om;
+    btn.addEventListener('click',()=>speak(ORAL[i].model));
+  });
+  document.querySelectorAll('[data-orev]').forEach(btn=>{
+    const i=+btn.dataset.orev;
+    btn.addEventListener('click',()=>{
+      document.getElementById('omb-'+i).classList.add('show');
+      document.getElementById('orw-'+i).style.display='none';
+    });
+  });
+  ORAL.forEach((_,i)=>{
+    document.getElementById('orec-'+i).addEventListener('click',()=>oralToggle(i));
+    document.getElementById('oplay-'+i).addEventListener('click',()=>oralPlay(i));
+  });
+}
+
+async function oralToggle(i){
+  const s=oralState[i];
+  const btn=document.getElementById('orec-'+i);
+  const info=document.getElementById('ori-'+i);
+  if(!s.recorder||s.recorder.state==='inactive'){
+    try{
+      const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+      const mimes=['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg'];
+      const mime=mimes.find(m=>MediaRecorder.isTypeSupported(m))||'';
+      s.recorder=new MediaRecorder(stream,mime?{mimeType:mime}:{});
+      s.chunks=[];
+      s.recorder.ondataavailable=e=>{ if(e.data.size>0) s.chunks.push(e.data); };
+      s.recorder.onstop=()=>{
+        s.blob=new Blob(s.chunks,{type:s.recorder.mimeType||'audio/webm'});
+        document.getElementById('oplay-'+i).disabled=false;
+        document.getElementById('orw-'+i).style.display='block';
+        btn.textContent='⏺ Record Again'; btn.classList.remove('active');
+        info.textContent='Recording saved!';
+        clearInterval(s.timer);
+      };
+      s.recorder.start(200);
+      btn.textContent='⏹ Stop'; btn.classList.add('active');
+      let sec=0;
+      s.timer=setInterval(()=>{
+        sec++; info.textContent='Recording… '+sec+'s / 90s';
+        if(sec>=90) oralToggle(i);
+      },1000);
+    }catch(e){
+      alert('Microphone access denied. Allow microphone in browser settings.');
+    }
+  } else if(s.recorder.state==='recording'){
+    clearInterval(s.timer);
+    s.recorder.stop();
+    s.recorder.stream.getTracks().forEach(t=>t.stop());
+  }
+}
+
+function oralPlay(i){
+  const s=oralState[i];
+  if(!s.blob) return;
+  const url=URL.createObjectURL(s.blob);
+  const audio=new Audio(url);
+  audio.play();
+}
+</script>
+</body>
+</html>

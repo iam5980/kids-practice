@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📚 English Quiz Practice</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap');
+:root{--bg:#0f1923;--card:#1a2840;--card2:#1e304d;--accent:#f7c948;--accent2:#4ecdc4;--green:#51cf66;--red:#ff6b6b;--text:#e8f4f8;--muted:#7a9bb5;--border:#2a4060;--radius:16px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:16px;}
+
+/* HOME */
+#home{max-width:680px;margin:0 auto;padding-top:20px;}
+.app-title{font-family:'Fredoka One',cursive;font-size:2.4rem;color:var(--accent);letter-spacing:1px;text-shadow:0 0 30px rgba(247,201,72,.4);margin-bottom:4px;text-align:center;}
+.app-sub{color:var(--muted);font-size:.9rem;margin-bottom:20px;text-align:center;}
+
+/* Category groups */
+.cat-group{margin-bottom:20px;}
+.cat-label{font-family:'Fredoka One',cursive;font-size:.85rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;padding-left:4px;}
+.section-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+.section-card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:14px 12px;cursor:pointer;transition:all .2s;text-align:left;position:relative;}
+.section-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 6px 20px rgba(247,201,72,.15);}
+.section-card.selected{border-color:var(--accent);background:#2a3f60;}
+.sc-title{font-weight:800;font-size:.88rem;color:var(--accent);margin-bottom:3px;}
+.sc-count{font-size:.75rem;color:var(--muted);}
+.sc-check{position:absolute;top:10px;right:12px;color:var(--green);font-size:1rem;display:none;}
+.section-card.selected .sc-check{display:inline;}
+
+/* Card colour variants */
+.card-vocab .sc-title{color:#4ecdc4;}
+.card-vocab.selected,.card-vocab:hover{border-color:#4ecdc4;}
+.card-vocab.selected{background:#0f2a28;}
+.card-comp .sc-title{color:#74c0fc;}
+.card-comp.selected,.card-comp:hover{border-color:#74c0fc;}
+.card-comp.selected{background:#0f1e30;}
+.card-lang .sc-title{color:#ffa94d;}
+.card-lang.selected,.card-lang:hover{border-color:#ffa94d;}
+.card-lang.selected{background:#2a1a0a;}
+.card-oral .sc-title{color:#a78bfa;}
+.card-oral.selected,.card-oral:hover{border-color:#a78bfa;}
+.card-oral.selected{background:#1a1030;}
+.card-mock{border-color:#ff6b6b;background:linear-gradient(135deg,#1a2840,#2a0f0f);}
+.card-mock .sc-title{color:#ff6b6b;font-size:1rem;}
+.card-mock:hover{border-color:#ff9999;box-shadow:0 6px 20px rgba(255,107,107,.3);}
+.card-mock.selected{border-color:#ff9999;background:linear-gradient(135deg,#2a1010,#2a0f0f);}
+.card-mistakes{border-color:#ff9f43;background:linear-gradient(135deg,#1a2840,#2a1f10);}
+.card-mistakes .sc-title{color:#ff9f43;}
+.card-mistakes:hover{border-color:#ffd32a;}
+.card-mistakes.selected{border-color:#ffd32a;background:linear-gradient(135deg,#2a2510,#2a1f10);}
+
+/* Oral TTS panel */
+.oral-panel{border-radius:16px;padding:16px;margin-bottom:14px;display:none;
+  background:linear-gradient(135deg,rgba(167,139,250,.1),rgba(78,205,196,.07));
+  border:2px solid rgba(167,139,250,.4);}
+.oral-panel.show{display:block;}
+.oral-title{font-family:'Fredoka One',cursive;font-size:1rem;color:#c4b5fd;margin-bottom:12px;}
+
+/* Step rows */
+.oral-steps{display:flex;flex-direction:column;gap:10px;}
+.oral-step{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);border-radius:11px;padding:10px 12px;}
+.step-num{min-width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900;flex-shrink:0;}
+.step-num.s1{background:rgba(167,139,250,.3);color:#c4b5fd;}
+.step-num.s2{background:rgba(255,107,107,.3);color:#ff9999;}
+.step-num.s3{background:rgba(81,207,102,.3);color:#a3e9b4;}
+.step-num.s4{background:rgba(78,205,196,.3);color:#4ecdc4;}
+.step-label{font-size:.8rem;color:var(--muted);flex:1;}
+
+/* Buttons */
+.tts-btn{padding:7px 14px;border:2px solid rgba(167,139,250,.5);background:rgba(167,139,250,.12);
+  color:#c4b5fd;border-radius:99px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.78rem;
+  cursor:pointer;transition:all .2s;white-space:nowrap;}
+.tts-btn:hover{background:rgba(167,139,250,.28);border-color:#c4b5fd;}
+.tts-btn.speaking{background:rgba(167,139,250,.3);border-color:#c4b5fd;color:#fff;
+  animation:glow .9s ease-in-out infinite;}
+@keyframes glow{0%,100%{box-shadow:0 0 6px rgba(167,139,250,.4)}50%{box-shadow:0 0 16px rgba(167,139,250,.8)}}
+
+.rec-btn{padding:7px 14px;border:2px solid rgba(255,107,107,.5);background:rgba(255,107,107,.12);
+  color:#ff9999;border-radius:99px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.78rem;
+  cursor:pointer;transition:all .2s;white-space:nowrap;}
+.rec-btn:hover{background:rgba(255,107,107,.28);}
+.rec-btn.recording{background:rgba(255,107,107,.3);border-color:#ff6b6b;color:#fff;
+  animation:pulse .8s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+
+.play-btn{padding:7px 14px;border:2px solid rgba(81,207,102,.5);background:rgba(81,207,102,.12);
+  color:#a3e9b4;border-radius:99px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.78rem;
+  cursor:pointer;transition:all .2s;white-space:nowrap;}
+.play-btn:hover{background:rgba(81,207,102,.28);}
+.play-btn:disabled{opacity:.35;cursor:not-allowed;}
+.play-btn.playing{background:rgba(81,207,102,.3);color:#fff;}
+
+.compare-btn{padding:7px 14px;border:2px solid rgba(78,205,196,.5);background:rgba(78,205,196,.12);
+  color:#4ecdc4;border-radius:99px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.78rem;
+  cursor:pointer;transition:all .2s;white-space:nowrap;}
+.compare-btn:hover{background:rgba(78,205,196,.28);}
+.compare-btn:disabled{opacity:.35;cursor:not-allowed;}
+
+/* Waveform / timer */
+.rec-timer{font-family:'Fredoka One',cursive;font-size:.85rem;color:#ff9999;
+  min-width:38px;text-align:center;}
+.rec-wave{display:flex;align-items:center;gap:2px;margin-left:4px;}
+.rec-wave span{display:inline-block;width:3px;background:#ff9999;border-radius:99px;
+  animation:wave .7s ease-in-out infinite;}
+.rec-wave span:nth-child(2){animation-delay:.1s;height:10px;}
+.rec-wave span:nth-child(3){animation-delay:.2s;height:16px;}
+.rec-wave span:nth-child(4){animation-delay:.1s;height:10px;}
+.rec-wave span:nth-child(5){animation-delay:0s;}
+@keyframes wave{0%,100%{height:4px}50%{height:18px}}
+.rec-wave{display:none;}
+.rec-wave.show{display:flex;}
+
+.oral-status-bar{font-size:.75rem;color:var(--muted);margin-top:10px;
+  padding:6px 10px;background:rgba(255,255,255,.04);border-radius:8px;min-height:30px;
+  display:flex;align-items:center;gap:6px;}
+
+.toolbar{display:flex;gap:10px;margin-bottom:16px;justify-content:center;flex-wrap:wrap;}
+.tool-btn{background:none;border:2px solid var(--border);color:var(--muted);padding:7px 16px;border-radius:99px;font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer;font-size:.82rem;transition:all .2s;}
+.tool-btn:hover{border-color:var(--accent2);color:var(--accent2);}
+.start-btn{width:100%;padding:15px;font-family:'Fredoka One',cursive;font-size:1.3rem;letter-spacing:1px;background:var(--accent);color:#1a1a1a;border:none;border-radius:var(--radius);cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(247,201,72,.3);margin-top:8px;}
+.start-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(247,201,72,.45);}
+.start-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+
+/* QUIZ */
+#quiz{max-width:680px;margin:0 auto;display:none;}
+.quiz-header{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.back-btn{background:var(--card);border:2px solid var(--border);color:var(--muted);width:38px;height:38px;border-radius:50%;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
+.back-btn:hover{border-color:var(--accent);color:var(--accent);}
+.progress-wrap{flex:1;}
+.progress-label{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin-bottom:4px;}
+.progress-bar{height:8px;background:var(--border);border-radius:99px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:99px;transition:width .4s ease;}
+.score-badge{font-weight:800;font-size:.85rem;background:var(--card);border:2px solid var(--border);padding:5px 12px;border-radius:99px;white-space:nowrap;}
+
+.question-card{background:var(--card);border:2px solid var(--border);border-radius:20px;padding:24px;margin-bottom:14px;animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.q-tag{display:inline-block;font-size:.7rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:99px;margin-bottom:10px;}
+.tag-mc{background:rgba(78,205,196,.15);color:var(--accent2);}
+.tag-tf{background:rgba(255,107,107,.15);color:var(--red);}
+.tag-fill{background:rgba(247,201,72,.15);color:var(--accent);}
+.tag-oral{background:rgba(167,139,250,.2);color:#c4b5fd;border:1px solid rgba(167,139,250,.3);}
+.q-text{font-size:1rem;font-weight:700;line-height:1.55;color:var(--text);margin-bottom:6px;}
+.q-context{font-size:.82rem;color:var(--muted);margin-bottom:16px;font-style:italic;}
+
+.options-grid{display:grid;gap:9px;}
+.option-btn{width:100%;text-align:left;padding:11px 14px;background:var(--card2);border:2px solid var(--border);border-radius:11px;color:var(--text);font-family:'Nunito',sans-serif;font-size:.92rem;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:9px;}
+.option-btn:hover:not(:disabled){border-color:var(--accent2);background:rgba(78,205,196,.08);}
+.option-btn.correct{border-color:var(--green);background:rgba(81,207,102,.12);color:var(--green);}
+.option-btn.wrong{border-color:var(--red);background:rgba(255,107,107,.12);color:var(--red);}
+.opt-letter{min-width:24px;height:24px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;flex-shrink:0;}
+.tf-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fill-input{width:100%;padding:11px 14px;background:var(--card2);border:2px solid var(--border);border-radius:11px;color:var(--text);font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:600;outline:none;transition:border .2s;}
+.fill-input:focus{border-color:var(--accent2);}
+.fill-input.correct{border-color:var(--green);background:rgba(81,207,102,.08);}
+.fill-input.wrong{border-color:var(--red);background:rgba(255,107,107,.08);}
+.hint-row{font-size:.78rem;color:var(--muted);margin-top:5px;}
+.correct-ans{color:var(--green);font-weight:700;}
+.feedback-box{padding:11px 14px;border-radius:11px;font-weight:700;font-size:.9rem;margin-top:12px;display:none;}
+.feedback-box.show{display:block;}
+.feedback-box.ok{background:rgba(81,207,102,.12);color:var(--green);border:1.5px solid rgba(81,207,102,.3);}
+.feedback-box.nope{background:rgba(255,107,107,.12);color:var(--red);border:1.5px solid rgba(255,107,107,.3);}
+.note-box{margin-top:10px;padding:9px 13px;background:rgba(255,159,67,.1);border:1.5px solid rgba(255,159,67,.35);border-radius:10px;font-size:.8rem;color:#ffd32a;line-height:1.5;display:none;}
+.note-box.show{display:block;}
+.submit-btn{width:100%;padding:13px;font-family:'Fredoka One',cursive;font-size:1.1rem;letter-spacing:1px;background:linear-gradient(135deg,var(--accent2),#2ec4b6);color:#0f1923;border:none;border-radius:13px;cursor:pointer;transition:all .2s;margin-top:4px;}
+.submit-btn:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(78,205,196,.3);}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.next-btn{width:100%;padding:13px;font-family:'Fredoka One',cursive;font-size:1.1rem;letter-spacing:1px;background:var(--accent);color:#1a1a1a;border:none;border-radius:13px;cursor:pointer;transition:all .2s;margin-top:10px;box-shadow:0 4px 18px rgba(247,201,72,.25);}
+.next-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(247,201,72,.4);}
+
+/* RESULTS */
+#results{max-width:580px;margin:0 auto;display:none;text-align:center;}
+.result-ring{width:150px;height:150px;border-radius:50%;background:conic-gradient(var(--green) 0%,var(--border) 0%);display:flex;align-items:center;justify-content:center;margin:16px auto 20px;box-shadow:0 0 40px rgba(81,207,102,.25);}
+.result-ring-inner{width:112px;height:112px;background:var(--bg);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.result-pct{font-family:'Fredoka One',cursive;font-size:2rem;color:var(--text);}
+.result-label{font-size:.72rem;color:var(--muted);font-weight:700;}
+.result-title{font-family:'Fredoka One',cursive;font-size:1.9rem;color:var(--accent);margin-bottom:5px;}
+.result-sub{color:var(--muted);margin-bottom:20px;}
+.review-list{text-align:left;margin-bottom:20px;}
+.review-item{background:var(--card);border-left:4px solid var(--red);border-radius:0 11px 11px 0;padding:12px 14px;margin-bottom:8px;}
+.review-item.ok-item{border-color:var(--green);}
+.ri-q{font-weight:700;font-size:.85rem;color:var(--text);margin-bottom:3px;}
+.ri-yours{font-size:.78rem;color:var(--red);}
+.ri-correct{font-size:.78rem;color:var(--green);font-weight:700;}
+.ri-ok-label{font-size:.78rem;color:var(--green);font-weight:700;}
+.result-btns{display:flex;gap:10px;}
+.result-btn{flex:1;padding:13px;font-family:'Fredoka One',cursive;font-size:1rem;border:none;border-radius:13px;cursor:pointer;transition:all .2s;}
+.rb-retry{background:var(--accent);color:#1a1a1a;}
+.rb-home{background:var(--card);border:2px solid var(--border);color:var(--text);}
+.rb-retry:hover{transform:translateY(-2px);}
+.rb-home:hover{border-color:var(--accent);color:var(--accent);}
+.review-toggle{background:none;border:2px solid var(--border);color:var(--muted);padding:8px 18px;border-radius:99px;font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer;margin-bottom:14px;font-size:.82rem;transition:all .2s;}
+.review-toggle:hover{border-color:var(--accent2);color:var(--accent2);}
+
+@media(max-width:480px){.section-grid{grid-template-columns:1fr;}.app-title{font-size:2rem;}.result-btns{flex-direction:column;}}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home">
+  <div class="app-title">📚 Quiz Practice</div>
+  <div class="app-sub">Orchid Class · Reading Street 5.1 · Final Exam Review</div>
+
+  <div class="toolbar">
+    <button class="tool-btn" onclick="toggleAll()">☑ Select / Deselect All</button>
+    <button class="tool-btn" onclick="selectCategory('vocab')">📝 Vocab Only</button>
+    <button class="tool-btn" onclick="selectCategory('comp')">📖 Comp Only</button>
+    <button class="tool-btn" onclick="selectCategory('lang')">🔤 Language Only</button>
+  </div>
+
+  <div id="sectionGrid"></div>
+
+  <button class="start-btn" id="startBtn" onclick="startQuiz()" disabled>🚀 Start Practice!</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz">
+  <div class="quiz-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div class="progress-wrap">
+      <div class="progress-label"><span id="qLabel">Question 1</span><span id="qTotal">of 0</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+    <div class="score-badge" id="scoreBadge">✓ 0 | ✗ 0</div>
+  </div>
+  <div id="questionArea"></div>
+
+  <!-- Oral TTS + Recording Panel -->
+  <div class="oral-panel" id="oralPanel">
+    <div class="oral-title">🎤 Oral Practice</div>
+    <div class="oral-steps">
+
+      <!-- Step 1: Listen to question -->
+      <div class="oral-step">
+        <div class="step-num s1">1</div>
+        <div class="step-label">Listen to the question</div>
+        <button class="tts-btn" id="ttsReadBtn" onclick="ttsRead()">🔊 Play Question</button>
+      </div>
+
+      <!-- Step 2: Record answer -->
+      <div class="oral-step">
+        <div class="step-num s2">2</div>
+        <div class="step-label">Record your answer</div>
+        <span class="rec-timer" id="recTimer">0:00</span>
+        <div class="rec-wave" id="recWave">
+          <span style="height:4px"></span><span></span><span></span><span></span><span style="height:4px"></span>
+        </div>
+        <button class="rec-btn" id="recBtn" onclick="toggleRecord()">⏺ Start</button>
+      </div>
+
+      <!-- Step 3: Play back own voice -->
+      <div class="oral-step">
+        <div class="step-num s3">3</div>
+        <div class="step-label">Listen to yourself</div>
+        <button class="play-btn" id="playMyBtn" onclick="playMyRecording()" disabled>▶ Play My Answer</button>
+      </div>
+
+      <!-- Step 4: Compare with model answer -->
+      <div class="oral-step">
+        <div class="step-num s4">4</div>
+        <div class="step-label">Hear the model answer</div>
+        <button class="compare-btn" id="ttsAnswerBtn" onclick="ttsReadAnswer()" disabled>📢 Model Answer</button>
+      </div>
+
+    </div>
+    <div class="oral-status-bar" id="oralStatus">
+      <span id="oralStatusText">👆 Tap "Play Question" to start!</span>
+    </div>
+  </div>
+
+  <button class="submit-btn" id="submitBtn" onclick="checkAnswer()">Check Answer ✓</button>
+  <button class="next-btn" id="nextBtn" onclick="nextQuestion()" style="display:none">Next →</button>
+</div>
+
+<!-- RESULTS -->
+<div id="results">
+  <div class="result-title" id="resultEmoji">🎉 Great Job!</div>
+  <div class="result-ring" id="resultRing">
+    <div class="result-ring-inner">
+      <div class="result-pct" id="resultPct">0%</div>
+      <div class="result-label">SCORE</div>
+    </div>
+  </div>
+  <div class="result-sub" id="resultSub">You got X out of Y correct.</div>
+  <button class="review-toggle" onclick="toggleReview()">📋 Show Answer Review</button>
+  <div id="reviewList" class="review-list" style="display:none"></div>
+  <div class="result-btns">
+    <button class="result-btn rb-retry" onclick="retryQuiz()">🔁 Retry</button>
+    <button class="result-btn rb-home" onclick="goHome()">🏠 Home</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  QUESTION BANK  ── reorganised by TYPE, not by week
+// ═══════════════════════════════════════════════════════════════
+
+const SECTIONS = [
+
+// ──────────────────────────────────────────────────────────────
+// GROUP: VOCABULARY
+// ──────────────────────────────────────────────────────────────
+{
+  id:'vocab_waterhouse', title:'📝 Vocab – Waterhouse Hawkins', cat:'vocab',
+  questions:[
+    {type:'fill',text:'I was a little late, so I _____ up the stairs so I would not miss class.',answer:'hurried',hint:'Past tense of "to hurry"'},
+    {type:'fill',text:'The remains of a pre-historic plant or animal preserved in solid form is a _____.',answer:'fossil',hint:'Think of dinosaur bones in rock'},
+    {type:'fill',text:'The _____ studies the dinosaur fossils we found.',answer:'paleontologist',hint:'A scientist who studies ancient life'},
+    {type:'fill',text:'He has a real _____ for this kind of work.',answer:'passion',hint:'Strong love or enthusiasm'},
+    {type:'fill',text:'When something moves about in search of prey it is on the _____.',answer:'prowl',hint:'Predators do this at night'},
+    {type:'fill',text:'When the artist quickly _____ a drawing, he used it to help himself when _____ a statue.',answer:'sketching / sculpting',hint:'Drawing quickly / making 3D art'},
+    {type:'fill',text:'A four-wheeled passenger vehicle pulled by horses is called a _____.',answer:'carriage',hint:'Before cars existed…'},
+    {type:'fill',text:'A Stegosaurus has large _____ all across its back.',answer:'spikes',hint:'Sharp pointed things'},
+    {type:'fill',text:'He threw a rock at me! Luckily I saw it coming and _____ it.',answer:'dodged',hint:'Moved quickly out of the way'},
+    {type:'fill',text:'The paleontologist _____ a huge amount of dinosaur bones in a field.',answer:'unearthed',hint:'Dug up from the ground'},
+    {type:'fill',text:'I quickly _____ up my bedroom before my friend came over.',answer:'tidied',hint:'Made neat and clean'},
+    {type:'fill',text:'A part or share of something compared to the whole is the _____.',answer:'proportion',hint:'Relative size of each part'},
+    {type:'fill',text:'He _____ the iron skeletons and built brick _____ before covering them in cement.',answer:'erected / foundations',hint:'Set up / base structures'},
+    {type:'fill',text:'The branch of science about bodily structure of living things is called _____.',answer:'anatomy',hint:'Biology of body structure'},
+    {type:'fill',text:'I _____ started my storytelling speech. I had memorized the whole story.',answer:'nervously',hint:'With anxiety or worry'},
+    {type:'fill',text:'This is the name of a particularly large type of dinosaur: _____.',answer:'iguanodon',hint:'Large plant-eating dinosaur'},
+    {type:'fill',text:'Frogs are _____, they are not mammals.',answer:'amphibians',hint:'Cold-blooded, live in water and on land'},
+    {type:'fill',text:'It was a _____ game that was being watched all around the world.',answer:'monumental',hint:'Extremely large or important'},
+  ]
+},
+
+{
+  id:'vocab_dinner', title:'📝 Vocab – The Dinner Party (Week 3)', cat:'vocab',
+  questions:[
+    {type:'fill',text:'Santa Claus _____ that heavy sack around behind him all night.',answer:'hauled',hint:'Pulled/dragged with great effort'},
+    {type:'fill',text:'A winged dinosaur that can be seen sketched on the invitations is a _____.',answer:'pterodactyl',hint:'Flying prehistoric reptile'},
+    {type:'fill',text:'The _____ loved the new play and he _____ in their approval and positive words.',answer:'critics / basked',hint:'Reviewers / enjoyed warmly'},
+    {type:'fill',text:'Everyone waited with great _____ to find out how the story would end.',answer:'anticipation',hint:'Excited expectation'},
+    {type:'fill',text:'The judge spoke in a _____ voice when he told the man he was guilty.',answer:'solemn',hint:'Serious and dignified'},
+    {type:'fill',text:'I walked into the _____ dining hall; they even had seafood _____ with full lobsters!',answer:'lavish / platters',hint:'Extravagant / large serving dishes'},
+    {type:'fill',text:'A prince or top scientist would be described as _____ as they are famous and respected.',answer:'eminent',hint:'Famous and respected'},
+    {type:'fill',text:'I enjoy greeting guests but my sister describes it as just a _____.',answer:'formality',hint:'A routine done out of politeness'},
+  ]
+},
+
+{
+  id:'vocab_flag', title:'📝 Vocab – Hold the Flag High', cat:'vocab',
+  questions:[
+    {type:'fill',text:'An action that shows respect for someone. He was the first African American to earn this _____.',answer:'tribute',hint:'Honor paid to someone'},
+    {type:'fill',text:'You have been beaten, you lost the battle. The Federal soldiers struggled away _____ .',answer:'defeated',hint:'Having lost the fight'},
+    {type:'fill',text:'You have won the battle. This is called a _____.',answer:'victory',hint:'Opposite of defeat'},
+    {type:'fill',text:'They _____ Carney because he helped defeat the enemy.',answer:'congratulated',hint:'To praise someone\'s success'},
+    {type:'fill',text:'Carney carried the flag safely back before he _____.',answer:'collapsed',hint:'Fell down due to injury/exhaustion'},
+    {type:'fill',text:'I went to Hannah\'s party and I _____ with many people I hadn\'t met before.',answer:'mingled',hint:'Mixed and chatted socially'},
+    {type:'fill',text:'I brought _____ donuts with me, so I had enough to share.',answer:'a dozen',hint:'Twelve of something'},
+    {type:'fill',text:'"I want to look _____," he said looking for his King Halloween costume.',answer:'regal',hint:'Like a king or queen; royal-looking'},
+    {type:'fill',text:'A building material made from broken stone, sand, cement and water is _____.',answer:'concrete',hint:'Used to build roads and buildings'},
+    {type:'fill',text:'_____ had damaged the statue and we needed to have it fixed.',answer:'Vandals',hint:'People who deliberately destroy things'},
+    {type:'fill',text:'There were many _____ in the arena who could not believe what they witnessed.',answer:'spectators',hint:'People watching an event'},
+    {type:'fill',text:'People important because of high rank or office are called _____.',answer:'dignitaries',hint:'VIPs; important officials'},
+  ]
+},
+
+// ──────────────────────────────────────────────────────────────
+// GROUP: COMPREHENSION
+// ──────────────────────────────────────────────────────────────
+{
+  id:'comp_waterhouse', title:'📖 Comprehension – Waterhouse (Weeks 1–4)', cat:'comp',
+  questions:[
+    {type:'mc',text:'Why was Waterhouse Hawkins in such a hurry to get back? (pg 396)',options:['He was late for dinner','He was expecting some very important visitors','He had to meet the Queen','He was afraid of the dark'],answer:'He was expecting some very important visitors'},
+    {type:'mc',text:'What did Waterhouse really love doing? (pg 397)',options:['Reading books about animals','Sketching and painting animals','Sculpting models of animals','Cooking meals'],answer:'Sculpting models of animals'},
+    {type:'mc',text:'What exciting project was Waterhouse busy doing? (pg 398)',options:['Painting a mural for the Queen','Building life-size dinosaur sculptures','Writing a science book with Richard Owen','Digging for fossils in a field'],answer:'Building life-size dinosaur sculptures'},
+    {type:'mc',text:'What was the FIRST step for Waterhouse making his dinosaurs? (pg 402)',options:['Making drawings of the creatures','Building iron skeletons','Pouring cement casts','Consulting a paleontologist'],answer:'Making drawings of the creatures'},
+    {type:'mc',text:'What did Waterhouse do with the help of his assistants? (pg 402)',options:['Painted the finished dinosaurs','Formed life-size clay figures and created the molds from them','Dug up fossils in a field','Mixed and poured the cement casts'],answer:'Formed life-size clay figures and created the molds from them'},
+    {type:'mc',text:'What did Waterhouse conclude about building his dinosaurs? (pg 402)',options:['It was easy because of his assistants','It was no less than building a house upon four columns','He needed more money to finish','He should have used a different method'],answer:'It was no less than building a house upon four columns'},
+    {type:'mc',text:'What did Waterhouse do with great anticipation? (pg 404)',options:['He started building the second dinosaur','He dressed for the occasion in his finest attire, ready to reveal his masterpiece','He presented his work to the Queen','He wrote a letter to Richard Owen'],answer:'He dressed for the occasion in his finest attire, ready to reveal his masterpiece'},
+    {type:'mc',text:'What did Waterhouse\'s guests do for eight hours? (pg 407)',options:['Danced and sang','For eight hours they rang in the New Year, laughing, shouting and toasting Waterhouse','Watched a play','Worked on the dinosaur models'],answer:'For eight hours they rang in the New Year, laughing, shouting and toasting Waterhouse'},
+    {type:'mc',text:'What were the guests doing by midnight? (pg 407)',options:['Sleeping','Belting out a song created especially for the occasion','Cleaning up after dinner','Walking home through London'],answer:'Belting out a song created especially for the occasion'},
+    {type:'tf',text:'Waterhouse signed the iguanodon on the lower jaw with "B. HAWKINS, BUILDER, 1854". (pg 408)',answer:'True'},
+    {type:'tf',text:'Forty thousand spectators attended the Crystal Palace ceremony. (pg 408)',answer:'True'},
+    {type:'tf',text:'Waterhouse mingled with foreign scientists and top dignitaries. (pg 408)',answer:'True'},
+    {type:'tf',text:'Waterhouse went to the lake to wait for the crowd to arrive. (pg 409)',answer:'True'},
+    {type:'tf',text:'The crowds laughed and cried when they saw the dinosaurs. (pg 409)',answer:'True'},
+    {type:'tf',text:'Waterhouse traveled to the United States in 1868. (Afterword)',answer:'True'},
+    {type:'mc',text:'What did Waterhouse do in 1868? (Afterword pg 411)',options:['He built new dinosaurs in London','He traveled to the United States to create the first-ever model of a complete dinosaur skeleton','He wrote a book about dinosaurs','He retired from sculpting'],answer:'He traveled to the United States to create the first-ever model of a complete dinosaur skeleton'},
+    {type:'mc',text:'What did vandals do to Waterhouse\'s work in New York?',options:['They painted over it','They broke in, smashed the models to pieces, and buried them in Central Park','They stole pieces of the sculptures','They moved them to a museum'],answer:'They broke in, smashed the models to pieces, and buried them in Central Park'},
+    {type:'mc',text:'Where are pieces of Waterhouse\'s dinosaurs today?',options:['In a museum in London','Still buried somewhere in Central Park','In a warehouse in Philadelphia','On display in a natural history museum'],answer:'Still buried somewhere in Central Park'},
+  ]
+},
+
+{
+  id:'comp_flag', title:'📖 Comprehension – Hold the Flag High', cat:'comp',
+  questions:[
+    {type:'mc',text:'Where was the sharpshooter? (passage)',options:['Behind the crumbling wall of the fortress','In the open field','On top of the fort wall','Behind a tree'],answer:'Behind the crumbling wall of the fortress'},
+    {type:'mc',text:'Why was the ground shaking?',options:['An earthquake','A shell exploded nearby','Cavalry charging','Cannons firing from inside the fort'],answer:'A shell exploded nearby'},
+    {type:'mc',text:'How did the infantry move?',options:['They charged quickly','They retreated','They advanced cautiously','They marched in a tight formation'],answer:'They advanced cautiously'},
+    {type:'tf',text:'The Fifty-Fourth woke up long before the sun rose. (pg 212)',answer:'True'},
+    {type:'tf',text:'The soldiers made sure their bayonets were sharp. (pg 212)',answer:'True'},
+    {type:'tf',text:'A color bearer was highly respected by the other soldiers. (pg 213)',answer:'True'},
+    {type:'tf',text:'Commander Shaw rode a white stallion. (pg 213)',answer:'True'},
+    {type:'tf',text:'Commander Shaw showed no fear in his speech to his troops. (pg 213)',answer:'True'},
+    {type:'tf',text:'Ned was uninjured when a shell exploded near him. (pg 214)',answer:'True'},
+    {type:'mc',text:'Who raised the flag over Fort Wagner\'s ramparts?',options:['Commander Shaw','William H. Carney','Ned','A Union officer'],answer:'William H. Carney'},
+    {type:'mc',text:'What would survivors of the battle of Fort Wagner never forget?',options:['The date of the battle','Brave Sergeant Carney, who showed the way by holding the flag high','The number of soldiers who died','Commander Shaw\'s speech'],answer:'Brave Sergeant Carney, who showed the way by holding the flag high'},
+    {type:'mc',text:'How was Colonel Robert Gould Shaw honored? (pg 219)',options:['He was given a statue in Boston','Carney and members of the Fifty-Fourth contributed funds to erect an impressive bronze memorial','He was awarded the Medal of Honor','He was buried with full military honors in Washington'],answer:'Carney and members of the Fifty-Fourth contributed funds to erect an impressive bronze memorial'},
+    {type:'mc',text:'How was William H. Carney honored? (pg 219)',options:['He received a cash prize','He was awarded the Congressional Medal of Honor — the first African American to earn it','He became a general','He was honored with a statue'],answer:'He was awarded the Congressional Medal of Honor — the first African American to earn it'},
+    {type:'mc',text:'Character Study: "He was the drummer for the 54th regiment." — Carney, Ned, or Both?',options:['Carney','Ned','Both'],answer:'Ned'},
+    {type:'mc',text:'Character Study: "A shell exploded next to him, but luckily he was uninjured." — Carney, Ned, or Both?',options:['Carney','Ned','Both'],answer:'Ned'},
+    {type:'mc',text:'Character Study: "He was shot three times and collapsed onto the ground." — Carney, Ned, or Both?',options:['Carney','Ned','Both'],answer:'Carney'},
+    {type:'mc',text:'Character Study: "He carried the flag safely behind Union lines." — Carney, Ned, or Both?',options:['Carney','Ned','Both'],answer:'Carney'},
+    {type:'mc',text:'Character Study: "They played an important role in the battle." — Carney, Ned, or Both?',options:['Carney','Ned','Both'],answer:'Both'},
+    {type:'mc',text:'Character Study: "He was awarded a Medal of Honor for his bravery." — Carney, Ned, or Both?',options:['Carney','Ned','Both'],answer:'Carney'},
+    {type:'mc',text:'Character Study: "He and the other soldiers congratulated Carney." — Carney, Ned, or Both?',options:['Carney','Ned','Both'],answer:'Ned'},
+  ]
+},
+
+{
+  id:'comp_sequence', title:'📖 Sequencing – Carney\'s Story (in order)', cat:'comp',
+  questions:[
+    {type:'mc',text:'SEQUENCING — What happened FIRST at Fort Wagner? (pg 214)',options:['The flag was dropped by the carrier','Carney felt a burning sensation as a bullet tore through his flesh','The bugler sounded retreat','Carney received the Medal of Honor'],answer:'Carney felt a burning sensation as a bullet tore through his flesh'},
+    {type:'mc',text:'SEQUENCING — What happened SECOND? (pg 214)',options:['The bugler sounded retreat','Carney picked up the falling flag — the carrier had been shot dead','Carney was shot two more times','Carney received the Medal of Honor'],answer:'Carney picked up the falling flag — the carrier had been shot dead'},
+    {type:'mc',text:'SEQUENCING — What happened THIRD? (pg 214)',options:['Carney felt the first bullet','The bugler sounded retreat','Carney lifted the banner and two more shots slammed into him','Carney received the Medal of Honor'],answer:'Carney lifted the banner and two more shots slammed into him'},
+    {type:'mc',text:'SEQUENCING — What happened FOURTH? (pg 216)',options:['Carney felt the first bullet','The flag was dropped','The Union bugler sounded retreat — Carney carried the flag safely back behind Union lines before he collapsed','Carney received the Medal of Honor'],answer:'The Union bugler sounded retreat — Carney carried the flag safely back behind Union lines before he collapsed'},
+    {type:'mc',text:'SEQUENCING — What happened LAST? (pg 219 Epilogue)',options:['The flag was dropped','Carney felt the first bullet','The bugler sounded retreat','Carney was awarded the Congressional Medal of Honor'],answer:'Carney was awarded the Congressional Medal of Honor'},
+  ]
+},
+
+// ──────────────────────────────────────────────────────────────
+// GROUP: LANGUAGE SKILLS
+// ──────────────────────────────────────────────────────────────
+{
+  id:'lang_antonyms', title:'🔤 Antonyms', cat:'lang',
+  questions:[
+    {type:'mc',text:'The man <u>buried</u> the treasure on the deserted island. What is the antonym?',options:['Unearthed','Discovered','Hidden','Found'],answer:'Unearthed'},
+    {type:'mc',text:'The girl <u>moved towards</u> the ball during the game. What is the antonym?',options:['Moved away from','Ran alongside','Stayed near','Dodged around'],answer:'Moved away from'},
+    {type:'mc',text:'Adam <u>walked slowly</u> down the hall. What is the antonym?',options:['Hurried quickly','Ran slowly','Crawled fast','Skipped along'],answer:'Hurried quickly'},
+    {type:'mc',text:'He had a <u>lack of interest</u> in sketching pictures. What is the antonym?',options:['Passion for','Curiosity about','Enthusiasm for','Love of'],answer:'Passion for'},
+    {type:'mc',text:'What is the antonym of DETERMINED?',options:['Motivated','Focused','Unmotivated','Dedicated'],answer:'Unmotivated'},
+    {type:'mc',text:'What is the antonym of BURIED?',options:['Hidden','Found','Unearthed','Discovered'],answer:'Unearthed'},
+    {type:'mc',text:'What is the antonym of LACK OF INTEREST?',options:['Love of','Enthusiasm for','Passion for','Curiosity about'],answer:'Passion for'},
+  ]
+},
+
+{
+  id:'lang_homonyms', title:'🔤 Homonyms', cat:'lang',
+  questions:[
+    {type:'mc',text:'"The WIND was so strong it knocked over the tree." Which meaning is used?',options:['Moving air / a breeze','To twist or coil'],answer:'Moving air / a breeze'},
+    {type:'mc',text:'"She had to TEAR the paper to open the gift." Which meaning is used?',options:['To rip or pull apart','A drop of liquid from the eye'],answer:'To rip or pull apart'},
+    {type:'mc',text:'"I will CLOSE the door after I leave." Which meaning is used?',options:['To shut','Near / nearby'],answer:'To shut'},
+    {type:'mc',text:'"He knew he needed to BOOK a doctor\'s appointment." Which meaning is used?',options:['Something you read with pages','To reserve a time or place'],answer:'To reserve a time or place'},
+    {type:'mc',text:'Now make a sentence with WIND using the OTHER meaning — which sentence uses "wind" as "to twist or coil"?',options:['"The strong wind blew my hat off."','"I need to wind the rope around the pole."','"The wind knocked over the tree."','"The wind came from the north."'],answer:'"I need to wind the rope around the pole."'},
+    {type:'mc',text:'Now use TEAR in the OTHER meaning (not ripping). Which sentence is correct?',options:['"She tore the wrapping paper."','"A tear rolled down her cheek as she said goodbye."','"He tore the envelope open."','"She had to tear the paper."'],answer:'"A tear rolled down her cheek as she said goodbye."'},
+    {type:'mc',text:'Now use CLOSE in the OTHER meaning (not "to shut"). Which sentence is correct?',options:['"Please close the window."','"Close the door after you leave."','"The school is close to my house."','"She closed her eyes."'],answer:'"The school is close to my house."'},
+  ]
+},
+
+{
+  id:'lang_idioms', title:'🔤 Idioms', cat:'lang',
+  questions:[
+    {type:'mc',text:'IDIOM: "Liam was feeling UNDER THE WEATHER." What does this mean?',options:['To be outside in the rain','To feel not well / sick','To look at the clouds','To be very cold'],answer:'To feel not well / sick'},
+    {type:'mc',text:'IDIOM: "He BARKED UP THE WRONG TREE when he accused me." What does this mean?',options:['To shout too loudly','To make a wrong decision or accuse the wrong person','To climb a tree','To make a big mistake at work'],answer:'To make a wrong decision or accuse the wrong person'},
+    {type:'mc',text:'IDIOM: "We\'ll CROSS THAT BRIDGE WHEN WE COME TO IT." What does this mean?',options:['To cross a physical bridge','To deal with a problem only when it actually happens','To plan everything in advance','To avoid all problems'],answer:'To deal with a problem only when it actually happens'},
+    {type:'mc',text:'IDIOM: "I can\'t believe we DROPPED THE BALL during the presentation." What does this mean?',options:['We literally dropped a ball','We made a mistake or failed at something important','We played a sport badly','We forgot to bring equipment'],answer:'We made a mistake or failed at something important'},
+    {type:'mc',text:'IDIOM: "When he heard the good news, he was ON CLOUD NINE all day." What does this mean?',options:['He was high up in the air','He was very happy and excited','He was daydreaming','He was flying in a plane'],answer:'He was very happy and excited'},
+  ]
+},
+
+{
+  id:'lang_synonym', title:'🔤 Synonyms & Word Skills', cat:'lang',
+  questions:[
+    {type:'mc',text:'SYNONYM: What is a synonym of FINISHED?',options:['Started','Beginning','Complete','Continuing'],answer:'Complete'},
+    {type:'mc',text:'SYNONYM: What is a synonym of HURRIED?',options:['Strolled','Rushed','Walked','Wandered'],answer:'Rushed'},
+    {type:'mc',text:'SYNONYM: What is a synonym of UNEARTHED?',options:['Buried','Discovered','Hidden','Covered'],answer:'Discovered'},
+    {type:'mc',text:'Find the mistake: "The team all SPY Andy after his homerun won the game." What is the correct word?',options:['surrounded','sketched','sergeant','uniform'],answer:'surrounded'},
+    {type:'mc',text:'Find the mistake: "Ruby didn\'t like her new dance team SOLDIERS." What is the correct word?',options:['uniforms','sketched','sergeant','surrounded'],answer:'uniforms'},
+    {type:'mc',text:'Find the mistake: "Ray needed to show respect to him because he is her UNION." What is the correct word?',options:['sergeant','uniform','surrounded','sketched'],answer:'sergeant'},
+    {type:'mc',text:'Find the mistake: "Mia DISMOUNTED a picture of an Among Us character in class." What is the correct word?',options:['sketched','sculpted','surrounded','erected'],answer:'sketched'},
+  ]
+},
+
+{
+  id:'lang_genre', title:'🔤 Genre & Story Knowledge', cat:'lang',
+  questions:[
+    {type:'mc',text:'What GENRE is "The Dinosaurs of Waterhouse Hawkins"?',options:['Fiction / Fairy tale','Biography — a true story about a real person\'s life','Mystery','Science fiction'],answer:'Biography — a true story about a real person\'s life'},
+    {type:'mc',text:'What GENRE is "Hold the Flag High"?',options:['Fantasy fiction','Literary Nonfiction — tells the story of a true event','Adventure fiction','Historical fiction'],answer:'Literary Nonfiction — tells the story of a true event'},
+    {type:'mc',text:'What is the "Question of the Week" in Hold the Flag High?',options:['How can we learn from history?','What are the risks in helping others?','Why is bravery important in war?','How do wars begin and end?'],answer:'What are the risks in helping others?'},
+    {type:'mc',text:'When did the American Civil War break out?',options:['1853','1861','1863','1868'],answer:'1861'},
+    {type:'mc',text:'What did Carney say when soldiers congratulated him?',options:['"I fought for my country and I am proud."','"The old flag never touched the ground."','"We shall never forget Fort Wagner."','"I did my duty as a soldier."'],answer:'"The old flag never touched the ground."'},
+    {type:'mc',text:'What did Ned do as his role in the Fifty-Fourth Regiment?',options:['He was a sergeant','He was the flag bearer (color bearer)','He was a drummer boy','He was a sharpshooter'],answer:'He was a drummer boy'},
+  ]
+},
+
+// ──────────────────────────────────────────────────────────────
+// GROUP: ORAL PRACTICE  ── concise core answers + keyword scoring
+// ──────────────────────────────────────────────────────────────
+{
+  id:'oral_waterhouse', title:'🎤 Oral – Waterhouse Hawkins', cat:'oral', oral:true,
+  questions:[
+    {type:'mc',text:'[ORAL] Who was Waterhouse Hawkins?',
+     answer:'An artist who built life-size dinosaur sculptures.',
+     keywords:['artist','sculpt','dinosaur'],
+     hint:'Think: What did he do? What did he make?'},
+
+    {type:'mc',text:'[ORAL] How did Waterhouse know what dinosaurs looked like?',
+     answer:'He compared fossil bones to living animals and worked with scientist Richard Owen.',
+     keywords:['fossil','living','Owen','compared'],
+     hint:'He compared fossils to something he could see.'},
+
+    {type:'mc',text:'[ORAL] What were the six steps Waterhouse used to build his dinosaurs? (pg 402)',
+     answer:'Step 1 is making a drawing. Step 2 is making a small clay model correct in every detail. Step 3 is making a life-size clay model with the help of assistants. Step 4 is making molds from the life-size clay model. Step 5 is building an iron skeleton and brick foundations inside. Step 6 is covering everything with cement casts from the molds to create the finished dinosaur.',
+     keywords:['drawing','clay','mold','iron','skeleton','cement','finished'],
+     hint:'There are 6 steps. Say each one as a full sentence: "Step 1 is making a drawing. Step 2 is…"'},
+
+    {type:'mc',text:'[ORAL] Why did Waterhouse host a dinner inside the iguanodon mold?',
+     answer:'To impress England\'s leading scientists with his masterpiece.',
+     keywords:['impress','scientist','dinner','masterpiece'],
+     hint:'Who were his guests? What did he want to show?'},
+
+    {type:'mc',text:'[ORAL] What happened to Waterhouse\'s dinosaurs in New York?',
+     answer:'Vandals smashed them and buried them in Central Park.',
+     keywords:['vandal','smash','buried','Central Park'],
+     hint:'Someone destroyed his work.'},
+
+    {type:'mc',text:'[ORAL] Why were Waterhouse\'s dinosaurs not accurate?',
+     answer:'Because complete skeletons didn\'t exist — he had to guess by comparing fossils to living animals.',
+     keywords:['skeleton','fossil','guess','living','compare'],
+     hint:'Scientists only had fragments in 1853.'},
+
+    {type:'mc',text:'[ORAL] What is the genre of "The Dinosaurs of Waterhouse Hawkins"?',
+     answer:'Biography — a true story about a real person\'s life.',
+     keywords:['biography','true','real','person'],
+     hint:'Was it made up or real?'},
+  ]
+},
+
+{
+  id:'oral_flag', title:'🎤 Oral – Hold the Flag High', cat:'oral', oral:true,
+  questions:[
+    {type:'mc',text:'[ORAL] Who was William H. Carney?',
+     answer:'An African American sergeant in the 54th Regiment who never let the flag touch the ground.',
+     keywords:['African American','sergeant','flag','54th'],
+     hint:'His rank, regiment, and famous act.'},
+
+    {type:'mc',text:'[ORAL] What was the Massachusetts Fifty-Fourth Regiment?',
+     answer:'One of the first African American regiments in the Union Army, formed in 1863.',
+     keywords:['African American','Union','regiment','1863'],
+     hint:'Think: who were they and when were they formed?'},
+
+    {type:'mc',text:'[ORAL] What did Carney do when the flag bearer was shot?',
+     answer:'Already wounded himself, he plunged forward to catch the falling flag and lifted it high, even as two more shots hit him.',
+     keywords:['wounded','flag','caught','lifted','shots'],
+     hint:'He was already hurt. What did he do with the flag?'},
+
+    {type:'mc',text:'[ORAL] What did Carney say after the battle?',
+     answer:'The old flag never touched the ground.',
+     keywords:['flag','never','touched','ground'],
+     hint:'His famous quote when soldiers congratulated him.'},
+
+    {type:'mc',text:'[ORAL] How was Carney honored?',
+     answer:'He was awarded the Congressional Medal of Honor — the first African American to earn it.',
+     keywords:['Medal of Honor','first','African American'],
+     hint:'What award? What made it historic?'},
+
+    {type:'mc',text:'[ORAL] How was Colonel Shaw honored?',
+     answer:'Carney and members of the 54th contributed funds to erect a bronze memorial honoring him.',
+     keywords:['bronze','memorial','funds','contributed'],
+     hint:'His soldiers raised money to build something for him.'},
+
+    {type:'mc',text:'[ORAL] What is the genre of "Hold the Flag High"?',
+     answer:'Literary Nonfiction — it tells the story of a true event.',
+     keywords:['nonfiction','true','event','literary'],
+     hint:'Was it made up or based on a true event?'},
+  ]
+},
+
+// ──────────────────────────────────────────────────────────────
+// GROUP: MOCK EXAM  ── unique questions only, no repeats
+// ──────────────────────────────────────────────────────────────
+{
+  id:'mock_exam', title:'🏆 Final Mock Exam (25 Questions)', cat:'mock',
+  questions:[
+    // Vocab fill — unique words not in other fill sets
+    {type:'fill',text:'[MOCK] Carney carried the flag safely back before he _____ .',answer:'collapsed',hint:'Fell down from exhaustion or injury'},
+    {type:'fill',text:'[MOCK] The judge spoke in a _____ voice when he gave the verdict.',answer:'solemn',hint:'Serious and grave in manner'},
+    {type:'fill',text:'[MOCK] A Stegosaurus has large _____ all across its back.',answer:'spikes',hint:'Sharp pointed structures'},
+    {type:'fill',text:'[MOCK] He threw a rock at me! Luckily I _____ it.',answer:'dodged',hint:'Moved quickly to avoid it'},
+    {type:'fill',text:'[MOCK] Everyone waited with great _____ to find out how the story ended.',answer:'anticipation',hint:'Excited expectation'},
+    {type:'fill',text:'[MOCK] People of high rank or office at an event are called _____ .',answer:'dignitaries',hint:'VIP officials like generals or royals'},
+    // Antonyms
+    {type:'mc',text:'[MOCK] ANTONYM of BURIED:',options:['Unearthed','Hidden','Covered','Stored'],answer:'Unearthed'},
+    {type:'mc',text:'[MOCK] ANTONYM of LACK OF INTEREST:',options:['Passion for','Boredom with','Hatred of','Confusion about'],answer:'Passion for'},
+    {type:'mc',text:'[MOCK] ANTONYM of DETERMINED:',options:['Focused','Motivated','Unmotivated','Brave'],answer:'Unmotivated'},
+    // Homonyms
+    {type:'mc',text:'[MOCK] "She had to TEAR the paper open." Which meaning of TEAR is used?',options:['A drop from the eye','To rip apart'],answer:'To rip apart'},
+    {type:'mc',text:'[MOCK] "I need to BOOK a table at the restaurant." Which meaning of BOOK?',options:['Something you read','To make a reservation'],answer:'To make a reservation'},
+    // Idioms
+    {type:'mc',text:'[MOCK] IDIOM: "Under the weather" means:',options:['Outside in the rain','Feeling unwell','Looking at clouds','Being very cold'],answer:'Feeling unwell'},
+    {type:'mc',text:'[MOCK] IDIOM: "Dropped the ball" means:',options:['Played sport badly','Failed or made a mistake','Forgot something','Literally dropped a ball'],answer:'Failed or made a mistake'},
+    {type:'mc',text:'[MOCK] IDIOM: "On cloud nine" means:',options:['High in the sky','Flying a plane','Very happy','Daydreaming'],answer:'Very happy'},
+    // Find the mistake
+    {type:'mc',text:'[MOCK] "Mia DISMOUNTED a picture in class." Correct word?',options:['sketched','sculpted','erased','painted'],answer:'sketched'},
+    {type:'mc',text:'[MOCK] "Ray showed respect because he is her UNION." Correct word?',options:['sergeant','uniform','corporal','general'],answer:'sergeant'},
+    // Comprehension
+    {type:'mc',text:'[MOCK] What was Waterhouse\'s conclusion about building dinosaurs?',options:['It was simple with helpers','No less than building a house on four columns','He needed more fossils','It was impossible without cement'],answer:'No less than building a house on four columns'},
+    {type:'tf', text:'[MOCK] Forty thousand spectators attended the Crystal Palace opening. (pg 408)',answer:'True'},
+    {type:'mc',text:'[MOCK] What did Carney say after being carried back behind Union lines?',options:['"I fought for my country."','"The old flag never touched the ground."','"We shall not forget."','"Victory is ours."'],answer:'"The old flag never touched the ground."'},
+    {type:'mc',text:'[MOCK] Who was Ned in the story?',options:['The flag bearer','The commanding officer','The drummer boy','A Confederate spy'],answer:'The drummer boy'},
+    // Sequencing
+    {type:'mc',text:'[MOCK] Which event happened FIRST at Fort Wagner? (pg 214)',options:['The flag carrier was shot dead and flag dropped','Carney felt a bullet tear through his flesh','The bugler sounded retreat','Carney received the Medal of Honor'],answer:'Carney felt a bullet tear through his flesh'},
+    {type:'mc',text:'[MOCK] Which event happened LAST?',options:['Flag carrier dropped the flag','Carney picked up the flag','Bugler sounded retreat and Carney carried flag back','Carney was awarded the Congressional Medal of Honor'],answer:'Carney was awarded the Congressional Medal of Honor'},
+    // Genre
+    {type:'mc',text:'[MOCK] Genre of "Dinosaurs of Waterhouse Hawkins":',options:['Fiction','Biography','Mystery','Nonfiction report'],answer:'Biography'},
+    {type:'mc',text:'[MOCK] Genre of "Hold the Flag High":',options:['Fantasy','Biography','Literary Nonfiction','Science fiction'],answer:'Literary Nonfiction'},
+    // Synonym
+    {type:'mc',text:'[MOCK] SYNONYM of FINISHED:',options:['Started','Complete','Continuing','Began'],answer:'Complete'},
+  ]
+},
+
+// ──────────────────────────────────────────────────────────────
+// Howard's Mistakes
+// ──────────────────────────────────────────────────────────────
+{
+  id:'howard_mistakes', title:"⭐ Howard's Mistakes (2)", cat:'mistakes', special:true,
+  questions:[
+    {type:'mc',text:'Week 3 Vocab: "The _____ loved the new play he had written and he _____ in their approval."',options:['critics / basked','formality / basked','critics / eminent','lavish / solemn'],answer:'critics / basked',
+    note:'Howard wrote "formality" in the first blank. FORMALITY means a routine done out of politeness. CRITICS are reviewers/journalists who write opinions about performances and art.'},
+    {type:'mc',text:'Week 3 Vocab: "I enjoy greeting guests but my sister describes it as being just a _____."',options:['formality','critics','anticipation','eminent'],answer:'formality',
+    note:'Howard wrote "critics" here. FORMALITY means something done as a polite social convention. Greeting guests can feel like a routine formality.'},
+  ]
+},
+
+]; // end SECTIONS
+
+// ════════════════════════════════════════════════════════════
+//  BUILD HOME – grouped by category
+// ════════════════════════════════════════════════════════════
+
+const CAT_META = {
+  vocab:  { label:'📝 Vocabulary',        cls:'card-vocab'    },
+  comp:   { label:'📖 Comprehension',      cls:'card-comp'     },
+  lang:   { label:'🔤 Language Skills',    cls:'card-lang'     },
+  oral:   { label:'🎤 Oral Practice',      cls:'card-oral'     },
+  mock:   { label:'🏆 Mock Exam',          cls:'card-mock'     },
+  mistakes:{ label:'⭐ Mistake Review',    cls:'card-mistakes' },
+};
+
+let selectedSections = new Set();
+let quizQuestions = [], currentIdx = 0, score = 0, wrong = 0;
+let answers = [], answered = false, lastQuestions = [];
+
+function buildHome() {
+  const container = document.getElementById('sectionGrid');
+  container.innerHTML = '';
+
+  const cats = ['mock','vocab','comp','lang','oral','mistakes'];
+  cats.forEach(cat => {
+    const secs = SECTIONS.filter(s => s.cat === cat);
+    if (!secs.length) return;
+    const meta = CAT_META[cat];
+
+    const group = document.createElement('div');
+    group.className = 'cat-group';
+    group.innerHTML = `<div class="cat-label">${meta.label}</div>`;
+
+    const grid = document.createElement('div');
+    // mock and mistakes get full width
+    grid.className = (cat === 'mock' || cat === 'mistakes') ? '' : 'section-grid';
+
+    secs.forEach(s => {
+      const card = document.createElement('div');
+      card.className = `section-card ${meta.cls}` + (selectedSections.has(s.id) ? ' selected' : '');
+      card.onclick = () => toggleSection(s.id, card);
+      card.innerHTML = `<span class="sc-check">✓</span>
+        <div class="sc-title">${s.title}</div>
+        <div class="sc-count">${s.questions.length} questions</div>`;
+      grid.appendChild(card);
+    });
+
+    group.appendChild(grid);
+    container.appendChild(group);
+  });
+
+  updateStartBtn();
+}
+
+function toggleSection(id, el) {
+  if (selectedSections.has(id)) selectedSections.delete(id);
+  else selectedSections.add(id);
+  el.classList.toggle('selected');
+  updateStartBtn();
+}
+
+function toggleAll() {
+  if (selectedSections.size === SECTIONS.length) {
+    selectedSections.clear();
+  } else {
+    SECTIONS.forEach(s => selectedSections.add(s.id));
+  }
+  buildHome();
+}
+
+function selectCategory(cat) {
+  selectedSections.clear();
+  SECTIONS.forEach(s => { if (s.cat === cat) selectedSections.add(s.id); });
+  buildHome();
+}
+
+function updateStartBtn() {
+  document.getElementById('startBtn').disabled = selectedSections.size === 0;
+}
+
+// ════════════════════════════════════════════════════════════
+//  QUIZ ENGINE
+// ════════════════════════════════════════════════════════════
+
+function startQuiz() {
+  quizQuestions = [];
+  SECTIONS.forEach(s => {
+    if (selectedSections.has(s.id))
+      quizQuestions.push(...s.questions.map(q => ({...q, section:s.title})));
+  });
+  // shuffle
+  for (let i = quizQuestions.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [quizQuestions[i],quizQuestions[j]] = [quizQuestions[j],quizQuestions[i]];
+  }
+  lastQuestions = [...quizQuestions];
+  currentIdx=0; score=0; wrong=0; answers=[];
+  show('quiz'); renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = quizQuestions[currentIdx];
+  const total = quizQuestions.length;
+
+  document.getElementById('qLabel').textContent = `Question ${currentIdx+1}`;
+  document.getElementById('qTotal').textContent = `of ${total}`;
+  document.getElementById('progressFill').style.width = `${(currentIdx/total)*100}%`;
+  document.getElementById('scoreBadge').textContent = `✓ ${score} | ✗ ${wrong}`;
+  document.getElementById('submitBtn').style.display = 'block';
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').textContent = 'Check Answer ✓';
+  document.getElementById('nextBtn').style.display = 'none';
+
+  const area = document.getElementById('questionArea');
+  area.innerHTML = '';
+  const card = document.createElement('div');
+  card.className = 'question-card';
+
+  const rawText = q.text;
+  const isOral = rawText.startsWith('[ORAL]');
+  const isMock = rawText.startsWith('[MOCK]');
+  const displayText = rawText.replace(/^\[(ORAL|MOCK)\]\s*/,'');
+
+  let tagClass='tag-mc', tagLabel='Multiple Choice';
+  if (isOral) { tagClass='tag-oral'; tagLabel='🎤 Oral Practice'; }
+  else if (q.type==='tf') { tagClass='tag-tf'; tagLabel='True / False'; }
+  else if (q.type==='fill') { tagClass='tag-fill'; tagLabel='Fill in the Blank'; }
+
+  card.innerHTML = `<span class="q-tag ${tagClass}">${tagLabel}</span>
+    <div class="q-text">${displayText}</div>
+    ${q.hint ? `<div class="q-context">💡 Hint: ${q.hint}</div>` : ''}
+    <div id="inputArea"></div>
+    <div class="feedback-box" id="feedbackBox"></div>`;
+  area.appendChild(card);
+
+  const inp = document.getElementById('inputArea');
+  if (isOral) {
+    // Oral questions: no MC options — just show "I'm ready" prompt
+    inp.innerHTML = `<div style="text-align:center;padding:12px 0;color:var(--muted);font-size:.88rem;">
+      🎤 Use the panel below to record and listen.<br>
+      When ready, tap <strong style="color:var(--accent)">"Reveal Answer"</strong> to see and hear the correct answer.
+    </div>`;
+    document.getElementById('submitBtn').textContent = '💡 Reveal Answer';
+  } else if (q.type==='mc') {
+    const opts = [...q.options].sort(()=>Math.random()-.5);
+    const letters=['A','B','C','D'];
+    inp.className='options-grid';
+    opts.forEach((o,i)=>{
+      const btn=document.createElement('button');
+      btn.className='option-btn'; btn.dataset.val=o;
+      btn.innerHTML=`<span class="opt-letter">${letters[i]}</span>${o}`;
+      btn.onclick=()=>selectOption(btn);
+      inp.appendChild(btn);
+    });
+  } else if (q.type==='tf') {
+    inp.className='tf-row';
+    ['True','False'].forEach(v=>{
+      const btn=document.createElement('button');
+      btn.className='option-btn'; btn.dataset.val=v;
+      btn.innerHTML=`<span class="opt-letter">${v[0]}</span>${v}`;
+      btn.onclick=()=>selectOption(btn);
+      inp.appendChild(btn);
+    });
+  } else {
+    inp.innerHTML=`<input class="fill-input" id="fillInput" type="text" placeholder="Type your answer…" autocomplete="off" autocorrect="off" spellcheck="false">`;
+    const fi=document.getElementById('fillInput');
+    fi.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!answered) checkAnswer(); });
+    setTimeout(()=>fi.focus(),80);
+  }
+
+  // Show/hide oral panel
+  updateOralPanel(isOral, displayText);
+}
+
+function selectOption(btn) {
+  if (answered) return;
+  document.querySelectorAll('.option-btn').forEach(b=>{
+    b.style.borderColor=''; b.querySelector('.opt-letter').style.background='';
+    delete b.dataset.selected;
+  });
+  btn.style.borderColor='var(--accent2)';
+  btn.querySelector('.opt-letter').style.background='rgba(78,205,196,0.3)';
+  btn.dataset.selected='true';
+}
+
+function checkAnswer() {
+  if (answered) return;
+  const q = quizQuestions[currentIdx];
+  const isOral = q.text.startsWith('[ORAL]');
+
+  // ── ORAL: reveal answer and play it ──
+  if (isOral) {
+    answered = true;
+    score++; // oral always counts as practiced
+    answers.push({q:displayQ(q.text), section:q.section, userAns:'(spoken)', correctAns:q.answer, isOk:true});
+
+    // Show the answer text prominently inside the card
+    const ansBox = document.createElement('div');
+    ansBox.style.cssText = 'margin-top:14px;padding:14px 16px;background:rgba(81,207,102,.1);border:2px solid rgba(81,207,102,.4);border-radius:13px;';
+
+    // Format answer: if it contains "Step N is" render as numbered list
+    let displayAnswer = q.answer;
+    let ttsText = q.answer; // plain text for TTS
+    if (/Step \d/.test(q.answer)) {
+      const steps = q.answer.split(/(?=Step \d)/).map(s => s.trim()).filter(Boolean);
+      displayAnswer = steps.map((s, i) => {
+        // Extract step number and content
+        const match = s.match(/^(Step \d+) is (.+)/);
+        if (match) {
+          return `<div style="display:flex;gap:10px;align-items:flex-start;padding:6px 0;border-bottom:1px solid rgba(81,207,102,.2);">
+            <span style="background:rgba(81,207,102,.25);color:var(--green);border-radius:6px;padding:2px 8px;font-size:.72rem;font-weight:900;white-space:nowrap;flex-shrink:0;">${match[1]}</span>
+            <span style="font-size:.92rem;font-weight:600;color:var(--text);">is ${match[2]}</span>
+          </div>`;
+        }
+        return `<div style="padding:5px 0;">${s}</div>`;
+      }).join('');
+      // TTS: add natural pauses between steps using commas
+      ttsText = steps.join('. ');
+    }
+
+    ansBox.innerHTML = `
+      <div style="font-size:.72rem;font-weight:800;color:var(--green);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">✓ Model Answer</div>
+      <div style="font-size:.95rem;font-weight:700;color:var(--text);line-height:1.7;">${displayAnswer}</div>
+      <button onclick="ttsReadAnswerText(${JSON.stringify(ttsText)})" style="margin-top:10px;padding:7px 16px;border:2px solid rgba(78,205,196,.5);background:rgba(78,205,196,.12);color:#4ecdc4;border-radius:99px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;" id="inlineAnswerBtn">🔊 Hear Model Answer</button>
+    `;
+    document.querySelector('.question-card').appendChild(ansBox);
+
+    // Unlock model answer panel button
+    const ansBtn = document.getElementById('ttsAnswerBtn');
+    if (ansBtn) ansBtn.disabled = false;
+
+    setStatus('✅ Answer revealed! Tap 🔊 to hear it. Compare with your recording.');
+
+    // Auto-play model answer after 0.8s using ttsText for natural pacing
+    setTimeout(() => ttsReadAnswerText(ttsText), 800);
+
+    document.getElementById('submitBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+    document.getElementById('nextBtn').textContent = currentIdx < quizQuestions.length-1 ? 'Next →' : 'See Results 🏆';
+    return;
+  }
+
+  // ── REGULAR questions ──
+  let userAns='';
+  if (q.type==='mc'||q.type==='tf') {
+    const sel=document.querySelector('.option-btn[data-selected="true"]');
+    if (!sel) { showFeedback('Please select an answer!','nope'); return; }
+    userAns=sel.dataset.val;
+  } else {
+    const fi=document.getElementById('fillInput');
+    userAns=fi.value.trim();
+    if (!userAns) { showFeedback('Please type your answer!','nope'); fi.focus(); return; }
+  }
+
+  answered=true;
+  const correctAns=q.answer;
+  const isOk = q.type==='fill'
+    ? normalizeAns(userAns)===normalizeAns(correctAns) ||
+      correctAns.split('/').map(a=>normalizeAns(a.trim())).some(a=>normalizeAns(userAns).includes(a))
+    : userAns===correctAns;
+
+  if (isOk) score++; else wrong++;
+  answers.push({q:displayQ(q.text),section:q.section,userAns,correctAns,isOk});
+
+  if (q.type==='mc'||q.type==='tf') {
+    document.querySelectorAll('.option-btn').forEach(btn=>{
+      btn.disabled=true;
+      if (btn.dataset.val===correctAns) btn.classList.add('correct');
+      else if (btn.dataset.selected&&!isOk) btn.classList.add('wrong');
+    });
+  } else {
+    const fi=document.getElementById('fillInput');
+    fi.disabled=true;
+    fi.classList.add(isOk?'correct':'wrong');
+    if (!isOk) fi.insertAdjacentHTML('afterend',`<div class="hint-row">Correct answer: <span class="correct-ans">${correctAns}</span></div>`);
+  }
+
+  showFeedback(isOk?'✓ Correct! 🎉':`✗ Not quite. Correct answer: <strong>${correctAns}</strong>`, isOk?'ok':'nope');
+
+  if (q.note) {
+    const nb=document.createElement('div');
+    nb.className='note-box show';
+    nb.innerHTML=`📖 <strong>Why?</strong> ${q.note}`;
+    document.querySelector('.question-card').appendChild(nb);
+  }
+
+  document.getElementById('submitBtn').style.display='none';
+  document.getElementById('nextBtn').style.display='block';
+  document.getElementById('nextBtn').textContent = currentIdx<quizQuestions.length-1 ? 'Next →' : 'See Results 🏆';
+}
+
+function displayQ(t) { return t.replace(/^\[(ORAL|MOCK)\]\s*/,''); }
+function normalizeAns(s) { return s.toLowerCase().replace(/[^a-z0-9\s]/g,'').replace(/\s+/g,' ').trim(); }
+function showFeedback(msg,type) {
+  const fb=document.getElementById('feedbackBox');
+  fb.innerHTML=msg; fb.className=`feedback-box show ${type}`;
+}
+function nextQuestion() {
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  currentIdx++;
+  if (currentIdx>=quizQuestions.length) showResults();
+  else renderQuestion();
+}
+
+// ════════════════════════════════════════════════════════════
+//  RESULTS
+// ════════════════════════════════════════════════════════════
+
+function showResults() {
+  show('results');
+  const total=quizQuestions.length;
+  const pct=Math.round((score/total)*100);
+  document.getElementById('resultPct').textContent=pct+'%';
+  document.getElementById('resultSub').textContent=`You got ${score} out of ${total} correct.`;
+
+  let emoji='😢',title='Keep Practicing!';
+  if (pct>=90){emoji='🏆';title='Outstanding!';}
+  else if (pct>=75){emoji='🎉';title='Great Job!';}
+  else if (pct>=60){emoji='👍';title='Good Effort!';}
+  else if (pct>=40){emoji='📖';title='Keep Studying!';}
+  document.getElementById('resultEmoji').textContent=`${emoji} ${title}`;
+
+  const color=pct>=75?'var(--green)':pct>=50?'var(--accent)':'var(--red)';
+  const ring=document.getElementById('resultRing');
+  ring.style.background=`conic-gradient(${color} ${pct}%,var(--border) ${pct}%)`;
+  ring.style.boxShadow=`0 0 40px ${pct>=75?'rgba(81,207,102,0.3)':'rgba(255,107,107,0.2)'}`;
+
+  const rl=document.getElementById('reviewList');
+  rl.innerHTML='';
+  answers.forEach(a=>{
+    const div=document.createElement('div');
+    div.className='review-item'+(a.isOk?' ok-item':'');
+    div.innerHTML=`<div class="ri-q">${trunc(a.q,85)}</div>
+      ${a.isOk
+        ?`<div class="ri-ok-label">✓ Correct: ${a.correctAns}</div>`
+        :`<div class="ri-yours">✗ Your answer: ${a.userAns||(a.userAns===''?'(blank)':a.userAns)}</div>
+          <div class="ri-correct">✓ Correct: ${a.correctAns}</div>`}`;
+    rl.appendChild(div);
+  });
+}
+
+function trunc(str,n){return str.length>n?str.slice(0,n)+'…':str;}
+function toggleReview(){const rl=document.getElementById('reviewList');rl.style.display=rl.style.display==='none'?'block':'none';}
+function retryQuiz(){quizQuestions=[...lastQuestions].sort(()=>Math.random()-.5);currentIdx=0;score=0;wrong=0;answers=[];show('quiz');renderQuestion();}
+function show(id){['home','quiz','results'].forEach(s=>document.getElementById(s).style.display=s===id?'block':'none');}
+function goHome(){if(window.speechSynthesis) window.speechSynthesis.cancel(); show('home');}
+
+buildHome();
+show('home');
+
+// ════════════════════════════════════════════════════════════
+//  TTS + RECORDING + SPEECH SCORING
+// ════════════════════════════════════════════════════════════
+
+let mediaRecorder = null;
+let recordedChunks = [];
+let recordingBlob = null;
+let audioURL = null;
+let recTimerInterval = null;
+let recSeconds = 0;
+let recognition = null;
+let transcriptWords = [];
+
+function setStatus(msg) {
+  document.getElementById('oralStatusText').textContent = msg;
+}
+
+// ── Panel reset ───────────────────────────────────
+function updateOralPanel(isOral, questionText) {
+  const panel = document.getElementById('oralPanel');
+  if (!isOral) { panel.classList.remove('show'); return; }
+  panel.classList.add('show');
+  document.getElementById('recBtn').textContent = '⏺ Start';
+  document.getElementById('recBtn').classList.remove('recording');
+  document.getElementById('recWave').classList.remove('show');
+  document.getElementById('recTimer').textContent = '0:00';
+  document.getElementById('playMyBtn').disabled = true;
+  document.getElementById('ttsAnswerBtn').disabled = true;
+  const ob = document.getElementById('speechScoreBadge');
+  if (ob) ob.remove();
+  recordedChunks=[]; recordingBlob=null; audioURL=null; transcriptWords=[];
+  clearInterval(recTimerInterval); recSeconds=0;
+  setStatus('👆 Tap "Play Question" to listen, then record your answer!');
+  setTimeout(() => ttsSpeak(questionText, () =>
+    setStatus('✅ Question played! Tap ⏺ Start to record.')), 700);
+}
+
+// ── TTS ──────────────────────────────────────────
+function getEnglishVoice() {
+  const voices = window.speechSynthesis.getVoices();
+  return voices.find(v => /samantha|karen|daniel|google us english|google uk english/i.test(v.name))
+      || voices.find(v => v.lang === 'en-US')
+      || voices.find(v => v.lang.startsWith('en')) || null;
+}
+function ttsSpeak(text, onEnd) {
+  if (!window.speechSynthesis) { setStatus('⚠ TTS not supported.'); return; }
+  window.speechSynthesis.cancel();
+  const clean = text.replace(/<[^>]+>/g,'').replace(/💡[^]*$/,'').trim();
+  const utter = new SpeechSynthesisUtterance(clean);
+  utter.lang='en-US'; utter.rate=0.87; utter.pitch=1.0;
+  const v=getEnglishVoice(); if(v) utter.voice=v;
+  const btn=document.getElementById('ttsReadBtn');
+  btn.textContent='🔊 Playing…'; btn.classList.add('speaking');
+  utter.onend=utter.onerror=()=>{ btn.textContent='🔊 Play Question'; btn.classList.remove('speaking'); if(onEnd)onEnd(); };
+  window.speechSynthesis.speak(utter);
+}
+function ttsRead() {
+  const q=quizQuestions[currentIdx];
+  ttsSpeak(q.text.replace(/^\[(ORAL|MOCK)\]\s*/,''), ()=>setStatus('✅ Done! Tap ⏺ Start to record.'));
+  setStatus('🔊 Reading question…');
+}
+function ttsReadAnswer() {
+  if(!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const q=quizQuestions[currentIdx];
+  const utter=new SpeechSynthesisUtterance(q.answer.replace(/\s*[—–]\s*/g,', ').replace(/\//g,' or '));
+  utter.lang='en-US'; utter.rate=0.80;
+  const v=getEnglishVoice(); if(v) utter.voice=v;
+  const btn=document.getElementById('ttsAnswerBtn');
+  btn.textContent='📢 Playing…';
+  setStatus('📢 Listen to the model answer…');
+  utter.onend=utter.onerror=()=>{ btn.textContent='📢 Model Answer'; setStatus('🎯 How did your answer compare?'); };
+  window.speechSynthesis.speak(utter);
+}
+
+// ── Timer ─────────────────────────────────────────
+function startTimer() {
+  recSeconds=0; document.getElementById('recTimer').textContent='0:00';
+  recTimerInterval=setInterval(()=>{
+    recSeconds++;
+    document.getElementById('recTimer').textContent=
+      Math.floor(recSeconds/60)+':'+String(recSeconds%60).padStart(2,'0');
+  },1000);
+}
+function stopTimer(){clearInterval(recTimerInterval);}
+
+// ── Speech Recognition ────────────────────────────
+function startSpeechRecognition() {
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){transcriptWords=[];return;}
+  recognition=new SR();
+  recognition.continuous=true; recognition.interimResults=true; recognition.lang='en-US';
+  recognition.onresult=e=>{
+    let t=''; for(let i=0;i<e.results.length;i++) t+=e.results[i][0].transcript+' ';
+    transcriptWords=t.toLowerCase().split(/\W+/).filter(Boolean);
+  };
+  recognition.onerror=()=>{transcriptWords=[];};
+  try{recognition.start();}catch(e){}
+}
+function stopSpeechRecognition(){
+  if(recognition){try{recognition.stop();}catch(e){} recognition=null;}
+}
+
+// ── Keyword Score Badge ───────────────────────────
+function showSpeechScore() {
+  const q=quizQuestions[currentIdx];
+  const keywords=q.keywords||[];
+  if(!keywords.length) return;
+
+  const hit=keywords.filter(kw=>transcriptWords.some(w=>w.includes(kw.toLowerCase())));
+  const pct=keywords.length?Math.round((hit.length/keywords.length)*100):0;
+  const missed=keywords.filter(k=>!hit.includes(k));
+
+  let grade,color,tip;
+  if(pct>=80){grade='⭐ Excellent!';color='#51cf66';tip='You covered the key points!';}
+  else if(pct>=60){grade='👍 Good';color='#ffd32a';tip='Keywords matched: '+hit.join(', ');}
+  else if(pct>=40){grade='📖 Keep Trying';color='#ffa94d';tip='Try to mention: '+missed.join(', ');}
+  else{grade='🔁 Try Again';color='#ff6b6b';tip='Key words to include: '+keywords.join(', ');}
+
+  const old=document.getElementById('speechScoreBadge'); if(old) old.remove();
+  const rgb=color==='#51cf66'?'81,207,102':color==='#ffd32a'?'247,201,72':color==='#ffa94d'?'255,169,77':'255,107,107';
+  const badge=document.createElement('div');
+  badge.id='speechScoreBadge';
+  badge.style.cssText=`margin-bottom:12px;padding:14px 16px;border-radius:13px;
+    background:rgba(${rgb},.12);border:2px solid ${color};animation:fadeUp .4s ease;`;
+  badge.innerHTML=`
+    <div style="font-family:'Fredoka One',cursive;font-size:1.1rem;color:${color};margin-bottom:5px;">
+      ${grade} &nbsp;<span style="font-size:.82rem;opacity:.8;">${pct}% key words matched</span>
+    </div>
+    <div style="font-size:.8rem;color:var(--muted);margin-bottom:8px;">${tip}</div>
+    <div style="height:8px;background:var(--border);border-radius:99px;overflow:hidden;">
+      <div style="height:100%;width:${pct}%;background:${color};border-radius:99px;transition:width .8s ease;"></div>
+    </div>`;
+  document.getElementById('oralPanel').after(badge);
+  setStatus(`Score: ${pct}% — ${tip}`);
+}
+
+// ── Record toggle ─────────────────────────────────
+async function toggleRecord() {
+  const btn=document.getElementById('recBtn'), wave=document.getElementById('recWave');
+  if(mediaRecorder && mediaRecorder.state==='recording') {
+    mediaRecorder.stop(); stopSpeechRecognition();
+    btn.textContent='⏺ Start'; btn.classList.remove('recording'); wave.classList.remove('show');
+    stopTimer();
+    setStatus('✅ Recording saved! Tap ▶ to listen to yourself.');
+    return;
+  }
+  try {
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+    recordedChunks=[];
+    const mime=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/mp4']
+      .find(t=>MediaRecorder.isTypeSupported(t))||'';
+    mediaRecorder=new MediaRecorder(stream,mime?{mimeType:mime}:{});
+    mediaRecorder.ondataavailable=e=>{if(e.data&&e.data.size>0)recordedChunks.push(e.data);};
+    mediaRecorder.onstop=()=>{
+      recordingBlob=new Blob(recordedChunks,{type:mime||'audio/webm'});
+      if(audioURL) URL.revokeObjectURL(audioURL);
+      audioURL=URL.createObjectURL(recordingBlob);
+      document.getElementById('playMyBtn').disabled=false;
+      document.getElementById('ttsAnswerBtn').disabled=false;
+      stream.getTracks().forEach(t=>t.stop());
+      showSpeechScore();
+    };
+    mediaRecorder.start(100);
+    btn.textContent='⏹ Stop'; btn.classList.add('recording'); wave.classList.add('show');
+    startTimer(); startSpeechRecognition();
+    setStatus('🔴 Recording… Speak clearly, then tap ⏹ Stop.');
+  } catch(err) {
+    setStatus(err.name==='NotAllowedError'
+      ?'⚠ Microphone blocked! Allow microphone in browser settings.'
+      :'⚠ Error: '+err.message);
+  }
+}
+
+// ── Play back own voice ───────────────────────────
+function playMyRecording() {
+  if(!audioURL) return;
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  const btn=document.getElementById('playMyBtn');
+  const audio=new Audio(audioURL);
+  btn.textContent='⏸ Playing…'; btn.classList.add('playing');
+  setStatus('▶ Playing your recording…');
+  audio.play().catch(()=>{
+    setStatus('⚠ Could not play. Try Chrome or Safari.');
+    btn.textContent='▶ Play My Answer'; btn.classList.remove('playing');
+  });
+  audio.onended=()=>{ btn.textContent='▶ Play My Answer'; btn.classList.remove('playing');
+    setStatus('✅ Done! Tap 📢 Model Answer to compare.'); };
+}
+
+</script>
+</body>
+</html>
