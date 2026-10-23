@@ -1,7 +1,7 @@
 /* =====================================================================
    app-core.js — shared core for the kids' exam-practice apps
    Canonical copy: github.com/iam5980/kids-practice/template/app-core.js
-   Version: 2026-10-23b (tap-to-answer widgets + game layer)
+   Version: 2026-10-23c (speech/typed short answers scored on key points)
 
    HOW TO USE (for the Reading / Science / Grammar skills)
    - Paste this whole file INSIDE the app's single <script> block, before
@@ -31,8 +31,8 @@
      wordBank(el, spec, o)     tap a word-bank chip → it fills the blank
      tiles(el, spec, o)        tap word / letter / step tiles to build the
                                answer (unscramble, spelling, ordering)
-     openAnswer(el, spec, o)   say it / write on paper → Show Answer →
-                               self-check (short answers, sentences)
+     openAnswer(el, spec, o)   🎤 speak (speech → text) or type → scored
+                               automatically on key points (short answers)
      Each draws its own ✔ Check button and calls o.onResult(ok, given).
 
    GAME LAYER
@@ -246,7 +246,8 @@ var AppCore = (function () {
           ul.appendChild(el("div", "ac-review-item",
             "<div>" + esc(w.q) + "</div>" +
             (w.given != null && w.given !== "" ? "<div class='ac-given'>Your answer: " + esc(w.given) + "</div>" : "") +
-            "<div class='ac-correct'>Answer: " + esc(w.correct) + "</div>"));
+            "<div class='ac-correct'>Answer: " + esc(w.correct) + "</div>" +
+            (w.appeal ? "<div><span class='ac-flag'>🙋 Ask a parent to check</span></div>" : "")));
         });
         box.appendChild(ul);
       } else {
@@ -612,47 +613,133 @@ var AppCore = (function () {
     render();
   }
 
-  /* 3) Open answer (short answer, "write a sentence", "name 3 things") →
-     say it or write it on paper, then reveal and self-check. No keyboard.
-     AppCore.openAnswer(el, {a: "model answer", keywords: ["..."], exp}, {onResult})
-     Students can still choose "⌨ Type instead"; typed answers are checked
-     against `accept` (array) if given, otherwise they self-check too.       */
+  /* 3) Open answer (short answer, "write a sentence", "name 3 things")
+     Speak (🎤 → text) or type, then the answer is scored AUTOMATICALLY on
+     key points, the way a teacher marks a short answer.
+     AppCore.openAnswer(el, {
+        a: "Plants need water, sunlight and air.",          // model answer
+        points: [["water"], ["sunlight", "sun", "sunshine"], ["air"]],
+                     // each key point = accepted words/phrases (first = label)
+                     // or {label: "sunlight", any: ["sun", "sunshine"]}
+        need: 2,     // points needed to count as correct (default: all if
+                     // 1–2 points, otherwise ~70% rounded up)
+        exp: "optional explanation"
+     }, {onResult: function(ok, given, info){}})
+     info = {hits, total, appeal}. Matching ignores case, punctuation,
+     plurals (-s/-es/-ies), -ed/-ing and number words (three = 3).
+     "🙋 I think I'm right" marks the answer for a parent to check
+     (info.appeal = true); it does NOT change the score.               */
+  var NUMS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+              "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"];
+  function stem(w) {
+    var n = NUMS.indexOf(w); if (n >= 0) return String(n);
+    w = w.replace(/'s$/, "");
+    if (w.length > 4 && /ies$/.test(w)) return w.slice(0, -3) + "y";
+    if (w.length > 4 && /(ches|shes|sses|xes)$/.test(w)) return w.slice(0, -2);
+    if (w.length > 5 && /ing$/.test(w)) return w.slice(0, -3);
+    if (w.length > 4 && /ied$/.test(w)) return w.slice(0, -3) + "y";
+    if (w.length > 4 && /ed$/.test(w)) return w.slice(0, -2);
+    if (w.length > 3 && /s$/.test(w) && !/ss$/.test(w)) return w.slice(0, -1);
+    return w;
+  }
+  function stems(s) { return norm(s).split(" ").filter(Boolean).map(stem); }
+  function hasPhrase(words, phrase) {
+    var p = stems(phrase); if (!p.length) return false;
+    for (var i = 0; i + p.length <= words.length; i++) {
+      var ok = true;
+      for (var k = 0; k < p.length; k++) if (words[i + k] !== p[k]) { ok = false; break; }
+      if (ok) return true;
+    }
+    return false;
+  }
+  function keyPoints(spec) {
+    var src = spec.points && spec.points.length ? spec.points : (spec.keywords || []).map(function (k) { return [k]; });
+    return src.map(function (p) {
+      if (Array.isArray(p)) return { label: p[0], any: p };
+      return { label: p.label, any: [p.label].concat(p.any || []) };
+    });
+  }
+  function scorePoints(text, pts) {
+    var w = stems(text);
+    return pts.map(function (p) {
+      for (var i = 0; i < p.any.length; i++) if (hasPhrase(w, p.any[i])) return true;
+      return false;
+    });
+  }
+  function speechSupported() { return !!(window.SpeechRecognition || window.webkitSpeechRecognition); }
+
   function openAnswer(container, spec, o) {
     o = o || {};
     container.innerHTML = "";
-    var box = el("div", "ac-q"), done = false;
-    box.appendChild(el("div", "ac-hint", "💭 Say your answer out loud (or write it on paper), then tap Show Answer."));
-    var row = el("div", "ac-row");
-    var show = btn("👁 Show Answer", "ac-primary", reveal);
-    row.appendChild(show); box.appendChild(row);
-    function reveal() {
-      row.remove(); if (tt) tt.remove();
+    var pts = keyPoints(spec), total = pts.length;
+    var need = spec.need || (total <= 2 ? total : Math.ceil(total * 0.7));
+    var box = el("div", "ac-q"), done = false, rec = null, listening = false;
+    box.appendChild(el("div", "ac-hint", speechSupported()
+      ? "🎤 Tap the mic and say your answer, or type it. Then tap ✔ Check."
+      : "⌨ Type your answer (tip: the 🎤 key on the iPad keyboard lets you speak it). Then tap ✔ Check."));
+    var inp = el("textarea", "ac-input");
+    inp.setAttribute("autocapitalize", "sentences"); inp.setAttribute("spellcheck", "false");
+    inp.placeholder = "Your answer…";
+    var row = el("div", "ac-row"), status = el("div", "ac-status");
+    var mic = btn("🎤 Speak", "ac-rec");
+    var c = checkRow(check);
+    row.appendChild(mic); row.appendChild(c.btn);
+    if (!speechSupported()) mic.hidden = true;
+    inp.addEventListener("input", function () { c.btn.disabled = done || !inp.value.trim(); });
+    inp.addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey && inp.value.trim()) { e.preventDefault(); check(); } });
+
+    mic.addEventListener("click", function () {          // start inside the tap (iOS)
+      if (done) return;
+      if (listening && rec) { rec.stop(); return; }
+      var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      stopSpeech();
+      rec = new SR(); rec.lang = "en-US"; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
+      var base = inp.value.trim() ? inp.value.trim() + " " : "";
+      rec.onresult = function (e) {
+        var t = "";
+        for (var i = 0; i < e.results.length; i++) t += e.results[i][0].transcript;
+        inp.value = base + t; c.btn.disabled = !inp.value.trim();
+      };
+      rec.onerror = function (e) {
+        status.textContent = e.error === "not-allowed" || e.error === "service-not-allowed"
+          ? "Microphone or speech not allowed. Open in Safari/Chrome, allow the mic — or type your answer."
+          : e.error === "no-speech" ? "I didn't hear anything. Tap 🎤 and try again." : "Speech didn't work — please type your answer.";
+      };
+      rec.onend = function () { listening = false; mic.innerHTML = "🎤 Speak"; card(false); if (inp.value.trim()) status.textContent = "✓ Check the words, fix any mistakes, then tap ✔ Check."; };
+      try { rec.start(); listening = true; mic.innerHTML = "⏹ Stop"; card(true); status.textContent = "● Listening…"; }
+      catch (err) { status.textContent = "Speech didn't start — please type your answer."; }
+    });
+    function card(on) { box.classList.toggle("ac-recording", on); }
+
+    function check() {
+      if (done || !inp.value.trim()) return;
+      if (listening && rec) { try { rec.stop(); } catch (e) {} }
+      done = true; inp.disabled = true; row.remove();
+      var hits = scorePoints(inp.value, pts), n = hits.filter(Boolean).length, ok = n >= need;
+      var list = pts.map(function (p, i) {
+        return "<span class='ac-kp " + (hits[i] ? "hit" : "miss") + "'>" + (hits[i] ? "✓ " : "✗ ") + esc(p.label) + "</span>";
+      }).join(" ");
+      var f = el("div", "ac-fb " + (ok ? "ok" : "bad"),
+        (ok ? "✓ " + praise() : "Not quite — keep going! 💪") +
+        "<div class='ac-kps'>" + list + "</div><div class='ac-exp'>Key points: " + n + " / " + total +
+        (ok ? "" : " (need " + need + ")") + "</div>");
+      box.appendChild(f);
       var m = el("div", "ac-model", "<b>Model answer</b><div>" + esc(spec.a) + "</div>" +
-        (spec.keywords && spec.keywords.length ? "<div class='ac-kw'>Key words: " + spec.keywords.map(esc).join(" · ") + "</div>" : ""));
+        (spec.exp ? "<div class='ac-kw'>" + esc(spec.exp) + "</div>" : ""));
       m.appendChild(btn("🔊 Hear it", "ac-ghost", function () { speak(spec.a); }));
       box.appendChild(m);
-      var self = el("div", "ac-row");
-      self.appendChild(btn("✓ I got it", "ac-ok", function () { fin(true); }));
-      self.appendChild(btn("✗ Not yet", "ac-ghost", function () { fin(false); }));
-      box.appendChild(self);
-      function fin(ok) {
-        if (done) return; done = true;
-        self.innerHTML = "<div class='ac-fb " + (ok ? "ok" : "bad") + "'>" + (ok ? "✓ " + praise() : "Keep going — you will get it next time! 💪") + "</div>";
-        if (o.onResult) o.onResult(ok, ok ? "Got it" : "Not yet");
+      var info = { hits: n, total: total, appeal: false };
+      if (!ok) {
+        var ap = btn("🙋 I think I'm right", "ac-ghost", function () {
+          info.appeal = true; ap.remove();
+          box.appendChild(el("div", "ac-exp", "Marked for a parent to check. 👍"));
+          if (o.onAppeal) o.onAppeal(inp.value, info);
+        });
+        box.appendChild(ap);
       }
+      if (o.onResult) o.onResult(ok, inp.value, info);
     }
-    var tt = el("button", "ac-link", "⌨ Type instead"); tt.type = "button";
-    tt.addEventListener("click", function () {
-      tt.remove(); row.remove(); tt = null;
-      if (spec.accept && spec.accept.length) {
-        typedInput(box, spec.accept, function (ok, g) { done = true; if (o.onResult) o.onResult(ok, g); }, spec.exp, spec.a);
-      } else {
-        var inp = el("textarea", "ac-input"); box.appendChild(inp);
-        var r2 = el("div", "ac-row"); r2.appendChild(btn("👁 Show Answer", "ac-primary", function () { r2.remove(); inp.disabled = true; reveal(); }));
-        box.appendChild(r2);
-      }
-    });
-    box.appendChild(tt);
+    box.appendChild(inp); box.appendChild(row); box.appendChild(status);
     container.appendChild(box);
   }
 
@@ -765,6 +852,9 @@ var AppCore = (function () {
     ".ac-cheerline{font-size:1.15rem;font-weight:700}" +
     ".ac-gamebox{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin:10px 0;padding:10px;border-radius:12px;background:rgba(245,158,11,.14)}" +
     ".ac-center{justify-content:center}" +
+    ".ac-kps{margin:6px 0;display:flex;flex-wrap:wrap;gap:6px}.ac-kp{padding:3px 10px;border-radius:999px;font-weight:700}" +
+    ".ac-kp.hit{background:rgba(22,163,74,.18);color:#15803d}.ac-kp.miss{background:rgba(220,38,38,.12);color:#b91c1c}" +
+    ".ac-flag{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:#fde68a;color:#78350f;font-size:.85rem}" +
     "@media (prefers-reduced-motion:reduce){.ac-confetti{display:none}.ac-cheer{animation:none}}";
   function injectCSS() {
     if (document.getElementById("ac-css")) return;
@@ -773,13 +863,13 @@ var AppCore = (function () {
   }
 
   return {
-    VERSION: "2026-10-23b",
+    VERSION: "2026-10-23c",
     esc: esc, el: el, btn: btn, shuffle: shuffle,
     speak: speak, stopSpeech: stopSpeech, getBestVoice: getBestVoice,
     dealer: dealer, stars: stars, result: result,
     drillBar: drillBar, resultView: resultView,
     recorder: recorder, oralCard: oralCard, pickMime: pickMime,
-    norm: norm, matches: matches,
+    norm: norm, matches: matches, scorePoints: function (t, p) { return scorePoints(t, keyPoints({points: p})); },
     wordBank: wordBank, tiles: tiles, openAnswer: openAnswer,
     game: game, praise: praise, cheer: cheer, confetti: confetti,
     WEBVIEW_NOTICE: WEBVIEW_NOTICE, injectCSS: injectCSS

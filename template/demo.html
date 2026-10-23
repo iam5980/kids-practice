@@ -25,7 +25,7 @@ main{max-width:760px;margin:0 auto;padding:16px}
 <div class="card"><h2>4. Tiles — build the sentence</h2><div id="tw"></div></div>
 <div class="card"><h2>5. Tiles — spell the word</h2><div id="tl"></div></div>
 <div class="card"><h2>6. Tiles — put the steps in order</h2><div id="ti"></div></div>
-<div class="card"><h2>7. Short answer — say it, then check</h2><div id="oa"></div></div>
+<div class="card"><h2>7. Short answer — speak or type, auto-scored on key points</h2><p><b>What do roots do for a plant?</b></p><div id="oa"></div></div>
 <div class="card" id="drill"><h2>8. Multiple choice game (points, streaks, Finish &amp; Score)</h2><div id="mc"></div></div>
 </main>
 <script src="app-core.js"></script>
@@ -69,8 +69,9 @@ A.tiles(document.getElementById("ti"), {
 }, {onResult: log("tiles-item")});
 
 A.openAnswer(document.getElementById("oa"), {
-  a: "Roots take in water and hold the plant in the soil.", keywords: ["water", "soil"]
-}, {onResult: log("open")});
+  a: "Roots take in water and hold the plant in the soil.",
+  points: [["water"], ["hold", "keep", "anchor"], ["soil", "ground", "dirt"]], need: 2
+}, {onResult: log("open"), onAppeal: function (g) { console.log("appeal", g); }});
 
 var BANK = [
   {q: "Which part of a plant takes in water?", c: "roots", w: ["leaves", "flowers"]},
