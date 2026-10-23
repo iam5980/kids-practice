@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App Core Test</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#0f172a}
+@media (prefers-color-scheme:dark){:root{--bg:#0f172a;--card:#1e293b;--ink:#e2e8f0}}
+body{margin:0;background:var(--bg);color:var(--ink);font:1.05rem/1.55 -apple-system,system-ui,sans-serif}
+main{max-width:760px;margin:0 auto;padding:16px}
+.card{background:var(--card);border-radius:14px;padding:16px;margin-bottom:16px}
+.opt{display:block;width:100%;text-align:left}
+#drill{background:var(--bg)}
+</style>
+</head>
+<body>
+<main>
+<h1>🧪 App Core Test</h1>
+<p>Test page for the shared template. Try each part on the iPad in Safari.</p>
+
+<div class="card"><h2>1. Voice</h2><div id="tts"></div></div>
+<div class="card"><h2>2. Oral (record → play → reveal)</h2><div id="notice"></div><div id="oral"></div></div>
+<div class="card" id="drill"><h2>3. Multiple choice + Finish &amp; Score</h2><div id="mc"></div></div>
+</main>
+<script src="app-core.js"></script>
+<script>
+AppCore.injectCSS();
+var A = AppCore;
+
+document.getElementById("tts").appendChild(A.btn("🔊 Hear a sentence", "ac-primary", function () {
+  A.speak("Plants need water, sunlight and air to grow.");
+}));
+document.getElementById("tts").appendChild(A.btn("🐢 Slow", "ac-ghost", function () {
+  A.speak("Plants need water, sunlight and air to grow.", {rate: 0.7});
+}));
+
+document.getElementById("notice").innerHTML = A.WEBVIEW_NOTICE;
+A.oralCard(document.getElementById("oral"), {
+  q: "What do plants need to grow?",
+  a: "Plants need water, sunlight, air and nutrients to grow.",
+  keywords: ["water", "sunlight", "air"], mustKnow: true
+}, {onSelfScore: function (ok) { console.log("self score", ok); }});
+
+var BANK = [
+  {q: "Which part of a plant takes in water?", c: "roots", w: ["leaves", "flowers"]},
+  {q: "Which part makes food for the plant?", c: "leaves", w: ["roots", "stem"]},
+  {q: "What holds the plant up?", c: "stem", w: ["seed", "flower"]},
+  {q: "Which is a living thing?", c: "a tree", w: ["a rock", "a cup"]},
+  {q: "What do seeds grow into?", c: "new plants", w: ["rocks", "water"]},
+  {q: "Which is NOT a need of animals?", c: "toys", w: ["food", "water"]},
+  {q: "Where do fish live?", c: "in water", w: ["in trees", "in sand"]},
+  {q: "What do flowers make?", c: "seeds", w: ["roots", "soil"]},
+  {q: "Which animal can fly?", c: "a bird", w: ["a fish", "a dog"]}
+];
+var S;
+function startDrill() {
+  S = {qs: A.shuffle(BANK), i: 0, log: [], deal: A.dealer()};
+  showQ();
+}
+function showQ() {
+  var box = document.getElementById("mc"); box.innerHTML = "";
+  box.appendChild(A.drillBar({title: "Question " + (S.i + 1) + " / " + S.qs.length, onFinish: showResult}));
+  var item = S.qs[S.i]; if (!item) return showResult();
+  var r = S.deal.place(item.c, item.w);
+  box.appendChild(A.el("p", null, "<b>" + A.esc(item.q) + "</b>"));
+  r.choices.forEach(function (txt, k) {
+    box.appendChild(A.btn("ABCD"[k] + ") " + A.esc(txt), "ac-ghost opt", function () {
+      var ok = k === r.answer;
+      S.log.push({q: item.q, given: txt, correct: "ABCD"[r.answer] + ") " + item.c, ok: ok});
+      S.i++; S.i < S.qs.length ? showQ() : showResult();
+    }));
+  });
+}
+function showResult() {
+  var box = document.getElementById("mc"); box.innerHTML = "";
+  box.appendChild(A.resultView(S.log, {onAgain: startDrill}));
+}
+startDrill();
+</script>
+</body>
+</html>
