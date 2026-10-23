@@ -1,0 +1,1829 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>四上社會練功房｜第一～三單元</title>
+</head>
+<body>
+<style>
+/* 社會課：土黃紙頁＋磚紅重點；單欄、手機優先 */
+:root{
+  --paper:#fbf8f0; --card:#ffffff; --ink:#2b2518; --muted:#6c6350;
+  --sage:#ead9b4; --sage-deep:#8a6b2b; --rose:#f6cba8; --rose-deep:#b3502a;
+  --line:#e2d6bb; --ok:#2f7a45; --bad:#b3362f; --okbg:#e3f2e6; --badbg:#fbe7e5;
+  --kai:"LXGW WenKai TC","BiauKai","DFKai-SB","標楷體",serif;
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#17140e; --card:#211c14; --ink:#f0e9db; --muted:#b2a68d;
+  --sage:#3a3121; --sage-deep:#e0bc6b; --rose:#4a2a1c; --rose-deep:#f0a877;
+  --line:#3a3222; --ok:#7fd29a; --bad:#ff958c; --okbg:#1d3324; --badbg:#3a1f1d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#17140e; --card:#211c14; --ink:#f0e9db; --muted:#b2a68d;
+  --sage:#3a3121; --sage-deep:#e0bc6b; --rose:#4a2a1c; --rose-deep:#f0a877;
+  --line:#3a3222; --ok:#7fd29a; --bad:#ff958c; --okbg:#1d3324; --badbg:#3a1f1d; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 40px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+header h1{font-family:var(--kai);font-size:clamp(24px,6.4vw,34px);margin:0;line-height:1.2;text-wrap:balance}
+header p{margin:2px 0 0;color:var(--muted);font-size:14px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,canvas:focus-visible{outline:3px solid var(--rose-deep);outline-offset:2px}
+.scope{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:4px 12px;font-size:14px}
+.chip[aria-pressed="true"]{background:var(--sage-deep);border-color:var(--sage-deep);color:var(--paper);font-weight:700}
+.chip.wrongchip[aria-pressed="true"]{background:var(--rose-deep);border-color:var(--rose-deep)}
+.count{font-size:13px;color:var(--muted);margin-left:auto}
+nav.tabs{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;background:var(--sage);padding:4px;border-radius:12px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+nav.tabs button{border:0;background:transparent;border-radius:9px;padding:8px 0;font-size:clamp(12px,3.4vw,15px);font-weight:500;white-space:nowrap}
+@media (max-width:760px){nav.tabs{grid-template-columns:repeat(5,1fr)}}
+nav.tabs button[aria-selected="true"]{background:var(--card);font-weight:700;color:var(--sage-deep);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+section{display:flex;flex-direction:column;gap:12px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{border:1.5px solid var(--sage-deep);background:var(--card);color:var(--sage-deep);border-radius:10px;padding:8px 16px;font-weight:700}
+.btn.primary{background:var(--sage-deep);color:var(--paper)}
+.btn.rose{border-color:var(--rose-deep);color:var(--rose-deep)}
+.btn.rose.primary{background:var(--rose-deep);color:var(--paper)}
+.btn:disabled{opacity:.45;cursor:default}
+.hint{color:var(--muted);font-size:14px;margin:0}
+select{font:inherit;padding:6px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--card);color:var(--ink)}
+.hdr{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+.hdr>div{min-width:0}
+.hdr #sfxBtn{flex:none;margin-top:6px}
+.modes{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.kai{font-family:var(--kai)}
+.zy{font-family:var(--sans);letter-spacing:1px}
+.say{display:inline-flex;align-items:center;gap:4px;border:1.5px solid var(--sage-deep);background:var(--card);color:var(--sage-deep);border-radius:999px;padding:2px 10px;font-size:14px;font-weight:700;vertical-align:middle;margin:2px 4px 2px 0;font-family:var(--sans)}
+.say svg{width:16px;height:16px;fill:currentColor}
+.say:active{background:var(--sage)}
+
+/* 重點卡 */
+.termlist{display:flex;flex-direction:column;gap:8px}
+.termcard{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px}
+.termcard .tt{font-family:var(--kai);font-size:22px;font-weight:700;color:var(--sage-deep);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.termcard .td{margin:4px 0 0;font-size:16px}
+.groupHead{font-family:var(--kai);font-size:18px;margin:8px 0 -2px;color:var(--sage-deep)}
+.cover{background:var(--sage);border-radius:6px;color:transparent;user-select:none;cursor:pointer;padding:0 6px;display:inline-block;min-width:120px}
+.cover::after{content:"點我看答案";color:var(--sage-deep);font-size:13px}
+.cover *{visibility:hidden}
+.lesson{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:0 6px;font-family:var(--sans);font-weight:400}
+
+/* 題卡、選項 */
+.qcard{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.qask{font-size:17px;margin:0;text-align:center}
+.qask.left{text-align:left;width:100%}
+.opts{display:grid;grid-template-columns:1fr;gap:8px;width:100%}
+.opt{border:2px solid var(--line);background:var(--paper);border-radius:12px;padding:10px 12px;display:flex;align-items:flex-start;gap:8px;text-align:left;line-height:1.5}
+.opt .o0{font-weight:700;color:var(--sage-deep);flex:none}
+.opt .o1{font-size:16px;min-width:0}
+.opt.ok{border-color:var(--ok);background:var(--okbg)}
+.opt.bad{border-color:var(--bad);background:var(--badbg)}
+.opt .mark{font-size:13px;font-weight:700;margin-left:auto;flex:none}
+.opt.ok .mark{color:var(--ok)}.opt.bad .mark{color:var(--bad)}
+.opt.tfbig{justify-content:center;font-size:30px;padding:16px;font-weight:700}
+.fb{border-radius:10px;padding:8px 12px;width:100%;font-size:15px}
+.fb.ok{background:var(--okbg);color:var(--ok)}.fb.bad{background:var(--badbg);color:var(--bad)}
+.fb b{color:var(--ink)}
+.prog{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* 計分列 */
+.rhud{width:100%;display:flex;flex-direction:column;gap:4px}
+.rrow{display:flex;flex-wrap:wrap;gap:4px 14px;justify-content:center;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.rrow b{color:var(--ink);font-size:17px}.rrow .cdw b{color:var(--bad)}
+.plus{text-align:center;font-size:14px;font-weight:700;color:var(--rose-deep);min-height:1.3em}
+.rsum{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%}
+.rsum div{background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:6px 2px;text-align:center;font-size:12px;color:var(--muted)}
+.rsum b{display:block;font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums}
+.hud{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:8px}
+.hud div{text-align:center;font-size:12px;color:var(--muted)}
+.hud b{display:block;font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums;font-family:var(--sans)}
+.hud .warn b{color:var(--bad)}
+.timebar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.timebar i{display:block;height:100%;background:var(--sage-deep);transition:width .25s linear}
+.timebar.warn i{background:var(--bad)}
+.combo{text-align:center;font-family:var(--kai);font-size:22px;color:var(--rose-deep);min-height:1.4em}
+.stars{font-size:34px;letter-spacing:4px;color:var(--rose-deep)}
+
+/* 配對題（連線式） */
+.pairwrap{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.pcol{display:flex;flex-direction:column;gap:8px}
+.pitem{border:2px solid var(--line);background:var(--paper);border-radius:10px;padding:8px 10px;text-align:left;font-size:15px;line-height:1.4;min-height:52px}
+.pitem.sel{border-color:var(--rose-deep);box-shadow:0 0 0 2px var(--rose-deep)}
+.pitem.done{border-color:var(--ok);background:var(--okbg);opacity:.7}
+.pitem.wrongflash{border-color:var(--bad);background:var(--badbg)}
+.pnum{font-size:12px;color:var(--muted);display:block}
+
+/* 分類題 */
+.sortq{font-size:17px;width:100%}
+.bins{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.bins.b3{grid-template-columns:repeat(3,1fr)}
+.bin{border:2px dashed var(--line);border-radius:12px;padding:8px;min-height:80px;background:var(--paper)}
+.bin h4{margin:0 0 6px;font-size:15px;color:var(--sage-deep);font-family:var(--kai)}
+.bin .tagi{display:block;background:var(--card);border:1.5px solid var(--line);border-radius:8px;padding:4px 8px;font-size:14px;margin-bottom:4px}
+.bin .tagi.ok{border-color:var(--ok);background:var(--okbg)}
+.bin .tagi.bad{border-color:var(--bad);background:var(--badbg)}
+.cur{background:var(--card);border:2px solid var(--rose-deep);border-radius:12px;padding:10px;text-align:center;font-size:19px;width:100%}
+
+/* 圖表 */
+.chartbox{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:10px;width:100%}
+.chartbox svg{display:block;width:100%;height:auto}
+.srcnote{font-size:12px;color:var(--muted);margin:4px 0 0;text-align:right}
+.tblwrap{overflow-x:auto;background:var(--card);border:1.5px solid var(--line);border-radius:12px}
+table.tbl{border-collapse:collapse;width:100%;font-size:15px}
+table.tbl caption{font-size:13px;color:var(--muted);padding:8px 10px 0;text-align:left}
+
+/* 寫國字 */
+.tian{position:relative;aspect-ratio:1;max-width:100%;border:2px solid var(--sage-deep);background:var(--card);display:grid;place-items:center}
+.tian::before,.tian::after{content:"";position:absolute;pointer-events:none}
+.tian::before{left:50%;top:0;bottom:0;border-left:1.5px dashed var(--line)}
+.tian::after{top:50%;left:0;right:0;border-top:1.5px dashed var(--line)}
+.tian .z{font-family:var(--kai);line-height:1;position:relative;z-index:1}
+.prompt{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;align-items:center;text-align:center}
+.prompt .word{font-family:var(--kai);font-size:34px;line-height:1.5}
+.prompt .box{display:inline-flex;align-items:center;justify-content:center;border:2px solid var(--rose-deep);border-radius:6px;padding:0 8px;margin:0 2px;font-family:var(--sans);font-size:20px;color:var(--rose-deep);vertical-align:middle;min-height:44px}
+.padwrap{width:min(100%,340px);margin:0 auto}
+.pad{touch-action:none}
+.pad canvas{position:absolute;inset:0;width:100%;height:100%;z-index:2}
+.pad .ghost{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--kai);color:var(--rose);z-index:1;line-height:1}
+.reveal{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.reveal .big{font-family:var(--kai);font-size:72px;line-height:1;color:var(--rose-deep)}
+.reveal .info{min-width:0;flex:1}
+.center{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.grade{display:flex;gap:14px;align-items:center;border-radius:14px;padding:12px 14px;border:2px solid var(--line);background:var(--card);margin-bottom:10px}
+.grade.g-ok{border-color:var(--ok);background:var(--okbg)}.grade.g-chk{border-color:var(--rose-deep);background:var(--badbg)}
+.gscore{text-align:center;flex:none}.gscore b{display:block;font-size:40px;line-height:1;font-variant-numeric:tabular-nums}.gscore span{font-size:13px;color:var(--muted)}
+.ginfo{min-width:0;font-size:15px}
+
+/* 翻牌 */
+.mem{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mem.m16{grid-template-columns:repeat(4,1fr)}
+.mc{aspect-ratio:3/4;border-radius:12px;border:2px solid var(--sage-deep);background:var(--sage);display:grid;place-items:center;font-size:0;padding:6px;transition:transform .2s;overflow:hidden}
+.mc.open,.mc.done{background:var(--card);font-size:13px}
+.mc.done{border-color:var(--ok);opacity:.65}
+.mc .k{font-family:var(--kai);font-size:clamp(14px,4.2vw,19px);line-height:1.3;text-align:center}
+.mc .k.sm{font-size:clamp(11px,3.2vw,14px);line-height:1.3}
+.mc:not(.open):not(.done)::after{content:"?";font-size:28px;font-family:var(--kai);color:var(--sage-deep)}
+.mc.pop{animation:pop .35s ease}
+.mc.shake{animation:shake .35s ease}
+@keyframes pop{50%{transform:scale(1.08)}}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@media (prefers-reduced-motion:reduce){.mc{transition:none}.mc.pop,.mc.shake{animation:none}}
+
+/* 慶祝 */
+#party{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:color-mix(in srgb,var(--paper) 70%,transparent);padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
+  --c1:#e8d9a8;--c2:#f0b48a;--c3:#ffd36e;--c4:#a9cdf2;animation:fadein .25s ease}
+#party.out{opacity:0;transition:opacity .3s}
+@keyframes fadein{from{opacity:0}}
+.party-card{position:relative;z-index:2;background:var(--card);border:2px solid var(--sage-deep);border-radius:20px;padding:18px 16px;text-align:center;max-width:380px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.dancers{display:flex;align-items:flex-end;justify-content:center;gap:4px}
+.dancer{width:110px;height:auto}
+.hundred{font-family:var(--kai);font-size:44px;font-weight:700;color:var(--rose-deep);align-self:center;animation:pulse .6s ease-in-out infinite alternate}
+.d1{animation:bounce .5s ease-in-out infinite alternate;transform-origin:50% 100%}
+.d2{animation:bounce .5s ease-in-out .25s infinite alternate;transform-origin:50% 100%}
+.arm{transform-box:fill-box}
+.d1 .al,.d2 .al{transform-origin:100% 100%;animation:wave .5s ease-in-out infinite alternate}
+.d1 .ar,.d2 .ar{transform-origin:0 100%;animation:wave2 .5s ease-in-out infinite alternate}
+.leg{transform-box:fill-box;transform-origin:50% 0}
+.ll{animation:kick .5s ease-in-out infinite alternate}.lr{animation:kick .5s ease-in-out .25s infinite alternate}
+@keyframes bounce{from{transform:translateY(0) rotate(-6deg)}to{transform:translateY(-14px) rotate(6deg)}}
+@keyframes wave{from{transform:rotate(18deg)}to{transform:rotate(-22deg)}}
+@keyframes wave2{from{transform:rotate(-18deg)}to{transform:rotate(22deg)}}
+@keyframes kick{from{transform:rotate(-12deg)}to{transform:rotate(12deg)}}
+@keyframes pulse{from{transform:scale(1)}to{transform:scale(1.15)}}
+.party-title{font-family:var(--kai);font-size:30px;font-weight:700;margin-top:6px}
+.party-sub{color:var(--muted);margin:4px 0 12px}
+.confetti{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.confetti i{position:absolute;top:-20px;width:10px;height:14px;border-radius:2px;animation:fall linear infinite}
+@keyframes fall{to{top:105%;transform:rotate(540deg)}}
+@media (prefers-reduced-motion:reduce){.d1,.d2,.arm,.leg,.hundred,.confetti i{animation:none!important}.confetti{display:none}}
+
+/* 結果、錯題 */
+.done-box{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:16px;text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center}
+.score{font-family:var(--kai);font-size:44px;line-height:1;color:var(--sage-deep);font-variant-numeric:tabular-nums}
+.wlist{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.wz{font-family:var(--kai);font-size:22px;border:1.5px solid var(--rose-deep);border-radius:8px;padding:0 8px;color:var(--rose-deep)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+.tbl{overflow-x:auto;background:var(--card);border:1.5px solid var(--line);border-radius:12px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+th{font-size:13px;color:var(--muted);font-weight:500}
+td.n{font-variant-numeric:tabular-nums;text-align:center;white-space:nowrap}
+.wtbl td{white-space:normal}
+.confirm{background:var(--badbg);border-radius:10px;padding:10px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.flag{display:inline-block;font-size:12px;background:var(--rose);color:var(--ink);border-radius:6px;padding:0 6px;margin-left:6px;vertical-align:middle}
+[hidden]{display:none!important}
+body{margin:0}
+img{max-width:100%}
+</style>
+<div class="wrap">
+<header class="hdr">
+  <div>
+    <h1>四上社會練功房</h1>
+    <p>期中考範圍：單元一 家鄉的地圖與運用、單元二 家鄉的地形與氣候、單元三 家鄉的人口與生活（1-1～3-2 共六課）</p>
+  </div>
+  <button class="btn" id="sfxBtn" aria-pressed="true">音效：開</button>
+</header>
+
+<div class="scope" id="scope"></div>
+
+<nav class="tabs" role="tablist" aria-label="練習模式">
+  <button role="tab" data-tab="cards" aria-selected="true">重點卡</button>
+  <button role="tab" data-tab="mc" aria-selected="false">選擇</button>
+  <button role="tab" data-tab="tf" aria-selected="false">是非</button>
+  <button role="tab" data-tab="pair" aria-selected="false">配對</button>
+  <button role="tab" data-tab="sort" aria-selected="false">分類</button>
+  <button role="tab" data-tab="chart" aria-selected="false">圖表</button>
+  <button role="tab" data-tab="write" aria-selected="false">寫國字</button>
+  <button role="tab" data-tab="mem" aria-selected="false">翻牌</button>
+  <button role="tab" data-tab="exam" aria-selected="false">模擬考</button>
+  <button role="tab" data-tab="wrong" aria-selected="false">錯題</button>
+</nav>
+
+<section id="tab-cards"><div id="cardsArea"></div></section>
+<section id="tab-mc" hidden><div id="mcArea"></div></section>
+<section id="tab-tf" hidden><div id="tfArea"></div></section>
+<section id="tab-pair" hidden><div id="pairArea"></div></section>
+<section id="tab-sort" hidden><div id="sortArea"></div></section>
+<section id="tab-chart" hidden><div id="chartArea"></div></section>
+<section id="tab-write" hidden><div id="writeArea"></div></section>
+<section id="tab-mem" hidden><div id="memArea"></div></section>
+<section id="tab-exam" hidden><div id="examArea"></div></section>
+<section id="tab-wrong" hidden><div id="wrongArea"></div></section>
+
+<p class="hint">答對、答錯的紀錄只存在這台裝置的瀏覽器裡，換手機或清除瀏覽資料就會不見，也不會同步到別的裝置。題目與答案都來自老師的單元複習卷答案卷、期中考答案卷和課本重點整理。</p>
+</div>
+<script>
+/* ===== 名詞解釋卡 TERM {g,t,d} ===== */
+const TERM=[
+/* 1-1 閱讀生活中的地圖 */
+{g:1,t:"地圖",d:"依據實際景物和各種資料繪製而成，把複雜的世界用簡單的資訊與圖像呈現的工具。"},
+{g:1,t:"圖名",d:"地圖的名稱或主題，看圖名就知道這是什麼類型的地圖。"},
+{g:1,t:"方向標",d:"用來辨識方位的工具，常是標上中文或英文的十字型符號。"},
+{g:1,t:"比例尺",d:"代表地圖縮小的比例，可以用來計算兩地的實際距離。"},
+{g:1,t:"圖例",d:"運用簡單的符號，來表示地面的實際景物，例如學校、寺廟、漁港。"},
+{g:1,t:"行政區域圖",d:"可以觀察有哪些地方區域；能知道縣市的位置、涵蓋的鄉鎮市區、相鄰縣市的名稱。"},
+{g:1,t:"交通路線圖",d:"臺鐵、高鐵、捷運和各地客運都會提供；能知道經過哪些車站、要在哪裡轉車。"},
+{g:1,t:"交通觀光導覽圖",d:"主要用來標示觀光景點與交通路線，可以帶我們探索當地的特色景點。"},
+{g:1,t:"電子地圖",d:"可以從電腦或手機取得。能局部放大縮小、定位、導航、觀看街景，適合用來規畫路線。"},
+{g:1,t:"衛星影像圖",d:"從高空往地面拍照所構成，能顯示建築物與土地利用的情形。"},
+/* 1-2 善用地圖好生活 */
+{g:2,t:"用地圖探索家鄉",d:"利用行政區域圖，了解家鄉或不同地區的位置與地名。"},
+{g:2,t:"規畫交通路線",d:"搭乘交通工具去工作或旅行時，參考交通路線圖，就能更順利抵達目的地。"},
+{g:2,t:"拿著地圖去旅行",d:"地圖內豐富的資訊，讓我們知道不同地區的自然環境，以及人們怎麼使用這些地方。"},
+{g:2,t:"伊達邵",d:"日月潭的景點名稱，是邵族的部落名。"},
+{g:2,t:"水社",d:"位於日月潭附近，盛產紅茶，並用紅茶製作茶葉蛋販售。"},
+{g:2,t:"定位與導航",d:"電子地圖的功能，可以指引我們到達指定地點，也能估算到目的地需要的時間。"},
+/* 2-1 高低起伏的地形 */
+{g:3,t:"地形",d:"指地表的高低起伏與形狀特徵。可以透過地圖、空拍實景等資料認識地形樣貌。"},
+{g:3,t:"山地",d:"高度超過 1,000 公尺、地勢起伏大，占臺灣大多數的面積。例如：合歡山。"},
+{g:3,t:"丘陵",d:"在山地邊緣、高度不超過 1,000 公尺、坡度變化比較和緩。例如：新北市石碇。"},
+{g:3,t:"台地",d:"地勢平坦的高地，高度不超過 1,000 公尺。例如：臺中市大肚台地。"},
+{g:3,t:"盆地",d:"四周地勢較高、中間平坦，像盆子的地形。例如：南投縣埔里盆地。"},
+{g:3,t:"平原",d:"通常位在河流出口或沿海地區，是寬闊平坦的地形。例如：嘉南平原。"},
+{g:3,t:"嘉南平原",d:"臺灣面積最大的平原，也是臺灣重要的穀倉；土壤肥沃，適合栽種稻米、甘蔗。"},
+{g:3,t:"山地與生活",d:"保留較完整的自然生態，可發展觀光旅遊，有些居民會種植高山蔬菜。"},
+{g:3,t:"丘陵與生活",d:"坡度較和緩、對外交通比山地便利；人們居住得比較分散，把丘陵地開墾成田地種茶樹、果樹。"},
+{g:3,t:"台地、平原和盆地的共同點",d:"都地勢平坦、交通便利，適合居住、農耕和工商發展，因而吸引人口聚集，形成聚落或都市。"},
+/* 2-2 千變萬化的氣候 */
+{g:4,t:"氣候",d:"指長時間的天氣狀況。「秋老虎」、「梅雨」都是在描述氣候的特色。"},
+{g:4,t:"天氣",d:"指短時間的大氣狀況，例如「今天下午可能會下雨」。和「氣候」不一樣。"},
+{g:4,t:"梅雨",d:"每年五、六月，臺灣常會有長達數週的陰雨綿綿。"},
+{g:4,t:"秋老虎",d:"描述氣候特色的說法之一，指秋天仍然很炎熱的現象。"},
+{g:4,t:"農民曆",d:"先民結合氣候特徵、農耕經驗、魚群出現的主要時期等資訊記載而成，供大家日常生活參考。"},
+{g:4,t:"氣象觀測站",d:"設有測量氣溫、雨量、風向和風速的儀器，提供天氣數據，讓我們了解每日天氣變化。"},
+{g:4,t:"交通部中央氣象署",d:"經過長時間統計分析，能讓我們對家鄉的氣候有更進一步的認識。"},
+{g:4,t:"臺灣的氣候差異",d:"夏季時全臺普遍溼熱；冬季時臺灣北部比南部多雨且氣溫較低。主要受地理位置與地形影響。"},
+{g:4,t:"地形對氣候的影響",d:"山地雨量較多、氣溫較低；平地雨量較少、氣溫較高。夏季時民眾會到山上避暑。"},
+{g:4,t:"臺南的芒果",d:"臺南氣候溫暖，適合芒果生長，所以盛產芒果。"},
+{g:4,t:"新竹的米粉",d:"每年十月到隔年的二月，有來自北方乾冷的風，適合晒米粉，所以盛產米粉。"},
+{g:4,t:"墾丁",d:"四季陽光普照，成了度假勝地。"},
+/* 3-1 家鄉的人口組成 */
+{g:5,t:"影響人口分布的原因",d:"受到自然環境、交通建設、經濟發展等因素影響。"},
+{g:5,t:"地勢平坦、水源充足",d:"適合農耕因此開發較早，容易聚集較多的人口。例如：南投市。"},
+{g:5,t:"地勢較高或地形崎嶇",d:"開發不易，人口較少。例如：南投縣仁愛鄉。"},
+{g:5,t:"交通建設與人口",d:"陸上或水上交通便利，工商業發達，人口會逐漸增加。例如：桃園市中壢區（陸運）、臺北市大稻埕（河運）。"},
+{g:5,t:"自然資源與人口",d:"有些山區雖然交通不便，但因盛產木材或開採礦產，曾經聚集不少人口居住。例如：新北市九份（金礦）、新竹縣內灣（林木、礦產）。"},
+{g:5,t:"幼年人口",d:"0～14 歲的人口。"},
+{g:5,t:"青壯年人口",d:"15～64 歲的人口，是主要從事生產的人口，代表了當地的生產力和競爭力。"},
+{g:5,t:"老年人口",d:"65 歲以上的人口。"},
+{g:5,t:"青壯年外移的影響",d:"如果青壯年外出工作的情況變普遍，當地容易出現老年人口比例偏高的現象。"},
+{g:5,t:"新竹縣竹北市",d:"鄰近科學園區及高鐵站，吸引青壯年人口移入，幼年人口比例也較高。"},
+{g:5,t:"雲林縣水林鄉",d:"生產活動以農業為主，老年人口比例高達 27%，代表當地務農人口高齡化、農業缺工。"},
+{g:5,t:"臺東縣池上鄉",d:"雖然努力發展觀光，但因交通不便，人口仍不斷減少。"},
+{g:5,t:"彰化縣員林市",d:"近年因產業發展帶來工作機會，加上新社區建立與公共建設完善，人口有增加的趨勢。"},
+{g:5,t:"苗栗縣頭份市",d:"交通發達，就業、逛街購物和生活都很方便，促進當地人口逐漸增加。"},
+/* 3-2 人口變化與發展 */
+{g:6,t:"人口數量變化的因素",d:"出生、死亡、移入、移出。"},
+{g:6,t:"人口增加的發展條件",d:"交通發達、工作機會多、就醫方便、行政與教育文化資源多。"},
+{g:6,t:"人口減少的原因",d:"地方缺乏發展條件，人口移出，數量可能停止成長，甚至逐漸減少。"},
+{g:6,t:"多子多孫多福氣",d:"早期臺灣人民以務農為主，需要投入大量人力，因此有這樣的生育觀念。"},
+{g:6,t:"家庭計畫",d:"後來政府推動的政策，鼓勵民眾減少生育，提出「兩個孩子恰恰好」的口號。"},
+{g:6,t:"少子化的原因",d:"經濟發達、教育程度提高、父母重視子女教養品質、養育費用提高、婦女就業比例增加，降低生育意願。"},
+{g:6,t:"少子化的影響",d:"會讓家鄉的勞動人口減少；部分學校會因為學生數太少而面臨併校或廢校的危機。"},
+{g:6,t:"因應少子化的作法",d:"政府制訂生育政策、發放生育津貼、設置公共托育、父母可申請育嬰假。"},
+{g:6,t:"高齡社會",d:"65 歲以上人口占總人口的 14% 以上。臺灣在民國 107 年達 14.6%，步入高齡社會。"},
+{g:6,t:"高齡社會的原因",d:"醫療技術進步、衛生環境改善使平均壽命延長，再加上少子化現象，提高了老年人口的比例。"},
+{g:6,t:"高齡社會要重視的議題",d:"老年人的照護、醫療，以及獨居老人養老問題。"},
+{g:6,t:"長照中心",d:"提供長者適當的照護或服務，是重要的施政之一。"},
+{g:6,t:"樂齡學堂",d:"提供老年人學習多樣的課程，讓長者參與學習，活到老、學到老。"},
+{g:6,t:"二度就業",d:"體力與精神充足的長者選擇再次就業，貢獻自己的專業。"}
+];
+/* ===== 選擇題 MC {g,q,o,a,why}  單元一（第 1-1、1-2 課）===== */
+const MC1=[
+{g:1,q:"下列哪一個不是我們生活中常見的地圖？",o:["軍事設施分布圖","交通路線圖","觀光導覽圖","行政區域圖"],a:0,why:"軍事設施屬於機密，不會做成一般生活中的地圖。"},
+{g:1,q:"有關電子地圖的描述，下列哪一個是錯誤的？",o:["電子地圖可以搭配汽車導航使用","電子地圖有定位功能","人口越多的地方，電子地圖的內容越不正確","我們可以利用智慧型手機來取得電子地圖"],a:2,why:"電子地圖的正確性和人口多寡沒有關係。"},
+{g:1,q:"如果我們剛搬到陌生的縣市，可以使用什麼地圖來了解該縣市的位置及涵蓋的鄉鎮市區呢？",o:["交通路線圖","世界地圖","觀光導覽圖","行政區域圖"],a:3,why:"行政區域圖可以知道縣市位置、涵蓋的鄉鎮市區和相鄰縣市。"},
+{g:1,q:"桃樂比想要搭公車到奶奶家吃章魚燒，請問她可以從下列哪一張地圖知道上下車的地點？",o:["世界地圖","行政區域圖","交通路線圖","觀光導覽圖"],a:2,why:"交通路線圖會標示經過的車站與轉車地點。"},
+{g:1,q:"旅行時，小甜甜想要查詢當地有什麼獨特的人文特色，請問你會建議她怎麼做呢？",o:["查詢行政區域圖","查詢交通路線圖","查詢世界地圖","查詢觀光導覽圖"],a:3,why:"觀光導覽圖會標示當地的觀光景點與特色。"},
+{g:1,q:"觀察交通觀光導覽圖的圖例時，無法得知下列哪一個資訊？",o:["當地的自然環境","人們怎麼使用這些地方","觀光區未來的發展計畫","當地的知名景點"],a:2,why:"地圖呈現的是現在的樣貌，不會有未來的發展計畫。"},
+{g:1,q:"米妮想要繪製地圖向同學介紹她的家鄉—南投縣，請問地圖上不太可能出現下列哪一項圖例？",o:["省道","鄉道","海港","學校"],a:2,why:"南投縣不靠海，所以不會有海港。"},
+{g:1,q:"早年搭火車規畫路線時，會利用紙本鐵道路線圖和什麼來進行？",o:["衛星地形圖","氣象預報","火車時刻表","以上都可以"],a:2,why:"鐵道路線圖搭配火車時刻表，就能規畫搭車路線。"},
+{g:1,q:"交通路線圖通常不提供下列哪項資訊？",o:["轉車地點","行經路線","車站名稱","特產清單"],a:3,why:"特產清單不是交通路線圖的內容。"},
+{g:1,q:"下列哪種地圖可以局部放大，呈現更仔細的地圖樣貌？",o:["交通路線圖","電子地圖","交通觀光導覽圖","行政區域圖"],a:1,why:"電子地圖可以透過局部放大、縮小，清楚閱讀地圖內容。"},
+{g:1,q:"衛星影像圖通常由照片構成，請問是從什麼角度拍攝的照片？",o:["從高空往地面拍照","從大海往陸地拍照","從月球往地球拍照","從地底往地面拍照"],a:0,why:"衛星影像圖是從高空往地面拍照，能顯示建築物與土地利用情形。"},
+{g:1,q:"想計算地圖上兩點間的距離，需要下列哪一項地圖工具？",o:["方向標","圖例","比例尺","圖名"],a:2,why:"比例尺代表地圖縮小的比例，可以用來計算實際距離。"},
+{g:1,q:"想知道某縣市政府地點在哪裡，應該查看哪一項地圖工具？",o:["圖名","圖例","比例尺","方向標"],a:1,why:"圖例用簡單符號表示地面的實際景物，可以找到縣市政府的位置。"},
+{g:1,q:"關於地圖的敘述，下列哪一項錯誤？",o:["有各式各樣的類別","因使用者的需求不同而繪製","憑自己的想像力繪製","是一種具功用的圖畫"],a:2,why:"地圖要依據實際景物和各種資料繪製，不能憑想像。"},
+{g:1,q:"阿敏在地圖上看到甲地區有寺廟的標示，請問甲地區可能有提供什麼服務？",o:["提供香客參拜","販售當地特產","辦理金融業務","靠船隻接送旅客"],a:0,why:"寺廟的圖例代表這裡可以參拜。"},
+{g:1,q:"小中是彰化縣北斗鎮人，想知道北斗鎮附近有哪些鄉鎮，他可以查閱哪一種地圖？",o:["彰化縣地形圖","臺灣行政區域圖","彰化縣行政區域圖","世界地圖"],a:2,why:"要看縣內鄉鎮的分布，查該縣的行政區域圖最清楚。"},
+{g:1,q:"小桃子查閱地圖時，發現地圖上面沒有標示□，因此無法判斷實際的方位。請問□應該填入什麼呢？",o:["圖名","方向標","比例尺","圖例"],a:1,why:"方向標是用來辨識方位的工具。"},
+{g:1,q:"地圖是以哪一種方式來呈現世界的樣貌？",o:["圖像","數字","聲音","影片"],a:0,why:"地圖把複雜的世界用簡單的資訊與圖像呈現。"},
+{g:1,q:"在地圖上的各種工具中，有一個通常呈現為標上中文或英文的十字型符號，可以協助使用者辨識方位。請問它的名字是什麼？",o:["方向標","比例尺","圖例","以上都有可能"],a:0,why:"十字型、標示東西南北的符號就是方向標。"},
+{g:1,q:"想要閱讀電子地圖可以使用什麼物品呢？",o:["平板電腦","桌上型電腦","智慧型手機","以上都可以"],a:3,why:"電子地圖可以從電腦或手機等裝置取得。"},
+{g:1,q:"閱讀行政區域圖，通常無法讓我們知道關於家鄉的什麼事？",o:["人口總數","相鄰縣市有哪些","涵蓋哪些鄉鎮市區","最大的區域是哪裡"],a:0,why:"行政區域圖呈現區域的劃分，看不出人口總數。"},
+{g:1,q:"透過電子地圖，通常可以做到下列哪件事？",o:["找到同學家的電話","開車時進行導航","查到當地人口的變化趨勢","知道時下的流行趨勢"],a:1,why:"電子地圖有定位和導航功能。"},
+{g:1,q:"地圖上標示的比例尺，代表什麼意義？",o:["地圖上景點的所在位置","地圖縮小的比例","地圖的名稱或主題","地圖上的方位"],a:1,why:"比例尺代表地圖縮小的比例。"},
+{g:1,q:"下列哪一種地圖提供觀看街景的功能？",o:["行政區域圖","交通路線圖","交通觀光導覽圖","電子地圖"],a:3,why:"電子地圖可以觀看街景。"},
+{g:1,q:"曉華在地圖上發現了廟的符號，這可能代表什麼意思？",o:["百貨公司","遊客中心","寺廟","車站"],a:2,why:"圖例用簡單符號表示實際景物，這個符號代表寺廟。"},
+{g:1,q:"小俊看著地圖，發現家鄉有學校、古蹟、橋梁等。請問小俊是從哪個地圖工具中知道的？",o:["方向標","比例尺","圖例","圖名"],a:2,why:"圖例用簡單符號表示地面的實際景物。"},
+{g:1,q:"下列哪一個不是地圖上圖例的功能？",o:["標示出道路","標示出河川的位置","標示出景點或廟宇位置","標示當地房屋的價格"],a:3,why:"圖例表示的是地面的實際景物，不會標示房價。"},
+{g:1,q:"我們無法從下列哪一項物品獲得電子地圖？",o:["智慧型手機","影印機","桌上型電腦","平板電腦"],a:1,why:"影印機沒有上網與顯示地圖的功能。"},
+{g:1,q:"我們可以從衛星影像圖知道什麼資訊？",o:["土地利用的情形","地方首長的名字","人口歷年的變化","公車經過的路線"],a:0,why:"衛星影像圖能顯示建築物與土地利用的情形。"},
+{g:1,q:"關於行政區域圖，哪一項敘述錯誤？",o:["可以知道行政區域的地形","可以知道行政區域的相對位置","知道哪一個地區的面積較大","海洋多以藍色呈現"],a:0,why:"要認識地形要看地形圖或空拍實景，行政區域圖主要呈現區域劃分。"},
+/* 1-2 善用地圖好生活 */
+{g:2,q:"小山一家人到花蓮縣旅遊，小山繪製的美食地圖是哪一種類型？",o:["行政區域圖","交通路線圖","交通觀光導覽圖","衛星影像圖"],a:2,why:"標示美食與景點位置，屬於交通觀光導覽圖。"},
+{g:2,q:"美英的家位於日月潭的伊達邵碼頭附近，她的鄰居們大多為原住民族，請問美英的鄰居最有可能是哪一個原住民族？",o:["阿美族","凱達格蘭族","排灣族","邵族"],a:3,why:"「伊達邵」是邵族的部落名。"},
+{g:2,q:"彰化市交通觀光導覽圖通常不會提供下列哪一項資訊？",o:["地方美食小吃的位置","彰化市在臺灣島上的位置","臺鐵車站的位置","風景名勝的位置"],a:1,why:"要知道彰化市在臺灣的位置，要看行政區域圖。"},
+{g:2,q:"日月潭的景點名稱常出現「伊達邵」，這是下列哪一個原住民族的部落名？",o:["鄒族","邵族","拉阿魯哇族","卡那卡那富族"],a:1,why:"伊達邵是邵族的部落名。"},
+{g:2,q:"小智和家人到彰化旅遊，一路上他們想尋找著名的景點方向與路線。他們可以到遊客中心查閱什麼地圖？",o:["衛星影像圖","行政區域圖","交通觀光導覽圖","藏寶圖"],a:2,why:"交通觀光導覽圖標示觀光景點與交通路線。"},
+{g:2,q:"甜甜上網查詢日月潭的交通觀光導覽圖，她在地圖上首先會看到哪一個醒目的自然景觀？",o:["纜車","河流","山丘","水潭"],a:3,why:"日月潭最主要的自然環境就是潭（水潭）。"},
+{g:2,q:"阿欽指著一張圖說：「我們將從花蓮瑞穗火車站出發，經過 4 個車站後，就可以抵達臺東火車站了。」阿欽正指著什麼地圖？",o:["交通路線圖","世界地圖","行政區域圖","交通觀光導覽圖"],a:0,why:"能知道經過幾個車站，是交通路線圖的資訊。"},
+{g:2,q:"正男使用地圖規畫旅行時，發現「星星生態農場就在紅茶觀光工廠的西方。」請問正男是以什麼地圖工具來做出這個判斷？",o:["比例尺","圖例","圖名","方向標"],a:3,why:"判斷東西南北方位要用方向標。"},
+{g:2,q:"利用火車時刻表和什麼地圖，就可以規畫旅行路線？",o:["衛星影像圖","行政區域圖","鐵道路線圖","以上都可以"],a:2,why:"鐵道路線圖搭配時刻表，才能規畫搭車路線。"},
+{g:2,q:"當阿凱到快樂鎮旅遊時，發現當地的交通觀光導覽圖中有許多海鮮餐廳及魚酥觀光工廠，請問快樂鎮比較有可能位在哪個地區？",o:["海港","山丘","森林","都市"],a:0,why:"有海鮮餐廳和魚酥工廠，推測靠海，是海港地區。"},
+{g:2,q:"容容一家人計畫去日月潭旅行，下列哪一項筆記出錯了呢？",o:["日月潭的一些景點以邵族部落伊達邵命名","衛星影像圖最適合遊客尋找日月潭周邊的景點","能到達日月潭的交通工具不只一種","水社出售茶葉蛋"],a:1,why:"要找景點應該用交通觀光導覽圖，衛星影像圖主要呈現土地利用情形。"},
+{g:2,q:"東東到某地觀光遊覽時，好奇當地維持森林面貌以及開發為城鎮的土地哪一種比較多。這時適合使用下列哪種工具？",o:["該地的衛星影像圖","交通路線圖","該地的行政區域圖","該地的交通觀光導覽圖"],a:0,why:"衛星影像圖能顯示土地利用的情形。"},
+{g:2,q:"下列哪一項資訊不太可能在交通路線圖上查到呢？",o:["有沒有直達目的地的班次","轉車站點的名稱","路上經過的地點","車站附近的景點"],a:3,why:"景點資訊要看交通觀光導覽圖。"},
+{g:2,q:"地圖上通常都會有個圖形，用來表示地圖縮小的比例，這圖形是什麼呢？",o:["方向標","圖名","比例尺","圖例"],a:2,why:"比例尺代表地圖縮小的比例。"}
+];
+/* ===== 選擇題 MC 單元二（第 2-1、2-2 課）===== */
+const MC2=[
+/* 2-1 高低起伏的地形 */
+{g:3,q:"什麼是地形？",o:["地底下的情形","地表的高低起伏與形狀特徵","就是平原的一種","我們常去一個地方的情形"],a:1,why:"地形指地表的高低起伏與形狀特徵。"},
+{g:3,q:"下列哪一個是臺灣面積最大的平原？",o:["花東縱谷平原","宜蘭平原","彰化平原","嘉南平原"],a:3,why:"嘉南平原是臺灣面積最大的平原，也是重要的穀倉。"},
+{g:3,q:"下列哪種地形較沒有交通便利、適合農耕和工商發展的特點？",o:["丘陵","台地","盆地","平原"],a:0,why:"台地、平原和盆地地勢平坦交通便利；丘陵有坡度，人們居住得比較分散。"},
+{g:3,q:"位於山地邊緣，坡度變化比較和緩，且高度不超過 1,000 公尺。下列哪個地方符合上述條件？",o:["玉山","埔里盆地","竹南丘陵","嘉南平原"],a:2,why:"這是丘陵的特徵，竹南丘陵符合。"},
+{g:3,q:"下列哪項不是平原地形的特性？",o:["交通便利","適合居住","容易保有較完整的自然生態","適合工商發展"],a:2,why:"保留較完整自然生態是山地的特色。"},
+{g:3,q:"高度在 1,000 公尺以下，地勢平坦的高地，稱為什麼地形？",o:["盆地","台地","平原","丘陵"],a:1,why:"地勢平坦的高地就是台地。"},
+{g:3,q:"下列哪種地形比較有可能保留較完整的自然生態？",o:["山地","台地","平原","丘陵"],a:0,why:"山地地形崎嶇不易開發，因此保留較完整的自然生態。"},
+{g:3,q:"地勢平坦、交通便利的地方，適合居民進行什麼活動？",o:["居住","農耕","工商發展","以上皆是"],a:3,why:"台地、平原和盆地都適合居住、農耕和工商發展。"},
+{g:3,q:"下列關於地形影響居民活動的比較，哪一項錯誤？",o:["人口密集程度：平原＞丘陵","稻米產量：平原＞山地","利用自然生態發展觀光旅遊：盆地＞山地","適合工商發展：平原＞山地"],a:2,why:"山地保留較完整的自然生態，發展生態觀光的條件優於盆地。"},
+{g:3,q:"「琪琪每次坐車到奶奶家時，會先經過一段上坡路，上去之後就能看到一片寬闊平坦的地方。」依上文判斷，琪琪的奶奶家可能位於下列哪一個地方？",o:["嘉南平原","大肚台地","埔里盆地","阿里山"],a:1,why:"先上坡再看到平坦高地，是台地的特徵。"},
+{g:3,q:"新北市石碇地區的山坡地可以看見茶樹景觀，請問這裡主要是什麼地形？",o:["丘陵","台地","平原","山地"],a:0,why:"石碇是丘陵，丘陵被開墾成一層一層的田地種茶。"},
+{g:3,q:"台地、盆地和平原地形，有什麼共同的特色呢？",o:["人們居住的比較分散","適合觀賞雲海","容易聚集人口","位在沿海地區"],a:2,why:"三者都地勢平坦、交通便利，因而吸引人口聚集。"},
+{g:3,q:"我們能透過什麼認識地形樣貌？",o:["空拍實景","天氣數據","農民曆","以上都可以"],a:0,why:"可以透過地圖和空拍實景等資料認識地形樣貌。"},
+{g:3,q:"美麗建築公司規畫興建房屋，請問下列哪一種地形因地勢起伏較大，土地開發會受到限制，因而較不可能將房屋蓋在那裡？",o:["台地","盆地","山地","平原"],a:2,why:"山地地勢起伏大，開發受限。"},
+{g:3,q:"由於山地地形崎嶇不易開發，因此具有什麼特色呢？",o:["保留較完整的自然生態","交通便利","不適合觀光旅遊","普遍種植茶樹"],a:0,why:"山地保留較完整的自然生態，可發展觀光旅遊。"},
+{g:3,q:"下列哪一種景象較不可能出現在盆地地形？",o:["居民在平坦的農地耕種農作物","到處可見高樓與商家林立","地勢高聳，森林密布","街道上車水馬龍、人群聚集"],a:2,why:"盆地中間平坦、人口密集；地勢高聳森林密布是山地的景象。"},
+{g:3,q:"圖片中的地形高度通常超過 1,000 公尺、地勢起伏大，下列哪一項敘述有誤？",o:["高度通常超過 1,000 公尺","地勢起伏大","這裡無人居住","占臺灣地形面積最廣"],a:2,why:"山地仍有居民居住，有些居民會種植高山蔬菜。"},
+/* 2-2 千變萬化的氣候 */
+{g:4,q:"每年什麼時候，臺灣全島大多是陰雨綿綿的天氣？",o:["1、2 月","5、6 月","8、9 月","11、12 月"],a:1,why:"每年五、六月是梅雨季節，常有長達數週的陰雨綿綿。"},
+{g:4,q:"請問下列哪一項會影響家鄉的氣候？",o:["地名","交通","地形","資金"],a:2,why:"家鄉的氣候會受到地理位置和地形的影響。"},
+{g:4,q:"阿里山的氣溫比嘉義市還要低，主要是什麼原因的影響呢？",o:["阿里山的地形比較高","阿里山的人口比較少","阿里山的空氣比較好","嘉義市的建築較密集"],a:0,why:"地勢愈高、氣溫愈低。"},
+{g:4,q:"志昀是住在臺南的農民，每年的某個時候他都會擔心缺水無法灌溉農田。請問志昀在下列哪個月分會比較擔心呢？",o:["5 月","7 月","9 月","12 月"],a:3,why:"冬季時南部雨量很少，比較可能缺水。"},
+{g:4,q:"下列哪一項不是氣象觀測站設置儀器測量的對象？",o:["氣溫","雨量","月分","風速"],a:2,why:"氣象觀測站測量氣溫、雨量、風向和風速。"},
+{g:4,q:"志穎寒假時分別報名了臺北、恆春、嘉義和高雄的馬拉松，如果下雨就不參加。請問哪一個地區的比賽最可能因為下雨而取消？",o:["臺北","恆春","嘉義","高雄"],a:0,why:"冬季時北部比南部多雨，臺北最可能下雨。"},
+{g:4,q:"下列關於芒果的說明，什麼是正確的？",o:["芒果的品種多由國外引進","基隆的芒果最有名","不適合種植在氣候炎熱的地方","以上都正確"],a:0,why:"芒果品種多由國外引進，適合種植在氣候炎熱的地區，臺南玉井最有名。"},
+{g:4,q:"老師要同學回家查詢家鄉的天氣數據，老師會提供什麼網站讓大家查詢呢？",o:["各縣市消防局網站","觀光旅遊網站","中央氣象署網站","財經新聞網站"],a:2,why:"交通部中央氣象署提供各地天氣與氣候資料。"},
+{g:4,q:"下列是某年農民曆其中一頁所提供的資訊，請問我們無法從上面得知什麼呢？",o:["適合捕撈的魚類","適合種植的作物","當天的氣溫","氣候的特徵"],a:2,why:"農民曆記載氣候特徵、農耕經驗和魚群出現時期，不會有當天的實際氣溫。"},
+{g:4,q:"俊哲是氣象觀測站的員工，請問下列哪一個較可能是他的工作內容呢？",o:["記錄天氣的變化","播報每天的新聞","提醒民眾預防疾病傳染","更新農民曆節氣資訊"],a:0,why:"氣象觀測站的工作是測量、記錄天氣數據。"},
+{g:4,q:"小黎寫著：「已經連續下兩個禮拜的雨了，連最喜歡的體育課都不能上。」請問小黎的日記可能是在哪一個月分寫的呢？",o:["3 月","6 月","9 月","12 月"],a:1,why:"五、六月是梅雨季，常有長達數週的陰雨綿綿。"},
+{g:4,q:"下列什麼因素是影響臺灣氣候差異的主要原因？",o:["地理位置與地形","人口與地形","族群與歷史","人口與風向"],a:0,why:"家鄉的氣候會因地理位置而不同，也會受地形影響。"},
+{g:4,q:"新聞報導說寒流來了，明天在山上有機會看到今年的第一場雪，為什麼只有山上會下雪？",o:["山上視野比較好才看得到雪","山上居住的人群比較稀少","山上植物較多水氣較重","山上地勢高氣溫較低"],a:3,why:"山地地勢高、氣溫較低，所以才會下雪。"},
+{g:4,q:"振明想種植一項對溫度要求不高、但需要一年四季都有充足雨量的作物，你會建議他在哪個地方種植呢？",o:["臺南","嘉義","基隆","屏東"],a:2,why:"基隆冬季雨量多，全年雨量充足。"},
+{g:4,q:"小麗探究芒果與家鄉地形氣候的關聯，下列哪一項資料和地形與氣候較沒有關係？",o:["芒果適合種植在氣候炎熱的地區","丘陵地形和土壤對芒果的品質有影響","芒果的品種多半由國外引進","雨量會影響當地是否適合種植芒果"],a:2,why:"品種從哪裡引進，和家鄉的地形氣候無關。"},
+{g:4,q:"小麗的家鄉盛產芒果，最可能是下列哪個地方？",o:["合歡山","新北","臺中","臺南"],a:3,why:"臺南氣候溫暖，盛產芒果。"},
+{g:4,q:"墾丁為什麼會是休閒度假的好去處？",o:["盛產茶葉","夏季氣溫較低","四季陽光普照","以上皆是"],a:2,why:"墾丁四季陽光普照，成了度假勝地。"},
+{g:4,q:"在下列哪個季節時，臺灣北部比南部多雨且寒冷？",o:["春季","夏季","秋季","冬季"],a:3,why:"冬季時臺灣北部比南部多雨且氣溫較低。"},
+{g:4,q:"下列哪個月分，全臺普遍溼熱？",o:["1 月","4 月","7 月","10 月"],a:2,why:"夏季時全臺普遍溼熱。"},
+{g:4,q:"氣象觀測站不會出現什麼氣候資訊？",o:["氣溫","雨量","風向","地圖"],a:3,why:"氣象觀測站測量氣溫、雨量、風向和風速。"},
+{g:4,q:"下列哪一個農民曆的內容和農事無關？",o:["春分","每日吉時","播種作物種類","秋分"],a:1,why:"每日吉時凶辰屬於擇時挑日，與農事無關。"},
+{g:4,q:"農民曆無法查詢到下列哪一個訊息？",o:["二十四節氣","每日吉時","農曆日期","地震預測"],a:3,why:"農民曆沒有地震預測的內容。"},
+{g:4,q:"農民曆中的「春分」、「秋分」都跟什麼有關？",o:["氣候","地形","高度","顏色"],a:0,why:"二十四節氣是在描述氣候特徵。"},
+{g:4,q:"人們可以用各地的氣象觀測站來測量天氣數據。請問觀測站中會有什麼儀器呢？",o:["風向風速儀","溫度計","雨量計","以上都有可能"],a:3,why:"氣象觀測站設有測量氣溫、雨量、風向和風速的儀器。"},
+{g:4,q:"氣象觀測站可以提供每日雨量、氣溫等資料，但下列哪一項不太可能由氣象觀測站提供呢？",o:["下個月的降雨機率","上個月的最高氣溫","去年的總雨量","昨天的最低氣溫"],a:0,why:"觀測站記錄的是已經發生的天氣數據。"},
+{g:4,q:"下列哪項不是影響家鄉氣候變化的因素之一？",o:["家鄉的主要地形","家鄉氣溫的變化","家鄉的人口多寡","家鄉的雨量多寡"],a:2,why:"人口多寡不是影響家鄉氣候的因素。"},
+{g:4,q:"農民曆的內容與下列哪項資訊無關呢？",o:["四季的氣候特徵","居民農田面積的大小","先民的農耕經驗","魚群出現的主要時期"],a:1,why:"農民曆不會記載農田面積。"},
+{g:4,q:"新竹在每年什麼時期，有來自北方乾冷的風，使當地能夠盛產米粉？",o:["10 月到隔年 2 月","3 月到 6 月","7 月到 9 月","9 月到 12 月"],a:0,why:"每年十月到隔年的二月，有來自北方乾冷的風，適合晒米粉。"}
+];
+/* ===== 選擇題 MC 單元三（第 3-1、3-2 課）===== */
+const MC3=[
+/* 3-1 家鄉的人口組成 */
+{g:5,q:"關於臺灣的人口分布說明，下列哪一項正確？",o:["每個縣市的居住人口都差不多","在同一個縣市內的不同行政區，有些人口比較多，有些人口比較少","在同一個縣市內，人口數會由東到西逐漸變多","在同一個縣市內，人口數會由北到南逐漸變少"],a:1,why:"臺灣的人口分布不平均，同一縣市內各行政區的人口也有多有少。"},
+{g:5,q:"家鄉人口的分布和環境有什麼關係？",o:["會受到自然與人文環境的影響而不同","只會受到自然環境的影響","只會受到人文環境的影響","家鄉人口的分布和環境沒有關係"],a:0,why:"人口分布受自然環境、交通建設、經濟發展等因素影響。"},
+{g:5,q:"「地方上青壯年的人口比例有逐年增加的趨勢」，這句話代表什麼意思？",o:["當地生產力和競爭力逐年提升中","當地已進入高齡化社會","當地政府提高托育補助金","當地老年人口已獲得妥善照顧"],a:0,why:"青壯年人口是主要從事生產的人口，代表當地的生產力和競爭力。"},
+{g:5,q:"現代社會中，一個地方具備什麼條件，較能吸引青壯年人口移入？",o:["產業發展帶來較多工作機會","地勢平坦","地勢崎嶇","水源充足"],a:0,why:"工作機會多，最能吸引青壯年人口移入。"},
+{g:5,q:"住在南投市的小圓，在調查家鄉的人口分布與地方特色時，可能發現哪一種情形？",o:["地勢較高","開發較晚","人口比較多","人口比較少"],a:2,why:"南投市地勢平坦、開發較早，人口比較多。"},
+{g:5,q:"哪一個地方雖然近年來努力發展觀光，但因交通不便，人口不斷減少？",o:["臺北市大稻埕","彰化縣員林市","臺東縣池上鄉","苗栗縣頭份市"],a:2,why:"池上鄉交通不便，人口仍不斷減少。"},
+{g:5,q:"下列哪一個地方曾經因為產金礦而興盛？",o:["臺北市大稻埕","新北市九份","桃園市中壢區","新竹縣內灣"],a:1,why:"九份因開採金礦而繁榮。"},
+{g:5,q:"新竹縣竹北市吸引青壯年人口移入的原因是什麼？",o:["地方政府努力發展觀光","鄰近科學園區及高鐵站","當地產業以農業為主","河運便利"],a:1,why:"竹北市鄰近科學園區及高鐵站，工作機會多、交通便利。"},
+{g:5,q:"一個地方出現什麼情形，會使當地的老年人口比例偏高？",o:["當地盛產木材","當地廣設幼兒園","青壯年人口移出","地方政府積極發展交通建設"],a:2,why:"青壯年外出工作變普遍，當地容易出現老年人口比例偏高的現象。"},
+{g:5,q:"雲林縣水林鄉主要生產活動為農業，老年人口比例卻高達 27%，這個數據代表當地正面臨什麼問題？",o:["婦女就業比例增加","務農人口高齡化","自動化生產過剩","養育子女費用提高"],a:1,why:"以農業為主而老年人口比例高，代表務農人口高齡化、農業缺工。"},
+{g:5,q:"當一個地方的青壯年人口增加，哪一種人口也會跟著增加？",o:["老年人口","女性人口","中老年人口","幼年人口"],a:3,why:"青壯年人口增加，幼年人口也會跟著增加。"},
+{g:5,q:"哪一種地形因為開發不易，人口通常比較少？",o:["盆地","平原","山地","台地"],a:2,why:"地勢較高或地形崎嶇的地方開發不易，人口較少。"},
+{g:5,q:"桃園市中壢區早期為什麼聚集許多人口？",o:["陸運方便","水運方便","空運方便","資源豐富"],a:0,why:"中壢區早期陸上交通方便，容易聚集較多人口。"},
+{g:5,q:"住在南投縣仁愛鄉的小益，在調查家鄉的人口分布後，可能得到哪一個結論？",o:["因為多山地，自然資源豐富，所以人口比較多","因為多山地，不易開發，所以人口比較少","因為地勢平坦，開發較早，所以人口比較多","因為地勢平坦，缺乏資源，所以人口比較少"],a:1,why:"仁愛鄉多山地，開發不易，人口較少。"},
+{g:5,q:"將家鄉的人口組成分為幼年、青壯年、老年，是以哪一種依據進行分類的？",o:["教育程度","年齡","經濟能力","身高"],a:1,why:"是以年齡來區分：0～14 歲幼年、15～64 歲青壯年、65 歲以上老年。"},
+{g:5,q:"下列哪一項是主要從事生產的人口，代表當地的生產力以及競爭力？",o:["幼年人口","青壯年人口","中老年人口","老年人口"],a:1,why:"青壯年人口（15～64 歲）是主要從事生產的人口。"},
+{g:5,q:"下列哪一個地方早期因為河運方便，商業發達，聚集較多人口？",o:["臺北市大稻埕","彰化縣員林市","新北市九份","新竹縣內灣"],a:0,why:"大稻埕早期因河運方便，商業發達。"},
+{g:5,q:"什麼樣的地方通常開發較早，因此人口比較多？",o:["水源缺乏、地勢平坦","水源缺乏、地勢高聳","水源充足、地勢平坦","水源充足、地勢高聳"],a:2,why:"地勢平坦、水源充足的地方適合農耕，開發較早，人口較多。"},
+{g:5,q:"下列哪一個地方曾因為盛產林木和礦產而繁榮？",o:["新北市九份","臺北市大稻埕","彰化縣員林市","新竹縣內灣"],a:3,why:"內灣盛產林木及礦產，曾經繁榮。"},
+{g:5,q:"一個地方具備什麼條件，人口可能會比較多？",o:["交通便利","產業發達","資源豐富","以上皆是"],a:3,why:"交通便利、產業發達、資源豐富都會讓人口增加。"},
+{g:5,q:"阿偉的家鄉是一個人口非常稀少的地方，請問阿偉所居住的地方，比較不會有下列哪種現象？",o:["交通不便利","礦業資源豐富","地勢崎嶇不平","缺乏醫療資源"],a:1,why:"資源豐富的地方容易聚集人口，和人口稀少的情形不符。"},
+{g:5,q:"臺灣某個鄉鎮的老年人口占很大比例，生產活動以農業為主。請問以下敘述哪一個最適當？",o:["該鄉鎮吸引老年人口移入","該鄉鎮的居民很長壽","該鄉鎮務農人口高齡化","該鄉鎮從事農業的人力充沛"],a:2,why:"以農業為主而老年人口比例高，代表務農人口高齡化。"},
+/* 3-2 人口變化與發展 */
+{g:6,q:"一個地方的出生人數逐年下降，會對當地造成什麼影響？",o:["婦女工作機會增加","青壯年人口選擇提早退休","老年人退休後無事可做","未來勞動人口減少"],a:3,why:"出生人數降低，意味著未來的勞動人口將減少。"},
+{g:6,q:"近年什麼社會現象讓部分學校面臨併校或廢校的危機？",o:["都市化","高齡化","少子化","國際化"],a:2,why:"少子化使學生數太少，部分學校面臨併校或廢校。"},
+{g:6,q:"「樂齡學堂」可以提供老年人學習多樣的課程，因而產生什麼好處？",o:["讓老年人可以活到老、學到老","提高老年人口比例","鼓勵老年人在家照顧孫子女","減免老人搭乘大眾運輸的費用"],a:0,why:"參與學習可以活到老、學到老。"},
+{g:6,q:"近年來政府為鼓勵民眾生育，提供什麼補助方案？",o:["企業能自動化生產","縣巿設有長照專車","設置托嬰中心","規畫大眾運輸工具停靠站"],a:2,why:"增設公共托育、發放津貼都是鼓勵生育的作法。"},
+{g:6,q:"高齡社會需重視什麼課題？",o:["老年人的照護","老年人的醫療","獨居老人養老問題","以上皆是"],a:3,why:"照護、醫療和獨居老人養老都是需要重視的議題。"},
+{g:6,q:"老年人可以選擇做什麼以貢獻專業？",o:["到健身房運動","二度就業","在家照顧孫子女","安排國外旅行"],a:1,why:"體力與精神充足的長者可以選擇二度就業，貢獻專業。"},
+{g:6,q:"鄰居阿旺伯退休一陣子了，他的女兒希望他可以活到老、學到老，可以建議阿旺伯去哪裡報名課程學習？",o:["安親班","補習班","樂齡學堂","托嬰中心"],a:2,why:"樂齡學堂提供長者多樣的學習課程。"},
+{g:6,q:"當一個國家的老年人口占總人口比例達 14% 時，代表什麼意思？",o:["少子化問題嚴重","已步入高齡社會","面臨農業缺工問題","總人口數增加"],a:1,why:"65 歲以上人口占總人口 14% 以上就是高齡社會。"},
+{g:6,q:"政府曾經推動什麼政策，使得家庭生育的子女數逐漸減少？",o:["家庭計畫","疾病照護","設置長照中心","推廣「多子多孫多福氣」的觀念"],a:0,why:"政府推動「家庭計畫」，提出「兩個孩子恰恰好」，鼓勵民眾減少生育。"},
+{g:6,q:"下列什麼原因促使近年臺灣社會出現「少子化」現象？",o:["老年人口增加","政府設置托嬰中心","養育子女費用增加","企業大量使用智慧化生產"],a:2,why:"養育費用提高，降低了人們生育子女的意願。"},
+{g:6,q:"在早期的臺灣社會，為什麼當時家庭普遍生育較多的孩子？",o:["工廠需要有人操作機器","農忙時需要人手幫忙","政府提供托育補助金","父母重視子女教育品質"],a:1,why:"早期以務農為主，需要投入大量人力，因此有「多子多孫多福氣」的觀念。"},
+{g:6,q:"哪一項是進入高齡社會後需要重視的課題？",o:["養育子女費用增加","婦女就業比例增加","交通不便問題","獨居老人養老問題"],a:3,why:"高齡社會要重視照護、醫療與獨居老人養老。"},
+{g:6,q:"下列哪一項不是少子化所造成的影響？",o:["醫療費用增加","學校面臨廢校危機","學校開始合併","勞動人口減少"],a:0,why:"少子化會造成勞動人口減少、學校併校廢校；醫療費用增加和高齡社會較有關。"},
+{g:6,q:"近年來，家鄉居民的平均壽命逐漸提高，這和什麼原因有關？",o:["教育愈來愈普及","多數人民不想生小孩","醫療技術進步","婦女就業比例提高"],a:2,why:"醫療技術進步、衛生環境改善，使國人平均壽命延長。"},
+{g:6,q:"當某地擁有發展條件時，當地的人口數量會呈現下列哪種變化？",o:["停止成長","逐漸增加","逐漸減少","快速減少"],a:1,why:"具備交通發達、工作機會多等發展條件，人口可能會不斷增加。"},
+{g:6,q:"陳老師第一年教書時班上有 58 位學生，現在只剩一半，由此可以推測她任教地方的哪一種人口減少了？",o:["青壯年人口","老年人口","幼年人口","上班族人口"],a:2,why:"學生人數變少，代表幼年人口（0～14 歲）減少。"},
+{g:6,q:"關於「家庭計畫」時的口號「★個孩子恰恰好」，★中應該填入什麼呢？",o:["一","兩","三","四"],a:1,why:"口號是「兩個孩子恰恰好」。"}
+];
+/* ===== 是非題 TF {g,q,a,why}  a:true=○ false=╳ ===== */
+const TF=[
+/* 1-1 */
+{g:1,q:"住在臺北市的阿華想要搭高鐵到高雄市拜訪奶奶，他可以查詢高鐵路線圖來規畫行進路線。",a:true,why:"交通路線圖可以知道經過哪些車站、在哪裡轉車。"},
+{g:1,q:"如果想了解家鄉所在的鄉鎮市區範圍及相鄰的縣市有哪些，使用行政區域圖是最好的方式。",a:true,why:"行政區域圖能顯示涵蓋的鄉鎮市區和相鄰縣市。"},
+{g:1,q:"雖然現代社會科技發達，但多數人仍習慣使用紙本地圖，電子地圖並不普及。",a:false,why:"電子地圖可以從電腦或手機取得，非常方便又普及。"},
+{g:1,q:"地圖提供的只是簡易資訊，不同景物所在的位置或方向不一定要符合實際狀況。",a:false,why:"地圖上景物的位置和方向必須符合實際狀況。"},
+{g:1,q:"衛星影像圖能顯示建築物與土地的利用情形。",a:true,why:"衛星影像圖是從高空往地面拍照。"},
+{g:1,q:"電子地圖能幫我們估算使用不同交通工具到目的地需要的時間。",a:true,why:"電子地圖有定位和導航功能。"},
+{g:1,q:"目前只有臺鐵和各地的客運會提供交通路線圖。",a:false,why:"臺鐵、高鐵、捷運、各地的客運都會提供交通路線圖。"},
+{g:1,q:"透過地圖的圖名，我們可以知道地圖的名稱或主題。",a:true,why:"圖名就是地圖的名稱或主題。"},
+{g:1,q:"行政區域圖通常只是示意圖，我們不能利用行政區域圖比較家鄉不同行政區的大小。",a:false,why:"可以從行政區域圖比較不同行政區的大小。"},
+{g:1,q:"地圖只需要提供簡易的資訊，景物位置或方向不一定要符合實際狀況。",a:false,why:"必須符合實際狀況。"},
+{g:1,q:"如果我們想知道自己的家鄉與哪些區域相鄰，最好的方式是查閱交通路線圖。",a:false,why:"應該查閱家鄉的行政區域圖。"},
+{g:1,q:"所有地圖的種類都一樣，提供的資訊也都相同。",a:false,why:"不同種類的地圖所提供的資訊也不同。"},
+{g:1,q:"圖例是用簡單符號來表示地面實際景物的地圖工具。",a:true,why:"這就是圖例的定義。"},
+{g:1,q:"美食外送員可以利用電子地圖定位及規畫外送的交通路線。",a:true,why:"電子地圖有定位和導航功能。"},
+{g:1,q:"小旻將平常走路或搭乘大眾運輸工具到學校的路線繪製成一張地圖，這張地圖可以說是學校周遭的行政區域圖。",a:false,why:"標示路線的地圖應為交通路線圖。"},
+{g:1,q:"電子地圖可以依照使用者的需求來放大或縮小，十分方便。",a:true,why:"電子地圖可以透過局部放大、縮小來清楚閱讀內容。"},
+{g:1,q:"現在的電子地圖已經非常方便，不管什麼資料都能查到，其他的地圖已經沒有存在的必要了。",a:false,why:"電子地圖呈現的資料太多，有時專用地圖反而更直覺與方便。"},
+{g:1,q:"地圖的圖名可以讓使用者了解地圖的主題與用處。",a:true,why:"圖名就是地圖的名稱或主題。"},
+{g:1,q:"電子地圖的優點是可以依照自己的需求放大或縮小，缺點則是只能在家裡使用。",a:false,why:"家裡以外的場所用手機、平板也能使用電子地圖。"},
+/* 1-2 */
+{g:2,q:"地圖是生活中重要的工具，透過不同類型的主題地圖，能將複雜的世界，用簡單的資訊與圖像呈現。",a:true,why:"這是地圖的功用。"},
+{g:2,q:"在生活中，透過家鄉的行政區域圖可以顯示出當地人口的富裕程度。",a:false,why:"行政區域圖無法得知人口的富裕程度。"},
+{g:2,q:"觀光導覽圖可以帶領我們探索當地的特色景點。",a:true,why:"交通觀光導覽圖標示觀光景點與交通路線。"},
+{g:2,q:"透過地圖上的圖名、方向標、比例尺與圖例，我們可以尋找家鄉的位置，並了解家鄉景點、道路與河流的分布。",a:true,why:"這四種是讀懂地圖的重要工具。"},
+{g:2,q:"地圖上常可以看到四種重要的工具，我們可以藉由觀察地圖中的圖例，知道這是什麼主題或類型的地圖。",a:false,why:"要知道主題或類型，應該看圖名。"},
+{g:2,q:"我們可以依據實際需求，選擇合適的地圖來使用。",a:true,why:"生活中有各式各樣不同類型的地圖，要選擇合適的使用。"},
+{g:2,q:"我們可以從客運站提供的交通路線圖，知道目前的交通路況是否擁擠。",a:false,why:"交通路線圖只提供經過地點與路線等重要訊息，無法顯示路況。"},
+{g:2,q:"透過地圖內豐富的資訊，我們可以知道不同地區的自然環境，以及人們怎麼使用這些地方。",a:true,why:"這是拿著地圖去旅行的收穫。"},
+{g:2,q:"從交通觀光導覽圖，可以看出當地人口的教育程度。",a:false,why:"交通觀光導覽圖的內容和教育程度無關。"},
+{g:2,q:"電子地圖可以局部放大，方便視力不好的人使用。",a:true,why:"電子地圖可以局部放大、縮小。"},
+{g:2,q:"電子地圖因使用複雜，需要大量配備，所以在生活中不易取得。",a:false,why:"可以從電腦或智慧型手機取得，非常方便。"},
+{g:2,q:"水社位於日月潭附近，盛產紅茶並用紅茶製作茶葉蛋販售。",a:true,why:"課本提到水社盛產紅茶、用紅茶煮茶葉蛋。"},
+{g:2,q:"小明想要觀察地方區域的劃分，他可以查詢交通觀光導覽圖。",a:false,why:"要觀察區域劃分應該查行政區域圖。"},
+{g:2,q:"成成想規畫暑假的旅遊交通路線及行程，除了透過交通路線圖之外，沒有其他地圖可以選擇了。",a:false,why:"還可以透過交通觀光導覽圖來規畫景點、美食的行程。"},
+{g:2,q:"地圖是依據每個人的想像所繪製而成的。",a:false,why:"地圖依據實際景物等資料繪製。"},
+{g:2,q:"電子地圖能透過定位的功能進行導航，指引我們到達指定地點。",a:true,why:"這是電子地圖的功能。"},
+{g:2,q:"在旅行或觀光時，可以運用各種不同功用的地圖，讓旅程更加順利與豐富。",a:true,why:"善用地圖能讓生活和旅行更方便。"},
+{g:2,q:"高鐵、臺鐵、捷運和客運都會提供交通路線圖，讓民眾能知道如何搭車、轉車以到達目的地。",a:true,why:"課本列出臺鐵、高鐵、捷運和各地客運。"},
+{g:2,q:"我們可以透過閱讀行政區域圖，知道圖上地區的環境特色，以及有哪些知名的景點。",a:false,why:"要知道景點應該看交通觀光導覽圖。"},
+{g:2,q:"在兩地之間的交通方式往往不只一種，例如在臺北車站就可以選擇搭乘高鐵或臺鐵到臺中。",a:true,why:"同一段路程常有多種交通工具可以選擇。"},
+{g:2,q:"搭乘大眾運輸工具之前，可以先參考相關的交通路線圖，有助於規畫行程路線。",a:true,why:"交通路線圖可以知道經過哪些車站、在哪裡轉車。"},
+/* 2-1 */
+{g:3,q:"臺灣的地形中，以地勢起伏大的山地占大多數的面積。",a:true,why:"山地占臺灣大多數的面積。"},
+{g:3,q:"臺北市四周地勢較高，中間平坦，屬於盆地地形。",a:true,why:"四周高、中間平坦像盆子的地形就是盆地。"},
+{g:3,q:"小倫寫道：「我的家鄉是在一片平坦的高地上，高度大約是 200～300 公尺。」可以推論小倫家鄉有可能為平原地形。",a:false,why:"平坦的高地是台地，不是平原。"},
+{g:3,q:"家鄉的地形會影響居民運用土地和生活的方式，居民的活動也會改變地形景觀與樣貌。",a:true,why:"地形與生活會互相影響。"},
+{g:3,q:"只有山地能保留較完整的自然生態，可發展觀光旅遊，其他地形無法發展觀光業。",a:false,why:"其他地形也可以發展觀光，只是山地的自然生態較完整。"},
+{g:3,q:"小翰到南投埔里旅行，發現這裡地勢平坦，四周還有許多山峰圍繞，可推斷這裡是盆地地形。",a:true,why:"埔里盆地四周地勢較高、中間平坦。"},
+{g:3,q:"嘉南平原是臺灣重要的穀倉。",a:true,why:"嘉南平原土壤肥沃，是臺灣重要的穀倉。"},
+{g:3,q:"我們能透過地圖、空拍實景等資料，認識地形樣貌。",a:true,why:"課本提到可以透過地圖和空拍實景認識地形。"},
+{g:3,q:"臺灣的地形，以地勢起伏較大的山地地形占最大的面積。",a:true,why:"山地占臺灣大多數的面積。"},
+{g:3,q:"台地的地勢較高，人口較不易聚集。",a:false,why:"台地、平原和盆地都地勢平坦，容易聚集人口。"},
+{g:3,q:"嘉南平原屬於中間平坦，四周地勢較高，像盆子的地形。",a:false,why:"平原為寬闊平坦的地形；這段描述的是盆地。"},
+{g:3,q:"地形的不同，會影響人們對土地的運用方式。",a:true,why:"地形會影響居民運用土地和生活的方式。"},
+{g:3,q:"居民的活動會改變土地的景觀與樣貌。",a:true,why:"居民的活動也會改變土地上的景觀和樣貌。"},
+{g:3,q:"臺灣常見的地形中，不包括「高原」地形。",a:true,why:"臺灣常見的五大地形是山地、丘陵、台地、盆地、平原。"},
+{g:3,q:"山地交通便利，是探索山林的好去處。",a:false,why:"山地交通不便利，丘陵的對外交通才比山地便利。"},
+{g:3,q:"「地形」是指地表的高低起伏和形狀特徵。",a:true,why:"這就是地形的定義。"},
+{g:3,q:"臺灣過去以農業為主，由此可知臺灣的地形以平原占最大面積。",a:false,why:"臺灣以山地占最大面積。"},
+{g:3,q:"我們的家鄉會因為地形、氣候的不同而有不同的景觀。",a:true,why:"地形和氣候會影響家鄉的景觀與特色。"},
+{g:3,q:"住在丘陵地的居民會將土地開闢成一層一層的田地。",a:true,why:"丘陵被開發成一層一層的田地，用來種茶。"},
+{g:3,q:"山地適合發展觀光旅遊，但無法發展農業。",a:false,why:"有些山地居民會種植高山蔬菜。"},
+{g:3,q:"地形指的是地表的高低起伏與形狀特徵，我們可以透過地圖與空拍實景來了解。",a:true,why:"課本的定義與認識方式。"},
+{g:3,q:"山地因有許多天然資源蘊藏，因而容易吸引人口聚集，形成都市。",a:false,why:"有資源的山地會形成聚落，但平原、台地或盆地才容易形成都市。"},
+{g:3,q:"山地地形因地勢陡峭，因此無法種植農作物，沒有任何用途。",a:false,why:"山地可以保留自然生態、種植高山蔬菜，以及發展觀光。"},
+{g:3,q:"地形的樣貌平常不容易直接觀察，但我們可以用空拍實景來認識它。",a:true,why:"課本提到透過地圖、空拍實景認識地形樣貌。"},
+/* 2-2 */
+{g:4,q:"如果想了解家鄉的氣候，可以上交通部中央氣象署網站查詢相關氣象資訊。",a:true,why:"中央氣象署經過長時間統計分析，提供氣候資料。"},
+{g:4,q:"過去的臺灣社會，先民會結合氣候特徵跟農耕經驗，記載在農民曆中，供大家日常生活參考。",a:true,why:"這就是農民曆的由來。"},
+{g:4,q:"氣象觀測站設有測量天氣的儀器，從各個觀測站提供的數據可以了解天氣的變化。",a:true,why:"觀測站測量氣溫、雨量、風向和風速。"},
+{g:4,q:"萱萱全家從基隆出發到恆春玩，發現這裡比基隆溫暖，這主要是因為地形的關係。",a:false,why:"臺灣南部氣溫比北部高，主要是受地理位置（南北位置）的影響。"},
+{g:4,q:"臺灣各地冬季氣溫的差異主要是受到南北位置不同的影響，與地形無關。",a:false,why:"家鄉的氣候也會受地形影響，山地氣溫較低。"},
+{g:4,q:"臺灣夏天時每個地方都很炎熱，氣溫也都差不多。",a:false,why:"夏季時平地的氣溫高於山地。"},
+{g:4,q:"天氣變化跟我們沒有關係，所以我們可以不用留意天氣狀況。",a:false,why:"天氣變化會影響家鄉居民的生活，所以要留意天氣狀況。"},
+{g:4,q:"我們可以利用各地氣象觀測站提供的天氣數據，來了解每日天氣變化。",a:true,why:"這是氣象觀測站的功用。"},
+{g:4,q:"溼冷的風適合米粉的製作。",a:false,why:"是乾冷的風才適合晒米粉。"},
+{g:4,q:"新竹盛產米粉的原因，是因為該地每年 2 月到 10 月的氣候適合製作米粉。",a:false,why:"是每年 10 月到隔年 2 月有來自北方的乾冷風。"},
+{g:4,q:"一些民眾會在夏季時前往海邊玩水消暑。",a:true,why:"夏季時民眾會到海邊玩水消暑，也會到山上避暑。"},
+{g:4,q:"「今天下午可能會下雨，大家出門記得帶傘。」這段話在描述氣候。",a:false,why:"氣候是長時間的天氣狀況；這段描述的是短時間的天氣。"},
+{g:4,q:"過去的臺灣社會，先民結合氣候特徵跟農耕經驗，記載在農民曆中，供大家日常生活參考。",a:true,why:"農民曆累積許多先民的經歷和體驗。"},
+{g:4,q:"臺灣的梅雨通常長達數週。",a:true,why:"每年五、六月常有長達數週的陰雨綿綿。"},
+{g:4,q:"天氣是長時間的氣候狀況。",a:false,why:"氣候才是長時間的天氣狀況。"},
+{g:4,q:"氣象觀測站提供的天氣數據可以幫助我們了解每日天氣狀況。",a:true,why:"這是氣象觀測站的功用。"},
+{g:4,q:"冬季時，臺灣南部相較於北部，比較可能缺水。",a:true,why:"冬季時北部雨量比南部多，南部雨量少所以容易缺水。"},
+{g:4,q:"每年的 10 月到隔年 2 月，新竹會有來自北方溼冷的風，適合用來製作米粉。",a:false,why:"是乾冷的風，不是溼冷的風。"},
+{g:4,q:"臺灣每年 5、6 月的時候通常容易缺水導致乾旱。",a:false,why:"5、6 月是陰雨綿綿的梅雨季節。"},
+{g:4,q:"「氣候」是指一個地區短時間的天氣狀況，例如晴天、雨天。",a:false,why:"氣候是長時間的天氣狀況，如梅雨、秋老虎。"},
+{g:4,q:"「農民曆」在早期農業社會中，是重要的日常生活參考用書。",a:true,why:"農民曆供大家日常生活參考。"},
+{g:4,q:"藉由衛生福利部長時間統計分析天氣數據，能讓我們更加了解氣候。",a:false,why:"是交通部中央氣象署，不是衛生福利部。"},
+{g:4,q:"夏天時有許多民眾會到海邊消暑，這是因為地勢低的海邊，氣溫也會比較低的緣故。",a:false,why:"地勢愈高、氣溫愈低；到海邊消暑是因為可以玩水。"},
+/* 3-1 */
+{g:5,q:"一個地方的人口如果不斷增加，有機會發展成更大的城鎮。",a:true,why:"人口不斷增加，可能發展成更大的城鎮。"},
+{g:5,q:"一個地方若青壯年人口外出工作的情況普遍，當地也會出現幼年人口比例偏高的現象。",a:false,why:"會出現老年人口比例偏高的現象。"},
+{g:5,q:"人口的增加或減少屬於自然變遷，地方政府無法透過任何作為來改變。",a:false,why:"政府可以透過興建交通設施等政策來發展地方，進而使人口增加。"},
+{g:5,q:"有一些山區，雖然交通不便，但因盛產木材或礦產，曾經聚集不少人口居住。",a:true,why:"例如新竹縣內灣、新北市九份。"},
+{g:5,q:"小志的表哥住在彰化縣員林市，近年因為當地產業發展帶來許多工作機會，所以人口有增加的趨勢。",a:true,why:"員林市因產業發展與公共建設，人口增加。"},
+{g:5,q:"有些地方老年人口比例偏高，導致青壯年人口外出工作變普遍。",a:false,why:"因果相反：是青壯年外出工作，才出現老年人口比例偏高。"},
+{g:5,q:"臺灣有些地方的人口比較多，有些地方的人口比較少。",a:true,why:"臺灣的人口分布並不平均。"},
+{g:5,q:"水源充足、地勢平坦的地方，通常開發較早，人口比較多。",a:true,why:"適合農耕因此開發較早。"},
+{g:5,q:"陸上交通便利的地方，容易聚集較多人口，例如：早期的桃園市中壢區。",a:true,why:"中壢區早期陸運方便。"},
+{g:5,q:"小浩聽導遊說，早期大稻埕因為陸運方便，商業發達，因此聚集了較多人口。",a:false,why:"大稻埕是因為河運方便。"},
+{g:5,q:"上週日爸爸帶全家到新北市九份旅遊，那裡雖然是山區，但曾經因為開採煤礦而繁榮。",a:false,why:"九份是因為開採金礦而繁榮。"},
+{g:5,q:"新竹科學園區因工作機會多，容易吸引年輕人來此地工作，當地的老年人口也會跟著增加。",a:false,why:"青壯年人口增加，幼年人口也會跟著增加。"},
+{g:5,q:"小羽家住在南投縣南投市，當地因為地勢平坦，開發早，所以人口比較多。",a:true,why:"地勢平坦、水源充足的地方開發較早、人口較多。"},
+{g:5,q:"臺東縣池上鄉近年來因努力發展觀光，人口不斷增加。",a:false,why:"池上鄉因交通不便，人口仍不斷減少。"},
+{g:5,q:"在臺灣，每個地方的人口都分布得很平均。",a:false,why:"有些地方人口較多，有些較少。"},
+{g:5,q:"地勢較高的山區，因有豐富的資源可以開發，人口通常比較多。",a:false,why:"地勢較高、地形崎嶇的地方開發不易，人口通常較少。"},
+{g:5,q:"一個地方的人口數量可能會不斷增加，也可能逐漸減少。",a:true,why:"受出生、死亡、移入、移出等因素影響。"},
+{g:5,q:"苗栗縣頭份市交通發達，就業、逛街購物和生活都很方便，促進當地人口逐漸增加。",a:true,why:"課本的案例。"},
+/* 3-2 */
+{g:6,q:"人口的變化，也會影響家鄉的政策與發展。",a:true,why:"人口的變化會影響家鄉的政策與發展。"},
+{g:6,q:"政府制訂父母可申請育嬰假的規定，讓近年臺灣新生兒出生人數逐漸下降。",a:false,why:"此規定有助於提高生育意願，不會導致新生兒人數下降。"},
+{g:6,q:"阿真是家中唯一的小孩，有時會發生缺少玩伴的情況；這種情形在近年比以往更常發生。",a:true,why:"少子化使家庭子女數減少。"},
+{g:6,q:"早期的臺灣人民以務農為主，農忙時常需要人手幫忙。",a:true,why:"務農需要投入大量人力。"},
+{g:6,q:"一個地方如果缺乏發展條件，人口數量可能會停止成長，但不會減少。",a:false,why:"也可能逐漸減少。"},
+{g:6,q:"醫療技術進步及衛生環境改善，使得平均壽命縮短。",a:false,why:"是使得平均壽命延長。"},
+{g:6,q:"林奶奶從工作崗位上退休後，即使覺得自己身體依舊健朗，也無法再繼續投入其他工作了。",a:false,why:"體力與精神充足的長者可以二度就業。"},
+{g:6,q:"民國 50 年代後，政府推動「家庭計畫」，鼓勵「多子多孫多福氣」。",a:false,why:"家庭計畫鼓勵「兩個孩子恰恰好」，減少生育。"},
+{g:6,q:"小奇爺爺今年 75 歲了，在他的童年時代，一般家裡有 6 個以上的兄弟姐妹是常見的事。",a:true,why:"早期有「多子多孫多福氣」的生育觀念。"},
+{g:6,q:"臺灣有些人口老化嚴重的地方，會由社區提供餐點，讓獨居老人一起享用。",a:true,why:"獨居老人養老是高齡社會重視的議題。"},
+{g:6,q:"少子化趨勢也是造成高齡社會現象的一個原因。",a:true,why:"少子化加上平均壽命延長，提高了老年人口比例。"},
+{g:6,q:"近年政府為了鼓勵民眾生育，制訂許多生育政策並發放津貼。",a:true,why:"希望改善少子化、增加新生兒人數。"},
+{g:6,q:"陳女士出生於民國 40 年代，她回憶童年放學後還要幫忙看顧剛出生的弟妹。",a:true,why:"早期家庭子女多，年紀大的要照顧年紀小的。"},
+{g:6,q:"近年隨著婦女就業比例增加，也會影響人們生育子女的意願。",a:true,why:"婦女就業比例增加降低了生育意願。"},
+{g:6,q:"出生人數降低，意味著未來的勞動人口將減少。",a:true,why:"少子化會讓勞動人口減少。"},
+{g:6,q:"早期臺灣以務農為主，沒有時間養育兒女，家庭多以養育一至兩個孩子為主。",a:false,why:"早期有「多子多孫多福氣」的觀念，子女數較多。"},
+{g:6,q:"近年各地方政府提供各項育兒相關津貼發放，是為了鼓勵民眾生育、減輕負擔，以改善少子化狀況。",a:true,why:"這是因應少子化的政策。"},
+{g:6,q:"和祖父母年代比起來，現代家庭的人員組成更多，子女數量增加。",a:false,why:"現代家庭多以養育一至兩個孩子為主，子女數量減少。"},
+{g:6,q:"由於現在臺灣面臨少子化的問題，因此政府開始推廣「多子多孫多福氣」的生育觀念。",a:false,why:"政府並沒有推廣這個觀念。"},
+{g:6,q:"臺灣人民重視傳統習俗，因此現代人仍保有早期「多子多孫多福氣」的觀念。",a:false,why:"現代人生育子女數量較少。"}
+];
+/* ===== 配對題 PAIR {g,cat,items:[[左,右],...]} ===== */
+const PAIR=[
+{g:1,cat:"地圖四要素",items:[
+ ["圖名","地圖的名稱或主題"],
+ ["方向標","用來辨識方位"],
+ ["比例尺","代表地圖縮小的比例"],
+ ["圖例","用簡單符號表示地面的實際景物"]]},
+{g:1,cat:"地圖類型與功用",items:[
+ ["行政區域圖","知道縣市位置與涵蓋的鄉鎮市區"],
+ ["交通路線圖","知道經過哪些車站、在哪裡轉車"],
+ ["交通觀光導覽圖","標示觀光景點與交通路線"],
+ ["電子地圖","可以定位、導航、觀看街景"],
+ ["衛星影像圖","從高空拍照，顯示土地利用情形"]]},
+{g:2,cat:"同學的需求要用哪種地圖",items:[
+ ["我想了解家鄉包含哪些鄉鎮市區","行政區域圖"],
+ ["我想知道和家鄉相鄰的地區有哪些","行政區域圖"],
+ ["我想知道每天搭的捷運經過哪些車站","交通路線圖"],
+ ["我想知道大溪老街附近有哪些觀光景點","交通觀光導覽圖"],
+ ["我想知道臺中有哪些好玩的地方、好吃的美食","交通觀光導覽圖"]]},
+{g:2,cat:"日月潭小常識",items:[
+ ["伊達邵","邵族的部落名"],
+ ["水社","盛產紅茶、賣紅茶茶葉蛋"],
+ ["日月潭","地圖上最主要的自然環境"]]},
+{g:3,cat:"五大地形的特徵",items:[
+ ["山地","高度超過 1,000 公尺，地勢起伏大"],
+ ["丘陵","在山地邊緣，坡度變化比較和緩"],
+ ["台地","地勢平坦，不超過 1,000 公尺的高地"],
+ ["盆地","四周地勢較高，中間平坦，像盆子"],
+ ["平原","通常在河流出口或沿海，寬闊平坦"]]},
+{g:3,cat:"地形與代表地點",items:[
+ ["山地","合歡山"],
+ ["丘陵","新北市石碇"],
+ ["台地","臺中市大肚台地"],
+ ["盆地","南投縣埔里盆地"],
+ ["平原","嘉南平原"]]},
+{g:3,cat:"地形與土地利用",items:[
+ ["山地","保留自然生態、種植高山蔬菜"],
+ ["丘陵","開墾成一層一層的田地種茶樹、果樹"],
+ ["平原","農業生產、人口聚居"],
+ ["盆地","四周群山環繞，底部平坦，人口密集"]]},
+{g:4,cat:"氣候與家鄉特產",items:[
+ ["臺南","氣候溫暖，盛產芒果"],
+ ["新竹","北方乾冷的風適合晒米粉"],
+ ["墾丁","四季陽光普照，是度假勝地"],
+ ["合歡山","有許多登山客會去攀登"]]},
+{g:4,cat:"氣候名詞",items:[
+ ["梅雨","每年五、六月長達數週的陰雨綿綿"],
+ ["秋老虎","秋天仍然很炎熱的氣候特色"],
+ ["農民曆","記載氣候特徵與農耕經驗的參考書"],
+ ["氣象觀測站","測量氣溫、雨量、風向和風速"],
+ ["中央氣象署","長時間統計分析天氣數據"]]},
+{g:5,cat:"地方與人口特色",items:[
+ ["桃園市中壢區","早期陸上交通方便"],
+ ["臺北市大稻埕","早期河運方便、商業發達"],
+ ["新北市九份","曾開採金礦而繁榮"],
+ ["新竹縣內灣","曾盛產林木及礦產"],
+ ["新竹縣竹北市","鄰近科學園區及高鐵站"]]},
+{g:5,cat:"地方與人口變化",items:[
+ ["南投市","地勢平坦、開發早，人口比較多"],
+ ["南投縣仁愛鄉","多山地、開發不易，人口比較少"],
+ ["臺東縣池上鄉","交通不便，人口不斷減少"],
+ ["雲林縣水林鄉","以農業為主，務農人口高齡化"],
+ ["苗栗縣頭份市","交通發達，生活方便，人口增加"]]},
+{g:5,cat:"年齡與人口分類",items:[
+ ["幼年人口","0～14 歲"],
+ ["青壯年人口","15～64 歲"],
+ ["老年人口","65 歲以上"]]},
+{g:6,cat:"口號與政策",items:[
+ ["多子多孫多福氣","早期務農社會的生育觀念"],
+ ["兩個孩子恰恰好","家庭計畫鼓勵減少生育的口號"],
+ ["長照中心","提供長者適當的照護或服務"],
+ ["樂齡學堂","讓長者參與學習，活到老、學到老"],
+ ["二度就業","長者再次就業，貢獻專業"]]},
+{g:6,cat:"現象與原因",items:[
+ ["少子化","養育費用提高、婦女就業比例增加"],
+ ["高齡社會","醫療技術進步、平均壽命延長"],
+ ["學校併校廢校","學生人數太少"],
+ ["勞動人口減少","出生人數降低"]]},
+{g:6,cat:"聚落繁榮的原因",items:[
+ ["內灣","自然資源豐富"],
+ ["九份","自然資源豐富"],
+ ["中壢區","交通方便"],
+ ["大稻埕","交通方便"]]}
+];
+
+/* ===== 分類題 SORT {g,q,cats:[...],items:[[項目,類別index],...]} ===== */
+const SORT=[
+{g:1,q:"哪些地方或工具可以取得電子地圖？",cats:["可以取得","不能取得"],items:[
+ ["平板電腦",0],["智慧型手機",0],["桌上型電腦",0],
+ ["飲料販賣機",1],["學校公布欄",1],["地球儀",1]]},
+{g:2,q:"繪製學校交通觀光導覽圖，哪些想法可以畫進地圖裡？",cats:["可以畫","不適合畫"],items:[
+ ["學校附近的街道名稱",0],["學校的交通路線",0],
+ ["學校的教職員人數",1],["全校同學的家",1]]},
+{g:3,q:"把地形依「地表平坦」和「高低起伏明顯」分類。",cats:["地表平坦","高低起伏明顯"],items:[
+ ["平原",0],["台地",0],["盆地",0],
+ ["山地",1],["丘陵",1]]},
+{g:3,q:"關於嘉南平原的敘述，哪些正確？",cats:["正確","錯誤"],items:[
+ ["是臺灣重要的穀倉",0],["土壤肥沃，適合栽種稻米、甘蔗",0],["是容易發展工商業的地形",0],
+ ["位於臺灣東部",1]]},
+{g:4,q:"下列敘述哪些是在形容「氣候」？",cats:["氣候","天氣"],items:[
+ ["梅雨",0],["秋老虎",0],
+ ["晴時多雲",1],["毛毛雨",1],["多雲短暫陣雨",1]]},
+{g:4,q:"對於位於臺灣南部、地理位置接近的平原與山地，哪些敘述正確？",cats:["正確","錯誤"],items:[
+ ["冬季時，平原的溫度比山地高",0],["夏季時，山地的雨量比平原多",0],
+ ["夏季時，山地的溫度比平原高",1],["冬季時，平原的雨量比山地多",1]]},
+{g:5,q:"一個地方具有什麼條件，人口數量可能會不斷增加？",cats:["是發展條件","不是發展條件"],items:[
+ ["就醫方便",0],["工作機會多",0],["交通發達",0],["教育文化資源多",0],
+ ["行政資源少",1],["地勢高聳",1]]},
+{g:5,q:"一個地方具備什麼條件，容易吸引青壯年人口移入？",cats:["容易吸引","不容易吸引"],items:[
+ ["便利的交通",0],["設立工廠和成立公司",0],["生活機能佳",0],
+ ["生產活動以農業為主",1],["行政與教育文化資源不足",1]]},
+{g:6,q:"哪些因素讓臺灣的老年人口比例提高，因而步入高齡社會？",cats:["是原因","不是原因"],items:[
+ ["醫療技術進步",0],["平均壽命延長",0],["衛生環境改善",0],["少子化現象",0],
+ ["生育子女數多",1]]},
+{g:6,q:"制訂哪些政策，有助於幼年人口逐漸增加？",cats:["有助於","沒有幫助"],items:[
+ ["發放生育津貼",0],["設置公共托育",0],["父母可以申請育嬰假",0],
+ ["設置長照中心",1]]},
+{g:6,q:"江先生是一位身強力壯的老年人，體力與精神狀況都還不錯，可以建議他做些什麼活動？",cats:["適合建議","不適合建議"],items:[
+ ["到樂齡學堂上課",0],["根據自己專長二度就業",0],
+ ["住進長照中心",1],["生育更多子女",1]]},
+{g:6,q:"阿公說找不到農工幫忙，可能和哪些因素有關？",cats:["有關","無關"],items:[
+ ["農村青壯年人口外移嚴重",0],["農業缺工情形嚴重",0],
+ ["農村地區衛生條件不佳",1],["農村家長過度重視子女教育品質",1]]}
+];
+/* ===== 圖表判讀 CHART =====
+   圖都是自己用 SVG 畫的原創示意圖，不使用課本圖片。
+   有標「課本資料」的，數值直接取自課本或老師考卷；
+   標「自製練習圖」的，數值是為了練習判讀而設計，題目的答案都看圖就能得到。 */
+
+/* 氣溫雨量圖：長條=雨量(mm)，折線=氣溫(℃) */
+function climateSVG(rain,temp,name){
+  const W=680,H=300,L=52,R=46,T=22,B=42;
+  const pw=W-L-R, ph=H-T-B;
+  const rmax=900, tmax=35;
+  const bw=pw/12*0.62;
+  let bars='',line='',dots='',xlab='';
+  for(let i=0;i<12;i++){
+    const cx=L+pw/12*(i+0.5);
+    const bh=rain[i]/rmax*ph;
+    bars+=`<rect x="${(cx-bw/2).toFixed(1)}" y="${(T+ph-bh).toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" fill="#9db8c9" stroke="#5b7f96" stroke-width="1"/>`;
+    const ty=T+ph-temp[i]/tmax*ph;
+    line+=`${cx.toFixed(1)},${ty.toFixed(1)} `;
+    dots+=`<circle cx="${cx.toFixed(1)}" cy="${ty.toFixed(1)}" r="3.4" fill="#c4622d"/>`;
+    xlab+=`<text x="${cx.toFixed(1)}" y="${H-B+16}" font-size="12" text-anchor="middle" fill="currentColor">${i+1}</text>`;
+  }
+  let gy='',yl='',yr='';
+  for(let v=0;v<=900;v+=150){
+    const y=T+ph-v/rmax*ph;
+    gy+=`<line x1="${L}" y1="${y.toFixed(1)}" x2="${L+pw}" y2="${y.toFixed(1)}" stroke="currentColor" stroke-width=".5" opacity=".22"/>`;
+    yl+=`<text x="${L-6}" y="${(y+4).toFixed(1)}" font-size="11" text-anchor="end" fill="currentColor">${v}</text>`;
+  }
+  for(let v=0;v<=35;v+=5){
+    const y=T+ph-v/tmax*ph;
+    yr+=`<text x="${L+pw+6}" y="${(y+4).toFixed(1)}" font-size="11" fill="currentColor">${v}</text>`;
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${name}的全年月平均雨量與氣溫圖">
+  <text x="${L}" y="14" font-size="13" fill="currentColor">${name}　全年月平均雨量‧氣溫圖</text>
+  <text x="${L-6}" y="${T-6}" font-size="11" text-anchor="end" fill="currentColor">雨量mm</text>
+  <text x="${L+pw+6}" y="${T-6}" font-size="11" fill="currentColor">氣溫℃</text>
+  ${gy}${bars}
+  <polyline points="${line}" fill="none" stroke="#c4622d" stroke-width="2.4"/>${dots}
+  <line x1="${L}" y1="${T+ph}" x2="${L+pw}" y2="${T+ph}" stroke="currentColor" stroke-width="1.2"/>
+  <line x1="${L}" y1="${T}" x2="${L}" y2="${T+ph}" stroke="currentColor" stroke-width="1.2"/>
+  <line x1="${L+pw}" y1="${T}" x2="${L+pw}" y2="${T+ph}" stroke="currentColor" stroke-width="1.2"/>
+  ${yl}${yr}${xlab}
+  <text x="${L+pw/2}" y="${H-6}" font-size="12" text-anchor="middle" fill="currentColor">月分</text>
+  </svg>`;
+}
+
+/* 人口年齡組成比較長條圖 */
+function popSVG(rows){
+  const W=640,H=250,L=92,R=24,T=30,B=40;
+  const pw=W-L-R, ph=H-T-B;
+  const cols=["#8fae6e","#c9a227","#b06a52"];
+  const names=["幼年 0~14歲","青壯年 15~64歲","老年 65歲以上"];
+  let g='',lg='';
+  rows.forEach((r,ri)=>{
+    const y0=T+ph/rows.length*ri+10;
+    g+=`<text x="${L-8}" y="${y0+22}" font-size="13" text-anchor="end" fill="currentColor">${r.n}</text>`;
+    let x=L;
+    r.v.forEach((v,vi)=>{
+      const w=v/100*pw;
+      g+=`<rect x="${x.toFixed(1)}" y="${y0}" width="${w.toFixed(1)}" height="34" fill="${cols[vi]}" stroke="currentColor" stroke-width=".6" opacity=".9"/>`;
+      if(w>34)g+=`<text x="${(x+w/2).toFixed(1)}" y="${y0+22}" font-size="12" text-anchor="middle" fill="#fff">${v}%</text>`;
+      x+=w;
+    });
+  });
+  names.forEach((n,i)=>{
+    lg+=`<rect x="${L+i*172}" y="6" width="13" height="13" fill="${cols[i]}"/><text x="${L+i*172+18}" y="17" font-size="11.5" fill="currentColor">${n}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="人口年齡組成比例長條圖">${lg}${g}
+  <line x1="${L}" y1="${T+ph+4}" x2="${L+pw}" y2="${T+ph+4}" stroke="currentColor" stroke-width="1"/>
+  <text x="${L}" y="${H-8}" font-size="11" fill="currentColor">0%</text>
+  <text x="${L+pw/2}" y="${H-8}" font-size="11" text-anchor="middle" fill="currentColor">50%</text>
+  <text x="${L+pw}" y="${H-8}" font-size="11" text-anchor="end" fill="currentColor">100%</text></svg>`;
+}
+
+/* 老年人口比例折線圖 */
+function lineSVG(xs,ys,name,unit){
+  const W=660,H=260,L=56,R=24,T=30,B=46;
+  const pw=W-L-R, ph=H-T-B, ymax=20;
+  let pts='',dots='',xl='',gy='',yl='';
+  xs.forEach((x,i)=>{
+    const cx=L+pw/(xs.length-1)*i, cy=T+ph-ys[i]/ymax*ph;
+    pts+=`${cx.toFixed(1)},${cy.toFixed(1)} `;
+    dots+=`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="3.6" fill="#b06a52"/><text x="${cx.toFixed(1)}" y="${(cy-9).toFixed(1)}" font-size="10.5" text-anchor="middle" fill="currentColor">${ys[i]}</text>`;
+    xl+=`<text x="${cx.toFixed(1)}" y="${H-B+18}" font-size="11" text-anchor="middle" fill="currentColor">${x}</text>`;
+  });
+  for(let v=0;v<=20;v+=5){
+    const y=T+ph-v/ymax*ph;
+    gy+=`<line x1="${L}" y1="${y.toFixed(1)}" x2="${L+pw}" y2="${y.toFixed(1)}" stroke="currentColor" stroke-width=".5" opacity=".22"/>`;
+    yl+=`<text x="${L-6}" y="${(y+4).toFixed(1)}" font-size="11" text-anchor="end" fill="currentColor">${v}</text>`;
+  }
+  const y14=T+ph-14/ymax*ph;
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${name}">
+  <text x="${L}" y="16" font-size="13" fill="currentColor">${name}（${unit}）</text>${gy}
+  <line x1="${L}" y1="${y14.toFixed(1)}" x2="${L+pw}" y2="${y14.toFixed(1)}" stroke="#b06a52" stroke-width="1.4" stroke-dasharray="6 4"/>
+  <text x="${L+pw-2}" y="${(y14-6).toFixed(1)}" font-size="11" text-anchor="end" fill="#b06a52">高齡社會門檻 14%</text>
+  <polyline points="${pts}" fill="none" stroke="#b06a52" stroke-width="2.4"/>${dots}
+  <line x1="${L}" y1="${T+ph}" x2="${L+pw}" y2="${T+ph}" stroke="currentColor" stroke-width="1.2"/>
+  <line x1="${L}" y1="${T}" x2="${L}" y2="${T+ph}" stroke="currentColor" stroke-width="1.2"/>
+  ${yl}${xl}<text x="${L+pw/2}" y="${H-6}" font-size="12" text-anchor="middle" fill="currentColor">年分（民國）</text></svg>`;
+}
+
+/* 五大地形示意圖（原創剖面） */
+function reliefSVG(){
+  return `<svg viewBox="0 0 680 270" width="100%" role="img" aria-label="五大地形示意圖">
+  <rect x="0" y="0" width="680" height="270" fill="none"/>
+  <path d="M0 250 L0 150 L40 150 L70 60 L110 30 L150 70 L185 150 L230 150 L230 250 Z" fill="#8a9a78" stroke="currentColor" stroke-width="1.2"/>
+  <text x="112" y="200" font-size="22" text-anchor="middle" fill="#fff" font-weight="bold">D</text>
+  <path d="M230 250 L230 150 L265 110 L300 140 L330 105 L365 145 L365 250 Z" fill="#a8b58c" stroke="currentColor" stroke-width="1.2"/>
+  <text x="298" y="205" font-size="22" text-anchor="middle" fill="#fff" font-weight="bold">E</text>
+  <path d="M365 250 L365 148 L420 120 L480 120 L480 250 Z" fill="#c3b687" stroke="currentColor" stroke-width="1.2"/>
+  <text x="424" y="200" font-size="22" text-anchor="middle" fill="#fff" font-weight="bold">C</text>
+  <path d="M480 250 L480 120 L505 170 L560 170 L585 120 L585 250 Z" fill="#b9a46d" stroke="currentColor" stroke-width="1.2"/>
+  <text x="532" y="215" font-size="22" text-anchor="middle" fill="#fff" font-weight="bold">A</text>
+  <path d="M585 250 L585 205 L680 205 L680 250 Z" fill="#cfc58f" stroke="currentColor" stroke-width="1.2"/>
+  <text x="632" y="236" font-size="20" text-anchor="middle" fill="#6b5a2a" font-weight="bold">B</text>
+  <line x1="0" y1="250" x2="680" y2="250" stroke="currentColor" stroke-width="1.4"/>
+  <text x="8" y="20" font-size="12" fill="currentColor">↑ 高度</text>
+  <line x1="652" y1="24" x2="672" y2="24" stroke="currentColor" stroke-width="1"/>
+  <text x="648" y="20" font-size="11" text-anchor="end" fill="currentColor">1,000 公尺</text>
+  <line x1="0" y1="120" x2="680" y2="120" stroke="currentColor" stroke-width=".7" stroke-dasharray="5 4" opacity=".5"/>
+  </svg>`;
+}
+
+const CHART=[
+{g:4,title:"氣溫雨量圖判讀（一）",note:"自製練習圖",
+ svg:()=>climateSVG([90,130,200,280,560,700,620,800,420,130,80,70],[8,9,11,13,15,15,15,15,14,12,10,8],"甲地"),
+ qs:[
+ {q:"平均降雨量最多的是哪一個月分？",o:["6 月","7 月","8 月","9 月"],a:2,why:"8 月的長條最高。"},
+ {q:"降雨量最多的月分，降雨量大約是多少？",o:["約 300mm","約 500mm","約 800mm","約 1,200mm"],a:2,why:"看左邊的雨量刻度，8 月大約到 800mm。"},
+ {q:"月平均氣溫最低的是哪一個月分？",o:["1 月","4 月","7 月","11 月"],a:0,why:"折線在 1 月最低。"},
+ {q:"由夏季的平均氣溫（約 15℃）來推測，這個地方可能位於哪裡？",o:["平地地區","山地地區","海邊沙灘","沙漠地區"],a:1,why:"夏季才 15℃ 相當涼爽，地勢愈高氣溫愈低，所以較可能是山地。"},
+ {q:"這個地區夏季容易出現乾旱的現象嗎？",o:["容易，因為夏季幾乎不下雨","不容易，因為夏季降雨量多","一定會乾旱","看不出來"],a:1,why:"夏季降雨量多，不易發生乾旱。"},
+ {q:"夏季時當地的氣候給人什麼感覺？",o:["涼爽舒適","悶熱難受","乾燥炎熱","寒冷下雪"],a:0,why:"夏季氣溫只有約 15℃，顯得涼爽舒適。"}]},
+{g:4,title:"氣溫雨量圖判讀（二）",note:"自製練習圖",
+ svg:()=>climateSVG([30,40,55,95,210,420,380,440,180,35,20,20],[20,21,23,26,28,29,29,29,28,26,23,21],"乙地"),
+ qs:[
+ {q:"乙地的雨量集中在哪個季節？",o:["春季","夏季","秋季","冬季"],a:1,why:"6～8 月的長條最高，雨量集中在夏季。"},
+ {q:"乙地冬季（12、1、2 月）的雨量大約是多少？",o:["每月不到 50mm","每月約 300mm","每月約 600mm","每月約 900mm"],a:0,why:"冬季的長條都很低，每月不到 50mm。"},
+ {q:"從雨量和氣溫判斷，乙地比較可能位在臺灣的哪裡？",o:["北部","南部","高山上","外國"],a:1,why:"冬季少雨、全年氣溫高，符合臺灣南部的氣候。"},
+ {q:"乙地的農民最可能在哪個季節擔心缺水無法灌溉？",o:["春季","夏季","秋季","冬季"],a:3,why:"冬季雨量很少，容易缺水。"},
+ {q:"乙地月平均氣溫最高大約是多少？",o:["約 15℃","約 20℃","約 29℃","約 35℃"],a:2,why:"看右邊氣溫刻度，夏季折線大約在 29℃。"}]},
+{g:4,title:"氣象觀測站資料判讀",note:"課本資料（花蓮氣象觀測站）",
+ svg:()=>`<div class="tblwrap"><table class="tbl"><caption>花蓮氣象觀測站資料</caption><tr><th>月分</th><th>氣溫(℃)</th><th>最高氣溫(℃)</th><th>最低氣溫(℃)</th><th>雨量(mm)</th></tr><tr><td>1 月</td><td>19.5</td><td>27.2</td><td>11.6</td><td>50.7</td></tr><tr><td>2 月</td><td>19.6</td><td>27.8</td><td>12.1</td><td>18.6</td></tr></table></div>`,
+ qs:[
+ {q:"1 月的平均氣溫是多少？",o:["11.6℃","19.5℃","27.2℃","50.7℃"],a:1,why:"看「氣溫」那一欄，1 月是 19.5℃。"},
+ {q:"1 月和 2 月，哪一個月的雨量比較多？",o:["1 月","2 月","一樣多","看不出來"],a:0,why:"1 月 50.7mm，比 2 月的 18.6mm 多。"},
+ {q:"1 月出現過的最低氣溫是多少？",o:["11.6℃","12.1℃","19.5℃","27.2℃"],a:0,why:"看「最低氣溫」那一欄，1 月是 11.6℃。"},
+ {q:"這張表是由什麼地方提供的資料？",o:["氣象觀測站","農民曆","行政區域圖","衛星影像圖"],a:0,why:"各地氣象觀測站提供氣溫、雨量等天氣數據。"}]},
+{g:3,title:"地形示意圖判讀",note:"自製練習圖",
+ svg:reliefSVG,
+ qs:[
+ {q:"圖中 A 是什麼地形？（四周地勢較高、中間平坦）",o:["平原","盆地","台地","丘陵"],a:1,why:"四周高、中間平坦像盆子，是盆地。"},
+ {q:"圖中 B 是什麼地形？（低平寬闊、靠近出海口）",o:["平原","盆地","台地","山地"],a:0,why:"寬闊平坦、位在河流出口或沿海，是平原。"},
+ {q:"圖中 C 是什麼地形？（平坦的高地）",o:["平原","盆地","台地","山地"],a:2,why:"地勢平坦的高地是台地。"},
+ {q:"圖中 D 是什麼地形？（高度超過 1,000 公尺、起伏最大）",o:["丘陵","台地","山地","盆地"],a:2,why:"高度超過 1,000 公尺、地勢起伏大，是山地。"},
+ {q:"圖中 E 是什麼地形？（在山地邊緣、坡度較和緩）",o:["丘陵","台地","平原","盆地"],a:0,why:"在山地邊緣、高度不超過 1,000 公尺、坡度和緩，是丘陵。"},
+ {q:"圖中哪些地形有明顯的高低起伏？",o:["A、B","B、C","D、E","A、C"],a:2,why:"山地(D)和丘陵(E)有明顯的高低起伏。"},
+ {q:"圖中哪些地形的表面是平坦的？",o:["A、B、C","C、D、E","A、D、E","只有 B"],a:0,why:"盆地(A)、平原(B)、台地(C)的地表都是平坦的。"}]},
+{g:5,title:"人口年齡組成比較",note:"課本資料（竹北市、水林鄉）",
+ svg:()=>popSVG([{n:"新竹縣竹北市",v:[22,69,9]},{n:"雲林縣水林鄉",v:[7,66,27]}]),
+ qs:[
+ {q:"哪一個地方的老年人口比例比較高？",o:["竹北市","水林鄉","一樣高","看不出來"],a:1,why:"水林鄉 27%，比竹北市的 9% 高很多。"},
+ {q:"哪一個地方的幼年人口比例比較高？",o:["竹北市","水林鄉","一樣高","看不出來"],a:0,why:"竹北市 22%，水林鄉只有 7%。"},
+ {q:"水林鄉的生產活動以農業為主，老年人口比例卻高達 27%，代表當地面臨什麼問題？",o:["婦女就業比例增加","務農人口高齡化、農業缺工","自動化生產過剩","養育子女費用提高"],a:1,why:"務農的人年紀愈來愈大，又找不到人幫忙，就是農業缺工。"},
+ {q:"竹北市幼年人口比例較高，和下列哪一項原因最有關係？",o:["鄰近科學園區及高鐵站，吸引青壯年移入","當地以農業為主","交通不便","開採金礦"],a:0,why:"青壯年人口增加，幼年人口也會跟著增加。"},
+ {q:"圖中代表「主要從事生產、代表生產力和競爭力」的是哪一段？",o:["幼年人口","青壯年人口","老年人口","三段都是"],a:1,why:"15～64 歲的青壯年人口是主要從事生產的人口。"}]},
+{g:6,title:"老年人口比例變化判讀",note:"課本與老師考卷資料",
+ svg:()=>lineSVG([70,80,82,90,100,107,110],[4.4,6.5,7.1,8.8,10.9,14.6,16.9],"臺灣 65 歲以上人口比例","%"),
+ qs:[
+ {q:"從圖中可以發現，65 歲以上人口比例呈現什麼趨勢？",o:["逐年下降","逐年增加","沒有變化","忽高忽低"],a:1,why:"折線一路往上，比例逐年增加。"},
+ {q:"從哪一年開始，臺灣進入了「高齡社會」？",o:["民國 70 年","民國 90 年","民國 100 年","民國 107 年"],a:3,why:"民國 107 年達 14.6%，超過 14% 的門檻。"},
+ {q:"民國 110 年時老年人口高達 16.9%，與下列什麼因素有關？",o:["外籍看護增加","醫療技術進步","出生人數增加","觀光業發達"],a:1,why:"醫療技術進步、衛生環境改善使平均壽命延長。"},
+ {q:"一個國家的老年人口占總人口比例達多少，就稱為高齡社會？",o:["7%","10%","14%","20%"],a:2,why:"65 歲以上人口占總人口 14% 以上就是高齡社會。"}]},
+{g:6,title:"A 市人口年齡組成變化表",note:"老師考卷資料",
+ svg:()=>`<div class="tblwrap"><table class="tbl"><caption>A 市人口年齡組成比例變化及預測</caption><tr><th>年分（民國）</th><th>75</th><th>85</th><th>95</th><th>105</th><th>115</th></tr><tr><td>0~14 歲</td><td>35%</td><td>28%</td><td>23%</td><td>18%</td><td>12%</td></tr><tr><td>15~64 歲</td><td>61%</td><td>66%</td><td>68%</td><td>70%</td><td>73%</td></tr><tr><td>65 歲以上</td><td>4%</td><td>6%</td><td>9%</td><td>12%</td><td>15%</td></tr></table></div>`,
+ qs:[
+ {q:"A 市的幼年人口比例有什麼變化？",o:["不斷減少","不斷增加","先增後減","沒有變化"],a:0,why:"從 35% 一路降到 12%，不斷減少。"},
+ {q:"A 市的老年人口比例有什麼變化？",o:["不斷減少","不斷增加","先增後減","沒有變化"],a:1,why:"從 4% 一路升到 15%，不斷增加。"},
+ {q:"可以從這張表看出 A 市的總人口數日漸增加嗎？",o:["可以","不可以，表中只有比例，沒有總人口數","可以，因為青壯年增加","可以，因為老年增加"],a:1,why:"表格呈現的是「比例」，看不出總人口數的多少。"},
+ {q:"民國 115 年時，A 市的老年人口比例和幼年人口比例比起來如何？",o:["老年比幼年多","幼年比老年多","一樣","看不出來"],a:0,why:"115 年老年 15%，幼年只有 12%，老年比幼年多。"},
+ {q:"從表中看 A 市青壯年人口比例的變化，可以推論生產力和競爭力如何？",o:["逐漸下降","逐漸提升","完全不變","立刻消失"],a:1,why:"青壯年比例從 61% 升到 73%，代表生產力和競爭力提升。"}]}
+];
+/* ===== 寫國字 WRITE {g,w,z,hint} ===== */
+/* z（注音）為編者標註，供孩子對照發音用；w 為教材中出現的語詞 */
+const WRITE=[
+{g:1,w:"比例尺",z:"ㄅㄧˇ ㄌㄧˋ ㄔˇ",hint:"代表地圖縮小的比例。"},
+{g:1,w:"圖例",z:"ㄊㄨˊ ㄌㄧˋ",hint:"用簡單的符號表示地面的實際景物。"},
+{g:1,w:"方向標",z:"ㄈㄤ ㄒㄧㄤˋ ㄅㄧㄠ",hint:"用來辨識地圖上的方位。"},
+{g:1,w:"行政區域圖",z:"ㄒㄧㄥˊ ㄓㄥˋ ㄑㄩ ㄩˋ ㄊㄨˊ",hint:"可以知道縣市的位置與涵蓋的鄉鎮市區。"},
+{g:1,w:"衛星影像圖",z:"ㄨㄟˋ ㄒㄧㄥ ㄧㄥˇ ㄒㄧㄤˋ ㄊㄨˊ",hint:"從高空拍照，顯示土地利用的情形。"},
+{g:1,w:"導航",z:"ㄉㄠˇ ㄏㄤˊ",hint:"電子地圖可以定位、導航、觀看街景。"},
+{g:1,w:"定位",z:"ㄉㄧㄥˋ ㄨㄟˋ",hint:"電子地圖能找出自己所在的位置。"},
+{g:2,w:"觀光",z:"ㄍㄨㄢ ㄍㄨㄤ",hint:"交通觀光導覽圖會標示觀光景點。"},
+{g:2,w:"導覽",z:"ㄉㄠˇ ㄌㄢˇ",hint:"交通觀光導覽圖可以帶我們認識景點。"},
+{g:2,w:"轉車",z:"ㄓㄨㄢˇ ㄔㄜ",hint:"看交通路線圖可以知道在哪裡轉車。"},
+{g:2,w:"邵族",z:"ㄕㄠˋ ㄗㄨˊ",hint:"伊達邵是邵族的部落名。"},
+{g:2,w:"伊達邵",z:"ㄧ ㄉㄚˊ ㄕㄠˋ",hint:"日月潭地圖上的地名，是邵族的部落。"},
+{g:2,w:"日月潭",z:"ㄖˋ ㄩㄝˋ ㄊㄢˊ",hint:"地圖上最主要的自然環境。"},
+{g:3,w:"丘陵",z:"ㄑㄧㄡ ㄌㄧㄥˊ",hint:"在山地邊緣，坡度變化比較和緩。"},
+{g:3,w:"台地",z:"ㄊㄞˊ ㄉㄧˋ",hint:"地勢平坦、不超過一千公尺的高地。"},
+{g:3,w:"盆地",z:"ㄆㄣˊ ㄉㄧˋ",hint:"四周地勢較高，中間平坦，像盆子一樣。"},
+{g:3,w:"平原",z:"ㄆㄧㄥˊ ㄩㄢˊ",hint:"通常在河流出口或沿海，寬闊平坦。"},
+{g:3,w:"嘉南平原",z:"ㄐㄧㄚ ㄋㄢˊ ㄆㄧㄥˊ ㄩㄢˊ",hint:"臺灣面積最大的平原，是重要的穀倉。"},
+{g:3,w:"穀倉",z:"ㄍㄨˇ ㄘㄤ",hint:"嘉南平原土壤肥沃，是臺灣重要的穀倉。"},
+{g:3,w:"埔里盆地",z:"ㄆㄨˇ ㄌㄧˇ ㄆㄣˊ ㄉㄧˋ",hint:"南投縣的盆地地形，四周群山環繞。"},
+{g:3,w:"合歡山",z:"ㄏㄜˊ ㄏㄨㄢ ㄕㄢ",hint:"山地地形，有許多登山客會去攀登。"},
+{g:3,w:"崎嶇",z:"ㄑㄧˊ ㄑㄩ",hint:"山地地形崎嶇，不容易開發。"},
+{g:3,w:"起伏",z:"ㄑㄧˇ ㄈㄨˊ",hint:"地形指地表的高低起伏與形狀特徵。"},
+{g:3,w:"開墾",z:"ㄎㄞ ㄎㄣˇ",hint:"丘陵被開墾成一層一層的田地種茶樹。"},
+{g:4,w:"梅雨",z:"ㄇㄟˊ ㄩˇ",hint:"每年五、六月長達數週的陰雨綿綿。"},
+{g:4,w:"秋老虎",z:"ㄑㄧㄡ ㄌㄠˇ ㄏㄨˇ",hint:"秋天仍然很炎熱的氣候特色。"},
+{g:4,w:"農民曆",z:"ㄋㄨㄥˊ ㄇㄧㄣˊ ㄌㄧˋ",hint:"記載氣候特徵與農耕經驗的參考書。"},
+{g:4,w:"氣象觀測站",z:"ㄑㄧˋ ㄒㄧㄤˋ ㄍㄨㄢ ㄘㄜˋ ㄓㄢˋ",hint:"測量氣溫、雨量、風向和風速。"},
+{g:4,w:"節氣",z:"ㄐㄧㄝˊ ㄑㄧˋ",hint:"農民曆中的春分、秋分都是二十四節氣。"},
+{g:4,w:"墾丁",z:"ㄎㄣˇ ㄉㄧㄥ",hint:"四季陽光普照，是度假勝地。"},
+{g:4,w:"米粉",z:"ㄇㄧˇ ㄈㄣˇ",hint:"新竹有北方乾冷的風，適合晒米粉。"},
+{g:4,w:"芒果",z:"ㄇㄤˊ ㄍㄨㄛˇ",hint:"臺南氣候溫暖，盛產芒果。"},
+{g:4,w:"綿綿",z:"ㄇㄧㄢˊ ㄇㄧㄢˊ",hint:"梅雨季節常常陰雨綿綿。"},
+{g:4,w:"溼熱",z:"ㄕ ㄖㄜˋ",hint:"夏季時全臺普遍溼熱。"},
+{g:4,w:"灌溉",z:"ㄍㄨㄢˋ ㄍㄞˋ",hint:"冬季南部雨量少，農民擔心缺水無法灌溉。"},
+{g:5,w:"大稻埕",z:"ㄉㄚˋ ㄉㄠˋ ㄔㄥˊ",hint:"臺北市的地方，早期河運方便、商業發達。"},
+{g:5,w:"九份",z:"ㄐㄧㄡˇ ㄈㄣˋ",hint:"新北市的地方，曾開採金礦而繁榮。"},
+{g:5,w:"內灣",z:"ㄋㄟˋ ㄨㄢ",hint:"新竹縣的地方，曾盛產林木及礦產。"},
+{g:5,w:"中壢",z:"ㄓㄨㄥ ㄌㄧˋ",hint:"桃園市的區，早期陸上交通方便。"},
+{g:5,w:"竹北",z:"ㄓㄨˊ ㄅㄟˇ",hint:"新竹縣的市，鄰近科學園區及高鐵站。"},
+{g:5,w:"池上",z:"ㄔˊ ㄕㄤˋ",hint:"臺東縣的鄉，交通不便，人口不斷減少。"},
+{g:5,w:"水林",z:"ㄕㄨㄟˇ ㄌㄧㄣˊ",hint:"雲林縣的鄉，以農業為主，務農人口高齡化。"},
+{g:5,w:"頭份",z:"ㄊㄡˊ ㄈㄣˋ",hint:"苗栗縣的市，交通發達、生活方便，人口增加。"},
+{g:5,w:"仁愛鄉",z:"ㄖㄣˊ ㄞˋ ㄒㄧㄤ",hint:"南投縣的鄉，多山地、開發不易，人口較少。"},
+{g:5,w:"礦產",z:"ㄎㄨㄤˋ ㄔㄢˇ",hint:"內灣曾盛產林木及礦產而繁榮。"},
+{g:5,w:"繁榮",z:"ㄈㄢˊ ㄖㄨㄥˊ",hint:"九份因為開採金礦而繁榮。"},
+{g:5,w:"青壯年",z:"ㄑㄧㄥ ㄓㄨㄤˋ ㄋㄧㄢˊ",hint:"十五到六十四歲，是主要從事生產的人口。"},
+{g:5,w:"幼年",z:"ㄧㄡˋ ㄋㄧㄢˊ",hint:"零到十四歲的人口。"},
+{g:5,w:"稠密",z:"ㄔㄡˊ ㄇㄧˋ",hint:"平原地勢平坦，人口比較稠密。"},
+{g:5,w:"稀少",z:"ㄒㄧ ㄕㄠˇ",hint:"山地開發不易，人口比較稀少。"},
+{g:5,w:"移入",z:"ㄧˊ ㄖㄨˋ",hint:"工作機會多，容易吸引青壯年人口移入。"},
+{g:6,w:"高齡社會",z:"ㄍㄠ ㄌㄧㄥˊ ㄕㄜˋ ㄏㄨㄟˋ",hint:"六十五歲以上人口占總人口百分之十四以上。"},
+{g:6,w:"少子化",z:"ㄕㄠˇ ㄗˇ ㄏㄨㄚˋ",hint:"出生人數逐年下降的現象。"},
+{g:6,w:"樂齡學堂",z:"ㄌㄜˋ ㄌㄧㄥˊ ㄒㄩㄝˊ ㄊㄤˊ",hint:"讓長者參與學習，活到老、學到老。"},
+{g:6,w:"長照中心",z:"ㄔㄤˊ ㄓㄠˋ ㄓㄨㄥ ㄒㄧㄣ",hint:"提供長者適當的照護或服務。"},
+{g:6,w:"二度就業",z:"ㄦˋ ㄉㄨˋ ㄐㄧㄡˋ ㄧㄝˋ",hint:"長者再次就業，貢獻自己的專業。"},
+{g:6,w:"育嬰假",z:"ㄩˋ ㄧㄥ ㄐㄧㄚˋ",hint:"父母可以申請，有助於幼年人口增加。"},
+{g:6,w:"津貼",z:"ㄐㄧㄣ ㄊㄧㄝ",hint:"政府發放生育津貼鼓勵民眾生育。"},
+{g:6,w:"托育",z:"ㄊㄨㄛ ㄩˋ",hint:"設置公共托育，幫助家庭照顧幼兒。"},
+{g:6,w:"勞動人口",z:"ㄌㄠˊ ㄉㄨㄥˋ ㄖㄣˊ ㄎㄡˇ",hint:"出生人數降低，未來勞動人口會減少。"},
+{g:6,w:"家庭計畫",z:"ㄐㄧㄚ ㄊㄧㄥˊ ㄐㄧˋ ㄏㄨㄚˋ",hint:"政府推動的政策，口號是「兩個孩子恰恰好」。"},
+{g:6,w:"平均壽命",z:"ㄆㄧㄥˊ ㄐㄩㄣ ㄕㄡˋ ㄇㄧㄥˋ",hint:"醫療技術進步，使國人平均壽命延長。"},
+{g:6,w:"獨居老人",z:"ㄉㄨˊ ㄐㄩ ㄌㄠˇ ㄖㄣˊ",hint:"高齡社會要重視獨居老人的養老問題。"},
+{g:6,w:"併校",z:"ㄅㄧㄥˋ ㄒㄧㄠˋ",hint:"學生人數太少，學校面臨併校或廢校。"},
+{g:6,w:"缺工",z:"ㄑㄩㄝ ㄍㄨㄥ",hint:"農村青壯年外移，農業缺工情形嚴重。"}
+];
+/* ===== 課次名稱 ===== */
+const GN=["1-1 閱讀生活中的地圖","1-2 善用地圖好生活","2-1 高低起伏的地形","2-2 千變萬化的氣候","3-1 家鄉的人口組成","3-2 人口變化與發展"];
+const MC=[].concat(MC1,MC2,MC3);
+
+/* ===== 小工具 ===== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+function load(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+const OL=['（1）','（2）','（3）','（4）','（5）'];
+
+/* ===== 發音（瀏覽器內建語音，優先用臺灣國語）===== */
+const SPK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
+const sayBtn=(t,label)=>`<button type="button" class="say" data-say="${esc(t)}" aria-label="${label}：${esc(t)}">${SPK}${label}</button>`;
+let zhVoice=null;
+const canSpeak=()=>{try{return 'speechSynthesis' in window && typeof SpeechSynthesisUtterance!=='undefined'}catch(e){return false}};
+function pickVoice(){try{const vs=speechSynthesis.getVoices();zhVoice=vs.find(v=>/zh[-_]TW/i.test(v.lang))||vs.find(v=>/zh[-_](HK|Hant)/i.test(v.lang))||vs.find(v=>/^(zh|cmn)/i.test(v.lang))||null}catch(e){}}
+if(canSpeak()){pickVoice();try{speechSynthesis.onvoiceschanged=pickVoice}catch(e){}}
+function say(t){
+  if(!canSpeak()){alertSay('這個瀏覽器不支援發音，請改用 Chrome、Safari 或 Edge。');return}
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='zh-TW';if(zhVoice)u.voice=zhVoice;u.rate=0.8;speechSynthesis.speak(u)}catch(e){alertSay('發音失敗，請再按一次。')}
+  if(canSpeak()&&!zhVoice){pickVoice();if(!zhVoice)alertSay('找不到中文語音，聲音可能不正確。可在裝置設定裡加裝「中文（台灣）」語音。')}
+}
+function alertSay(m){let t=document.getElementById('sayToast');if(!t){t=document.createElement('div');t.id='sayToast';t.setAttribute('role','status');t.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);padding:8px 14px;border-radius:10px;font-size:14px;z-index:20;max-width:90vw';document.body.appendChild(t)}t.textContent=m;t.hidden=false;clearTimeout(t._h);t._h=setTimeout(()=>t.hidden=true,3500)}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-say]');if(b){e.stopPropagation();say(b.dataset.say)}},true);
+
+/* ===== 音效（Web Audio 合成，不需下載音檔）===== */
+let sfxOn=load('soc4-sfx',true),actx=null;
+function tone(seq){
+  if(!sfxOn)return;
+  try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();
+    let t=actx.currentTime+0.01;
+    seq.forEach(([f,d,type,v])=>{const o=actx.createOscillator(),g=actx.createGain();o.type=type||'sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(v||0.16,t+0.015);g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+      o.connect(g);g.connect(actx.destination);o.start(t);o.stop(t+d+0.03);t+=d*0.8});
+  }catch(e){}
+}
+const SFX={
+  ok:()=>tone([[659,.12],[880,.12],[1175,.25]]),
+  bad:()=>tone([[311,.18,'triangle',.14],[233,.32,'triangle',.14]]),
+  flip:()=>tone([[540,.05,'triangle',.07]]),
+  match:()=>tone([[784,.09],[1047,.2]]),
+  combo:()=>tone([[784,.08],[988,.08],[1319,.22]]),
+  tick:()=>tone([[1250,.04,'square',.035]]),
+  win:()=>tone([[523,.13],[659,.13],[784,.13],[1047,.13],[784,.1],[1047,.4]]),
+  lose:()=>tone([[392,.2,'triangle'],[330,.2,'triangle'],[262,.45,'triangle']])
+};
+function renderSfx(){const b=$('#sfxBtn');b.setAttribute('aria-pressed',sfxOn);b.textContent='音效：'+(sfxOn?'開':'關')}
+$('#sfxBtn').onclick=()=>{sfxOn=!sfxOn;save('soc4-sfx',sfxOn);renderSfx();if(sfxOn)SFX.ok()};
+renderSfx();
+
+/* ===== 每一關的計時與計分 ===== */
+let tmode=load('soc4-tmode','up'),rt=null;const QLIM=15;
+const rmt=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
+const timeChips=()=>`<div class="modes"><button class="chip" data-tm="up" aria-pressed="${tmode==='up'}">計時計分</button><button class="chip" data-tm="cd" aria-pressed="${tmode==='cd'}">每題 ${QLIM} 秒倒數</button></div>`;
+document.addEventListener('click',e=>{const b=e.target.closest('[data-tm]');if(!b)return;tmode=b.dataset.tm;save('soc4-tmode',tmode);document.querySelectorAll('[data-tm]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.tm===tmode))});
+function rtStart(key){rt={key,t0:Date.now(),score:0,streak:0,best:0,ok:0,n:0,qT:Date.now(),onTimeout:null,last:'',lastTick:-1,done:false}}
+function rtQ(onTimeout){if(!rt)return;rt.qT=Date.now();rt.onTimeout=(tmode==='cd'&&onTimeout)?onTimeout:null;rt.lastTick=-1;rtTick()}
+function rtAns(right){
+  if(!rt)return 0;rt.n++;rt.onTimeout=null;let pts=0;
+  if(right){rt.ok++;rt.streak++;rt.best=Math.max(rt.best,rt.streak);const sec=(Date.now()-rt.qT)/1000;
+    const sp=Math.round(50*Math.max(0,Math.min(1,1-(sec-3)/12))),cb=Math.min(5,rt.streak-1)*10;pts=100+sp+cb;rt.score+=pts;
+    rt.last=`＋${pts}${sp?`（快答 ＋${sp}）`:''}${rt.streak>1?`・${rt.streak} 連對`:''}`}
+  else{rt.streak=0;rt.last='連對中斷'}
+  rtTick();return pts;
+}
+function rtTick(){
+  if(!rt||rt.done)return;
+  const now=Date.now(),el=(now-rt.t0)/1000;
+  let cd='';
+  if(rt.onTimeout){const left=QLIM-(now-rt.qT)/1000,c=Math.ceil(left);
+    if(c<=3&&c>0&&c!==rt.lastTick){rt.lastTick=c;SFX.tick()}
+    cd=`<div class="timebar${left<=5?' warn':''}"><i style="width:${Math.max(0,left/QLIM*100)}%"></i></div>`;
+    if(left<=0){const f=rt.onTimeout;rt.onTimeout=null;f();return}}
+  document.querySelectorAll('.rhud').forEach(h=>{const sec=h.closest('section');if(sec&&sec.hidden)return;
+    h.innerHTML=`<div class="rrow"><span>時間 <b>${rmt(el)}</b></span><span>分數 <b>${rt.score}</b></span><span>連對 <b>${rt.streak}</b></span>${rt.onTimeout?`<span class="cdw">剩 <b>${Math.max(0,Math.ceil(QLIM-(now-rt.qT)/1000))}</b> 秒</span>`:''}</div>${cd}<div class="plus">${rt.last}</div>`})
+}
+setInterval(rtTick,250);
+function rtEnd(label){
+  if(!rt)return '';
+  rt.done=true;rt.onTimeout=null;const el=(Date.now()-rt.t0)/1000,acc=rt.n?Math.round(rt.ok/rt.n*100):0;
+  const key='soc4-rbest-'+rt.key+(label||''),best=load(key,null),rec=!best||rt.score>best.sc;
+  if(rec&&rt.n)save(key,{sc:rt.score,t:el});
+  return `<div class="rsum"><div><b>${rt.score}</b>分數</div><div><b>${rmt(el)}</b>用時</div><div><b>${acc}%</b>正確率</div><div><b>${rt.best}</b>最高連對</div></div>
+   <p class="qask">${rec&&rt.n?'<b style="color:var(--rose-deep)">新紀錄！</b>':`這一關最佳紀錄：${best?best.sc:0} 分`}</p>`;
+}
+
+/* ===== 範圍與錯題 ===== */
+let WR=load('soc4-wrong',{});
+const KINDN={mc:'選擇題',tf:'是非題',pair:'配對題',sort:'分類題',chart:'圖表判讀',write:'寫國字'};
+function addWrong(kind,idx,label){const k=kind+':'+idx;const o=WR[k]||{n:0,kind,t:label};o.n++;o.t=label;o.kind=kind;WR[k]=o;save('soc4-wrong',WR);renderScope()}
+const isWrong=(kind,idx)=>!!WR[kind+':'+idx];
+const st={groups:new Set([1,2,3,4,5,6]),onlyWrong:false,selfTest:false};
+function pool(arr,kind){
+  let p=arr.map((x,i)=>Object.assign({},x,{_i:i})).filter(x=>st.groups.has(x.g));
+  if(st.onlyWrong&&kind)p=p.filter(x=>isWrong(kind,x._i));
+  return p;
+}
+function renderScope(){
+  const n=Object.keys(WR).length;if(!n)st.onlyWrong=false;
+  const el=$('#scope');
+  el.innerHTML=GN.map((g,i)=>`<button class="chip" data-g="${i+1}" aria-pressed="${st.groups.has(i+1)}">${g}</button>`).join('')+
+   `<button class="chip" data-g="all" aria-pressed="false">全選</button>`+
+   (n?`<button class="chip wrongchip" data-g="wrong" aria-pressed="${st.onlyWrong}">只練錯題（${n}）</button>`:'')+
+   `<span class="count">範圍內 ${pool(MC,'mc').length+pool(TF,'tf').length} 題</span>`;
+}
+$('#scope').addEventListener('click',e=>{
+  const b=e.target.closest('.chip');if(!b)return;const g=b.dataset.g;
+  if(g==='all')st.groups=new Set([1,2,3,4,5,6]);
+  else if(g==='wrong')st.onlyWrong=!st.onlyWrong;
+  else{const i=+g;if(st.groups.has(i)){if(st.groups.size>1)st.groups.delete(i)}else st.groups.add(i)}
+  renderScope();refreshTab();
+});
+
+/* ===== 分頁 ===== */
+let tab='cards';
+document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  tab=b.dataset.tab;rt=null;if(mm&&mm.timer){clearInterval(mm.timer);mm.timer=null}clearWTimer();if(ex&&ex.timer){clearInterval(ex.timer);ex.timer=null}
+  document.querySelectorAll('nav.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  document.querySelectorAll('section').forEach(s=>s.hidden=s.id!=='tab-'+tab);
+  refreshTab(true);
+}));
+function refreshTab(){
+  if(tab==='cards')renderCards();
+  if(tab==='mc')mcIntro();
+  if(tab==='tf')tfIntro();
+  if(tab==='pair')pairIntro();
+  if(tab==='sort')sortIntro();
+  if(tab==='chart')chartIntro();
+  if(tab==='write')writeIntro();
+  if(tab==='mem')memIntro();
+  if(tab==='exam')examIntro();
+  if(tab==='wrong')renderWrong();
+}
+const sizeSel=(id,n)=>`<label class="hint" for="${id}">題數</label> <select id="${id}"><option value="10">10 題</option><option value="20">20 題</option><option value="999">全部${n?`（${n} 題）`:''}</option></select>`;
+const emptyMsg=`<p class="hint">這個範圍裡沒有題目，請在上方多選幾課，或關掉「只練錯題」。</p>`;
+/* ===== 重點卡（名詞解釋）===== */
+function renderCards(){
+  const p=pool(TERM);
+  const cv=h=>st.selfTest?`<span class="cover" tabindex="0" role="button">${h}</span>`:h;
+  let html=`<div class="bar"><button class="chip" id="stBtn" aria-pressed="${st.selfTest}">考自己（先遮住說明）</button><span class="count">共 ${p.length} 張卡</span></div>`;
+  if(!p.length)html+=emptyMsg;
+  for(let g=1;g<=6;g++){
+    const xs=p.filter(x=>x.g===g);if(!xs.length)continue;
+    html+=`<h3 class="groupHead">${GN[g-1]}</h3><div class="termlist">`+
+      xs.map(x=>`<div class="termcard"><div class="tt">${esc(x.t)} ${sayBtn(x.t,'聽')}</div><p class="td">${cv(esc(x.d))}</p></div>`).join('')+`</div>`;
+  }
+  $('#cardsArea').innerHTML=html;
+  $('#stBtn').onclick=()=>{st.selfTest=!st.selfTest;renderCards()};
+  document.querySelectorAll('#cardsArea .cover').forEach(c=>{
+    const open=()=>{c.classList.remove('cover');c.removeAttribute('role');c.removeAttribute('tabindex')};
+    c.onclick=open;c.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}};
+  });
+}
+
+/* ===== 選擇題 ===== */
+let mcs=null;
+function mcIntro(){
+  const p=pool(MC,'mc');
+  $('#mcArea').innerHTML=`<div class="qcard"><p class="qask">四個選項選一個。答完會立刻告訴你對不對，還會說明理由。</p>
+    ${timeChips()}
+    ${p.length?`<div class="bar">${sizeSel('mcN',p.length)}<button class="btn primary" id="mcGo">開始作答</button></div>`:emptyMsg}
+    <p class="hint">題目來自老師的單元複習卷、期中考卷與課本重點整理。</p></div>`;
+  const g=$('#mcGo');if(g)g.onclick=()=>{const n=+$('#mcN').value;rtStart('mc');mcs={q:shuffle(p).slice(0,n),i:0,ok:0,bad:[]};mcQ()};
+}
+function mcQ(){
+  if(mcs.i>=mcs.q.length)return mcDone();
+  const x=mcs.q[mcs.i],order=shuffle(x.o.map((t,i)=>({t,i})));
+  $('#mcArea').innerHTML=`<div class="qcard"><div class="rhud"></div>
+    <span class="prog">第 ${mcs.i+1} / ${mcs.q.length} 題　<span class="lesson">${GN[x.g-1]}</span></span>
+    <p class="qask left">${esc(x.q)}</p>
+    <div class="opts" id="mcOpts">${order.map((o,k)=>`<button class="opt" data-k="${k}"><span class="o0">${OL[k]}</span><span class="o1">${esc(o.t)}</span></button>`).join('')}</div>
+    <div id="mcFb"></div></div>`;
+  rtQ(()=>pick(-1));
+  let locked=false;
+  function pick(k){
+    if(locked)return;locked=true;
+    const right=k>=0&&order[k].i===x.a,ci=order.findIndex(o=>o.i===x.a);
+    document.querySelectorAll('#mcOpts .opt').forEach((b,j)=>{b.disabled=true;
+      if(j===ci)b.className='opt ok',b.insertAdjacentHTML('beforeend','<span class="mark">✓ 正確</span>');
+      else if(j===k)b.className='opt bad',b.insertAdjacentHTML('beforeend','<span class="mark">✗ 你選的</span>')});
+    rtAns(right);
+    if(right){mcs.ok++;SFX.ok()}else{SFX.bad();mcs.bad.push(x);addWrong('mc',x._i,x.q)}
+    $('#mcFb').innerHTML=`<div class="fb ${right?'ok':'bad'}">${right?'✓ 答對了！':k<0?'✗ 時間到':'✗ 答錯了'}　<b>${esc(x.why)}</b></div>
+      <div class="center" style="margin-top:10px"><button class="btn primary" id="mcNext">${mcs.i+1>=mcs.q.length?'看成績':'下一題'}</button></div>`;
+    $('#mcNext').onclick=()=>{mcs.i++;mcQ()};
+  }
+  document.querySelectorAll('#mcOpts .opt').forEach(b=>b.onclick=()=>pick(+b.dataset.k));
+}
+function mcDone(){
+  if(mcs.q.length&&mcs.ok===mcs.q.length)celebrate('選擇題全對！');
+  $('#mcArea').innerHTML=`<div class="done-box"><div class="score">${mcs.ok} / ${mcs.q.length}</div>${rtEnd()}
+   <p class="qask">${mcs.bad.length?'這幾題再看一次：':'全部答對，太厲害了！'}</p>
+   <div class="termlist" style="text-align:left">${mcs.bad.map(x=>`<div class="termcard"><div class="tt" style="font-size:16px">${esc(x.q)}</div><p class="td"><b>正解：</b>${esc(x.o[x.a])}<br>${esc(x.why)}</p></div>`).join('')}</div>
+   <div class="center">${mcs.bad.length?'<button class="btn rose primary" id="mcRe">只重做錯的</button>':''}<button class="btn" id="mcAgain">再來一輪</button></div></div>`;
+  $('#mcAgain').onclick=mcIntro;
+  const r=$('#mcRe');if(r)r.onclick=()=>{rtStart('mc');mcs={q:shuffle(mcs.bad),i:0,ok:0,bad:[]};mcQ()};
+}
+
+/* ===== 是非題 ===== */
+let tfs=null;
+function tfIntro(){
+  const p=pool(TF,'tf');
+  $('#tfArea').innerHTML=`<div class="qcard"><p class="qask">對的按 <b>○</b>，錯的按 <b>✗</b>。答完會說明理由。</p>
+    ${timeChips()}
+    ${p.length?`<div class="bar">${sizeSel('tfN',p.length)}<button class="btn primary" id="tfGo">開始作答</button></div>`:emptyMsg}
+    <p class="hint">題目來自老師的單元複習卷與期中考卷。</p></div>`;
+  const g=$('#tfGo');if(g)g.onclick=()=>{const n=+$('#tfN').value;rtStart('tf');tfs={q:shuffle(p).slice(0,n),i:0,ok:0,bad:[]};tfQ()};
+}
+function tfQ(){
+  if(tfs.i>=tfs.q.length)return tfDone();
+  const x=tfs.q[tfs.i];
+  $('#tfArea').innerHTML=`<div class="qcard"><div class="rhud"></div>
+    <span class="prog">第 ${tfs.i+1} / ${tfs.q.length} 題　<span class="lesson">${GN[x.g-1]}</span></span>
+    <p class="qask left">${esc(x.q)}</p>
+    <div class="opts" style="grid-template-columns:1fr 1fr" id="tfOpts">
+      <button class="opt tfbig" data-v="1">○</button><button class="opt tfbig" data-v="0">✗</button></div>
+    <div id="tfFb"></div></div>`;
+  rtQ(()=>pick(null));
+  let locked=false;
+  function pick(v){
+    if(locked)return;locked=true;
+    const right=v!==null&&(!!v)===(!!x.a);
+    document.querySelectorAll('#tfOpts .opt').forEach(b=>{b.disabled=true;const bv=b.dataset.v==='1';
+      if(bv===(!!x.a))b.className='opt tfbig ok';else if(v!==null&&bv===(!!v))b.className='opt tfbig bad'});
+    rtAns(right);
+    if(right){tfs.ok++;SFX.ok()}else{SFX.bad();tfs.bad.push(x);addWrong('tf',x._i,x.q)}
+    $('#tfFb').innerHTML=`<div class="fb ${right?'ok':'bad'}">${right?'✓ 答對了！':v===null?'✗ 時間到':'✗ 答錯了'}　正確答案是 <b>${x.a?'○':'✗'}</b>。<b>${esc(x.why)}</b></div>
+      <div class="center" style="margin-top:10px"><button class="btn primary" id="tfNext">${tfs.i+1>=tfs.q.length?'看成績':'下一題'}</button></div>`;
+    $('#tfNext').onclick=()=>{tfs.i++;tfQ()};
+  }
+  document.querySelectorAll('#tfOpts .opt').forEach(b=>b.onclick=()=>pick(+b.dataset.v));
+}
+function tfDone(){
+  if(tfs.q.length&&tfs.ok===tfs.q.length)celebrate('是非題全對！');
+  $('#tfArea').innerHTML=`<div class="done-box"><div class="score">${tfs.ok} / ${tfs.q.length}</div>${rtEnd()}
+   <p class="qask">${tfs.bad.length?'這幾題再看一次：':'全部答對，太厲害了！'}</p>
+   <div class="termlist" style="text-align:left">${tfs.bad.map(x=>`<div class="termcard"><div class="tt" style="font-size:16px">${x.a?'○':'✗'}　${esc(x.q)}</div><p class="td">${esc(x.why)}</p></div>`).join('')}</div>
+   <div class="center">${tfs.bad.length?'<button class="btn rose primary" id="tfRe">只重做錯的</button>':''}<button class="btn" id="tfAgain">再來一輪</button></div></div>`;
+  $('#tfAgain').onclick=tfIntro;
+  const r=$('#tfRe');if(r)r.onclick=()=>{rtStart('tf');tfs={q:shuffle(tfs.bad),i:0,ok:0,bad:[]};tfQ()};
+}
+/* ===== 配對題 ===== */
+let ps=null;
+function pairIntro(){
+  const p=pool(PAIR,'pair');
+  $('#pairArea').innerHTML=`<div class="qcard"><p class="qask">左邊點一下，再點右邊和它相配的那一個。配對成功會變綠色 ✓。</p>
+    ${p.length?`<div class="bar" style="justify-content:center">${p.map(x=>`<button class="btn" data-p="${x._i}">${esc(x.cat)}<span class="lesson" style="margin-left:6px">${GN[x.g-1].slice(0,3)}</span></button>`).join('')}</div>
+      <button class="btn primary" id="pRand">隨機抽一組</button>`:emptyMsg}
+    <p class="hint">共 ${p.length} 組可以練。</p></div>`;
+  document.querySelectorAll('#pairArea [data-p]').forEach(b=>b.onclick=()=>pairStart(+b.dataset.p));
+  const r=$('#pRand');if(r)r.onclick=()=>pairStart(p[Math.random()*p.length|0]._i);
+}
+function pairStart(idx){
+  const g=PAIR[idx];
+  rtStart('pair');
+  /* 右邊可能有「多對一」（例如好幾個聚落都是因為交通方便），所以右欄先去掉重複，
+     並記住每一張右卡還要被配幾次，全部配完才算完成。 */
+  const rights=[];g.items.forEach(it=>{if(rights.indexOf(it[1])<0)rights.push(it[1])});
+  const need={},tot={};
+  rights.forEach((r,k)=>{need[k]=tot[k]=g.items.filter(it=>it[1]===r).length});
+  ps={idx,cat:g.cat,g:g.g,
+     L:shuffle(g.items.map((it,i)=>({t:it[0],i,r:rights.indexOf(it[1])}))),
+     R:shuffle(rights.map((t,k)=>({t,i:k}))),
+     need,tot,doneL:{},doneR:{},sel:null,n:g.items.length,ok:0,tries:0,fx:null};
+  pairRender();rtQ(null);
+}
+function pairRender(){
+  const cell=(side,o)=>{
+    const done=side==='L'?ps.doneL[o.i]:ps.doneR[o.i];
+    const sel=ps.sel&&ps.sel.side===side&&ps.sel.i===o.i;
+    const fx=ps.fx&&ps.fx.side===side&&ps.fx.i===o.i;
+    const more=side==='R'&&ps.tot[o.i]>1&&!done?`<span class="lesson" style="margin-left:6px">還要 ${ps.need[o.i]} 個</span>`:'';
+    return `<button class="pitem${done?' done':''}${sel?' sel':''}${fx?' wrongflash':''}" data-s="${side}" data-i="${o.i}"${done?' disabled':''}>${esc(o.t)}${more}${done?' ✓':''}</button>`};
+  $('#pairArea').innerHTML=`<div class="qcard"><div class="rhud"></div>
+    <span class="prog">${esc(ps.cat)}　<span class="lesson">${GN[ps.g-1]}</span>　已配對 ${ps.ok} / ${ps.n}</span>
+    <div class="pairwrap">
+      <div class="pcol">${ps.L.map(o=>cell('L',o)).join('')}</div>
+      <div class="pcol">${ps.R.map(o=>cell('R',o)).join('')}</div>
+    </div>
+    <div class="center"><button class="btn" id="pBack">換一組</button></div>
+    <div id="pMsg"></div></div>`;
+  $('#pBack').onclick=pairIntro;
+  document.querySelectorAll('#pairArea .pitem').forEach(b=>b.onclick=()=>pairTap(b.dataset.s,+b.dataset.i));
+}
+function pairTap(side,i){
+  if(side==='L'?ps.doneL[i]:ps.doneR[i])return;
+  if(!ps.sel||ps.sel.side===side){ps.sel={side,i};ps.fx=null;SFX.flip();pairRender();return}
+  const li=side==='L'?i:ps.sel.i,ri=side==='L'?ps.sel.i:i;
+  ps.tries++;
+  const lo=ps.L.filter(o=>o.i===li)[0];
+  if(lo&&lo.r===ri){
+    ps.doneL[li]=true;ps.need[ri]--;if(ps.need[ri]<=0)ps.doneR[ri]=true;
+    ps.ok++;ps.sel=null;ps.fx=null;rtAns(true);SFX.match();
+    pairRender();
+    if(ps.ok===ps.n)return pairDone();
+    rtQ(null);
+  }else{
+    rtAns(false);SFX.bad();addWrong('pair',ps.idx,ps.cat);
+    ps.fx={side,i};const keep=ps.sel;ps.sel=null;pairRender();
+    $('#pMsg').innerHTML=`<div class="fb bad">✗ 這兩個不是一對，再想一想。</div>`;
+    setTimeout(()=>{if(ps&&ps.fx){ps.fx=null;pairRender();rtQ(null)}},700);
+  }
+}
+function pairDone(){
+  const perfect=ps.tries===ps.n;
+  if(perfect)celebrate('配對全對！');else SFX.win();
+  $('#pMsg').innerHTML=`<div class="done-box"><div class="score">${ps.ok} / ${ps.n}</div>${rtEnd('-'+ps.idx)}
+    <p class="qask">${perfect?'一次都沒配錯，超強！':`配了 ${ps.tries} 次才全部完成，再練一次會更快。`}</p>
+    <div class="center"><button class="btn primary" id="pAgain">再配一次</button><button class="btn" id="pBack2">換一組</button></div></div>`;
+  $('#pAgain').onclick=()=>pairStart(ps.idx);$('#pBack2').onclick=pairIntro;
+}
+
+/* ===== 分類題 ===== */
+let ss=null;
+function sortIntro(){
+  const p=pool(SORT,'sort');
+  $('#sortArea').innerHTML=`<div class="qcard"><p class="qask">看題目，把每一個項目放進正確的籃子裡。</p>
+    ${p.length?`<div class="bar" style="justify-content:center">${p.map(x=>`<button class="btn" data-s="${x._i}" style="text-align:left">${esc(x.q)}<span class="lesson" style="margin-left:6px">${GN[x.g-1].slice(0,3)}</span></button>`).join('')}</div>
+      <button class="btn primary" id="sRand">隨機抽一題</button>`:emptyMsg}
+    <p class="hint">共 ${p.length} 題可以練。</p></div>`;
+  document.querySelectorAll('#sortArea [data-s]').forEach(b=>b.onclick=()=>sortStart(+b.dataset.s));
+  const r=$('#sRand');if(r)r.onclick=()=>sortStart(p[Math.random()*p.length|0]._i);
+}
+function sortStart(idx){
+  const q=SORT[idx];
+  rtStart('sort');
+  ss={idx,q,items:shuffle(q.items.map(it=>({t:it[0],c:it[1]}))),i:0,ok:0,placed:q.cats.map(()=>[])};
+  sortQ();
+}
+function binsHTML(){
+  return ss.q.cats.map((c,k)=>`<div class="bin"><h4>${esc(c)}</h4>${ss.placed[k].map(p=>`<span class="tagi ${p.ok?'ok':'bad'}">${esc(p.t)} ${p.ok?'✓':'✗'}</span>`).join('')}</div>`).join('');
+}
+function sortQ(){
+  if(ss.i>=ss.items.length)return sortDone();
+  const q=ss.q,cur=ss.items[ss.i];
+  $('#sortArea').innerHTML=`<div class="qcard"><div class="rhud"></div>
+    <p class="qask left">${esc(q.q)}　<span class="lesson">${GN[q.g-1]}</span></p>
+    <span class="prog">第 ${ss.i+1} / ${ss.items.length} 個</span>
+    <div class="cur">${esc(cur.t)}</div>
+    <p class="hint">它應該放進哪一個？</p>
+    <div class="opts" style="grid-template-columns:repeat(${q.cats.length},1fr)" id="sBtns">
+      ${q.cats.map((c,k)=>`<button class="opt" data-k="${k}" style="justify-content:center;text-align:center"><span class="o1">${esc(c)}</span></button>`).join('')}</div>
+    <div class="bins${q.cats.length===3?' b3':''}" id="sBins">${binsHTML()}</div>
+    <div class="center"><button class="btn" id="sBack">換一題</button></div>
+    <div id="sFb"></div></div>`;
+  $('#sBack').onclick=sortIntro;
+  rtQ(()=>pick(-1));
+  let locked=false;
+  function pick(k){
+    if(locked)return;locked=true;
+    const right=k===cur.c;
+    rtAns(right);
+    ss.placed[cur.c].push({t:cur.t,ok:right});
+    $('#sBins').innerHTML=binsHTML();            /* 讓孩子馬上看到它掉進籃子裡 */
+    document.querySelectorAll('#sBtns .opt').forEach(b=>{b.disabled=true;
+      if(+b.dataset.k===cur.c)b.className='opt ok';else if(+b.dataset.k===k)b.className='opt bad'});
+    if(right){ss.ok++;SFX.ok()}else{SFX.bad();addWrong('sort',ss.idx,ss.q.q)}
+    $('#sFb').innerHTML=`<div class="fb ${right?'ok':'bad'}">${right?'✓ 放對了！':k<0?'✗ 時間到':'✗ 放錯了'}　「${esc(cur.t)}」要放進 <b>${esc(ss.q.cats[cur.c])}</b>。</div>
+      <div class="center" style="margin-top:10px"><button class="btn primary" id="sNext">${ss.i+1>=ss.items.length?'看成績':'下一個'}</button></div>`;
+    $('#sNext').onclick=()=>{ss.i++;sortQ()};
+  }
+  document.querySelectorAll('#sBtns .opt').forEach(b=>b.onclick=()=>pick(+b.dataset.k));
+}
+function sortDone(){
+  const q=ss.q;
+  if(ss.ok===ss.items.length)celebrate('分類全對！');
+  $('#sortArea').innerHTML=`<div class="done-box"><div class="score">${ss.ok} / ${ss.items.length}</div>${rtEnd('-'+ss.idx)}
+    <p class="qask left">${esc(q.q)}</p>
+    <div class="bins${q.cats.length===3?' b3':''}" style="width:100%">${q.cats.map((c,k)=>`<div class="bin"><h4>${esc(c)}</h4>${q.items.filter(it=>it[1]===k).map(it=>`<span class="tagi">${esc(it[0])}</span>`).join('')}</div>`).join('')}</div>
+    <p class="hint">上面是正確答案。</p>
+    <div class="center"><button class="btn primary" id="sAgain">再做一次</button><button class="btn" id="sBack2">換一題</button></div></div>`;
+  $('#sAgain').onclick=()=>sortStart(ss.idx);$('#sBack2').onclick=sortIntro;
+}
+/* ===== 圖表判讀 ===== */
+let cs=null;
+function chartIntro(){
+  const p=pool(CHART,'chart');
+  $('#chartArea').innerHTML=`<div class="qcard"><p class="qask">看圖、看表回答問題。圖表都是自己畫的練習圖，資料來源寫在圖的下面。</p>
+    ${p.length?`<div class="bar" style="justify-content:center">${p.map(x=>`<button class="btn" data-c="${x._i}" style="text-align:left">${esc(x.title)}<span class="lesson" style="margin-left:6px">${GN[x.g-1].slice(0,3)}</span></button>`).join('')}</div>`:emptyMsg}
+    <p class="hint">共 ${p.length} 組圖表。</p></div>`;
+  document.querySelectorAll('#chartArea [data-c]').forEach(b=>b.onclick=()=>chartStart(+b.dataset.c));
+}
+function chartStart(idx){
+  const c=CHART[idx];
+  rtStart('chart');
+  cs={idx,c,q:shuffle(c.qs.map((q,i)=>Object.assign({},q,{_q:i}))),i:0,ok:0,bad:[]};
+  chartQ();
+}
+function chartQ(){
+  if(cs.i>=cs.q.length)return chartDone();
+  const c=cs.c,x=cs.q[cs.i],order=shuffle(x.o.map((t,i)=>({t,i})));
+  $('#chartArea').innerHTML=`<div class="qcard"><div class="rhud"></div>
+    <span class="prog">${esc(c.title)}　<span class="lesson">${GN[c.g-1]}</span>　第 ${cs.i+1} / ${cs.q.length} 題</span>
+    <div class="chartbox">${c.svg()}</div><p class="srcnote">${esc(c.note)}</p>
+    <p class="qask left">${esc(x.q)}</p>
+    <div class="opts" id="cOpts">${order.map((o,k)=>`<button class="opt" data-k="${k}"><span class="o0">${OL[k]}</span><span class="o1">${esc(o.t)}</span></button>`).join('')}</div>
+    <div id="cFb"></div>
+    <div class="center"><button class="btn" id="cBack">換一組圖表</button></div></div>`;
+  $('#cBack').onclick=chartIntro;
+  rtQ(()=>pick(-1));
+  let locked=false;
+  function pick(k){
+    if(locked)return;locked=true;
+    const right=k>=0&&order[k].i===x.a,ci=order.findIndex(o=>o.i===x.a);
+    document.querySelectorAll('#cOpts .opt').forEach((b,j)=>{b.disabled=true;
+      if(j===ci)b.className='opt ok',b.insertAdjacentHTML('beforeend','<span class="mark">✓ 正確</span>');
+      else if(j===k)b.className='opt bad',b.insertAdjacentHTML('beforeend','<span class="mark">✗ 你選的</span>')});
+    rtAns(right);
+    if(right){cs.ok++;SFX.ok()}else{SFX.bad();cs.bad.push(x);addWrong('chart',cs.idx,c.title+'：'+x.q)}
+    $('#cFb').innerHTML=`<div class="fb ${right?'ok':'bad'}">${right?'✓ 答對了！':k<0?'✗ 時間到':'✗ 答錯了'}　<b>${esc(x.why)}</b></div>
+      <div class="center" style="margin-top:10px"><button class="btn primary" id="cNext">${cs.i+1>=cs.q.length?'看成績':'下一題'}</button></div>`;
+    $('#cNext').onclick=()=>{cs.i++;chartQ()};
+  }
+  document.querySelectorAll('#cOpts .opt').forEach(b=>b.onclick=()=>pick(+b.dataset.k));
+}
+function chartDone(){
+  if(cs.q.length&&cs.ok===cs.q.length)celebrate('圖表判讀全對！');
+  $('#chartArea').innerHTML=`<div class="done-box"><div class="score">${cs.ok} / ${cs.q.length}</div>${rtEnd('-'+cs.idx)}
+   <p class="qask">${cs.bad.length?'這幾題再看一次：':'全部答對，判讀能力滿分！'}</p>
+   <div class="termlist" style="text-align:left">${cs.bad.map(x=>`<div class="termcard"><div class="tt" style="font-size:16px">${esc(x.q)}</div><p class="td"><b>正解：</b>${esc(x.o[x.a])}<br>${esc(x.why)}</p></div>`).join('')}</div>
+   <div class="center"><button class="btn primary" id="cAgain">同一組再做</button><button class="btn" id="cBack3">換一組</button></div></div>`;
+  $('#cAgain').onclick=()=>chartStart(cs.idx);$('#cBack3').onclick=chartIntro;
+}
+
+/* ===== 寫國字（重要地名、名詞；自動評分只看字形，筆畫數僅供參考）===== */
+let ws=null,wTime=load('soc4-wtime',0);
+function wParts(x){
+  const zs=String(x.z).trim().split(/\s+/);
+  return zs.length===x.w.length?zs:null;
+}
+function writeIntro(){
+  clearWTimer();
+  const p=pool(WRITE,'write');
+  const tchip=v=>`<button class="chip" data-wt="${v}" aria-pressed="${wTime===v}">${v?`每字 ${v} 秒`:'不限時'}</button>`;
+  $('#writeArea').innerHTML=`<div class="qcard">
+    <p class="qask">看注音寫國字：語詞裡會空一個字，把那個字寫在格子裡，寫好按「寫好了」。App 會先<b>自動評分</b>（只比對字形），再請你自己對照答案確認。</p>
+    <div class="modes">${tchip(0)}${tchip(30)}${tchip(20)}</div>
+    ${p.length?`<div class="bar">${sizeSel('wN',p.length)}<button class="btn primary" id="wGo">開始寫</button></div>`:emptyMsg}
+    <p class="hint">注音是編者標註的，請以課本為準。自動評分只能抓出明顯寫錯的字，細節要自己對照。</p></div>`;
+  document.querySelectorAll('#writeArea [data-wt]').forEach(b=>b.onclick=()=>{wTime=+b.dataset.wt;save('soc4-wtime',wTime);writeIntro()});
+  const g=$('#wGo');if(g)g.onclick=()=>{const n=+$('#wN').value;rtStart('write');
+    ws={q:shuffle(p).slice(0,n).map(x=>{const zs=wParts(x);const k=Math.random()*x.w.length|0;return Object.assign({},x,{k,c:x.w[k],zc:zs?zs[k]:x.z})}),i:0,ok:0,bad:[],scores:[]};writeQ()};
+}
+function promptWord(x){return x.w.split('').map((ch,i)=>i===x.k?`<span class="box">${esc(x.zc)}</span>`:esc(ch)).join('')}
+function clearWTimer(){if(ws&&ws.timer){clearInterval(ws.timer);ws.timer=null}}
+function writeQ(){
+  clearWTimer();
+  if(ws.i>=ws.q.length)return writeDone();
+  const x=ws.q[ws.i];
+  $('#writeArea').innerHTML=`<div class="prompt"><div class="rhud"></div><span class="prog">第 ${ws.i+1} / ${ws.q.length} 字　<span class="lesson">${GN[x.g-1]}</span></span>
+      <div class="word">${promptWord(x)}</div><span class="hint">${esc(x.hint)}</span><span class="hint">把框框裡的注音寫成國字　${sayBtn(x.w,'聽語詞')}</span></div>
+    ${wTime?`<div class="timebar" id="wBar"><i style="width:100%"></i></div><div class="prog" id="wLeft" style="text-align:center">剩下 ${wTime} 秒</div>`:''}
+    ${padHTML(x.c)}
+    <div class="center"><button class="btn" id="wClear">擦掉重寫</button><button class="btn primary" id="wShow">寫好了，評分</button></div>
+    <div id="wRev"></div>`;
+  setupPad($('#writeArea'));rtQ(null);
+  $('#wClear').onclick=clearPad;
+  let done=false;
+  const reveal=async(timeout)=>{
+    if(done)return;done=true;clearWTimer();padLocked=true;
+    $('#wShow').disabled=true;$('#wClear').disabled=true;
+    const sc=await gradeWriting(x.c);ws.scores.push(sc.score);
+    const shapeTxt=sc.n===0?'沒有寫':sc.f>=0.80?'很接近 ✓':sc.f>=0.65?'有部分相似，請仔細對照':'差很多，可能寫錯字了';
+    const verdict=sc.good?'很可能寫對了！再看一眼確認吧。':sc.n===0?'沒有寫到字，記下來再練一次。':'可能有地方寫錯，請和答案仔細比對。';
+    if(sc.good)SFX.ok();
+    $('#wRev').innerHTML=`<div class="grade ${sc.good?'g-ok':'g-chk'}">
+        <div class="gscore"><b>${sc.score}</b><span>分</span></div>
+        <div class="ginfo">${timeout?'<div><b>時間到！</b></div>':''}<div><b>字形</b>：${shapeTxt}</div><div><b>筆畫</b>：你寫了 ${sc.n} 畫（僅供參考）</div><div><b>初評</b>：${verdict}</div></div></div>
+      <div class="reveal"><div class="big">${esc(x.c)}</div>
+      <div class="info"><div><b>語詞</b>：<span class="kai" style="font-size:22px">${esc(x.w)}</span></div>
+      <div class="zy hint">${esc(x.z)}</div><div class="hint">${esc(x.hint)}</div></div></div>
+      <div class="center" style="margin-top:10px"><button class="btn" id="wGhost" aria-pressed="false">把答案疊在格子上比對</button></div>
+      <div class="center" style="margin-top:10px"><button class="btn ${sc.good?'primary':''}" id="wOk">我寫對了</button><button class="btn rose ${sc.good?'':'primary'}" id="wBad">寫錯了，記下來</button></div>
+      <p class="hint" style="text-align:center">自動評分是參考：只比對字形，細節請自己對照課本。</p>`;
+    $('#wGhost').onclick=e=>{const g=$('#writeArea .ghost');g.hidden=!g.hidden;e.currentTarget.setAttribute('aria-pressed',!g.hidden)};
+    $('#wOk').onclick=()=>{rtAns(true);if(!sc.good)SFX.ok();ws.ok++;ws.i++;writeQ()};
+    $('#wBad').onclick=()=>{rtAns(false);SFX.bad();ws.bad.push(x);addWrong('write',x._i,x.w);ws.i++;writeQ()};
+  };
+  $('#wShow').onclick=()=>reveal(false);
+  if(wTime){const t0=Date.now();let lastTick=-1;
+    ws.timer=setInterval(()=>{const left=wTime-(Date.now()-t0)/1000;const bar=$('#wBar'),lt=$('#wLeft');
+      if(!bar){clearWTimer();return}
+      bar.firstElementChild.style.width=Math.max(0,left/wTime*100)+'%';bar.classList.toggle('warn',left<=5);
+      lt.textContent=`剩下 ${Math.max(0,Math.ceil(left))} 秒`;
+      const c=Math.ceil(left);if(c<=5&&c>0&&c!==lastTick){lastTick=c;SFX.tick()}
+      if(left<=0)reveal(true)},200)}
+}
+function writeDone(){
+  clearWTimer();
+  const avg=ws.scores.length?Math.round(ws.scores.reduce((a,b)=>a+b,0)/ws.scores.length):0;
+  if(ws.q.length&&ws.ok===ws.q.length)celebrate('全部寫對！');
+  $('#writeArea').innerHTML=`<div class="done-box"><div class="score">${ws.ok} / ${ws.q.length}</div>${rtEnd(wTime?'-'+wTime:'')}
+   <p class="qask">自動評分平均 ${avg} 分</p>
+   <p class="qask">${ws.bad.length?'這幾個語詞再多寫幾次：':'全部寫對，太棒了！'}</p>
+   <div class="wlist">${ws.bad.map(x=>`<span class="wz">${esc(x.w)}</span>`).join('')}</div>
+   <div class="center">${ws.bad.length?'<button class="btn rose primary" id="wRe">只重寫錯的</button>':''}<button class="btn" id="wAgain">再來一輪</button></div></div>`;
+  $('#wAgain').onclick=writeIntro;
+  const r=$('#wRe');if(r)r.onclick=()=>{const b=ws.bad.slice();rtStart('write');ws={q:shuffle(b),i:0,ok:0,bad:[],scores:[]};writeQ()};
+}
+let cv,ctx,drawing=false,last=null,padStrokes=0,padLocked=false;
+const padHTML=ch=>`<div class="padwrap"><div class="tian pad"><div class="ghost" hidden>${esc(ch)}</div><canvas aria-label="寫字格"></canvas></div></div>`;
+function setupPad(root){
+  cv=root.querySelector('canvas');ctx=cv.getContext('2d');padStrokes=0;padLocked=false;
+  const r=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+  cv.width=Math.max(1,r.width*dpr);cv.height=Math.max(1,r.height*dpr);ctx.scale(dpr,dpr);
+  ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=Math.max(5,r.width/30);
+  ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--ink').trim()||'#2b2518';
+  root.querySelector('.ghost').style.fontSize=(r.width*0.82)+'px';
+  const pt=e=>{const b=cv.getBoundingClientRect();return [e.clientX-b.left,e.clientY-b.top]};
+  cv.onpointerdown=e=>{if(padLocked)return;drawing=true;padStrokes++;last=pt(e);try{cv.setPointerCapture(e.pointerId)}catch(_){}ctx.beginPath();ctx.arc(last[0],last[1],ctx.lineWidth/2,0,7);ctx.fillStyle=ctx.strokeStyle;ctx.fill()};
+  cv.onpointermove=e=>{if(!drawing||padLocked)return;const p=pt(e);ctx.beginPath();ctx.moveTo(...last);ctx.lineTo(...p);ctx.stroke();last=p};
+  cv.onpointerup=cv.onpointercancel=()=>{drawing=false};
+}
+function clearPad(){if(padLocked)return;ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);ctx.restore();padStrokes=0}
+
+/* 字形相似度：把手寫和標準楷書都縮放到 64×64、細化成骨架，再算互相覆蓋的比例 */
+const GZ=64;
+function toGrid(src){
+  const w=src.width,h=src.height,d=src.getContext('2d').getImageData(0,0,w,h).data;
+  let x0=w,y0=h,x1=-1,y1=-1;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(d[(y*w+x)*4+3]>60){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+  if(x1<0)return null;
+  const off=document.createElement('canvas');off.width=off.height=GZ;const o=off.getContext('2d');
+  const bw=x1-x0+1,bh=y1-y0+1,s=(GZ-4)/Math.max(bw,bh),dw=bw*s,dh=bh*s;
+  o.drawImage(src,x0,y0,bw,bh,(GZ-dw)/2,(GZ-dh)/2,dw,dh);
+  const od=o.getImageData(0,0,GZ,GZ).data,g=new Uint8Array(GZ*GZ);
+  for(let i=0;i<g.length;i++)g[i]=od[i*4+3]>60?1:0;
+  return g;
+}
+function thin(g){
+  const N=GZ,a=Uint8Array.from(g);let ch=true;
+  const P=(x,y)=>(x<0||y<0||x>=N||y>=N)?0:a[y*N+x];
+  while(ch){ch=false;
+    for(const step of [0,1]){const del=[];
+      for(let y=0;y<N;y++)for(let x=0;x<N;x++){if(!a[y*N+x])continue;
+        const p=[P(x,y-1),P(x+1,y-1),P(x+1,y),P(x+1,y+1),P(x,y+1),P(x-1,y+1),P(x-1,y),P(x-1,y-1)];
+        const B=p.reduce((s,v)=>s+v,0);if(B<2||B>6)continue;
+        let A=0;for(let k=0;k<8;k++)if(!p[k]&&p[(k+1)%8])A++;if(A!==1)continue;
+        if(step===0){if(p[0]*p[2]*p[4]||p[2]*p[4]*p[6])continue}else{if(p[0]*p[2]*p[6]||p[0]*p[4]*p[6])continue}
+        del.push(y*N+x)}
+      if(del.length){ch=true;del.forEach(i=>a[i]=0)}}}
+  return a;
+}
+function dilate(g,r){const N=GZ,o=new Uint8Array(N*N);
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(g[y*N+x])for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){
+    if(dx*dx+dy*dy>r*r)continue;const X=x+dx,Y=y+dy;if(X>=0&&Y>=0&&X<N&&Y<N)o[Y*N+X]=1}
+  return o}
+async function gradeWriting(ch){
+  const n=padStrokes;
+  let f=0;
+  try{
+    if(n>0){
+      try{await document.fonts.load(`100px "LXGW WenKai TC"`,ch)}catch(_){}
+      const ref=document.createElement('canvas');ref.width=cv.width;ref.height=cv.height;
+      const r=ref.getContext('2d');r.fillStyle='#000';r.textAlign='center';r.textBaseline='middle';
+      r.font=`${Math.round(cv.width*0.82)}px "LXGW WenKai TC","BiauKai","DFKai-SB",serif`;r.fillText(ch,cv.width/2,cv.height/2);
+      const U0=toGrid(cv),R0=toGrid(ref);
+      if(U0&&R0){const U=thin(U0),R=thin(R0),dU=dilate(U,3),dR=dilate(R,3);
+        let su=0,sr=0,pu=0,pr=0;for(let i=0;i<U.length;i++){if(U[i]){su++;if(dR[i])pu++}if(R[i]){sr++;if(dU[i])pr++}}
+        const p=su?pu/su:0,q=sr?pr/sr:0;f=p+q?2*p*q/(p+q):0}
+    }
+  }catch(e){f=0}
+  const score=n===0?0:Math.round(100*Math.min(1,Math.max(0,(f-0.55)/(0.88-0.55))));
+  return {n,f,score,good:n>0&&f>=0.80};
+}
+/* ===== 翻牌配對（計時賽／限時賽、連擊加分、星等、最佳紀錄）===== */
+let mm=null,memMode='up',memSize=6;
+const mmt=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
+const memKey=()=>`soc4-best-${memMode}-${memSize}`;
+function memCards(){
+  const seenL=new Set(),seenR=new Set(),out=[];
+  for(const g of shuffle(pool(PAIR)))for(const it of shuffle(g.items)){
+    if(seenL.has(it[0])||seenR.has(it[1])||seenL.has(it[1])||seenR.has(it[0]))continue;
+    seenL.add(it[0]);seenR.add(it[1]);out.push({a:it[0],b:it[1],cat:g.cat});
+  }
+  return shuffle(out);
+}
+function memIntro(){
+  if(mm&&mm.timer){clearInterval(mm.timer);mm.timer=null}
+  const best=load(memKey(),null),avail=memCards().length;
+  const chip=(k,v,label)=>`<button class="chip" data-${k}="${v}" aria-pressed="${({mode:memMode,size:String(memSize)})[k]===String(v)}">${label}</button>`;
+  $('#memArea').innerHTML=`<div class="qcard"><p class="qask">翻開兩張牌，把<b>名詞或地點</b>和它的<b>說明</b>配成一對。連續配對成功有連擊加分！</p>
+   <div class="modes">${chip('mode','up','計時賽：越快越好')}${chip('mode','down','限時賽：倒數讀秒')}</div>
+   <div class="modes">${chip('size',6,'6 對（12 張）')}${chip('size',8,'8 對（16 張）')}</div>
+   <p class="hint">${best?`這一關的最佳紀錄：${memMode==='up'?`${mmt(best.t)}・翻 ${best.mv} 次`:`${best.sc} 分`}`:'這一關還沒有紀錄，來創第一個吧！'}${memMode==='down'?`　限時 ${memSize===6?90:120} 秒`:''}</p>
+   ${avail>=memSize?'<button class="btn primary" id="mGo">發牌開始</button>':`<p class="hint">範圍內的配對不夠 ${memSize} 對，請多選幾課。</p>`}</div>`;
+  document.querySelectorAll('#memArea [data-mode]').forEach(b=>b.onclick=()=>{memMode=b.dataset.mode;memIntro()});
+  document.querySelectorAll('#memArea [data-size]').forEach(b=>b.onclick=()=>{memSize=+b.dataset.size;memIntro()});
+  const g=$('#mGo');if(g)g.onclick=memDeal;
+}
+function memDeal(){
+  if(mm&&mm.timer)clearInterval(mm.timer);
+  const pick=memCards().slice(0,memSize);
+  const cards=shuffle(pick.flatMap((x,i)=>[{id:i,t:'a',x},{id:i,t:'b',x}]));
+  const limit=memMode==='down'?(memSize===6?90:120):0;
+  mm={cards,open:[],done:0,moves:0,n:pick.length,lock:false,score:0,combo:0,maxCombo:0,start:0,el:0,limit,over:false,timer:null,lastTick:-1,msg:''};
+  memRender();
+}
+function memStartClock(){
+  if(mm.start)return;mm.start=Date.now();
+  mm.timer=setInterval(()=>{mm.el=(Date.now()-mm.start)/1000;
+    if(mm.limit){const left=Math.ceil(mm.limit-mm.el);if(left<=10&&left>0&&left!==mm.lastTick){mm.lastTick=left;SFX.tick()}
+      if(mm.el>=mm.limit){mm.el=mm.limit;memEnd(false);return}}
+    memHud()},250);
+}
+function memHud(){
+  const h=$('#mHud');if(!h)return;
+  const left=mm.limit?Math.max(0,mm.limit-mm.el):0,warn=mm.limit&&left<=10;
+  h.innerHTML=`<div class="${warn?'warn':''}">${mm.limit?'剩下':'時間'}<b>${mmt(mm.limit?Math.ceil(left):mm.el)}</b></div><div>翻牌<b>${mm.moves}</b></div><div>配對<b>${mm.done}/${mm.n}</b></div><div>分數<b>${mm.score}</b></div>`;
+  const tb=$('#mBar');if(tb){tb.classList.toggle('warn',!!warn);tb.firstElementChild.style.width=(mm.limit?left/mm.limit*100:mm.done/mm.n*100)+'%'}
+}
+function memFace(c){const t=c.t==='a'?c.x.a:c.x.b;return `<span class="k${t.length>8?' sm':''}">${esc(t)}</span>`}
+function memRender(fx){
+  $('#memArea').innerHTML=`<div class="hud" id="mHud"></div><div class="timebar" id="mBar"><i></i></div>
+   <div class="combo" id="mCombo">${mm.msg}</div>
+   <div class="mem${mm.n===8?' m16':''}">${mm.cards.map((c,i)=>`<button class="mc${c.open?' open':''}${c.done?' done':''}${fx&&fx.idx.includes(i)?' '+fx.cls:''}" data-i="${i}" aria-label="${c.open||c.done?'已翻開':'蓋著的牌'}">${c.open||c.done?memFace(c):''}</button>`).join('')}</div>
+   <div class="center"><button class="btn" id="mNew">重新發牌</button><button class="btn" id="mBack">換關卡</button></div>
+   <div id="mMsg"></div>`;
+  memHud();
+  $('#mNew').onclick=memDeal;$('#mBack').onclick=memIntro;
+  document.querySelectorAll('.mc').forEach(b=>b.onclick=()=>memFlip(+b.dataset.i));
+}
+function memFlip(i){
+  const c=mm.cards[i];if(mm.over||mm.lock||c.open||c.done)return;
+  memStartClock();SFX.flip();
+  c.open=true;mm.open.push(c);
+  if(mm.open.length===2){mm.moves++;const [a,b]=mm.open,ia=mm.cards.indexOf(a),ib=mm.cards.indexOf(b);
+    if(a.id===b.id&&a.t!==b.t){
+      a.done=b.done=true;a.open=b.open=false;mm.done++;mm.open=[];mm.combo++;mm.maxCombo=Math.max(mm.maxCombo,mm.combo);
+      const add=100+(mm.combo-1)*50;mm.score+=add;
+      mm.msg=mm.combo>1?`${mm.combo} 連擊！＋${add}`:`配對成功 ＋${add}`;
+      mm.combo>1?SFX.combo():SFX.match();
+      memRender({idx:[ia,ib],cls:'pop'});
+      if(mm.done===mm.n)memEnd(true);
+    }else{
+      mm.combo=0;mm.msg='';mm.lock=true;memRender({idx:[ia,ib],cls:'shake'});
+      setTimeout(()=>{if(mm.over)return;a.open=b.open=false;mm.open=[];mm.lock=false;memRender()},900);
+    }
+  }else memRender();
+}
+function memEnd(win){
+  mm.over=true;clearInterval(mm.timer);mm.timer=null;
+  if(mm.start)mm.el=Math.min(mm.limit||1e9,(Date.now()-mm.start)/1000);
+  let bonus=0;if(win&&mm.limit)bonus=Math.ceil(mm.limit-mm.el)*10;mm.score+=bonus;
+  memHud();
+  if(!win){SFX.lose();
+    const left=mm.cards.filter(c=>!c.done&&c.t==='a').map(c=>c.x);
+    mm.cards.forEach(c=>{if(!c.done)c.open=true});memRender();
+    $('#mMsg').innerHTML=`<div class="done-box"><div class="score">時間到！</div><p class="qask">配了 ${mm.done} / ${mm.n} 對，得 ${mm.score} 分。還沒配到的：</p>
+      <div class="termlist" style="text-align:left">${left.map(x=>`<div class="termcard"><div class="tt" style="font-size:16px">${esc(x.a)}</div><p class="td">${esc(x.b)}</p></div>`).join('')}</div>
+      <button class="btn primary" id="mAgain">再挑戰一次</button></div>`;
+    $('#mAgain').onclick=memDeal;return;
+  }
+  const stars=mm.moves<=mm.n+2?3:mm.moves<=Math.ceil(mm.n*1.7)?2:1;
+  const key=memKey(),best=load(key,null);let rec=false;
+  if(mm.limit){if(!best||mm.score>best.sc){save(key,{sc:mm.score});rec=true}}
+  else{if(!best||mm.el<best.t){save(key,{t:mm.el,mv:mm.moves});rec=true}}
+  setTimeout(()=>stars===3?celebrate('三顆星過關！'):SFX.win(),250);
+  $('#mMsg').innerHTML=`<div class="done-box"><div class="stars" aria-label="${stars} 顆星">${'★'.repeat(stars)}${'☆'.repeat(3-stars)}</div>
+    <div class="score">${mm.score} 分</div>
+    <p class="qask">用了 ${mmt(mm.el)}、翻 ${mm.moves} 次、最高 ${mm.maxCombo} 連擊${bonus?`，剩餘時間加分 ＋${bonus}`:''}。</p>
+    ${rec?'<p class="qask" style="color:var(--rose-deep)"><b>🏆 新紀錄！</b></p>':''}
+    <div class="center"><button class="btn primary" id="mAgain">再玩一局</button><button class="btn" id="mBack2">換關卡</button></div></div>`;
+  $('#mAgain').onclick=memDeal;$('#mBack2').onclick=memIntro;
+}
+
+/* ===== 模擬考（交卷後才公布答案與分數）===== */
+let ex=null;
+const EXPLAN=[['tf',10,2,'一、是非題'],['mc',15,2,'二、選擇題'],['pair',5,2,'三、配對題'],['sort',5,2,'四、分類題'],['chart',10,3,'五、圖表判讀']];
+function examIntro(){
+  if(ex&&ex.timer){clearInterval(ex.timer);ex.timer=null}
+  const best=load('soc4-exambest',null);
+  $('#examArea').innerHTML=`<div class="qcard"><p class="qask">模擬考要<b>全部作答完、按「交卷」之後</b>才會看到答案和分數，和真的考試一樣。</p>
+    <div class="tblwrap"><table class="tbl"><tr><th>大題</th><th>題數</th><th>每題</th><th>小計</th></tr>
+      ${EXPLAN.map(([k,n,p,t])=>`<tr><td>${t}</td><td class="n">${n}</td><td class="n">${p} 分</td><td class="n">${n*p} 分</td></tr>`).join('')}
+      <tr><th>合計</th><th class="n">${EXPLAN.reduce((a,b)=>a+b[1],0)}</th><th></th><th class="n">${EXPLAN.reduce((a,b)=>a+b[1]*b[2],0)} 分</th></tr></table></div>
+    <p class="hint">${best?`上次最好成績：${best.sc} 分（${best.d}）`:'還沒有考過，加油！'}</p>
+    <p class="hint">題目會從範圍內隨機抽，所以每次考都不一樣。若上方只選了部分課次，題數可能會變少，總分也會跟著調整。</p>
+    <button class="btn primary" id="exGo">開始模擬考</button></div>`;
+  $('#exGo').onclick=examStart;
+}
+function examBuild(){
+  const items=[];
+  const addTF=n=>shuffle(pool(TF)).slice(0,n).forEach(x=>items.push({sec:0,kind:'tf',q:x.q,o:['○ 對','✗ 錯'],a:x.a?0:1,why:x.why,pt:2}));
+  const addMC=n=>shuffle(pool(MC)).slice(0,n).forEach(x=>{const od=shuffle(x.o.map((t,i)=>({t,i})));
+    items.push({sec:1,kind:'mc',q:x.q,o:od.map(o=>o.t),a:od.findIndex(o=>o.i===x.a),why:x.why,pt:2})});
+  const addPair=n=>{
+    const gs=pool(PAIR);if(!gs.length)return;
+    const flat=[];gs.forEach(g=>g.items.forEach(it=>flat.push({l:it[0],r:it[1],cat:g.cat,gi:g._i})));
+    shuffle(flat).slice(0,n).forEach(p=>{
+      const same=PAIR[p.gi].items.map(it=>it[1]).filter(r=>r!==p.r);
+      const other=flat.map(f=>f.r).filter(r=>r!==p.r&&!same.includes(r));
+      const dis=shuffle(same).slice(0,3);while(dis.length<3&&other.length)dis.push(shuffle(other).shift());
+      const od=shuffle([p.r].concat(dis.slice(0,3)));
+      items.push({sec:2,kind:'pair',q:`${p.l}（${p.cat}）`,o:od,a:od.indexOf(p.r),why:`「${p.l}」要配「${p.r}」。`,pt:2})})};
+  const addSort=n=>{
+    const gs=pool(SORT);if(!gs.length)return;
+    const flat=[];gs.forEach(g=>g.items.forEach(it=>flat.push({t:it[0],c:it[1],cats:g.cats,q:g.q})));
+    shuffle(flat).slice(0,n).forEach(f=>items.push({sec:3,kind:'sort',q:`${f.q}　→　「${f.t}」`,o:f.cats.slice(),a:f.c,why:`「${f.t}」屬於「${f.cats[f.c]}」。`,pt:2}))};
+  const addChart=n=>{
+    const cs2=shuffle(pool(CHART));let left=n;
+    for(const c of cs2){
+      if(left<=0)break;
+      const qs=shuffle(c.qs).slice(0,Math.min(5,left));left-=qs.length;
+      qs.forEach((x,j)=>{const od=shuffle(x.o.map((t,i)=>({t,i})));
+        items.push({sec:4,kind:'chart',q:x.q,o:od.map(o=>o.t),a:od.findIndex(o=>o.i===x.a),why:x.why,pt:3,
+          chart:j===0?{svg:c.svg,note:c.note,title:c.title}:null})})}};
+  addTF(10);addMC(15);addPair(5);addSort(5);addChart(10);
+  return items;
+}
+function examStart(){
+  const items=examBuild();
+  if(!items.length){$('#examArea').innerHTML=`<div class="qcard">${emptyMsg}<button class="btn" id="exB">回去</button></div>`;$('#exB').onclick=examIntro;return}
+  ex={items,ans:{},t0:Date.now(),timer:null,over:false};
+  examRender();
+  ex.timer=setInterval(()=>{const e=$('#exClock');if(e)e.textContent=mmt((Date.now()-ex.t0)/1000)},500);
+}
+function examRender(){
+  let html=`<div class="hud"><div>作答時間<b id="exClock">0:00</b></div><div>已答<b id="exDone">0</b></div><div>題數<b>${ex.items.length}</b></div><div>總分<b>${ex.items.reduce((a,b)=>a+b.pt,0)}</b></div></div>`;
+  let sec=-1;
+  ex.items.forEach((it,i)=>{
+    if(it.sec!==sec){sec=it.sec;const p=EXPLAN[sec];html+=`<h3 class="groupHead">${p[3]}（每題 ${p[2]} 分）</h3>`}
+    html+=`<div class="qcard" style="align-items:stretch">
+      ${it.chart?`<div class="chartbox">${it.chart.svg()}</div><p class="srcnote">${esc(it.chart.note)}</p>`:''}
+      <p class="qask left"><b>${i+1}.</b> ${esc(it.q)}</p>
+      <div class="opts" data-q="${i}">${it.o.map((o,k)=>`<button class="opt" data-k="${k}"><span class="o0">${OL[k]}</span><span class="o1">${esc(o)}</span></button>`).join('')}</div></div>`;
+  });
+  html+=`<div class="qcard"><p class="hint" id="exWarn"></p><button class="btn primary" id="exSubmit">交卷，看分數</button>
+    <button class="btn" id="exQuit">放棄這次模擬考</button></div>`;
+  $('#examArea').innerHTML=html;
+  document.querySelectorAll('#examArea .opts').forEach(g=>{
+    const qi=+g.dataset.q;
+    g.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+      ex.ans[qi]=+b.dataset.k;SFX.flip();
+      g.querySelectorAll('.opt').forEach(x=>x.classList.toggle('sel2',x===b));
+      g.querySelectorAll('.opt').forEach(x=>x.style.borderColor=x===b?'var(--rose-deep)':'');
+      $('#exDone').textContent=Object.keys(ex.ans).length;
+    });
+  });
+  $('#exQuit').onclick=()=>{if(ex.timer)clearInterval(ex.timer);examIntro()};
+  $('#exSubmit').onclick=()=>{
+    const un=ex.items.map((_,i)=>i).filter(i=>!(i in ex.ans));
+    if(un.length&&!ex.warned){ex.warned=true;$('#exWarn').innerHTML=`還有 ${un.length} 題沒作答（第 ${un.slice(0,8).map(i=>i+1).join('、')}${un.length>8?'…':''} 題）。要直接交卷就再按一次「交卷」。`;return}
+    examGrade();
+  };
+}
+function examGrade(){
+  if(ex.timer){clearInterval(ex.timer);ex.timer=null}
+  ex.over=true;
+  const el=(Date.now()-ex.t0)/1000;
+  let got=0,total=0;const secS=[0,0,0,0,0],secT=[0,0,0,0,0];
+  ex.items.forEach((it,i)=>{total+=it.pt;secT[it.sec]+=it.pt;
+    if(ex.ans[i]===it.a){got+=it.pt;secS[it.sec]+=it.pt}});
+  const pct=total?Math.round(got/total*100):0;
+  const best=load('soc4-exambest',null),rec=!best||got>best.sc;
+  const d=new Date();const ds=`${d.getMonth()+1}/${d.getDate()}`;
+  if(rec)save('soc4-exambest',{sc:got,d:ds});
+  if(pct===100)celebrate('模擬考滿分！');else if(pct>=80)SFX.win();else SFX.lose();
+  let html=`<div class="done-box"><div class="score">${got} / ${total} 分</div>
+    <p class="qask">用了 ${mmt(el)}，正確率 ${pct}%${rec?'　<b style="color:var(--rose-deep)">新紀錄！</b>':`　最佳 ${best?best.sc:0} 分`}</p>
+    <div class="tblwrap" style="width:100%"><table class="tbl"><tr><th>大題</th><th>得分</th><th>滿分</th></tr>
+      ${EXPLAN.map((p,s)=>secT[s]?`<tr><td>${p[3]}</td><td class="n">${secS[s]}</td><td class="n">${secT[s]}</td></tr>`:'').join('')}</table></div>
+    <div class="center"><button class="btn primary" id="exAgain">再考一次</button><button class="btn" id="exBack">回說明</button></div></div>
+    <h3 class="groupHead">檢討：每一題的答案</h3>`;
+  ex.items.forEach((it,i)=>{
+    const my=ex.ans[i],right=my===it.a;
+    html+=`<div class="qcard" style="align-items:stretch">
+      <p class="qask left"><b>${i+1}.</b> ${esc(it.q)}</p>
+      <div class="opts">${it.o.map((o,k)=>`<div class="opt${k===it.a?' ok':(k===my?' bad':'')}"><span class="o0">${OL[k]}</span><span class="o1">${esc(o)}</span>${k===it.a?'<span class="mark">✓ 正確</span>':(k===my?'<span class="mark">✗ 你選的</span>':'')}</div>`).join('')}</div>
+      <div class="fb ${right?'ok':'bad'}">${right?'✓ 答對':my===undefined?'✗ 沒作答':'✗ 答錯'}　<b>${esc(it.why)}</b></div></div>`;
+  });
+  $('#examArea').innerHTML=html;
+  $('#exAgain').onclick=examStart;$('#exBack').onclick=examIntro;
+  window.scrollTo(0,0);
+}
+
+/* ===== 慶祝角色（全部原創，每次隨機兩位出場）===== */
+const FACE=(y,c='var(--ink)')=>`<circle cx="48" cy="${y}" r="5" fill="${c}"/><circle cx="72" cy="${y}" r="5" fill="${c}"/><circle cx="49.5" cy="${y-1.5}" r="1.6" fill="#fff"/><circle cx="73.5" cy="${y-1.5}" r="1.6" fill="#fff"/>
+ <ellipse cx="40" cy="${y+11}" rx="6" ry="4" fill="var(--c2)" opacity=".75"/><ellipse cx="80" cy="${y+11}" rx="6" ry="4" fill="var(--c2)" opacity=".75"/><path d="M51 ${y+14} Q60 ${y+23} 69 ${y+14}" stroke="${c}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+const CHARS=[
+ {name:'小墨',body:`<path d="M60 18 C30 46 24 70 24 88 a36 36 0 0 0 72 0 C96 70 90 46 60 18Z" fill="#8fb8e8" stroke="var(--ink)" stroke-width="3"/>`+FACE(80)},
+ {name:'小筆',body:`<rect x="36" y="40" width="48" height="82" rx="10" fill="var(--c4)" stroke="var(--ink)" stroke-width="3"/><path d="M36 50 L60 12 L84 50Z" fill="var(--c3)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><path d="M54 22 L60 12 L66 22Z" fill="var(--ink)"/>`+FACE(74)},
+ {name:'飯糰君',body:`<path d="M60 22 C70 22 104 92 98 110 C94 122 26 122 22 110 C16 92 50 22 60 22Z" fill="#fffaf0" stroke="var(--ink)" stroke-width="3"/><rect x="40" y="100" width="40" height="22" rx="4" fill="#2f3b33"/>`+FACE(76)},
+ {name:'星星妹',body:`<path d="M60 14 L74 52 L114 54 L82 78 L94 118 L60 95 L26 118 L38 78 L6 54 L46 52Z" fill="var(--c3)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/>`+FACE(70)},
+ {name:'雲朵朵',body:`<path d="M30 112 C10 112 8 84 26 80 C22 58 46 46 58 58 C66 38 96 42 94 66 C114 66 116 112 92 112Z" fill="#f4f7fb" stroke="var(--ink)" stroke-width="3"/>`+FACE(84)},
+ {name:'小龍寶',body:`<path d="M40 40 L46 26 L54 38 L60 22 L66 38 L74 26 L80 40" fill="var(--c3)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><ellipse cx="60" cy="82" rx="38" ry="44" fill="#9ed49a" stroke="var(--ink)" stroke-width="3"/><ellipse cx="60" cy="98" rx="20" ry="18" fill="#e9f6d8"/>`+FACE(70)},
+ {name:'包子弟',body:`<path d="M20 112 C18 70 40 40 60 40 C80 40 102 70 100 112Z" fill="#fff3e2" stroke="var(--ink)" stroke-width="3"/><path d="M60 40 L54 30 M60 40 L60 28 M60 40 L66 30" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>`+FACE(80)},
+ {name:'貓頭鷹博士',body:`<path d="M30 40 L38 24 L48 38 M90 40 L82 24 L72 38" fill="none" stroke="var(--ink)" stroke-width="3"/><ellipse cx="60" cy="80" rx="38" ry="44" fill="#c8a27a" stroke="var(--ink)" stroke-width="3"/><circle cx="46" cy="70" r="13" fill="#fff" stroke="var(--ink)" stroke-width="2"/><circle cx="74" cy="70" r="13" fill="#fff" stroke="var(--ink)" stroke-width="2"/><circle cx="46" cy="70" r="5" fill="var(--ink)"/><circle cx="74" cy="70" r="5" fill="var(--ink)"/><path d="M55 84 L60 92 L65 84Z" fill="var(--c3)" stroke="var(--ink)" stroke-width="2"/><ellipse cx="60" cy="104" rx="18" ry="12" fill="#ead6bd"/>`},
+ {name:'小地球',body:`<circle cx="60" cy="80" r="42" fill="#8ec8e8" stroke="var(--ink)" stroke-width="3"/><path d="M28 62 q14 8 26 2 t22 6 q8 6 18 2 M30 98 q16 -6 24 2 t20 -2" stroke="#4f9a5f" stroke-width="7" fill="none" stroke-linecap="round"/>`+FACE(74)},
+ {name:'指北針妹',body:`<circle cx="60" cy="80" r="40" fill="#fdf3dc" stroke="var(--ink)" stroke-width="3"/><path d="M60 46 L70 80 L60 114 L50 80Z" fill="var(--c2)" stroke="var(--ink)" stroke-width="2"/><text x="60" y="40" text-anchor="middle" font-size="16" fill="var(--ink)">N</text>`+FACE(72)},
+];
+function dancerSVG(c,cls){
+  const hand=['var(--c2)','var(--c3)','var(--c4)','var(--c1)'][Math.floor(Math.random()*4)];
+  return `<svg class="dancer ${cls}" viewBox="0 0 120 150" aria-hidden="true">
+   <g class="arm al"><path d="M28 80 Q12 64 8 46" stroke="var(--ink)" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="8" cy="44" r="6" fill="${hand}"/></g>
+   <g class="arm ar"><path d="M92 80 Q108 64 112 46" stroke="var(--ink)" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="112" cy="44" r="6" fill="${hand}"/></g>
+   <g class="leg ll"><path d="M48 118 L42 144" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/></g>
+   <g class="leg lr"><path d="M72 118 L78 144" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/></g>
+   ${c.body}</svg>`;
+}
+/* ===== 滿分慶祝：隨機兩位原創角色跳舞＋彩紙 ===== */
+function celebrate(msg){
+  SFX.win();
+  let ov=document.getElementById('party');if(ov)ov.remove();
+  ov=document.createElement('div');ov.id='party';ov.setAttribute('role','dialog');ov.setAttribute('aria-label','滿分慶祝');
+  const conf=Array.from({length:40},(_,i)=>`<i style="left:${Math.random()*100}%;animation-delay:${(Math.random()*1.2).toFixed(2)}s;animation-duration:${(2.2+Math.random()*1.8).toFixed(2)}s;background:var(--c${i%4+1});transform:rotate(${Math.random()*360}deg)"></i>`).join('');
+  const pair=shuffle(CHARS).slice(0,2);
+  ov.innerHTML=`<div class="confetti">${conf}</div>
+   <div class="party-card">
+    <div class="dancers">
+     ${dancerSVG(pair[0],'d1')}
+     <div class="hundred">100</div>
+     ${dancerSVG(pair[1],'d2')}
+    </div>
+    <div class="party-title">${esc(msg||'100 分！')}</div>
+    <p class="party-sub">${pair[0].name}和${pair[1].name}在幫你跳舞慶祝！</p>
+    <button class="btn primary" id="partyClose">好耶，繼續加油</button>
+   </div>`;
+  document.body.appendChild(ov);
+  const close=()=>{ov.classList.add('out');setTimeout(()=>ov.remove(),300)};
+  ov.querySelector('#partyClose').onclick=close;ov.addEventListener('click',e=>{if(e.target===ov)close()});
+  ov.querySelector('#partyClose').focus();
+  setTimeout(()=>{if(document.body.contains(ov))close()},7000);
+}
+
+/* ===== 錯題本 ===== */
+function renderWrong(confirm){
+  const ks=Object.keys(WR).sort((a,b)=>WR[b].n-WR[a].n);
+  $('#wrongArea').innerHTML=ks.length?`<p class="hint">答錯的題目都會記在這裡（只存在這台裝置的瀏覽器裡，換裝置或清掉瀏覽資料就會不見）。上方點「只練錯題」，各關就只出這些題。</p>
+   <div class="tblwrap"><table class="tbl wtbl"><tr><th>關卡</th><th>題目</th><th>錯幾次</th></tr>
+   ${ks.map(k=>`<tr><td>${KINDN[WR[k].kind]||WR[k].kind}</td><td>${esc(WR[k].t||'')}</td><td class="n">${WR[k].n}</td></tr>`).join('')}</table></div>
+   <div class="bar"><button class="btn rose primary" id="goWrong">只練錯題</button><button class="btn" id="clrW">清空錯題本</button></div>
+   ${confirm?`<div class="confirm">確定清空全部錯題紀錄？<button class="btn rose primary" id="clrYes">清空</button><button class="btn" id="clrNo">取消</button></div>`:''}`
+   :`<div class="done-box"><p class="qask">錯題本是空的。</p><p class="hint">在「選擇」「是非」「配對」「分類」「圖表」「寫國字」答錯的題目都會自動記到這裡。模擬考不會記，請看交卷後的檢討。</p></div>`;
+  const g=$('#goWrong');if(g)g.onclick=()=>{st.onlyWrong=true;renderScope();document.querySelector('[data-tab="mc"]').click()};
+  const c=$('#clrW');if(c)c.onclick=()=>renderWrong(true);
+  const y=$('#clrYes');if(y)y.onclick=()=>{WR={};save('soc4-wrong',WR);renderScope();renderWrong()};
+  const n=$('#clrNo');if(n)n.onclick=()=>renderWrong();
+}
+
+renderScope();renderCards();
+</script>
+
+</body>
+</html>
