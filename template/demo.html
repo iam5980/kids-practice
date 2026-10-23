@@ -21,12 +21,18 @@ main{max-width:760px;margin:0 auto;padding:16px}
 
 <div class="card"><h2>1. Voice</h2><div id="tts"></div></div>
 <div class="card"><h2>2. Oral (record → play → reveal)</h2><div id="notice"></div><div id="oral"></div></div>
-<div class="card" id="drill"><h2>3. Multiple choice + Finish &amp; Score</h2><div id="mc"></div></div>
+<div class="card"><h2>3. Word bank — tap a word</h2><div id="wb"></div></div>
+<div class="card"><h2>4. Tiles — build the sentence</h2><div id="tw"></div></div>
+<div class="card"><h2>5. Tiles — spell the word</h2><div id="tl"></div></div>
+<div class="card"><h2>6. Tiles — put the steps in order</h2><div id="ti"></div></div>
+<div class="card"><h2>7. Short answer — say it, then check</h2><div id="oa"></div></div>
+<div class="card" id="drill"><h2>8. Multiple choice game (points, streaks, Finish &amp; Score)</h2><div id="mc"></div></div>
 </main>
 <script src="app-core.js"></script>
 <script>
 AppCore.injectCSS();
 var A = AppCore;
+function log(id) { return function (ok, g) { console.log(id, ok, g); }; }
 
 document.getElementById("tts").appendChild(A.btn("🔊 Hear a sentence", "ac-primary", function () {
   A.speak("Plants need water, sunlight and air to grow.");
@@ -42,6 +48,30 @@ A.oralCard(document.getElementById("oral"), {
   keywords: ["water", "sunlight", "air"], mustKnow: true
 }, {onSelfScore: function (ok) { console.log("self score", ok); }});
 
+A.wordBank(document.getElementById("wb"), {
+  text: "The cat is ___ the box, and the dog is ___ the table.",
+  bank: ["under", "on", "between", "in"], answers: ["in", "under"]
+}, {onResult: log("wordbank")});
+
+A.tiles(document.getElementById("tw"), {
+  answer: "She always eats breakfast at seven.", unit: "word", extra: ["never"],
+  hint: "Put the words in order."
+}, {onResult: log("tiles-word")});
+
+A.tiles(document.getElementById("tl"), {
+  answer: "seventh", unit: "letter", hint: "🔊 Listen and spell.", exp: "7 → seventh"
+}, {onResult: log("tiles-letter")});
+document.getElementById("tl").insertBefore(A.btn("🔊 Hear the word", "ac-ghost", function () { A.speak("seventh"); }), document.getElementById("tl").firstChild);
+
+A.tiles(document.getElementById("ti"), {
+  unit: "item", items: ["seed", "sprout", "young plant", "adult plant"],
+  hint: "How does a plant grow?"
+}, {onResult: log("tiles-item")});
+
+A.openAnswer(document.getElementById("oa"), {
+  a: "Roots take in water and hold the plant in the soil.", keywords: ["water", "soil"]
+}, {onResult: log("open")});
+
 var BANK = [
   {q: "Which part of a plant takes in water?", c: "roots", w: ["leaves", "flowers"]},
   {q: "Which part makes food for the plant?", c: "leaves", w: ["roots", "stem"]},
@@ -54,27 +84,34 @@ var BANK = [
   {q: "Which animal can fly?", c: "a bird", w: ["a fish", "a dog"]}
 ];
 var S;
-function startDrill() {
-  S = {qs: A.shuffle(BANK), i: 0, log: [], deal: A.dealer()};
+function startDrill(list) {
+  S = {qs: A.shuffle(list || BANK), i: 0, log: [], deal: A.dealer(), game: A.game("demo-mc")};
   showQ();
 }
 function showQ() {
   var box = document.getElementById("mc"); box.innerHTML = "";
-  box.appendChild(A.drillBar({title: "Question " + (S.i + 1) + " / " + S.qs.length, onFinish: showResult}));
+  box.appendChild(A.drillBar({title: "Question " + (S.i + 1) + " / " + S.qs.length, onFinish: showResult, game: S.game}));
   var item = S.qs[S.i]; if (!item) return showResult();
   var r = S.deal.place(item.c, item.w);
   box.appendChild(A.el("p", null, "<b>" + A.esc(item.q) + "</b>"));
+  var fb = A.el("div");
   r.choices.forEach(function (txt, k) {
     box.appendChild(A.btn("ABCD"[k] + ") " + A.esc(txt), "ac-ghost opt", function () {
+      if (S.answered) return; S.answered = true;
       var ok = k === r.answer;
-      S.log.push({q: item.q, given: txt, correct: "ABCD"[r.answer] + ") " + item.c, ok: ok});
-      S.i++; S.i < S.qs.length ? showQ() : showResult();
+      S.game.record(ok);
+      S.log.push({q: item.q, given: txt, correct: "ABCD"[r.answer] + ") " + item.c, ok: ok, item: item});
+      fb.innerHTML = ok ? "<div class='ac-fb ok'>✓ " + A.praise() + "</div>" : "<div class='ac-fb bad'>✗ The answer is:<div class='ac-ans'>" + A.esc(item.c) + "</div></div>";
+      fb.appendChild(A.btn("Next ▶", "ac-primary", function () { S.answered = false; S.i++; S.i < S.qs.length ? showQ() : showResult(); }));
     }));
   });
+  box.appendChild(fb);
 }
 function showResult() {
   var box = document.getElementById("mc"); box.innerHTML = "";
-  box.appendChild(A.resultView(S.log, {onAgain: startDrill}));
+  var wrong = S.log.filter(function (x) { return !x.ok; }).map(function (x) { return x.item; });
+  box.appendChild(A.resultView(S.log, {game: S.game, onAgain: function () { startDrill(); },
+    onRetryWrong: function () { startDrill(wrong); }}));
 }
 startDrill();
 </script>

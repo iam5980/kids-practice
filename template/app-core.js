@@ -1,7 +1,7 @@
 /* =====================================================================
    app-core.js — shared core for the kids' exam-practice apps
    Canonical copy: github.com/iam5980/kids-practice/template/app-core.js
-   Version: 2026-10-23
+   Version: 2026-10-23b (tap-to-answer widgets + game layer)
 
    HOW TO USE (for the Reading / Science / Grammar skills)
    - Paste this whole file INSIDE the app's single <script> block, before
@@ -26,6 +26,20 @@
      recorder(opts)            iOS-safe recording + playback
      oralCard(el, q, opts)     record-first, reveal-later oral flow
      WEBVIEW_NOTICE            "open in Safari/Chrome" notice HTML
+
+   TAP-TO-ANSWER (iPad/phone friendly — avoid the keyboard)
+     wordBank(el, spec, o)     tap a word-bank chip → it fills the blank
+     tiles(el, spec, o)        tap word / letter / step tiles to build the
+                               answer (unscramble, spelling, ordering)
+     openAnswer(el, spec, o)   say it / write on paper → Show Answer →
+                               self-check (short answers, sentences)
+     Each draws its own ✔ Check button and calls o.onResult(ok, given).
+
+   GAME LAYER
+     game(key)                 points, 🔥 streaks, cheers, confetti,
+                               best score per drill on this device
+     drillBar({game}) shows the HUD; resultView(log, {game, onRetryWrong})
+     shows points, best streak, new-best badge and "Practise my mistakes".
    ===================================================================== */
 var AppCore = (function () {
   "use strict";
@@ -197,6 +211,7 @@ var AppCore = (function () {
     var bar = el("div", "ac-bar");
     if (o.onBack) bar.appendChild(btn("⬅ Back", "ac-ghost", o.onBack));
     bar.appendChild(el("span", "ac-bar-title", esc(o.title || "")));
+    if (o.game) bar.appendChild(o.game.hud());
     bar.appendChild(btn("🏁 Finish &amp; Score", "ac-finish", function () {
       stopSpeech(); if (o.onFinish) o.onFinish();
     }));
@@ -205,6 +220,8 @@ var AppCore = (function () {
 
   /* ---------- result screen ----------
      resultView(log, {onAgain: restartSameDrill, onHome: goHome}) -> element */
+  var CHEERS = {5: "Perfect! You are a star! 🌟", 4: "Great work — almost perfect! 🎉", 3: "Good job! Keep practising 👍",
+                2: "Nice try! Practise your mistakes and try again 💪", 1: "Every try makes you stronger. Let's practise again! 🌱"};
   function resultView(log, o) {
     o = o || {};
     var r = result(log), box = el("div", "ac-result");
@@ -214,6 +231,14 @@ var AppCore = (function () {
       box.appendChild(el("div", "ac-stars", new Array(r.stars + 1).join("⭐")));
       box.appendChild(el("h2", null, "Answered " + r.answered + " question" + (r.answered > 1 ? "s" : "") +
         " — " + r.correct + " correct (" + r.pct + "%)"));
+      box.appendChild(el("p", "ac-cheerline", CHEERS[r.stars]));
+      if (o.game) {
+        var g = o.game.summary();
+        box.appendChild(el("div", "ac-gamebox",
+          "<span>⭐ <b>" + g.points + "</b> points</span><span>🔥 Best streak <b>" + g.bestStreak + "</b></span>" +
+          "<span>" + (g.newBest ? "🏆 <b>New best score!</b>" : "🏅 Best <b>" + g.best + "</b>") + "</span>"));
+      }
+      if (r.pct === 100 && r.answered >= 3) setTimeout(function () { confetti(80); }, 200);
       if (r.wrong.length) {
         var ul = el("div", "ac-review");
         ul.appendChild(el("h3", null, "Review these"));
@@ -228,7 +253,8 @@ var AppCore = (function () {
         box.appendChild(el("p", null, "Perfect — no mistakes! 🎉"));
       }
     }
-    var row = el("div", "ac-row");
+    var row = el("div", "ac-row ac-center");
+    if (o.onRetryWrong && r.wrong.length) row.appendChild(btn("🎯 Practise my " + r.wrong.length + " mistake" + (r.wrong.length > 1 ? "s" : ""), "ac-finish", o.onRetryWrong));
     if (o.onAgain) row.appendChild(btn("🔄 Try Again", "ac-primary", o.onAgain));
     if (o.onHome) row.appendChild(btn("🏠 Home", "ac-ghost", o.onHome));
     box.appendChild(row);
@@ -406,6 +432,293 @@ var AppCore = (function () {
     return { destroy: function () { R.reset(); stopSpeech(); } };
   }
 
+  /* ---------- answer normalising (for Check) ---------- */
+  function norm(s) {
+    return String(s == null ? "" : s).toLowerCase()
+      .replace(/[’‘`]/g, "'").replace(/[“”]/g, '"')
+      .replace(/[.,!?;:"]/g, " ").replace(/\s+/g, " ").trim();
+  }
+  function matches(given, answers) {
+    var list = Array.isArray(answers) ? answers : [answers];
+    for (var i = 0; i < list.length; i++) if (norm(given) === norm(list[i])) return true;
+    return false;
+  }
+
+  /* ---------- TAP-TO-ANSWER widgets (no keyboard needed on iPad/phone) ----
+     All three share the same contract:
+       AppCore.xxx(container, spec, {onResult: function(ok, given){...}})
+     They draw their own ✔ Check button (Enter also checks when typing),
+     lock after checking, and show green ✓ or the yellow correct-answer box.
+     Every widget has a small "⌨ Type instead" link for older kids.        */
+
+  function checkRow(onCheck) {
+    var row = el("div", "ac-row");
+    var b = btn("✔ Check", "ac-primary ac-check", onCheck);
+    b.disabled = true;
+    row.appendChild(b);
+    return { row: row, btn: b };
+  }
+  function feedback(box, ok, correctText, exp) {
+    var f = el("div", "ac-fb " + (ok ? "ok" : "bad"),
+      ok ? "✓ " + praise() :
+      "✗ Not quite. The answer is:<div class='ac-ans'>" + esc(correctText) + "</div>" +
+      (exp ? "<div class='ac-exp'>" + esc(exp) + "</div>" : ""));
+    box.appendChild(f);
+    return f;
+  }
+  function typeToggle(box, onType) {
+    var t = el("button", "ac-link", "⌨ Type instead");
+    t.type = "button";
+    t.addEventListener("click", function () { t.remove(); onType(); });
+    box.appendChild(t);
+  }
+  function typedInput(box, answers, done, exp, shown) {
+    var inp = el("input", "ac-input"); inp.setAttribute("autocapitalize", "off");
+    inp.setAttribute("autocomplete", "off"); inp.setAttribute("spellcheck", "false");
+    box.appendChild(inp);
+    var c = checkRow(function () { go(); });
+    box.appendChild(c.row);
+    inp.addEventListener("input", function () { c.btn.disabled = !inp.value.trim(); });
+    inp.addEventListener("keydown", function (e) { if (e.key === "Enter" && inp.value.trim()) go(); });
+    var used = false;
+    function go() {
+      if (used) return; used = true; inp.disabled = true; c.row.remove();
+      var ok = matches(inp.value, answers);
+      feedback(box, ok, shown, exp);
+      done(ok, inp.value);
+    }
+    inp.focus();
+  }
+
+  /* 1) Word bank → tap a word to fill the blank(s)
+     AppCore.wordBank(el, {
+        text: "The cat is ___ the box.",      // "___" marks each blank
+        bank: ["in", "on", "under"],          // chips shown under the sentence
+        answers: ["under"],                   // one per blank (string or array of accepted)
+        exp: "optional explanation"
+     }, {onResult})
+     Tap a chip → it goes into the first empty blank. Tap a filled blank → it
+     goes back. Words can be re-used if the bank has duplicates.            */
+  function wordBank(container, spec, o) {
+    o = o || {};
+    container.innerHTML = "";
+    var box = el("div", "ac-q"), parts = String(spec.text).split("___");
+    var n = parts.length - 1, filled = [], used = false;
+    for (var z = 0; z < n; z++) filled.push(null);
+    var line = el("div", "ac-sentence"), chips = el("div", "ac-chips");
+    var pool = spec.bank.map(function (w, i) { return { w: w, id: i, out: false }; });
+    var c = checkRow(check);
+    function render() {
+      line.innerHTML = "";
+      parts.forEach(function (p, i) {
+        line.appendChild(document.createTextNode(p));
+        if (i < n) {
+          var slot = el("button", "ac-slot" + (filled[i] ? " ac-filled" : ""), filled[i] ? esc(filled[i].w) : "&nbsp;");
+          slot.type = "button";
+          slot.addEventListener("click", function () {
+            if (used || !filled[i]) return;
+            filled[i].out = false; filled[i] = null; render();
+          });
+          line.appendChild(slot);
+        }
+      });
+      chips.innerHTML = "";
+      pool.forEach(function (it) {
+        var ch = el("button", "ac-chip" + (it.out ? " ac-used" : ""), esc(it.w));
+        ch.type = "button"; ch.disabled = used || it.out;
+        ch.addEventListener("click", function () {
+          var k = filled.indexOf(null);
+          if (k < 0) return;
+          filled[k] = it; it.out = true; render();
+        });
+        chips.appendChild(ch);
+      });
+      c.btn.disabled = used || filled.filter(Boolean).length < n;
+    }
+    function check() {
+      if (used) return; used = true; c.row.remove(); render();
+      var given = filled.map(function (f) { return f ? f.w : ""; });
+      var ok = given.every(function (g, i) { return matches(g, spec.answers[i]); });
+      var full = parts.map(function (p, i) {
+        var a = spec.answers[i]; return p + (i < n ? (Array.isArray(a) ? a[0] : a) : "");
+      }).join("");
+      feedback(box, ok, full, spec.exp);
+      if (o.onResult) o.onResult(ok, given.join(" / "));
+    }
+    box.appendChild(line); box.appendChild(chips); box.appendChild(c.row);
+    container.appendChild(box);
+    render();
+  }
+
+  /* 2) Build from tiles → unscramble a sentence, spell a word, order steps
+     AppCore.tiles(el, {
+        answer: "She always eats breakfast at seven.",   // or ["acceptable", ...]
+        unit: "word" | "letter" | "item",   // word: split on spaces, letter: per letter
+        items: [...],        // only for unit "item": the pieces in the CORRECT order
+        extra: ["never"],    // optional distractor tiles
+        hint: "optional instruction shown above",
+        exp: "optional explanation"
+     }, {onResult})
+     Tap a tile → it moves to the answer line; tap it there → it moves back.
+     Spelling (unit "letter") also offers "⌨ Type instead".                  */
+  function tiles(container, spec, o) {
+    o = o || {};
+    container.innerHTML = "";
+    var box = el("div", "ac-q"), unit = spec.unit || "word";
+    var first = Array.isArray(spec.answer) ? spec.answer[0] : spec.answer;
+    var pieces = unit === "item" ? spec.items.slice()
+      : unit === "letter" ? String(first).replace(/\s+/g, "").split("")
+      : String(first).replace(/[.!?]$/, "").split(/\s+/);
+    var tail = unit === "word" ? (String(first).match(/[.!?]$/) || [""])[0] : "";
+    var all = pieces.concat(spec.extra || []).map(function (t, i) { return { t: t, id: i }; });
+    var src;
+    do { src = shuffle(all); } while (all.length > 1 && src.map(function (x) { return x.t; }).join("|") === pieces.join("|"));
+    var ans = [], used = false;
+    if (spec.hint) box.appendChild(el("div", "ac-hint", esc(spec.hint)));
+    var line = el("div", "ac-tiles ac-answer-line"), pool = el("div", "ac-tiles");
+    var c = checkRow(check);
+    function joinUp(arr) {
+      var s = arr.map(function (x) { return x.t; });
+      return unit === "letter" ? s.join("") : unit === "item" ? s.join(" → ") : s.join(" ") + tail;
+    }
+    function render() {
+      line.innerHTML = ""; pool.innerHTML = "";
+      if (!ans.length) line.appendChild(el("span", "ac-placeholder", "Tap the tiles below in order"));
+      ans.forEach(function (x, i) {
+        var b = btn(esc(x.t), "ac-tile ac-in", function () { if (used) return; src.push(ans.splice(i, 1)[0]); render(); });
+        line.appendChild(b);
+      });
+      src.forEach(function (x, i) {
+        var b = btn(esc(x.t), "ac-tile", function () { if (used) return; ans.push(src.splice(i, 1)[0]); render(); });
+        pool.appendChild(b);
+      });
+      c.btn.disabled = used || !ans.length;
+    }
+    function check() {
+      if (used) return; used = true; c.row.remove(); render();
+      var given = joinUp(ans);
+      var target = unit === "item" ? [pieces.join(" → ")] : (Array.isArray(spec.answer) ? spec.answer : [spec.answer]);
+      var ok = unit === "letter" ? matches(given, target.map(function (a) { return String(a).replace(/\s+/g, ""); }))
+                                 : matches(given, target);
+      feedback(box, ok, unit === "item" ? pieces.join(" → ") : first, spec.exp);
+      if (o.onResult) o.onResult(ok, given);
+    }
+    box.appendChild(line); box.appendChild(pool); box.appendChild(c.row);
+    if (unit === "letter") typeToggle(box, function () {
+      line.remove(); pool.remove(); c.row.remove();
+      typedInput(box, spec.answer, function (ok, g) { used = true; if (o.onResult) o.onResult(ok, g); }, spec.exp, first);
+    });
+    container.appendChild(box);
+    render();
+  }
+
+  /* 3) Open answer (short answer, "write a sentence", "name 3 things") →
+     say it or write it on paper, then reveal and self-check. No keyboard.
+     AppCore.openAnswer(el, {a: "model answer", keywords: ["..."], exp}, {onResult})
+     Students can still choose "⌨ Type instead"; typed answers are checked
+     against `accept` (array) if given, otherwise they self-check too.       */
+  function openAnswer(container, spec, o) {
+    o = o || {};
+    container.innerHTML = "";
+    var box = el("div", "ac-q"), done = false;
+    box.appendChild(el("div", "ac-hint", "💭 Say your answer out loud (or write it on paper), then tap Show Answer."));
+    var row = el("div", "ac-row");
+    var show = btn("👁 Show Answer", "ac-primary", reveal);
+    row.appendChild(show); box.appendChild(row);
+    function reveal() {
+      row.remove(); if (tt) tt.remove();
+      var m = el("div", "ac-model", "<b>Model answer</b><div>" + esc(spec.a) + "</div>" +
+        (spec.keywords && spec.keywords.length ? "<div class='ac-kw'>Key words: " + spec.keywords.map(esc).join(" · ") + "</div>" : ""));
+      m.appendChild(btn("🔊 Hear it", "ac-ghost", function () { speak(spec.a); }));
+      box.appendChild(m);
+      var self = el("div", "ac-row");
+      self.appendChild(btn("✓ I got it", "ac-ok", function () { fin(true); }));
+      self.appendChild(btn("✗ Not yet", "ac-ghost", function () { fin(false); }));
+      box.appendChild(self);
+      function fin(ok) {
+        if (done) return; done = true;
+        self.innerHTML = "<div class='ac-fb " + (ok ? "ok" : "bad") + "'>" + (ok ? "✓ " + praise() : "Keep going — you will get it next time! 💪") + "</div>";
+        if (o.onResult) o.onResult(ok, ok ? "Got it" : "Not yet");
+      }
+    }
+    var tt = el("button", "ac-link", "⌨ Type instead"); tt.type = "button";
+    tt.addEventListener("click", function () {
+      tt.remove(); row.remove(); tt = null;
+      if (spec.accept && spec.accept.length) {
+        typedInput(box, spec.accept, function (ok, g) { done = true; if (o.onResult) o.onResult(ok, g); }, spec.exp, spec.a);
+      } else {
+        var inp = el("textarea", "ac-input"); box.appendChild(inp);
+        var r2 = el("div", "ac-row"); r2.appendChild(btn("👁 Show Answer", "ac-primary", function () { r2.remove(); inp.disabled = true; reveal(); }));
+        box.appendChild(r2);
+      }
+    });
+    box.appendChild(tt);
+    container.appendChild(box);
+  }
+
+  /* ---------- GAME LAYER: points, streaks, praise, confetti, best score ----
+     var G = AppCore.game("audrey-reading-1151-vocab");   // one per drill, key = unique
+     G.hud()                -> element: ⭐ points · 🔥 streak  (put it in the drill bar area)
+     G.record(ok)           -> call after EVERY judged answer (any mode)
+     G.summary()            -> {points, bestStreak, best, newBest}
+     resultView(log, {game: G, onRetryWrong: fn, ...}) shows it all.
+     Scoring: correct +10, streak bonus +2 per answer in a row (max +10).
+     Streak milestones (3, 5, 10, …) pop a cheer; 5+ and 100% fire confetti.
+     The best score per drill is kept on this device (localStorage, safe).  */
+  var PRAISE = ["Great job!", "Awesome!", "You got it!", "Super!", "Well done!", "Nice work!", "Brilliant!", "Fantastic!", "Way to go!", "Excellent!"];
+  function praise() { return PRAISE[Math.floor(Math.random() * PRAISE.length)]; }
+  function cheer(text) {
+    var t = el("div", "ac-cheer", esc(text));
+    document.body.appendChild(t);
+    setTimeout(function () { t.classList.add("ac-out"); }, 1100);
+    setTimeout(function () { t.remove(); }, 1600);
+  }
+  function confetti(n) {
+    var colors = ["#f59e0b", "#0284c7", "#16a34a", "#dc2626", "#a855f7", "#ec4899"];
+    var layer = el("div", "ac-confetti");
+    for (var i = 0; i < (n || 60); i++) {
+      var p = el("i");
+      p.style.left = Math.random() * 100 + "vw";
+      p.style.background = colors[i % colors.length];
+      p.style.animationDelay = (Math.random() * 0.4) + "s";
+      p.style.animationDuration = (1.2 + Math.random() * 1.2) + "s";
+      p.style.transform = "rotate(" + Math.floor(Math.random() * 360) + "deg)";
+      layer.appendChild(p);
+    }
+    document.body.appendChild(layer);
+    setTimeout(function () { layer.remove(); }, 3000);
+  }
+  function game(key) {
+    var pts = 0, streak = 0, bestStreak = 0, hudEl = null, best = 0, newBest = false;
+    try { best = parseInt(localStorage.getItem("ac-best-" + key) || "0", 10) || 0; } catch (e) { best = 0; }
+    function draw() {
+      if (hudEl) hudEl.innerHTML = "⭐ " + pts + (streak >= 2 ? " &nbsp; 🔥 " + streak + " in a row" : "");
+    }
+    return {
+      hud: function () { hudEl = el("span", "ac-hud"); draw(); return hudEl; },
+      record: function (ok) {
+        if (ok) {
+          streak++; bestStreak = Math.max(bestStreak, streak);
+          pts += 10 + Math.min(10, (streak - 1) * 2);
+          if (streak === 3) cheer("🔥 3 in a row!");
+          else if (streak === 5) { cheer("🚀 5 in a row! Amazing!"); confetti(40); }
+          else if (streak > 5 && streak % 5 === 0) { cheer("🏆 " + streak + " in a row! Unstoppable!"); confetti(60); }
+        } else {
+          if (streak >= 3) cheer("Good try! Start a new streak 💪");
+          streak = 0;
+        }
+        draw();
+      },
+      summary: function () {
+        if (pts > best) {
+          newBest = best > 0 || pts > 0; best = pts;
+          try { localStorage.setItem("ac-best-" + key, String(pts)); } catch (e) {}
+        }
+        return { points: pts, bestStreak: bestStreak, best: best, newBest: newBest };
+      }
+    };
+  }
+
   /* ---------- styles (call once) ---------- */
   var CSS =
     ".ac-btn{font:inherit;font-size:1.05rem;min-height:50px;padding:10px 16px;border-radius:12px;border:2px solid transparent;cursor:pointer;margin:4px 6px 4px 0;touch-action:manipulation}" +
@@ -428,7 +741,31 @@ var AppCore = (function () {
     ".ac-status{min-height:1.4em;margin:6px 0;opacity:.85}" +
     ".ac-model{background:rgba(22,163,74,.12);border:2px solid #16a34a;border-radius:12px;padding:12px;margin:10px 0}" +
     ".ac-kw{margin-top:6px;opacity:.85}" +
-    ".ac-fb{padding:10px 14px;border-radius:10px;font-weight:700}.ac-fb.ok{background:rgba(22,163,74,.15);color:#15803d}.ac-fb.bad{background:rgba(245,158,11,.18)}";
+    ".ac-fb{padding:10px 14px;border-radius:10px;font-weight:700;margin-top:8px}.ac-fb.ok{background:rgba(22,163,74,.15);color:#15803d}.ac-fb.bad{background:rgba(245,158,11,.18)}" +
+    ".ac-ans{font-size:1.25rem;margin-top:4px}.ac-exp{font-weight:400;margin-top:4px;opacity:.85}" +
+    ".ac-q{margin:6px 0}.ac-hint{opacity:.8;margin-bottom:8px}" +
+    ".ac-sentence{font-size:1.2rem;line-height:2.4;margin-bottom:10px}" +
+    ".ac-slot{font:inherit;min-width:90px;min-height:44px;margin:0 4px;padding:4px 12px;border:none;border-bottom:3px solid #0284c7;border-radius:6px;background:rgba(2,132,199,.08);color:inherit;cursor:pointer}" +
+    ".ac-slot.ac-filled{background:#0284c7;color:#fff;border-bottom-color:#075985}" +
+    ".ac-chips,.ac-tiles{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}" +
+    ".ac-chip,.ac-tile{font:inherit;font-size:1.1rem;min-height:48px;min-width:48px;padding:8px 14px;border-radius:12px;border:2px solid #0284c7;background:transparent;color:inherit;cursor:pointer;touch-action:manipulation}" +
+    ".ac-chip.ac-used{opacity:.3}.ac-tile.ac-in{background:#0284c7;color:#fff}" +
+    ".ac-answer-line{min-height:62px;padding:6px;border:2px dashed rgba(127,127,127,.5);border-radius:12px;align-items:center}" +
+    ".ac-placeholder{opacity:.55;padding:0 6px}" +
+    ".ac-input{font:inherit;font-size:1.15rem;width:100%;max-width:520px;min-height:50px;padding:8px 12px;border-radius:10px;border:2px solid rgba(127,127,127,.5);background:transparent;color:inherit;display:block;margin:8px 0}" +
+    "textarea.ac-input{min-height:90px}" +
+    ".ac-link{font:inherit;font-size:.9rem;background:none;border:none;color:#0284c7;text-decoration:underline;cursor:pointer;padding:6px 0;margin-top:4px}" +
+    ".ac-hud{font-weight:700;white-space:nowrap}" +
+    ".ac-cheer{position:fixed;left:50%;top:22%;transform:translate(-50%,0) scale(1);z-index:9999;background:#f59e0b;color:#1f2937;font-weight:800;font-size:1.4rem;padding:14px 24px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:ac-pop .35s ease-out;transition:opacity .5s,transform .5s;pointer-events:none}" +
+    ".ac-cheer.ac-out{opacity:0;transform:translate(-50%,-30px)}" +
+    "@keyframes ac-pop{from{transform:translate(-50%,0) scale(.4)}to{transform:translate(-50%,0) scale(1)}}" +
+    ".ac-confetti{position:fixed;inset:0;pointer-events:none;z-index:9998;overflow:hidden}" +
+    ".ac-confetti i{position:absolute;top:-12px;width:10px;height:14px;border-radius:2px;animation:ac-fall linear forwards}" +
+    "@keyframes ac-fall{to{top:105vh;transform:rotate(720deg)}}" +
+    ".ac-cheerline{font-size:1.15rem;font-weight:700}" +
+    ".ac-gamebox{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin:10px 0;padding:10px;border-radius:12px;background:rgba(245,158,11,.14)}" +
+    ".ac-center{justify-content:center}" +
+    "@media (prefers-reduced-motion:reduce){.ac-confetti{display:none}.ac-cheer{animation:none}}";
   function injectCSS() {
     if (document.getElementById("ac-css")) return;
     var s = document.createElement("style"); s.id = "ac-css"; s.textContent = CSS;
@@ -436,12 +773,15 @@ var AppCore = (function () {
   }
 
   return {
-    VERSION: "2026-10-23",
+    VERSION: "2026-10-23b",
     esc: esc, el: el, btn: btn, shuffle: shuffle,
     speak: speak, stopSpeech: stopSpeech, getBestVoice: getBestVoice,
     dealer: dealer, stars: stars, result: result,
     drillBar: drillBar, resultView: resultView,
     recorder: recorder, oralCard: oralCard, pickMime: pickMime,
+    norm: norm, matches: matches,
+    wordBank: wordBank, tiles: tiles, openAnswer: openAnswer,
+    game: game, praise: praise, cheer: cheer, confetti: confetti,
     WEBVIEW_NOTICE: WEBVIEW_NOTICE, injectCSS: injectCSS
   };
 })();
