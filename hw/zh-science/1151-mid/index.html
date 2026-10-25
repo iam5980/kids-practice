@@ -1,0 +1,1519 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>六上自然複習練功房</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* 自然科：水藍綠的溪流色＋珊瑚色重點；單欄、手機優先 */
+:root{
+  --paper:#f5fafa; --card:#ffffff; --ink:#152a2b; --muted:#54706f;
+  --sage:#bfe0e2; --sage-deep:#1f6f73; --rose:#f7bfa8; --rose-deep:#c0562f;
+  --line:#cfe2e3; --ok:#1f7a52; --bad:#b3362f; --okbg:#e0f3ea; --badbg:#fbe7e5;
+  --kai:"LXGW WenKai TC","BiauKai","DFKai-SB","標楷體",serif;
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f1818; --card:#172122; --ink:#e4efef; --muted:#9bb4b3;
+  --sage:#234445; --sage-deep:#8ed2d6; --rose:#5a3326; --rose-deep:#f3a884;
+  --line:#2a3b3c; --ok:#7fd2a8; --bad:#ff958c; --okbg:#1a3329; --badbg:#3a1f1d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f1818; --card:#172122; --ink:#e4efef; --muted:#9bb4b3;
+  --sage:#234445; --sage-deep:#8ed2d6; --rose:#5a3326; --rose-deep:#f3a884;
+  --line:#2a3b3c; --ok:#7fd2a8; --bad:#ff958c; --okbg:#1a3329; --badbg:#3a1f1d; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 40px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+header h1{font-family:var(--kai);font-size:clamp(26px,7vw,36px);margin:0;line-height:1.2;text-wrap:balance}
+header p{margin:2px 0 0;color:var(--muted);font-size:14px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--rose-deep);outline-offset:2px}
+.hdr{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+.hdr>div{min-width:0}
+.hdr #sfxBtn{flex:none;margin-top:6px}
+.scope{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:4px 12px;font-size:14px}
+.chip[aria-pressed="true"]{background:var(--sage-deep);border-color:var(--sage-deep);color:var(--paper);font-weight:700}
+.chip.wrongchip[aria-pressed="true"]{background:var(--rose-deep);border-color:var(--rose-deep)}
+.count{font-size:13px;color:var(--muted);margin-left:auto}
+nav.tabs{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;background:var(--sage);padding:4px;border-radius:12px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+nav.tabs button{border:0;background:transparent;border-radius:9px;padding:8px 0;font-size:clamp(12px,3.4vw,15px);font-weight:500;white-space:nowrap}
+@media (max-width:620px){nav.tabs{grid-template-columns:repeat(4,1fr)}}
+nav.tabs button[aria-selected="true"]{background:var(--card);font-weight:700;color:var(--sage-deep);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+section{display:flex;flex-direction:column;gap:12px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{border:1.5px solid var(--sage-deep);background:var(--card);color:var(--sage-deep);border-radius:10px;padding:8px 16px;font-weight:700}
+.btn.primary{background:var(--sage-deep);color:var(--paper)}
+.btn.rose{border-color:var(--rose-deep);color:var(--rose-deep)}
+.btn.rose.primary{background:var(--rose-deep);color:var(--paper)}
+.btn:disabled{opacity:.45;cursor:default}
+.hint{color:var(--muted);font-size:14px;margin:0}
+select{font:inherit;padding:6px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--card);color:var(--ink)}
+.kai{font-family:var(--kai)}
+.modes{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.cover{background:var(--sage);border-radius:6px;color:transparent;user-select:none;cursor:pointer;padding:0 6px}
+.cover::after{content:"點我看";color:var(--sage-deep);font-size:13px}
+.cover *{visibility:hidden}
+
+/* 計時計分 */
+.hud{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:8px}
+.hud div{text-align:center;font-size:12px;color:var(--muted)}
+.hud b{display:block;font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums}
+.hud .warn b{color:var(--bad)}
+.timebar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.timebar i{display:block;height:100%;background:var(--sage-deep);transition:width .25s linear}
+.timebar.warn i{background:var(--bad)}
+.combo{text-align:center;font-family:var(--kai);font-size:22px;color:var(--rose-deep);min-height:1.4em}
+.stars{font-size:34px;letter-spacing:4px;color:var(--rose-deep)}
+.rhud{width:100%;display:flex;flex-direction:column;gap:4px}
+.rrow{display:flex;flex-wrap:wrap;gap:4px 14px;justify-content:center;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.rrow b{color:var(--ink);font-size:17px}.rrow .cdw b{color:var(--bad)}
+.plus{text-align:center;font-size:14px;font-weight:700;color:var(--rose-deep);min-height:1.3em}
+.rsum{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%}
+.rsum div{background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:6px 2px;text-align:center;font-size:12px;color:var(--muted)}
+.rsum b{display:block;font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums}
+
+/* 題目卡 */
+.qcard{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.qask{font-size:17px;margin:0;text-align:center}
+.qbig{font-size:19px;line-height:1.7;text-align:left;width:100%}
+.qtag{font-size:12px;color:var(--muted);align-self:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:1px 10px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.opts.one{grid-template-columns:1fr}
+.opt{border:2px solid var(--line);background:var(--paper);border-radius:12px;padding:10px 12px;display:flex;align-items:flex-start;gap:8px;min-height:52px;text-align:left;font-size:16px;line-height:1.5}
+.opt .no{flex:none;font-size:18px;color:var(--sage-deep);font-weight:700}
+.opt.tf{justify-content:center;align-items:center;font-size:28px;font-family:var(--kai);min-height:72px}
+.opt.ok{border-color:var(--ok);background:var(--okbg)}
+.opt.bad{border-color:var(--bad);background:var(--badbg)}
+.opt .mark{font-size:13px;font-weight:700;margin-left:auto;flex:none}
+.opt.ok .mark{color:var(--ok)}.opt.bad .mark{color:var(--bad)}
+.fb{border-radius:10px;padding:8px 12px;width:100%;font-size:15px;text-align:left}
+.fb.ok{background:var(--okbg);color:var(--ok)}.fb.bad{background:var(--badbg);color:var(--bad)}
+.fb b{color:var(--ink)}
+.fb .src{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+.prog{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.center{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+
+/* 概念卡 */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px}
+.cmini{width:100%;border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:8px 4px;font-family:var(--kai);font-size:17px;line-height:1.3}
+.cmini.sel{border-color:var(--rose-deep);box-shadow:0 0 0 2px var(--rose-deep)}
+.cdetail{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.cdetail .term{font-family:var(--kai);font-size:clamp(30px,8vw,42px);line-height:1.2}
+.cdetail .dsc{font-size:17px;line-height:1.8}
+.groupHead{font-family:var(--kai);font-size:18px;margin:6px 0 -2px;color:var(--sage-deep)}
+
+/* 翻牌 */
+.mem{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mc{aspect-ratio:1;border-radius:12px;border:2px solid var(--sage-deep);background:var(--sage);display:grid;place-items:center;font-size:0;padding:6px;transition:transform .2s;overflow:hidden}
+.mc.open,.mc.done{background:var(--card);font-size:14px}
+.mc.done{border-color:var(--ok);opacity:.65}
+.mc .term{font-family:var(--kai);font-size:clamp(17px,4.6vw,22px);font-weight:700;line-height:1.25}
+.mc .dsc{font-size:clamp(11px,2.9vw,13px);line-height:1.35;color:var(--ink)}
+.mc:not(.open):not(.done)::after{content:"?";font-size:28px;font-family:var(--kai);color:var(--sage-deep)}
+.mc.pop{animation:pop .35s ease}
+.mc.shake{animation:shake .35s ease}
+@keyframes pop{50%{transform:scale(1.08)}}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@media (prefers-reduced-motion:reduce){.mc{transition:none}.mc.pop,.mc.shake{animation:none}}
+
+/* 實驗步驟排序 */
+.steps{display:flex;flex-direction:column;gap:8px;width:100%}
+.step{border:2px solid var(--line);background:var(--paper);border-radius:10px;padding:10px 12px;text-align:left;font-size:15px;line-height:1.5;display:flex;gap:8px;align-items:flex-start;width:100%}
+.step .no{flex:none;width:24px;height:24px;border-radius:50%;background:var(--sage);color:var(--sage-deep);font-size:13px;font-weight:700;display:grid;place-items:center}
+.step.ok{border-color:var(--ok);background:var(--okbg)}
+.step.ok .no{background:var(--ok);color:var(--paper)}
+.step.bad{animation:shake .35s ease;border-color:var(--bad)}
+@media (prefers-reduced-motion:reduce){.step.bad{animation:none}}
+
+/* 結果、錯題 */
+.done-box{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:16px;text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center}
+.score{font-family:var(--kai);font-size:44px;line-height:1;color:var(--sage-deep);font-variant-numeric:tabular-nums}
+.wlist{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.wz{font-family:var(--kai);font-size:20px;border:1.5px solid var(--rose-deep);border-radius:8px;padding:2px 8px;color:var(--rose-deep)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+.tbl{overflow-x:auto;background:var(--card);border:1.5px solid var(--line);border-radius:12px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+th{font-size:13px;color:var(--muted);font-weight:500;white-space:nowrap}
+td.q{white-space:normal;min-width:220px}
+td.n{font-variant-numeric:tabular-nums;text-align:center;white-space:nowrap}
+.confirm{background:var(--badbg);border-radius:10px;padding:10px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* 慶祝 */
+#party{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:color-mix(in srgb,var(--paper) 70%,transparent);padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
+  --c1:#bfe3c6;--c2:#f2a7c0;--c3:#ffd36e;--c4:#a9cdf2;animation:fadein .25s ease}
+#party.out{opacity:0;transition:opacity .3s}
+@keyframes fadein{from{opacity:0}}
+.party-card{position:relative;z-index:2;background:var(--card);border:2px solid var(--sage-deep);border-radius:20px;padding:18px 16px;text-align:center;max-width:380px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.dancers{display:flex;align-items:flex-end;justify-content:center;gap:4px}
+.dancer{width:110px;height:auto}
+.hundred{font-family:var(--kai);font-size:44px;font-weight:700;color:var(--rose-deep);align-self:center;animation:pulse .6s ease-in-out infinite alternate}
+.d1{animation:bounce .5s ease-in-out infinite alternate;transform-origin:50% 100%}
+.d2{animation:bounce .5s ease-in-out .25s infinite alternate;transform-origin:50% 100%}
+.arm{transform-box:fill-box}
+.d1 .al,.d2 .al{transform-origin:100% 100%;animation:wave .5s ease-in-out infinite alternate}
+.d1 .ar,.d2 .ar{transform-origin:0 100%;animation:wave2 .5s ease-in-out infinite alternate}
+.leg{transform-box:fill-box;transform-origin:50% 0}
+.ll{animation:kick .5s ease-in-out infinite alternate}.lr{animation:kick .5s ease-in-out .25s infinite alternate}
+@keyframes bounce{from{transform:translateY(0) rotate(-6deg)}to{transform:translateY(-14px) rotate(6deg)}}
+@keyframes wave{from{transform:rotate(18deg)}to{transform:rotate(-22deg)}}
+@keyframes wave2{from{transform:rotate(-18deg)}to{transform:rotate(22deg)}}
+@keyframes kick{from{transform:rotate(-12deg)}to{transform:rotate(12deg)}}
+@keyframes pulse{from{transform:scale(1)}to{transform:scale(1.15)}}
+.party-title{font-family:var(--kai);font-size:30px;font-weight:700;margin-top:6px}
+.party-sub{color:var(--muted);margin:4px 0 12px}
+.confetti{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.confetti i{position:absolute;top:-20px;width:10px;height:14px;border-radius:2px;animation:fall linear infinite}
+@keyframes fall{to{top:105%;transform:rotate(540deg)}}
+@media (prefers-reduced-motion:reduce){.d1,.d2,.arm,.leg,.hundred,.confetti i{animation:none!important}.confetti{display:none}}
+[hidden]{display:none!important}
+img{max-width:100%}
+
+/* 圖表判讀：手繪 SVG 與資料表（固定淺色，深色模式也看得清楚）*/
+.fig{width:100%;display:flex;justify-content:center;margin:2px 0}
+.fig svg{display:block;border:1px solid #c9d6d8;border-radius:10px}
+.dtab{border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;font-size:15px}
+.dtab th,.dtab td{border:1px solid #c9d6d8;padding:6px 12px;text-align:center;color:#152a2b}
+.dtab th{background:#dceef0;font-weight:700}
+.ctx{width:100%;background:var(--paper);border:1.5px solid var(--line);border-left:5px solid var(--sage-deep);
+  border-radius:10px;padding:10px 12px;font-size:15px;line-height:1.8;text-align:left;font-family:var(--kai)}
+/* 模擬考 */
+.esec{width:100%;max-width:760px;margin:16px auto 0;font-family:var(--kai);font-size:20px;color:var(--sage-deep);
+  border-bottom:2px solid var(--line);padding-bottom:4px}
+.ecard{margin-top:10px}
+.ehud{position:sticky;top:0;z-index:5;background:var(--card);border:1.5px solid var(--line);border-radius:999px;
+  padding:6px 14px;font-size:14px;text-align:center;font-variant-numeric:tabular-nums;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.epts{font-size:12px;color:var(--rose-deep);border:1px solid var(--rose);border-radius:999px;padding:1px 8px;margin-left:6px}
+.opt[aria-pressed="true"]{border-color:var(--sage-deep);background:var(--sage);font-weight:700}
+.ewarn{color:var(--bad);font-size:15px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hdr">
+    <div><h1>六上自然複習練功房</h1>
+    <p>期中考・單元一 探索天氣的變化＋單元二 水溶液：選擇是非、概念卡、翻牌、實驗步驟與變因、分類、因果、圖表判讀、素養題，還有一份 100 分模擬考</p></div>
+    <button class="chip" id="sfxBtn" aria-pressed="true">音效：開</button>
+  </header>
+
+  <div class="scope" id="scope" aria-label="練習範圍"></div>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="quiz" aria-selected="true">練習題</button>
+    <button role="tab" data-tab="cards" aria-selected="false">概念卡</button>
+    <button role="tab" data-tab="mem" aria-selected="false">翻牌</button>
+    <button role="tab" data-tab="exp" aria-selected="false">實驗</button>
+    <button role="tab" data-tab="sort" aria-selected="false">分類</button>
+    <button role="tab" data-tab="pair" aria-selected="false">配對</button>
+    <button role="tab" data-tab="chart" aria-selected="false">圖表</button>
+    <button role="tab" data-tab="lit" aria-selected="false">素養</button>
+    <button role="tab" data-tab="exam" aria-selected="false">模擬考</button>
+    <button role="tab" data-tab="wrong" aria-selected="false">錯題</button>
+  </nav>
+
+  <section id="tab-quiz"><div id="quizArea"></div></section>
+  <section id="tab-cards" hidden>
+    <div class="bar"><button class="btn" id="selfTest" aria-pressed="false">考自己：遮住說明</button></div>
+    <div class="cdetail" id="cDetail"></div>
+    <div id="cardGrid"></div>
+    <p class="hint">概念卡的說明都來自課本重點整理。點「考自己」可以把說明遮起來，先自己想一遍再看答案。</p>
+  </section>
+  <section id="tab-mem" hidden><div id="memArea"></div></section>
+  <section id="tab-exp" hidden><div id="expArea"></div></section>
+  <section id="tab-sort" hidden><div id="sortArea"></div></section>
+  <section id="tab-pair" hidden><div id="pairArea"></div></section>
+  <section id="tab-chart" hidden><div id="chartArea"></div></section>
+  <section id="tab-lit" hidden><div id="litArea"></div></section>
+  <section id="tab-exam" hidden><div id="examArea"></div></section>
+  <section id="tab-wrong" hidden><div id="wrongArea"></div></section>
+</div>
+
+<script>
+/* ===== 題庫資料：答案全部來自教用版印刷答案（重點整理、隨堂練習、月考A/B卷、期中考A/B卷、素養學習單）===== */
+/* ===== 題庫資料：答案全部來自教用版印刷答案 ===== */
+/* 題庫 A：單元一 探索天氣的變化
+   g: 1-1 天氣變化的主角 / 1-2 預測天氣變化 / 1-3 氣候正在改變嗎
+   t: tf（是非，a:0=○對 1=╳錯）/ mc（選擇，a 為正解索引）
+   s: 出處 */
+const QB1=[
+/* ── 重點整理 活動一（教用）是非 ── */
+{g:'1-1',t:'tf',q:'爬山的時候，有時在步道周圍會看見白茫茫的一片，且沾到衣服上會溼溼的，這是霧。',a:0,s:'重點整理1-1',e:'霧是水蒸氣在地面附近凝結成的小水滴。'},
+{g:'1-1',t:'tf',q:'露和霜都是水蒸氣變成的，雖然形成時的環境氣溫不同，但形態都是液態。',a:1,s:'重點整理1-1',e:'露是液態的小水滴，霜是固態的冰晶。'},
+{g:'1-1',t:'tf',q:'雲中的小水滴或冰晶聚集變大後會往下掉落，如果在掉落的過程中融化，就是下雪。',a:1,s:'重點整理1-1',e:'掉落過程中融化成水是下雨；沒有融化才是下雪。'},
+{g:'1-1',t:'tf',q:'地球上的海洋面積大，能夠吸收大部分的太陽輻射並儲存大量熱能，對地球氣溫的調節有很大的作用。',a:0,s:'重點整理1-1',e:'海面溫度變化比陸地小，所以海洋可以調節氣溫。'},
+/* ── 重點整理 活動一（教用）選擇 ── */
+{g:'1-1',t:'mc',q:'小妍和家人到山上露營，隔天清晨他發現樹葉上面有許多小水珠，請問這些小水珠可能是什麼？',o:['雪','霜','霧','露'],a:3,s:'重點整理1-1',e:'氣溫夠低時，水蒸氣附著在較冷的物體表面凝結成小水滴，就是露。'},
+{g:'1-1',t:'mc',q:'下列哪一項是雨和雪主要的差異？',o:['形成時的顏色','形成時的大小','掉落到地面時的形態','形成時的位置'],a:2,s:'重點整理1-1',e:'雨和雪的形成原因與位置相同，差別在掉到地面時是液態還是固態。'},
+{g:'1-1',t:'mc',q:'下列關於水循環的敘述，哪一項是不正確的？',o:['水不會滲入到地底下，所以地下水不屬於水循環的一環','植物會蒸散水分到空氣中變成水蒸氣','霜和雪都是水的三態中的固態','雲是由小水滴或冰晶組成的'],a:0,s:'重點整理1-1',e:'地下水也是水循環的一部分。'},
+/* ── 重點整理 活動二（教用）是非 ── */
+{g:'1-2',t:'tf',q:'衛星雲圖上被白色所涵蓋的地區，表示該地區天氣晴朗。',a:1,s:'重點整理1-2',e:'偏白代表有雲層分布，有機會下雨。'},
+{g:'1-2',t:'tf',q:'臺灣夏季時主要受到太平洋暖氣團的影響，天氣溫暖、潮溼。',a:0,s:'重點整理1-2',e:'太平洋暖氣團來自低緯度的海洋，又溼又熱，夏季影響臺灣。'},
+{g:'1-2',t:'tf',q:'地面天氣圖上的高氣壓中心，表示該區域的氣壓數值由中心往外越來越高。',a:1,s:'重點整理1-2',e:'越接近高氣壓中心，氣壓越高。'},
+/* ── 重點整理 活動二（教用）選擇 ── */
+{g:'1-2',t:'mc',q:'下列關於滯留鋒的敘述，哪一項是正確的？',o:['冷氣團推擠暖氣團，使暖氣團後退所形成的鋒面','常會帶來晴朗的好天氣','是臺灣梅雨季節的主因','通常在每年秋、冬兩季，徘徊在臺灣上空'],a:2,s:'重點整理1-2',e:'每年5、6月滯留鋒徘徊臺灣上空，形成梅雨季。'},
+{g:'1-2',t:'mc',q:'下列哪一項是衛星雲圖上颱風的特徵？',o:['是螺旋狀雲團','等壓線分布相當密集','以「L」標示颱風的中心','是一條細長的雲帶'],a:0,s:'重點整理1-2',e:'等壓線和 L 是地面天氣圖上的資訊。'},
+{g:'1-2',t:'mc',q:'如果想知道颱風生成之後的行進路線變化，應該參考下列哪一項資料？',o:['地面天氣圖','颱風行進路線圖','累積雨量分布圖','衛星雲圖'],a:1,s:'重點整理1-2',e:'颱風行進路線圖可以看出颱風中心的位置、移動方向和強度變化。'},
+/* ── 重點整理 活動三（教用）是非 ── */
+{g:'1-3',t:'tf',q:'臺灣從南到北有很多座水庫，如果很長時間沒有下雨也不用擔心。',a:1,s:'重點整理1-3',e:'久旱不雨會造成水資源不足，要珍惜水資源。'},
+{g:'1-3',t:'tf',q:'電視新聞常報導北極海冰逐漸融化的消息，這是地球暖化造成的影響。',a:0,s:'重點整理1-3',e:'全球暖化使氣溫上升，南北極的海冰和高山冰河都在融化。'},
+{g:'1-3',t:'tf',q:'近年來，世界各地的氣溫上升，與大氣層內的溫室氣體增加有關。',a:0,s:'重點整理1-3',e:'溫室氣體增加會加強溫室效應，使全球平均氣溫上升。'},
+/* ── 重點整理 活動三（教用）選擇 ── */
+{g:'1-3',t:'mc',q:'下列哪一種氣體不屬於溫室氣體？',o:['氧氣','水蒸氣','二氧化碳','甲烷'],a:0,s:'重點整理1-3',e:'溫室氣體是大氣中能吸收熱能的氣體，氧氣不是。'},
+{g:'1-3',t:'mc',q:'下列哪一個行為對於減少碳足跡較沒有幫助？',o:['購買當地生產的蔬果','多吃牛肉','出門多搭乘大眾運輸工具前往目的地','購物時自備購物袋'],a:1,s:'重點整理1-3',e:'牛、羊等家畜會排放甲烷。'},
+{g:'1-3',t:'mc',q:'下列哪一項不是珍惜水資源的作法？',o:['避免浪費食物','洗手抹肥皂時，水龍頭一直開著','收集雨水來沖洗地板','洗澡時用淋浴的方式，並且盡快洗好'],a:1,s:'重點整理1-3',e:'抹肥皂時應該先把水龍頭關起來，水一直流會白白浪費。'},
+/* ── 隨堂練習單 第1回（1-1，教用）是非 ── */
+{g:'1-1',t:'tf',q:'霧、雲、雨、雪、露、霜等天氣現象中，只有霧是液態的水。',a:1,s:'隨堂1',e:'雲中的小水滴、雨、露也都是液態的水。'},
+{g:'1-1',t:'tf',q:'地面上的水蒸發到天空，遇冷後會形成小水滴或冰晶，飄在空中就是我們看到的雲。',a:0,s:'隨堂1',e:'水蒸氣上升遇冷凝結成小水滴或冰晶，聚集在空中就是雲。'},
+{g:'1-1',t:'tf',q:'「模擬雲和霧的形成」實驗中，在錐形瓶內加熱水的目的是為了能夠快速產生水蒸氣。',a:0,s:'隨堂1',e:'熱水蒸發得快，瓶內很快充滿水蒸氣，才看得到雲霧生成。'},
+{g:'1-1',t:'tf',q:'露和霜都是靠近地面的水蒸氣遇冷所形成的，只是形成的溫度不同。',a:0,s:'隨堂1',e:'霜形成時氣溫接近或低於 0℃。'},
+{g:'1-1',t:'tf',q:'由於海水溫度的變化比陸地大，因此海洋無法調節氣溫的變化。',a:1,s:'隨堂1',e:'海面溫度變化比陸地小，所以能調節氣溫。'},
+/* ── 隨堂練習單 第1回（1-1，教用）選擇 ── */
+{g:'1-1',t:'mc',q:'大氣中的水會因為下列哪一項因素的影響，而形成我們生活中看到各種不同的天氣現象？',o:['溼度','溫度','亮度','角度'],a:1,s:'隨堂1',e:'水會因為溫度不同而以氣態、液態、固態變化。'},
+{g:'1-1',t:'mc',q:'下列有關雲和霧的敘述，哪一項是正確的呢？',o:['都是氣態的水蒸氣','都會飄浮在高空中','都會飄浮在地面附近','都是水蒸氣遇冷後形成的'],a:3,s:'隨堂1',e:'雲飄在空中、霧在地面附近，但形成原因類似。'},
+{g:'1-1',t:'mc',q:'在鋼杯中加入水、冰塊和食鹽，經過一段時間之後，會發現杯壁外側出現一些白色的固態物質，這種物質最接近下列哪一種天氣現象？',o:['霧','雨','露','霜'],a:3,s:'隨堂1',e:'杯壁溫度低於 0℃，水蒸氣直接變成冰晶，類似霜。'},
+{g:'1-1',t:'mc',q:'下列有關雨的敘述，哪一項是不正確的？',o:['是液態的小水滴','雲中的冰晶融化後落到地面而形成','落到地面後就不會回到空氣中','落到地面後，可能會匯集成河流'],a:2,s:'隨堂1',e:'落到地面的水會再蒸發回到空氣中，形成水循環。'},
+{g:'1-1',t:'mc',q:'下列有關水循環的敘述，哪一位同學的說法是正確的呢？',o:['小恩：海水會蒸發成固態的冰晶','小翔：海水無法影響其他地區的天氣變化','小萱：水可能會滲入地底下，變成地下水','小妍：水蒸發後就消失在地球上，水循環就中止了'],a:2,s:'隨堂1',e:'水循環中，水會滲入地底成為地下水，再慢慢流回河川和海洋，不會消失。'},
+/* ── 隨堂練習單 第2回（1-2，教用）是非 ── */
+{g:'1-2',t:'tf',q:'在夏、秋兩季，常有颱風生成侵襲臺灣。',a:0,s:'隨堂2',e:'颱風生成於高溫的熱帶海洋，臺灣的颱風季主要在夏、秋兩季。'},
+{g:'1-2',t:'tf',q:'每年五、六月左右，勢均力敵的冷、暖氣團會在臺灣上空形成滯留鋒，此時天氣狀態通常是晴朗無雲。',a:1,s:'隨堂2',e:'滯留鋒出現時常是陰雨連綿的梅雨天氣。'},
+{g:'1-2',t:'tf',q:'高氣壓中心的氣壓會比周圍還要低。',a:1,s:'隨堂2',e:'高氣壓中心的氣壓比周圍高。'},
+{g:'1-2',t:'tf',q:'颱風通常發展於熱帶海洋上，在衛星雲圖上看起來是螺旋狀的濃密雲團。',a:0,s:'隨堂2',e:'颱風在衛星雲圖上是螺旋狀的濃密雲團，中心可能有颱風眼。'},
+{g:'1-2',t:'tf',q:'由衛星雲圖可以知道特定時間和區域，高空中的雲層分布情形，並推測該地的天氣現象。',a:0,s:'隨堂2',e:'衛星雲圖呈現某個時間、某個區域高空的雲層分布，可用來推測天氣。'},
+/* ── 隨堂練習單 第2回（1-2，教用）選擇 ── */
+{g:'1-2',t:'mc',q:'小廷發現戶外教學的目的地在衛星雲圖中被一大片厚重的白色區塊籠罩，此時當地的天氣狀態最可能是下列哪一種？',o:['晴空萬里','風和日麗','豔陽高照','陰雨連綿'],a:3,s:'隨堂2',e:'白色代表雲層密布，有機會降雨。'},
+{g:'1-2',t:'mc',q:'下列關於颱風的敘述，哪一個是正確的？',o:['只會固定從臺灣東部海岸登陸','只有冬天才會形成颱風','通常都在陸地上形成','在地面天氣圖上是等壓線相當密集的低氣壓'],a:3,s:'隨堂2',e:'颱風生成於熱帶海洋，最常在夏、秋兩季侵襲臺灣。'},
+{g:'1-2',t:'mc',q:'小翔正在研究臺灣冬季的天氣資料，下列他蒐集到的資料哪一項是正確的？',o:['天氣高溫潮溼','會有滯留鋒徘徊，帶來梅雨','受到大陸冷氣團影響，氣溫會降低','時常受到颱風侵襲，帶來狂風暴雨'],a:2,s:'隨堂2',e:'臺灣冬季主要受大陸冷氣團影響，氣溫降低；梅雨在春末夏初，颱風在夏、秋季。'},
+{g:'1-2',t:'mc',q:'當冷氣團勢力較弱，會被暖氣團推擠後退而形成鋒面，請問這道鋒面應該是下列哪一種？',o:['冷鋒','暖鋒','滯留鋒','颱風'],a:1,s:'隨堂2',e:'暖氣團勢力較強往冷氣團推擠，形成暖鋒。'},
+{g:'1-2',t:'mc',q:'下列天氣現象中，哪一種最有可能發展成颱風？',o:['熱帶性低氣壓','暖鋒','冷鋒','熱帶性高氣壓'],a:0,s:'隨堂2',e:'颱風由熱帶性低氣壓發展而來。'},
+/* ── 隨堂練習單 第3回（1-3，教用）是非 ── */
+{g:'1-3',t:'tf',q:'天氣是短時間內大氣的變化，而氣候是長時間天氣現象的平均狀態和趨勢。',a:0,s:'隨堂3',e:'天氣是短時間內的大氣變化，氣候是長時間的平均狀態和趨勢。'},
+{g:'1-3',t:'tf',q:'燃燒化石燃料會產生二氧化碳，使溫室效應加劇。',a:0,s:'隨堂3',e:'煤、石油、天然氣都是化石燃料。'},
+{g:'1-3',t:'tf',q:'二氧化碳和氮氣都是造成全球氣候暖化的溫室氣體。',a:1,s:'隨堂3',e:'氮氣不是溫室氣體。'},
+{g:'1-3',t:'tf',q:'就算天氣變化的現象過於極端，例如降雨量與過去相比過多或過少，對我們的生活也不會有影響。',a:1,s:'隨堂3',e:'過於極端的天氣變化可能造成災害。'},
+{g:'1-3',t:'tf',q:'產品的生產、運送和銷售等過程，都會排放溫室氣體，這些過程中所產生的溫室氣體排放量總和，就稱為碳足跡。',a:0,s:'隨堂3',e:'碳足跡是產品從生產、運送到廢棄，整個過程排放的溫室氣體總量。'},
+/* ── 隨堂練習單 第3回（1-3，教用）選擇 ── */
+{g:'1-3',t:'mc',q:'下列有關水足跡的敘述，哪一項是不正確的？',o:['一盤青菜從種植、採收、銷售、烹調等所有過程總共消耗多少水，就是這盤青菜的水足跡','清洗碗盤時將水龍頭開很大，可以減少水足跡','使用雨撲滿，可以減少水足跡','避免浪費食物，可以減少水足跡'],a:1,s:'隨堂3',e:'水龍頭開很大會增加水足跡。'},
+{g:'1-3',t:'mc',q:'下列哪一個行為能減少碳足跡？',o:['多吃肉少吃蔬果','經常購買進口的昂貴水果','多使用一次性餐具','出門盡量搭乘大眾運輸工具'],a:3,s:'隨堂3',e:'搭乘大眾運輸，平均每個人排放的二氧化碳比自己開車少很多。'},
+{g:'1-3',t:'mc',q:'衡量直接與間接水資源用量的，稱為下列哪一項？',o:['水足跡','碳足跡','水價值','回收水'],a:0,s:'隨堂3',e:'水足跡用來衡量直接和間接使用的水資源量。'},
+{g:'1-3',t:'mc',q:'下列天氣現象中，哪一個最有可能是氣候變遷造成的災害？',o:['夏季時氣溫連續二十天超過 40℃','夏季時颱風侵襲臺灣','梅雨季時陰雨連綿','冬季時寒流來襲'],a:0,s:'隨堂3',e:'過於極端的現象才是氣候變遷的徵兆。'},
+/* ── 第一次月考 A 卷（教用）是非 ── */
+{g:'1-2',t:'tf',q:'冷鋒是因為冷氣團被勢力較強的暖氣團推擠而形成的。',a:1,s:'月考A',e:'冷鋒是冷氣團勢力較強，推擠暖氣團後退而形成。'},
+{g:'1-2',t:'tf',q:'氣團中空氣的溼度和溫度很接近。',a:0,s:'月考A',e:'氣團是性質相近的大範圍空氣。'},
+{g:'1-2',t:'tf',q:'觀察天氣資料會發現，冷鋒通過或停留的地區，氣溫會升高。',a:1,s:'月考A',e:'冷鋒通過時氣溫會降低。'},
+{g:'1-1',t:'tf',q:'水是造成天氣變化的主要因素，不同形態的水會產生不同天氣現象。',a:0,s:'月考A',e:'水在空中和地表不斷循環，變成雲、霧、雨、雪、露、霜等各種天氣現象。'},
+{g:'1-2',t:'tf',q:'每年五、六月徘徊在臺灣上空的鋒面稱為冷鋒。',a:1,s:'月考A',e:'那是滯留鋒，形成梅雨季。'},
+{g:'1-3',t:'tf',q:'大氣層中的溫室氣體增加，使全球平均氣溫升高，造成氣候變遷。',a:0,s:'月考A',e:'溫室氣體增加使地表留住更多熱量，全球平均氣溫上升，造成氣候變遷。'},
+/* ── 第一次月考 A 卷（教用）選擇 ── */
+{g:'1-2',t:'mc',q:'下列關於颱風的敘述，哪一項是不正確的？',o:['通常在熱帶海面上形成','在衛星雲圖上是螺旋狀的濃密雲團','是等壓線分布相當密集的高氣壓','中心可能有颱風眼'],a:2,s:'月考A',e:'颱風是等壓線密集的低氣壓。'},
+{g:'1-2',t:'mc',q:'等壓線是把氣壓值相同的點連結起來所形成的封閉曲線，它的單位是什麼？',o:['公斤','強帕','百帕','毫米'],a:2,s:'月考A',e:'氣壓的單位是百帕。'},
+{g:'1-3',t:'mc',q:'下列關於氣候變遷的敘述，哪一項是不正確的？',o:['和空氣中的二氧化碳含量增加有關','可能使冰河融化','會使全球平均氣溫急速降低','會導致極端天氣現象發生'],a:2,s:'月考A',e:'氣候變遷使全球平均氣溫升高。'},
+{g:'1-1',t:'mc',q:'下列關於雲的敘述，哪一項是正確的呢？',o:['是由小水滴或冰晶組成','是由水蒸氣遇熱形成','是由氣態的水蒸氣組成','會漂浮在地面附近'],a:0,s:'月考A',e:'水蒸氣遇冷凝結或凝華才形成雲。'},
+{g:'1-2',t:'mc',q:'下列關於鋒面的敘述，哪一項是正確的？',o:['是由性質相近的空氣組成','鋒面通過時，常會讓天氣產生變化','鋒面只要形成就會使氣溫升高','大陸冷氣團南下時會產生暖鋒'],a:1,s:'月考A',e:'鋒面是冷、暖兩種不同性質氣團的交界面，通過時天氣常有明顯變化。'},
+{g:'1-2',t:'mc',q:'下列天氣現象中，哪一項最容易在冬季時通過臺灣上空呢？',o:['颱風','冷鋒','暖鋒','滯留鋒'],a:1,s:'月考A',e:'冬季臺灣受大陸冷氣團影響。'},
+/* ── 第一次月考 B 卷（教用）是非 ── */
+{g:'1-1',t:'tf',q:'地表的水蒸發成水蒸氣後，就會在空中直接聚集形成雲。',a:1,s:'月考B',e:'水蒸氣要上升、溫度降低後凝結成小水滴或冰晶才形成雲。'},
+{g:'1-2',t:'tf',q:'鋒面通過或停留的地區，通常雲層分布較多，容易下雨，氣溫、風力或氣壓等也可能會產生變化。',a:0,s:'月考B',e:'鋒面附近空氣被抬升，容易成雲致雨，氣溫、風力、氣壓也會跟著改變。'},
+{g:'1-2',t:'tf',q:'地面天氣圖上有許多一圈一圈的封閉曲線，每一圈封閉曲線就代表同一數值的氣壓。',a:0,s:'月考B',e:'那就是等壓線。'},
+{g:'1-1',t:'tf',q:'水是造成地球上天氣變化的主要因素，它在空氣中和地表不斷循環，使地球上產生了各種不同形態的天氣現象。',a:0,s:'月考B',e:'水的三態變化造成了地球上各式各樣的天氣現象。'},
+{g:'1-2',t:'tf',q:'如果冷氣團的勢力較強，迫使暖氣團後退，就會形成暖鋒。',a:1,s:'月考B',e:'那是冷鋒。'},
+{g:'1-1',t:'tf',q:'「模擬露和霜的形成」的實驗中，加入冰塊的鋼杯放置在桌上一段時間後，鋼杯外壁會附著小水滴，這些小水滴就是霜。',a:1,s:'月考B',e:'小水滴是露；霜是白色固體，要加冰塊和食鹽讓溫度低於 0℃。'},
+{g:'1-1',t:'tf',q:'當飄浮在空中的冰晶越來越重而往下掉落，若在此過程中沒有融化成水，落至地面時就是雪。',a:0,s:'月考B',e:'冰晶往下掉落的過程中沒有融化成水，落到地面就是雪。'},
+/* ── 第一次月考 B 卷（教用）選擇 ── */
+{g:'1-2',t:'mc',q:'關於颱風，下列哪一項敘述是錯的？',o:['是等壓線相當密集的低氣壓','衛星雲圖上是魚鱗狀的稀疏雲團','通常生成於熱帶海洋上','颱風眼經過的區域通常無風、無雨'],a:1,s:'月考B',e:'颱風在衛星雲圖上是螺旋狀的濃密雲團。'},
+{g:'1-1',t:'mc',q:'在春季晴朗的清晨，可以在植物葉片上發現有小水滴附著在上面，這些小水滴稱為什麼？',o:['雨','霜','露','雪'],a:2,s:'月考B',e:'氣溫在 0 ℃ 以上時，水蒸氣遇冷凝結成小水滴附著在物體上，就是露。'},
+{g:'1-3',t:'mc',q:'有關氣候變遷，下列哪一項敘述是錯的？',o:['與空氣中的氧氣濃度有關','全球平均氣溫逐年增加','起因是大氣中的溫室氣體含量增加','造成世界各地出現許多極端天氣現象'],a:0,s:'月考B',e:'氧氣不是溫室氣體。'},
+{g:'1-2',t:'mc',q:'當滯留鋒徘徊臺灣上空，導致天氣不穩且經常下雨，即為「梅雨季」，梅雨季通常會在每年的什麼時候發生呢？',o:['二、三月','三、四月','五、六月','七、八月'],a:2,s:'月考B',e:'臺灣的梅雨季大約在每年 5 月到 6 月。'},
+{g:'1-2',t:'mc',q:'從衛星雲圖中可以獲得下列哪一項資訊？',o:['氣壓高低','降雨量','風力和風向','雲層分布情形'],a:3,s:'月考B',e:'氣壓高低要看地面天氣圖。'},
+{g:'1-2',t:'mc',q:'下列符號中，哪一個是代表高氣壓中心？',o:['L','H','M','W'],a:1,s:'月考B',e:'H 是高氣壓中心，L 是低氣壓中心。'},
+{g:'1-3',t:'mc',q:'可用來衡量直接或間接的水資源使用量的，稱為什麼？',o:['雨撲滿','碳足跡','水痕跡','水足跡'],a:3,s:'月考B',e:'水足跡衡量的是直接加上間接的水資源使用量。'},
+/* ── 隨堂練習單 第15回（1-1～2-1，教用）── */
+{g:'1-1',t:'tf',q:'清晨氣溫較低，在地面附近的水蒸氣遇冷後，可能會附著在物體表面形成露。',a:0,s:'隨堂15',e:'露是水蒸氣在 0 ℃ 以上遇冷凝結成的小水滴。'},
+{g:'1-2',t:'tf',q:'颱風的中心稱為颱風眼，颱風眼經過的地區通常風最強、雨勢最大。',a:1,s:'隨堂15',e:'颱風眼經過的區域通常無風、無雨。'},
+{g:'1-2',t:'tf',q:'當冷氣團和暖氣團交會時，暖氣團的勢力較強，迫使冷氣團後退，此時會形成冷鋒。',a:1,s:'隨堂15',e:'那是暖鋒。'},
+{g:'1-1',t:'mc',q:'下列關於霜的敘述，哪一項是正確的？',o:['形成時的溫度高於 10℃','是氣態的水蒸氣','會在高空形成','是固態的冰晶'],a:3,s:'隨堂15',e:'霜在氣溫接近或低於 0℃ 時，於地面附近的物體表面形成。'},
+{g:'1-2',t:'mc',q:'下列哪一種天氣現象可能會發展成颱風？',o:['寒帶性高氣壓','熱帶性低氣壓','暖鋒','冷鋒'],a:1,s:'隨堂15',e:'颱風是由熱帶海洋上的熱帶性低氣壓發展增強而成。'},
+{g:'1-3',t:'mc',q:'下列哪一種行為可以減少碳足跡，減緩地球暖化和氣候變遷的影響？',o:['購買在地生產的農產品','購買大量的進口商品','出門盡量自行開車','多使用一次性餐具'],a:0,s:'隨堂15',e:'在地生產的農產品運送距離短，排放的溫室氣體比較少。'},
+/* ── 期中考 A 卷（教用）── */
+{g:'1-2',t:'tf',q:'在臺灣，冬季時常有暖鋒通過或停留在上空，使天氣變得寒冷且潮溼多雨。',a:1,s:'期中考A',e:'冬季臺灣受大陸冷氣團和冷鋒影響。'},
+{g:'1-1',t:'tf',q:'在裝有水和冰塊的杯子中加入砂糖，可以讓杯中的溫度迅速降到 0℃ 以下。',a:1,s:'期中考A',e:'要加入食鹽才能讓溫度降到 0℃ 以下。'},
+{g:'1-2',t:'tf',q:'當滯留鋒形成時，由於鋒面無法迅速移動，會徘徊在原地，使得附近地區出現陰雨連綿的天氣。',a:0,s:'期中考A',e:'冷、暖氣團勢均力敵，鋒面在原地徘徊，帶來連綿的陰雨。'},
+{g:'1-2',t:'tf',q:'如果衛星雲圖上某地區被白色的雲層籠罩，表示當地的天氣狀況晴朗，適合戶外活動。',a:1,s:'期中考A',e:'白色代表有雲層，有機會下雨。'},
+{g:'1-2',t:'tf',q:'颱風有時會夾帶大量的豪雨，導致災情，但此豐沛雨量也是臺灣重要的水資源來源。',a:0,s:'期中考A',e:'颱風會造成災害，但帶來的雨量也是臺灣重要的水資源來源。'},
+{g:'1-1',t:'mc',q:'天氣現象變化和下列哪一項物質的關係最密切？',o:['土壤','氧氣','氮氣','水'],a:3,s:'期中考A',e:'水是造成天氣變化的主要因素。'},
+{g:'1-1',t:'mc',q:'清晨天氣晴朗且氣溫較低時，水蒸氣常在較低溫的物體表面上形成小水滴，這個天氣現象稱為什麼？',o:['霜','露','雪','雲'],a:1,s:'期中考A',e:'清晨氣溫在 0 ℃ 以上，水蒸氣凝結在物體表面形成小水滴，就是露。'},
+{g:'1-1',t:'mc',q:'關於「模擬露和霜的形成」實驗，下列哪一項敘述是正確的？',o:['要模擬露的形成，鋼杯中除了冰塊，還要加入食鹽','露需要溫度在 0℃ 以下才能形成','霜需要溫度在 0℃ 以下才能形成','露和霜都是固態的冰晶'],a:2,s:'期中考A',e:'加食鹽是為了模擬霜；露是液態小水滴。'},
+{g:'1-2',t:'mc',q:'下列有關颱風的敘述，哪一項是不正確的？',o:['行進路線無法預測，無法預防颱風帶來的災害','在衛星雲圖上像是螺旋狀的濃密雲團','在地面天氣圖上是等壓線分布相當密集的低氣壓','形成的位置常在潮溼、高溫的熱帶海洋上'],a:0,s:'期中考A',e:'颱風的路徑和強度可以預測，能做好防颱準備。'},
+{g:'1-3',t:'mc',q:'大氣層中的溫室氣體增加，使地表溫度升高，造成氣候變遷，下列哪一項行為能減少溫室氣體排放量，減緩氣候變遷？',o:['購買進口服飾','多吃肉少吃菜','料理時選用在地食材','外出時自行開車'],a:2,s:'期中考A',e:'選用在地食材，運送距離短，可以減少運輸過程的溫室氣體排放。'},
+/* ── 期中考 B 卷（教用）── */
+{g:'1-1',t:'tf',q:'在臺灣的平地較少遇到下雪，主要是因為平地的氣溫不夠低。',a:0,s:'期中考B',e:'水要在 0 ℃ 以下才會結成雪，臺灣平地冬天氣溫通常不夠低。'},
+{g:'1-1',t:'tf',q:'當雲中的冰晶往下掉落，若冰晶在掉落過程融化，會形成雪。',a:1,s:'期中考B',e:'融化成水掉落就是下雨。'},
+{g:'1-2',t:'tf',q:'衛星雲圖上有各種不同的天氣符號，可以用來分析和預測天氣。',a:1,s:'期中考B',e:'有天氣符號的是地面天氣圖；衛星雲圖呈現的是雲層分布。'},
+{g:'1-2',t:'tf',q:'當冷、暖氣團交會、且兩種氣團勢均力敵時，它們會相互推擠，形成滯留鋒。',a:0,s:'期中考B',e:'冷、暖氣團勢均力敵，誰也推不動誰，就形成滯留鋒。'},
+{g:'1-3',t:'tf',q:'隨著空氣中的氮氣比例升高，全球的平均氣溫也跟著升高，造成氣候變遷。',a:1,s:'期中考B',e:'是二氧化碳等溫室氣體增加造成的。'},
+{g:'1-1',t:'mc',q:'下列的天氣現象中，哪一項主要都是由液態的水所構成呢？',o:['雪','霜','雹','雨'],a:3,s:'期中考B',e:'雪、霜、雹都是固態的冰。'},
+{g:'1-1',t:'mc',q:'下列有關水循環的敘述，哪一項是不正確的？',o:['地表水會蒸發形成水蒸氣','升到高空的水蒸氣會凝結成小水滴，形成霧','小水滴合併變大、變重，落到地面會變成雨','有些落到地面上的水會滲入地下，變成地下水'],a:1,s:'期中考B',e:'升到高空凝結成的是雲；霧在地面附近。'},
+{g:'1-2',t:'mc',q:'從地面天氣圖中可以獲得許多氣象相關資訊，但是並不包括下列哪一項？',o:['高氣壓中心位置','是否有鋒面形成','當日最高與最低氣溫','低氣壓中心位置'],a:2,s:'期中考B',e:'地面天氣圖顯示氣壓、鋒面的分布，當日最高與最低氣溫要看氣溫資料。'},
+{g:'1-2',t:'mc',q:'當冷、暖氣團勢力相當，相互推擠，會形成哪一個鋒面？',o:['冷鋒','暖鋒','滯留鋒','上鋒'],a:2,s:'期中考B',e:'冷、暖氣團勢力相當、相互推擠時形成的是滯留鋒。'},
+{g:'1-3',t:'mc',q:'下列哪一種作法可以減少水足跡？',o:['購買許多食物，吃不完就直接丟棄','將水龍頭開到最大','回收洗米水澆花','天天泡澡'],a:2,s:'期中考B',e:'回收洗米水澆花可以重複利用水，減少水資源的使用量。'},
+/* ── 隨堂練習單 第7回 期中考綜合（教用）── */
+{g:'1-2',t:'tf',q:'地面天氣圖上，把氣壓值相同的點連結起來所形成的封閉曲線，稱為等壓線。',a:0,s:'隨堂7',e:'把氣壓值相同的地點連起來的封閉曲線，叫做等壓線。'},
+{g:'1-3',t:'tf',q:'如果想要減少自己的碳足跡，我們可以多使用一次性餐具。',a:1,s:'隨堂7',e:'一次性餐具會增加碳足跡。'},
+{g:'1-1',t:'mc',q:'移開冰袋後，錐形瓶瓶口有白煙冒出，這個現象最接近下列哪一種天氣現象？',o:['露','雪','霧','霜'],a:2,s:'隨堂7',e:'瓶口的白煙是水蒸氣遇冷凝結的細小水滴，像雲和霧。'},
+{g:'1-2',t:'mc',q:'下列有關颱風的敘述，哪一項是錯誤的？',o:['颱風來襲可能帶來強風、豪雨','行進路線無法預測，無法預防災害','颱風眼經過的區域通常無風、無雨','形成的位置大多在熱帶海洋上'],a:1,s:'隨堂7',e:'颱風的行進路線和強度可以預測，我們能提早做好防颱準備。'},
+{g:'1-3',t:'mc',q:'住在屏東的小恩購買下列哪一項產品會消耗最多的碳足跡呢？',o:['自家花圃種植的番茄','彰化產的葡萄','新竹產的柿餅','美國進口的牛排'],a:3,s:'隨堂7',e:'運送距離越遠、又是牛肉，碳足跡最多。'},
+];
+
+/* 題庫 B：單元二 水溶液
+   g: 2-1 物質溶解後消失了嗎 / 2-2 水溶液可以導電嗎 / 2-3 水溶液的酸鹼性可以改變嗎 */
+const QB2=[
+/* ── 重點整理 活動一（教用）是非 ── */
+{g:'2-1',t:'tf',q:'因為砂糖水是由砂糖和水兩種不同的物質所組成，所以砂糖水是一種混合物。',a:0,s:'重點整理2-1',e:'混合物是由兩種以上的物質混合而成，水溶液就是一種混合物。'},
+{g:'2-1',t:'tf',q:'所有物質和水混合成為水溶液後，物質原本的性質都會改變。',a:1,s:'重點整理2-1',e:'混合物中的物質可能仍保有原來的性質，例如砂糖水還是甜的。'},
+{g:'2-1',t:'tf',q:'水可以溶解固體和液體的物質，但無法溶解氣體的物質。',a:1,s:'重點整理2-1',e:'汽水就是把氣體的二氧化碳溶解在水中。'},
+{g:'2-1',t:'tf',q:'食鹽溶解於水中後的總重量，會比溶解前食鹽和水的總重量還要重。',a:1,s:'重點整理2-1',e:'物質溶解前、後的重量不會改變。'},
+/* ── 重點整理 活動一（教用）選擇 ── */
+{g:'2-1',t:'mc',q:'下列關於食鹽水的敘述，哪一項是正確的？',o:['食鹽是溶劑','水是溶質','顏色是黃色','嘗起來鹹鹹的'],a:3,s:'重點整理2-1',e:'食鹽是溶質、水是溶劑；食鹽水是無色的。'},
+{g:'2-1',t:'mc',q:'近年來市面上很流行的氣泡水，是以什麼物質當作溶質？',o:['氧氣','水','二氧化碳','食鹽'],a:2,s:'重點整理2-1',e:'氣泡水是把氣體的二氧化碳溶解在水中。'},
+{g:'2-1',t:'mc',q:'下列哪一個方法可以將食鹽水中的食鹽分離出來？',o:['將食鹽水放在太陽底下晒','將食鹽水放進冰箱冷凍','在食鹽水中加入大量的水','在食鹽水中加入砂糖'],a:0,s:'重點整理2-1',e:'把水蒸發掉，溶解的物質就會分離出來。'},
+{g:'2-1',t:'mc',q:'小萱將 30 克重的砂糖放入裝有 100 克重水的杯子中，當砂糖完全溶解後，若杯子的重量不計，這杯砂糖水的重量應該是多少克重呢？',o:['160 克重','130 克重','100 克重','30 克重'],a:1,s:'重點整理2-1',e:'溶解前後總重量不變：100＋30＝130。'},
+/* ── 重點整理 活動二（教用）是非 ── */
+{g:'2-2',t:'tf',q:'將食鹽水連接在電路中，無法使發光二極體發亮，表示食鹽水不容易導電。',a:1,s:'重點整理2-2',e:'食鹽水容易導電，會使發光二極體發亮。'},
+{g:'2-2',t:'tf',q:'在電路中連接發光二極體，要分別用電線將發光二極體的長腳端和電池正極連接，短腳端和電池負極連接，才能形成通路。',a:0,s:'重點整理2-2',e:'發光二極體有正負極之分，長腳接電池正極、短腳接負極才會亮。'},
+{g:'2-2',t:'tf',q:'進行「水溶液的導電性」實驗時，放入水溶液中的電線兩端要互相接觸。',a:1,s:'重點整理2-2',e:'兩端不可以互相接觸，否則會短路。'},
+/* ── 重點整理 活動二（教用）選擇 ── */
+{g:'2-2',t:'mc',q:'將水溶液連接於電路中，觀察發光二極體的發亮情形，可以判斷水溶液的哪一種性質？',o:['導電性','酸鹼性','體積','重量'],a:0,s:'重點整理2-2',e:'燈泡（發光二極體）亮不亮，代表水溶液容不容易導電。'},
+{g:'2-2',t:'mc',q:'進行「水溶液的導電性」實驗操作時，下列哪一種作法是不正確的？',o:['放入水溶液中的兩端電線不可以互相接觸','觀察完將電池座開關切成斷路','每測試完一種水溶液，都要清洗電線接觸水溶液的部分','測試完一種水溶液後，可以直接將電線浸入另一種水溶液中'],a:3,s:'重點整理2-2',e:'要先沖洗並擦乾，以免影響實驗結果。'},
+{g:'2-2',t:'mc',q:'將砂糖水連接在有發光二極體的電路中，通電後，會有什麼現象？',o:['發光二極體會發出聲音','發光二極體發亮','發光二極體不亮','發光二極體燒壞了'],a:2,s:'重點整理2-2',e:'砂糖水不易導電。'},
+/* ── 重點整理 活動三（教用）是非 ── */
+{g:'2-3',t:'tf',q:'石蕊試紙有紅色和藍色兩種，可以用來檢驗水溶液的酸鹼性，使用時可以直接用手拿取較方便。',a:1,s:'重點整理2-3',e:'要用鑷子夾取，避免用手汙染試紙。'},
+{g:'2-3',t:'tf',q:'進行水溶液酸鹼性實驗時，如果皮膚不小心接觸到強酸或強鹼的水溶液，要先用大量清水沖洗，再盡快送醫。',a:0,s:'重點整理2-3',e:'強酸、強鹼會腐蝕皮膚，要立刻用大量清水沖洗再就醫。'},
+{g:'2-3',t:'tf',q:'熱水瓶使用一段時間後通常會產生水垢，水垢屬於鹼性物質，因此可以用酸性的檸檬酸來清洗。',a:0,s:'重點整理2-3',e:'水垢是鹼性的，用酸性的檸檬酸可以把它清掉。'},
+/* ── 重點整理 活動三（教用）選擇 ── */
+{g:'2-3',t:'mc',q:'有一杯不知名的水溶液，滴在紅色石蕊試紙上不變色，滴在藍色石蕊試紙上也不變色，請問這杯水溶液可能是下列何者？',o:['醋','小蘇打水','檸檬酸水','食鹽水'],a:3,s:'重點整理2-3',e:'兩種試紙都不變色表示是中性水溶液。'},
+{g:'2-3',t:'mc',q:'一杯紅、藍石蕊試紙都不變色的水溶液，將蝶豆花瓣汁滴入後，水溶液的顏色會如何變化？',o:['變成紫色','變成藍色','變成綠色','變成白色'],a:1,s:'重點整理2-3',e:'中性水溶液加蝶豆花瓣汁會變成藍色。'},
+{g:'2-3',t:'mc',q:'將酸性水溶液和鹼性水溶液分別滴入蝶豆花瓣汁，再將兩種水溶液混合，發現混合水溶液的顏色變藍色，這樣的結果表示混合水溶液的酸鹼性為何？',o:['鹼性','酸性','中性','可能是酸性，也可能是鹼性'],a:2,s:'重點整理2-3',e:'偏藍色表示接近中性。'},
+/* ── 隨堂練習單 第4回（2-1，教用）是非 ── */
+{g:'2-1',t:'tf',q:'當食鹽完全溶解在水中後，就會形成食鹽水。',a:0,s:'隨堂4',e:'食鹽溶解在水中均勻分散，形成的水溶液就是食鹽水。'},
+{g:'2-1',t:'tf',q:'臺灣早期生產的粗鹽，主要是利用陽光將海水中的水分蒸發後取得。',a:0,s:'隨堂4',e:'日晒法利用陽光把海水中的水分蒸發掉，留下粗鹽。'},
+{g:'2-1',t:'tf',q:'食用醋是生活中常見的水溶液，其中溶質是水，溶劑是醋。',a:1,s:'隨堂4',e:'食用醋的溶質是醋，溶劑是水。'},
+{g:'2-1',t:'tf',q:'砂糖是甜的，溶解在水中變成砂糖水後，味道會變鹹。',a:1,s:'隨堂4',e:'物質溶解後可能保有原來的性質，砂糖水還是甜的。'},
+{g:'2-1',t:'tf',q:'物質溶解前、後的總重量不會產生改變。',a:0,s:'隨堂4',e:'物質溶解只是分散到水中，沒有消失，總重量不會改變。'},
+/* ── 隨堂練習單 第4回（2-1，教用）選擇 ── */
+{g:'2-1',t:'mc',q:'下列生活中常見的物品，哪一項不是水溶液呢？',o:['洗衣精','礦泉水','奶粉','汽水'],a:2,s:'隨堂4',e:'奶粉沒有完全溶解在水中。'},
+{g:'2-1',t:'mc',q:'小妍觀察眼藥水的成分表後，發現含有以下物質，下列哪一種物質不屬於溶質？',o:['維生素 A','維生素 B','鹽類','水'],a:3,s:'隨堂4',e:'水是溶劑，不是溶質。'},
+{g:'2-1',t:'mc',q:'小翔在 60 克重的水中加入 5 克重的砂糖，當砂糖完全溶解後，這杯砂糖水的重量應該是多少克重？',o:['70 克重','65 克重','60 克重','55 克重'],a:1,s:'隨堂4',e:'60＋5＝65，溶解前後重量不變。'},
+{g:'2-1',t:'mc',q:'下列哪一個方法無法將食鹽水中的食鹽分離出來？',o:['用電風扇對著食鹽水吹','用瓦斯爐加熱食鹽水','加入更多的水','將食鹽水放在太陽下晒乾'],a:2,s:'隨堂4',e:'加水只會變稀，無法分離出食鹽。'},
+{g:'2-1',t:'mc',q:'下列關於水溶液的敘述，哪一項是不正確的？',o:['食鹽溶解在水中後，水溶液總重量會減少','固體溶解在水中後，仍可能保留原來的性質','水也可以溶解液體的醋','氣體的二氧化碳也可以溶解在水中'],a:0,s:'隨堂4',e:'溶解前後總重量不變。'},
+/* ── 隨堂練習單 第5回（2-2，教用）是非 ── */
+{g:'2-2',t:'tf',q:'食鹽水容易導電，能使發光二極體發亮。',a:0,s:'隨堂5',e:'食鹽水容易導電，接上電路後發光二極體會亮。'},
+{g:'2-2',t:'tf',q:'不同物質和水混合後，導電性可能改變。',a:0,s:'隨堂5',e:'食鹽、小蘇打粉溶於水後就變得容易導電。'},
+{g:'2-2',t:'tf',q:'只要是水溶液就一定可以導電。',a:1,s:'隨堂5',e:'砂糖水就不易導電。'},
+{g:'2-2',t:'tf',q:'生活中的自來水也是一種水溶液，所以手潮溼時不能碰觸插座，以免觸電。',a:0,s:'隨堂5',e:'自來水中溶有物質，容易導電，手溼的時候碰插座會觸電。'},
+{g:'2-2',t:'tf',q:'純水容易導電，把純水接在有發光二極體的電路中，發光二極體會發亮。',a:1,s:'隨堂5',e:'純水不易導電，發光二極體不會亮。'},
+/* ── 隨堂練習單 第5回（2-2，教用）選擇 ── */
+{g:'2-2',t:'mc',q:'將發光二極體、電池與電線連接在一起，形成電路後，可以用來檢測水溶液的哪一種特性？',o:['導電性','酸鹼性','有無氣味','顏色深淺'],a:0,s:'隨堂5',e:'把水溶液接入含發光二極體的電路，可以檢測它的導電性。'},
+{g:'2-2',t:'mc',q:'下列哪一個方法可以測試水溶液是否容易導電？',o:['把發光二極體浸入水溶液中','將紫色高麗菜汁滴入水溶液中','將溫度計浸入水溶液中','將水溶液連接在有發光二極體的電路中'],a:3,s:'隨堂5',e:'要把水溶液接在有發光二極體的電路中，看燈亮不亮來判斷。'},
+{g:'2-2',t:'mc',q:'下列關於物質導電性的敘述，哪一項是不正確的？',o:['食鹽水容易導電','砂糖水不易導電','純水容易導電','小蘇打水容易導電'],a:2,s:'隨堂5',e:'純水不易導電。'},
+{g:'2-2',t:'mc',q:'下列有關「水溶液的導電性」實驗敘述，哪一項是正確的？',o:['放入水溶液中的電線兩端要互相碰觸','更換水溶液測試時，要先沖洗電線並擦乾','觀察完一種水溶液後，不須關閉電池盒開關','所有水溶液都不易導電'],a:1,s:'隨堂5',e:'換測另一種水溶液前要先沖洗電線並擦乾，免得殘留的溶質影響結果。'},
+{g:'2-2',t:'mc',q:'下列哪一種物質連接在電路中時，無法使發光二極體發亮？',o:['食鹽水','小蘇打水','鐵釘','砂糖水'],a:3,s:'隨堂5',e:'砂糖水不易導電。'},
+/* ── 隨堂練習單 第6回（2-3，教用）是非 ── */
+{g:'2-3',t:'tf',q:'石蕊試紙不可以重複使用。',a:0,s:'隨堂6',e:'石蕊試紙變色後就不能再用，每次檢驗都要換新的。'},
+{g:'2-3',t:'tf',q:'檢驗不同水溶液的酸鹼性時，可以使用同一支滴管吸取不同的水溶液。',a:1,s:'隨堂6',e:'滴管不可混用，要更換或清洗擦乾。'},
+{g:'2-3',t:'tf',q:'熱水瓶使用一段時間產生的水垢是鹼性物質，可以利用小蘇打粉清洗去除。',a:1,s:'隨堂6',e:'水垢是鹼性，要用酸性的檸檬酸去除。'},
+{g:'2-3',t:'tf',q:'將酸性水溶液和鹼性水溶液混合，混合後的水溶液酸鹼性可能接近中性。',a:0,s:'隨堂6',e:'酸和鹼會互相中和，混合後可能變成接近中性。'},
+{g:'2-3',t:'tf',q:'紅色石蕊試紙滴上酸性水溶液後，顏色會變成藍色。',a:1,s:'隨堂6',e:'酸性水溶液使紅色石蕊試紙不變色、藍色變紅色。'},
+/* ── 隨堂練習單 第6回（2-3，教用）選擇 ── */
+{g:'2-3',t:'mc',q:'下列哪一種水溶液滴在紅色和藍色石蕊試紙上，都不會使試紙變色？',o:['小蘇打水','食鹽水','汽水','醋'],a:1,s:'隨堂6',e:'食鹽水是中性。'},
+{g:'2-3',t:'mc',q:'用石蕊試紙檢驗水溶液的酸鹼性時，下列哪一項操作可能會影響結果？',o:['不重複使用石蕊試紙','使用不同滴管吸取不同水溶液','用手直接拿取試紙','每張石蕊試紙只檢驗一種水溶液'],a:2,s:'隨堂6',e:'要用鑷子夾取，避免手汙染試紙。'},
+{g:'2-3',t:'mc',q:'水溶液滴入蝶豆花瓣汁後，顏色變成紫色，這杯最有可能是下列哪一種水溶液呢？',o:['醋','食鹽水','小蘇打水','砂糖水'],a:0,s:'隨堂6',e:'紫色代表酸性。'},
+{g:'2-3',t:'mc',q:'因使用氮肥而酸化的土壤撒上下列哪一種物質，可以調整土壤的酸鹼性？',o:['砂糖','食鹽','石灰粉','汽水'],a:2,s:'隨堂6',e:'石灰粉是鹼性，可中和酸化的土壤。'},
+{g:'2-3',t:'mc',q:'將醋和小蘇打水混合，若混合後的水溶液會讓藍色石蕊試紙變紅色、紅色石蕊試紙不變色，如何才能讓此混合水溶液變成中性？',o:['加入食鹽水','加入檸檬水','加入醋','加入小蘇打水'],a:3,s:'隨堂6',e:'混合液偏酸性，要加入鹼性的小蘇打水。'},
+/* ── 隨堂練習單 第7回 期中考綜合（教用）── */
+{g:'2-1',t:'tf',q:'如果將食鹽水倒在淺盤中並放在通風處，等水蒸發後，就會出現食鹽。',a:0,s:'隨堂7',e:'水蒸發後留下來的白色固體就是原本溶在水裡的食鹽。'},
+{g:'2-2',t:'tf',q:'進行水溶液的導電性實驗，容易導電的水溶液都是中性。',a:1,s:'隨堂7',e:'醋是酸性、小蘇打水是鹼性，都容易導電。'},
+{g:'2-3',t:'tf',q:'胃藥裡通常含有酸性物質，可以中和胃酸過多造成的不適。',a:1,s:'隨堂7',e:'胃藥含的是鹼性物質。'},
+{g:'2-1',t:'mc',q:'下列敘述中，哪一項與分離溶解在水中的物質無關？',o:['晒乾海水取得粗鹽','洗米時使用篩網可以取出米','熬煮甘蔗汁取得紅糖','砂糖水乾掉後摸起來黏黏的'],a:1,s:'隨堂7',e:'米沒有溶解在水中，用篩網是過濾不是蒸發。'},
+{g:'2-3',t:'mc',q:'在酸性水溶液中滴入蝶豆花瓣汁後，水溶液會呈現什麼顏色？',o:['紫色','藍色','綠色','白色'],a:0,s:'隨堂7',e:'蝶豆花瓣汁遇到酸性水溶液會變成紫（紫紅）色。'},
+/* ── 第一次月考 A 卷（教用）── */
+{g:'2-1',t:'tf',q:'當食鹽溶解在水中後，食鹽溶解前、後的總重量不會改變。',a:0,s:'月考A',e:'溶解只是把食鹽分散到水中，溶解前後總重量不變。'},
+{g:'2-1',t:'tf',q:'洗衣精中有殺菌劑、漂白劑等成分溶解在水中，是一種水溶液。',a:0,s:'月考A',e:'洗衣精的成分溶解在水中形成均勻的溶液，是一種水溶液。'},
+{g:'2-1',t:'tf',q:'可以利用濾網篩出完全溶解在水中的食鹽。',a:1,s:'月考A',e:'完全溶解的物質無法用濾網篩出，要把水蒸發掉。'},
+{g:'2-1',t:'mc',q:'下列生活中常見的物品中，哪一項是水溶液呢？',o:['奶粉','食鹽','砂糖','洗衣精'],a:3,s:'月考A',e:'食鹽、砂糖是固體，要溶在水中才是水溶液。'},
+{g:'2-1',t:'mc',q:'下列關於水溶液的敘述，哪一項是不正確的呢？',o:['是一種混合物','奶粉是一種水溶液','物質溶解後可能保有原本的性質','物質溶解前、後的總重量不會改變'],a:1,s:'月考A',e:'奶粉沖泡後是懸浮的小顆粒、會沉澱，不是均勻透明的水溶液。'},
+/* ── 第一次月考 B 卷（教用）── */
+{g:'2-1',t:'tf',q:'礦泉水中含有鈣、鎂、鈉等礦物質，而且這些礦物質都溶解在水中，所以礦泉水也是一種水溶液。',a:0,s:'月考B',e:'礦泉水中的礦物質溶解在水中，形成均勻的水溶液。'},
+{g:'2-1',t:'tf',q:'早期臺灣生產的粗鹽，是把河水等淡水透過日晒蒸發水分而取得。',a:1,s:'月考B',e:'是把海水引進鹽田日晒蒸發取得。'},
+{g:'2-1',t:'tf',q:'物質只要完全溶解在水中，形成水溶液之後，就無法再從水溶液中分離出來。',a:1,s:'月考B',e:'把水蒸發掉就能分離出來。'},
+{g:'2-1',t:'mc',q:'下列哪一項是將溶解在水中的物質分離出來的例子？',o:['將食鹽在水中攪拌，食鹽顆粒看起來不見了','熬煮甘蔗汁，製成紅糖','在冰塊上加食鹽，使溫度低於 0℃','加水稀釋，使湯喝起來不會太鹹'],a:1,s:'月考B',e:'熬煮甘蔗汁時水分蒸發，糖就從汁液中分離出來成為紅糖。'},
+{g:'2-1',t:'mc',q:'有關水溶液，下列哪一項敘述是錯的？',o:['物質溶解在水中後，就成為水溶液','只有固體的物質可以作為水溶液的溶質','物質溶解前、後，總重量不會改變','將水溶液的水分蒸發後，可以將溶質分離出來'],a:1,s:'月考B',e:'液體的醋、氣體的二氧化碳也都可以當溶質。'},
+/* ── 隨堂練習單 第15回（教用）── */
+{g:'2-1',t:'tf',q:'眼藥水中有維生素、鹽類等成分溶解在水中，屬於水溶液。',a:0,s:'隨堂15',e:'眼藥水的成分溶解在水中，是一種水溶液。'},
+{g:'2-1',t:'tf',q:'砂糖加入水中完全溶解後，水溶液仍然能嘗到甜味，原來的性質並未消失。',a:0,s:'隨堂15',e:'溶解後砂糖仍在水中，原來的甜味性質沒有消失。'},
+{g:'2-1',t:'mc',q:'下列哪一個不屬於生活中常見的水溶液？',o:['食用醋','眼藥水','小蘇打粉','汽水'],a:2,s:'隨堂15',e:'小蘇打粉是固體粉末，溶在水中才是小蘇打水。'},
+{g:'2-1',t:'mc',q:'小廷想分離出食鹽水中的食鹽，他可以使用下列哪一種方法？',o:['加更多水','用紗布過濾','加入砂糖水','加熱使水分蒸發'],a:3,s:'隨堂15',e:'加熱使水分蒸發，溶解在水中的食鹽就會留下來。'},
+/* ── 期中考 A 卷（教用）── */
+{g:'2-1',t:'tf',q:'食鹽溶解在水中時，會看不見食鹽顆粒，但我們可以從水溶液的重量變化，得知食鹽仍在水中。',a:0,s:'期中考A',e:'食鹽雖然看不見，但水溶液的重量增加了，表示食鹽還在水中。'},
+{g:'2-3',t:'tf',q:'將醋與小蘇打水相互混合，再滴入蝶豆花瓣汁，水溶液如果變成藍色，表示此混合水溶液接近中性。',a:0,s:'期中考A',e:'蝶豆花瓣汁呈藍色代表接近中性，表示酸鹼互相中和了。'},
+{g:'2-3',t:'tf',q:'食鹽水可以使紅色石蕊試紙變藍色，藍色石蕊試紙不變色。',a:1,s:'期中考A',e:'食鹽水是中性，兩種試紙都不變色。'},
+{g:'2-2',t:'tf',q:'將接有電池和發光二極體的電線兩端分別放入小蘇打水中，因為小蘇打水容易導電，所以發光二極體會發亮。',a:0,s:'期中考A',e:'小蘇打水容易導電，接上電路後發光二極體會亮。'},
+{g:'2-3',t:'tf',q:'石蕊試紙有紅色和藍色兩種，檢測過水溶液的石蕊試紙可以重複使用，不會影響結果。',a:1,s:'期中考A',e:'使用過的石蕊試紙不可以再重複使用。'},
+{g:'2-1',t:'mc',q:'下列生活中常見的物品組合，哪些都是水溶液呢？',o:['眼藥水、食鹽','礦泉水、小蘇打粉','洗碗精、洗衣精','奶粉、砂糖'],a:2,s:'期中考A',e:'食鹽、小蘇打粉、砂糖是固體，奶粉不是水溶液。'},
+{g:'2-3',t:'mc',q:'如果想讓一杯酸性水溶液的酸鹼性變成中性，加入下列哪一種水溶液最有可能成功呢？',o:['檸檬酸水','醋','小蘇打水','食鹽水'],a:2,s:'期中考A',e:'要加入鹼性水溶液才能中和。'},
+{g:'2-3',t:'mc',q:'小廷將砂糖水、食鹽水、小蘇打水和醋分別滴在藍色石蕊試紙上，總共有幾張石蕊試紙會變成紅色？',o:['4 張','3 張','2 張','1 張'],a:3,s:'期中考A',e:'只有酸性的醋會讓藍色石蕊試紙變紅色。'},
+{g:'2-2',t:'mc',q:'下列有關「水溶液的導電性」實驗的敘述，哪一項是正確的？',o:['砂糖水容易導電','純水是對照組','食鹽水、砂糖水和小蘇打水是對照組','小蘇打水不易導電'],a:1,s:'期中考A',e:'純水沒有加入任何溶質，是用來比較的對照組。'},
+{g:'2-3',t:'mc',q:'下列敘述中，哪一項是生活中應用水溶液酸鹼特性的例子呢？',o:['用檸檬酸清洗熱水瓶中鹼性的水垢','在檸檬汁中加砂糖，增加甜味','在玉米濃湯內加胡椒，增加風味','在熱湯中加食鹽，增加鹹味'],a:0,s:'期中考A',e:'水垢是鹼性，用酸性的檸檬酸清洗是利用酸鹼中和的特性。'},
+/* ── 期中考 B 卷（教用）── */
+{g:'2-2',t:'tf',q:'將食鹽放入純水中溶解，再將食鹽水連接到接有發光二極體的電路中，發光二極體會發亮。',a:0,s:'期中考B',e:'食鹽水容易導電，可以讓發光二極體發亮。'},
+{g:'2-3',t:'tf',q:'將分別加入蝶豆花瓣汁的酸性水溶液和鹼性水溶液均勻混合，發現水溶液的顏色變成藍色，表示此混合溶液較接近中性。',a:0,s:'期中考B',e:'蝶豆花瓣汁變成藍色代表水溶液接近中性。'},
+{g:'2-3',t:'tf',q:'如果不小心讓皮膚接觸到酸性較強的水溶液，應先以大量的鹼性水溶液沖洗，再立即送醫。',a:1,s:'期中考B',e:'要先用大量清水沖洗，再立即送醫。'},
+{g:'2-1',t:'tf',q:'混合物是由不同物質所組成，水溶液屬於混合物的一種，混合物中的物質可能保有原來的性質。',a:0,s:'期中考B',e:'水溶液由溶質和水組成，是混合物，物質可能保有原來的性質。'},
+{g:'2-1',t:'tf',q:'將水溶液中的水蒸發，可以使溶解在水中的物質分離出來，例如海水蒸發後可以取出粗鹽、熬煮甘蔗汁可以製成紅糖。',a:0,s:'期中考B',e:'把水蒸發掉，溶解在水中的物質就會留下來，這是分離溶質的方法。'},
+{g:'2-1',t:'mc',q:'下列哪一項生活中常見的物品不是水溶液？',o:['洗衣精','礦泉水','奶粉','眼藥水'],a:2,s:'期中考B',e:'奶粉泡水後會沉澱、不均勻，不是水溶液。'},
+{g:'2-3',t:'mc',q:'將酸性水溶液和鹼性水溶液混合，如果混合後偏鹼性，下列哪一種作法可能使水溶液變成中性？',o:['加入純水','加入食鹽','加入鹼性水溶液','加入酸性水溶液'],a:3,s:'期中考B',e:'偏鹼性就要加酸性來中和。'},
+{g:'2-3',t:'mc',q:'在酸化的土壤上撒下列哪一種物質，能調整土壤的酸鹼性？',o:['食鹽','石灰粉','砂糖','麵粉'],a:1,s:'期中考B',e:'石灰粉是鹼性，撒在酸化的土壤上可以中和酸性。'},
+{g:'2-3',t:'mc',q:'下列哪一組水溶液都會使紅色和藍色石蕊試紙不變色呢？',o:['醋、食鹽水','砂糖水、小蘇打水','食鹽水、砂糖水','醋、砂糖水'],a:2,s:'期中考B',e:'食鹽水和砂糖水都是中性。'},
+{g:'2-1',t:'mc',q:'把 5 克重的食鹽加入 50 克重的水中，攪拌至完全溶解，此時食鹽水為多少克重？',o:['50 克重','45 克重','55 克重','5 克重'],a:2,s:'期中考B',e:'50＋5＝55，溶解前後重量不變。'},
+];
+
+/* ===== 概念卡：名詞與概念（出自課本重點整理）===== */
+const CARDS=[
+/* 1-1 */
+{k:'雲',d:'水蒸氣上升到空中，溫度降低後凝結成小水滴或直接變冰晶，飄浮在空中',g:'1-1'},
+{k:'霧',d:'形成原因和雲類似，但飄浮在地面附近',g:'1-1'},
+{k:'露',d:'氣溫夠低時，地面附近的水蒸氣附著在較冷的物體表面，凝結成的小水滴（液態）',g:'1-1'},
+{k:'霜',d:'氣溫接近或低於 0℃ 時，水蒸氣附著在物體表面直接變成的冰晶（固態）',g:'1-1'},
+{k:'雨',d:'雲中的小水滴直接掉落，或冰晶掉落時融化成水，落到地面就是雨',g:'1-1'},
+{k:'雪',d:'雲中的冰晶在掉落過程中沒有融化，直接落到地面',g:'1-1'},
+{k:'雹',d:'積雨雲中對流旺盛，冰粒反覆被帶上高空、外圍的水再凝固，越變越大後掉落',g:'1-1'},
+{k:'凝華',d:'物質沒有經過液態，直接從氣態變成固態，例如水蒸氣凝華成冰晶',g:'1-1'},
+{k:'水循環',d:'水在地表和空中不斷以氣態、液態、固態變化循環，產生各種天氣現象',g:'1-1'},
+{k:'蒸散',d:'植物把吸收的水分以水蒸氣的形式散到空氣中',g:'1-1'},
+{k:'海洋調節氣溫',d:'海洋吸收大部分太陽輻射並儲存熱能，海面溫度變化比陸地小，可以調節氣溫',g:'1-1'},
+/* 1-2 */
+{k:'衛星雲圖',d:'呈現高空中雲層的分布；偏白表示有雲層，有機會降雨',g:'1-2'},
+{k:'地面天氣圖',d:'用高低氣壓、等壓線、鋒面等符號表示天氣資訊，是天氣預報的重要依據',g:'1-2'},
+{k:'高氣壓中心（H）',d:'範圍內氣壓比周圍高，越接近中心氣壓越高',g:'1-2'},
+{k:'低氣壓中心（L）',d:'範圍內氣壓比周圍低，越接近中心氣壓越低',g:'1-2'},
+{k:'等壓線',d:'把氣壓值相同的點連起來的封閉曲線，氣壓單位是百帕',g:'1-2'},
+{k:'氣團',d:'在廣闊平坦地區停留，溫度、溼度性質逐漸一致的大範圍空氣',g:'1-2'},
+{k:'鋒面',d:'冷、暖氣團交會時，暖空氣的水蒸氣遇冷凝結，沿交界面形成的一條雲帶',g:'1-2'},
+{k:'冷鋒',d:'冷氣團勢力較強推擠暖氣團後退；通過的地區雲多、易下雨、氣溫降低',g:'1-2'},
+{k:'暖鋒',d:'暖氣團勢力較強推擠冷氣團後退；通過的地區氣溫會升高',g:'1-2'},
+{k:'滯留鋒',d:'冷、暖氣團勢均力敵在原地徘徊；出現時常是陰雨連綿的天氣',g:'1-2'},
+{k:'梅雨季',d:'每年 5、6 月左右滯留鋒徘徊臺灣上空，天氣不穩定、經常下雨',g:'1-2'},
+{k:'颱風',d:'生成於熱帶海洋，由熱帶性低氣壓發展而來；最常在夏、秋兩季侵襲臺灣',g:'1-2'},
+{k:'颱風眼',d:'颱風的中心，經過的區域通常無風無雨；但不是每個颱風都有明顯的颱風眼',g:'1-2'},
+{k:'颱風行進路線圖',d:'可看出颱風生成和消散地點、行進路線、強度變化',g:'1-2'},
+{k:'大陸冷氣團',d:'冬季影響臺灣，使氣溫下降',g:'1-2'},
+{k:'太平洋暖氣團',d:'夏季影響臺灣，天氣溫暖、潮溼',g:'1-2'},
+/* 1-3 */
+{k:'天氣與氣候',d:'天氣是短時間內大氣的變化；氣候是長時間天氣現象的平均狀態和趨勢',g:'1-3'},
+{k:'溫室效應',d:'陽光能量被地球吸收後輻射出去，停留在大氣層內，使地表維持合宜的溫度',g:'1-3'},
+{k:'溫室氣體',d:'大氣中能吸收熱能的氣體，例如二氧化碳、水蒸氣、甲烷',g:'1-3'},
+{k:'氣候變遷',d:'溫室氣體濃度增加使地表溫度升高，出現氣溫上升、極端降雨、降雨過少等現象',g:'1-3'},
+{k:'化石燃料',d:'煤、石油、天然氣，是人類最主要使用的能源，燃燒時會產生二氧化碳',g:'1-3'},
+{k:'碳足跡',d:'產品從原料取得、生產、運送、銷售、使用到廢棄回收所產生的溫室氣體排放量總和',g:'1-3'},
+{k:'水足跡',d:'用來衡量直接與間接的水資源使用量',g:'1-3'},
+/* 2-1 */
+{k:'水溶液',d:'物質完全溶解在水中之後所形成的液體',g:'2-1'},
+{k:'溶質',d:'水溶液中被溶解的物質，例如砂糖水中的砂糖、汽水中的二氧化碳',g:'2-1'},
+{k:'溶劑',d:'把物質溶解的液體；水溶液中的溶劑是水',g:'2-1'},
+{k:'混合物',d:'由不同物質所組成，其中的物質可能仍保有原來的性質；水溶液是混合物',g:'2-1'},
+{k:'溶解前後重量不變',d:'物質溶解前、後的總重量不會改變，例如 100 克水＋30 克砂糖＝130 克砂糖水',g:'2-1'},
+{k:'蒸發分離',d:'把水溶液的水蒸發掉，可以使溶解在水中的物質分離出來',g:'2-1'},
+{k:'晒鹽',d:'把海水引進鹽田，利用日晒蒸發水分而取得粗鹽',g:'2-1'},
+{k:'紅糖',d:'熬煮甘蔗汁，使水分蒸發而製成',g:'2-1'},
+/* 2-2 */
+{k:'導電性',d:'水溶液是否容易讓電流通過；用發光二極體是否發亮來判斷',g:'2-2'},
+{k:'發光二極體（LED）',d:'長腳端接電池正極、短腳端接負極；發亮表示水溶液容易導電',g:'2-2'},
+{k:'容易導電的水溶液',d:'食鹽水、小蘇打水、檸檬酸水、醋，能使發光二極體發亮',g:'2-2'},
+{k:'不易導電的水溶液',d:'砂糖水、純水，無法使發光二極體發亮',g:'2-2'},
+{k:'導電實驗注意事項',d:'電線兩端不可互相接觸；觀察完切成斷路；換水溶液前要沖洗電線並擦乾',g:'2-2'},
+/* 2-3 */
+{k:'石蕊試紙',d:'檢驗水溶液酸鹼性的試紙，有紅色和藍色兩種',g:'2-3'},
+{k:'酸性水溶液',d:'使藍色石蕊試紙變紅色、紅色不變色；例如醋、檸檬酸水、汽水',g:'2-3'},
+{k:'中性水溶液',d:'紅色和藍色石蕊試紙都不變色；例如食鹽水、砂糖水',g:'2-3'},
+{k:'鹼性水溶液',d:'使紅色石蕊試紙變藍色、藍色不變色；例如小蘇打水',g:'2-3'},
+{k:'蝶豆花瓣汁',d:'遇酸性變紫色、遇中性變藍色、遇鹼性變綠色',g:'2-3'},
+{k:'酸鹼中和',d:'酸性水溶液和鹼性水溶液混合後，水溶液會接近中性',g:'2-3'},
+{k:'石蕊試紙使用規則',d:'用鑷子夾取、不可重複使用；滴管不可混用，要更換或清洗擦乾',g:'2-3'},
+{k:'酸鹼的生活應用',d:'胃藥中和胃酸、檸檬酸清水垢、酸性清潔劑除馬桶汙垢、石灰粉改良酸化土壤',g:'2-3'},
+];
+
+/* ===== 實驗步驟排序 ===== */
+const EXPSEQ=[
+{g:'1-1',t:'模擬雲和霧的形成',steps:[
+ '在錐形瓶中加入熱水，讓瓶內快速產生水蒸氣',
+ '把點燃的線香伸入錐形瓶中',
+ '將一袋冰塊覆蓋在錐形瓶瓶口上方',
+ '觀察瓶口周圍出現的白色煙霧',
+ '移開冰袋，觀察白煙冒出的情形'],s:'課本活動一'},
+{g:'1-1',t:'模擬露和霜的形成',steps:[
+ '準備三個鋼杯，分別倒入等量的常溫水',
+ '在第二個鋼杯中加入冰塊',
+ '在第三個鋼杯中加入冰塊和食鹽',
+ '用溫度計測量三個鋼杯中的水溫（避免碰到杯底）',
+ '觀察並記錄三個鋼杯杯壁外側的變化'],s:'課本活動一'},
+{g:'2-1',t:'從食鹽水中分離出食鹽',steps:[
+ '把食鹽加入水中，攪拌到完全溶解',
+ '將食鹽水倒入淺盤中',
+ '把淺盤放在通風處或太陽下',
+ '等待幾天讓水分蒸發',
+ '觀察淺盤中留下的白色食鹽顆粒'],s:'課本活動一'},
+{g:'2-2',t:'水溶液的導電性實驗',steps:[
+ '把發光二極體的長腳端接電池正極、短腳端接負極',
+ '將兩條電線的末端分別放入水溶液中，兩端不可互相接觸',
+ '打開電池盒開關，觀察發光二極體是否發亮',
+ '記錄導電情形後，把開關切成斷路',
+ '用清水沖洗電線接觸水溶液的部分並擦乾，再測下一種水溶液'],s:'課本活動二'},
+{g:'2-3',t:'用石蕊試紙檢驗水溶液的酸鹼性',steps:[
+ '用鑷子夾取紅色和藍色石蕊試紙',
+ '用滴管吸取要檢驗的水溶液',
+ '分別滴在紅色和藍色石蕊試紙上',
+ '觀察並記錄兩種試紙的顏色變化，判斷酸鹼性',
+ '清洗滴管並擦乾，再檢驗下一種水溶液'],s:'課本活動三'},
+{g:'2-3',t:'酸性和鹼性水溶液混合實驗',steps:[
+ '在兩個透明杯中分別倒入醋和小蘇打水',
+ '各滴入幾滴蝶豆花瓣汁，醋變紫色、小蘇打水變綠色',
+ '把其中一杯慢慢倒入另一杯中並攪拌',
+ '觀察混合後水溶液的顏色變化',
+ '顏色偏藍色時，表示混合水溶液接近中性'],s:'課本活動三'},
+];
+
+/* ===== 變因判斷 ===== */
+const EXPVAR=[
+{g:'1-1',q:'「模擬露和霜的形成」實驗中，想知道「加不加食鹽會不會影響杯壁出現的東西」，要改變的（操縱變因）是哪一項？',o:['鋼杯中有沒有加入食鹽','水的量','鋼杯的材質','觀察的時間長短'],a:0,s:'課本活動一',e:'想知道什麼原因，就改變那一項，這是操縱變因。'},
+{g:'1-1',q:'「模擬露和霜的形成」實驗中，下列哪一項必須保持相同（控制變因）？',o:['有沒有加食鹽','每個鋼杯中常溫水的量','杯壁外側出現的物質','杯中的溫度'],a:1,s:'課本活動一',e:'除了要改變的那一項，其他條件都要一樣才公平。'},
+{g:'1-1',q:'「模擬露和霜的形成」實驗中，要觀察、記錄的結果（應變變因）是下列哪一項？',o:['水的量','加不加食鹽','杯壁外側出現的物質和杯中的溫度','鋼杯的數量'],a:2,s:'課本活動一',e:'要觀察的是杯壁外側出現的物質（露或霜）和杯中的溫度。'},
+{g:'1-1',q:'「模擬雲和霧的形成」實驗中，在錐形瓶內加熱水的目的是什麼？',o:['讓瓶子比較好拿','為了快速產生水蒸氣','讓線香比較容易點燃','讓冰塊融化得比較慢'],a:1,s:'隨堂1',e:'熱水蒸發得快，瓶內很快充滿水蒸氣，才看得到雲霧生成。'},
+{g:'2-2',q:'「水溶液的導電性」實驗中，想比較不同水溶液的導電性，操縱變因是哪一項？',o:['水溶液的種類','電池的數量','發光二極體的大小','電線的長短'],a:0,s:'課本活動二',e:'要比較的是不同水溶液，所以改變的是水溶液的種類。'},
+{g:'2-2',q:'「水溶液的導電性」實驗中，下列哪一項要保持相同（控制變因）？',o:['水溶液的種類','電池數量、電線和發光二極體','發光二極體發亮的情形','水溶液是否導電'],a:1,s:'課本活動二',e:'除了水溶液種類以外，電池數量、電線和發光二極體都要保持相同。'},
+{g:'2-2',q:'「水溶液的導電性」實驗中，要觀察、記錄的結果（應變變因）是哪一項？',o:['水溶液的種類','電池的數量','發光二極體有沒有發亮','電線的材質'],a:2,s:'課本活動二',e:'要觀察記錄的結果是發光二極體有沒有發亮。'},
+{g:'2-2',q:'「水溶液的導電性」實驗中，加入純水進行測試，純水在這個實驗裡扮演什麼角色？',o:['操縱變因','對照組','應變變因','實驗器材'],a:1,s:'期中考A',e:'純水沒有加入任何溶質，是用來比較的對照組。'},
+{g:'2-2',q:'想研究「物質溶解前、後導電性會不會改變」，操縱變因應該是下列哪一項？',o:['物質有沒有溶解在水中','物質的名稱全部換掉','電池的數量','觀察的人'],a:0,s:'隨堂5',e:'要比較同一種物質在「未溶解」和「溶解」兩種情況下的導電性。'},
+{g:'2-3',q:'用石蕊試紙檢驗酸鹼性時，想比較不同水溶液的酸鹼性，操縱變因是哪一項？',o:['水溶液的種類','石蕊試紙的顏色','滴管的大小','實驗的時間'],a:0,s:'課本活動三',e:'要比較不同水溶液的酸鹼性，所以改變的是水溶液的種類。'},
+{g:'2-3',q:'檢驗酸鹼性時，每換一種水溶液就要換新試紙、清洗滴管並擦乾，主要是為了什麼？',o:['讓實驗看起來比較整齊','避免前一種水溶液殘留而影響結果','節省試紙','讓顏色變得更明顯'],a:1,s:'課本活動三',e:'避免前一種水溶液殘留，影響下一次檢驗的結果。'},
+{g:'2-1',q:'想知道「物質溶解前、後重量會不會改變」，應該測量比較的是下列哪一項？',o:['水溶液的顏色','溶解前後的總重量','水溶液的味道','攪拌的次數'],a:1,s:'課本活動一',e:'要比較的是溶解前和溶解後的總重量。'},
+];
+
+/* ===== 分類題 ===== */
+const SETS=[
+{id:'state',g:'1-1',name:'天氣現象的形態',cats:['固態','液態','氣態'],
+ items:[['霜',0],['雪',0],['雹',0],['冰晶',0],['露',1],['雨',1],['霧',1],['雲中的小水滴',1],['水蒸氣',2]]},
+{id:'front',g:'1-2',name:'三種鋒面的特徵',cats:['冷鋒','暖鋒','滯留鋒'],
+ items:[['冷氣團勢力較強，推擠暖氣團後退',0],['通過的地區氣溫會降低',0],['冬季常通過臺灣上空',0],['暖氣團勢力較強，推擠冷氣團後退',1],['通過的地區氣溫會升高',1],['冷、暖氣團勢均力敵，相互推擠',2],['在原地徘徊，陰雨連綿',2],['造成臺灣 5、6 月的梅雨季',2]]},
+{id:'wmap',g:'1-2',name:'這張圖可以看出什麼',cats:['衛星雲圖','地面天氣圖','颱風行進路線圖'],
+ items:[['高空中的雲層分布情形',0],['螺旋狀的濃密雲團',0],['高氣壓中心和低氣壓中心',1],['等壓線的密集程度',1],['冷鋒、暖鋒、滯留鋒的位置',1],['颱風生成和消散的地點',2],['颱風強度的變化',2]]},
+{id:'ghg',g:'1-3',name:'是不是溫室氣體',cats:['是溫室氣體','不是溫室氣體'],
+ items:[['二氧化碳',0],['甲烷',0],['水蒸氣',0],['氧氣',1],['氮氣',1]]},
+{id:'carbon',g:'1-3',name:'能不能減少碳足跡',cats:['可以減少碳足跡','無法減少碳足跡'],
+ items:[['購買在地食材',0],['多吃當季新鮮蔬果',0],['自備環保杯和購物袋',0],['搭乘大眾運輸工具',0],['選購包裝簡單的商品',0],['多吃牛肉',1],['購買進口的昂貴水果',1],['使用一次性餐具',1],['出門都自行開車',1]]},
+{id:'sol',g:'2-1',name:'是不是水溶液',cats:['是水溶液','不是水溶液'],
+ items:[['食鹽水',0],['砂糖水',0],['眼藥水',0],['洗衣精',0],['洗碗精',0],['礦泉水',0],['汽水',0],['食用醋',0],['奶粉',1],['冰糖',1],['食鹽',1],['砂糖',1],['黑胡椒',1],['小蘇打粉',1]]},
+{id:'solute',g:'2-1',name:'溶質的形態',cats:['固體的溶質','液體的溶質','氣體的溶質'],
+ items:[['食鹽水中的食鹽',0],['砂糖水中的砂糖',0],['礦泉水中的礦物質',0],['食用醋中的醋',1],['汽水中的二氧化碳',2],['氣泡水中的二氧化碳',2]]},
+{id:'cond',g:'2-2',name:'水溶液的導電性',cats:['容易導電','不易導電'],
+ items:[['食鹽水',0],['小蘇打水',0],['檸檬酸水',0],['醋',0],['自來水',0],['砂糖水',1],['純水',1]]},
+{id:'ph',g:'2-3',name:'水溶液的酸鹼性',cats:['酸性','中性','鹼性'],
+ items:[['醋',0],['檸檬酸水',0],['檸檬汁',0],['汽水',0],['蘋果醋',0],['食鹽水',1],['砂糖水',1],['純水',1],['小蘇打水',2]]},
+{id:'litmus',g:'2-3',name:'石蕊試紙的變色情形',cats:['紅色試紙變藍色','藍色試紙變紅色','兩種都不變色'],
+ items:[['小蘇打水',0],['醋',1],['檸檬酸水',1],['食鹽水',2],['砂糖水',2]]},
+{id:'bpea',g:'2-3',name:'蝶豆花瓣汁的顏色',cats:['紫色','藍色','綠色'],
+ items:[['醋',0],['檸檬汁',0],['汽水',0],['蘋果醋',0],['食鹽水',1],['砂糖水',1],['小蘇打水＋檸檬汁（中和後）',1],['小蘇打水',2],['蘋果醋＋小蘇打水（偏鹼）',2]]},
+];
+
+/* ===== 因果配對 ===== */
+const CAUSE=[
+{c:'水蒸氣上升到空中，溫度降低後凝結',r:'形成飄浮在空中的雲',g:'1-1'},
+{c:'地表附近的水蒸氣遇冷凝結',r:'形成飄浮在地面附近的霧',g:'1-1'},
+{c:'氣溫夠低，水蒸氣附著在較冷的物體表面凝結',r:'形成液態的露',g:'1-1'},
+{c:'氣溫接近或低於 0℃，水蒸氣在物體表面直接變成冰晶',r:'形成固態的霜',g:'1-1'},
+{c:'雲中的冰晶掉落時融化成水',r:'下雨',g:'1-1'},
+{c:'雲中的冰晶掉落時沒有融化',r:'下雪',g:'1-1'},
+{c:'積雨雲中對流旺盛，冰粒反覆被帶上高空',r:'形成越來越大的雹',g:'1-1'},
+{c:'海洋吸收大量太陽輻射並儲存熱能',r:'可以調節氣溫的變化',g:'1-1'},
+{c:'鋼杯裡加入冰塊和食鹽，溫度降到 0℃ 以下',r:'杯壁外側出現白色固體，像霜',g:'1-1'},
+{c:'冷氣團勢力較強，推擠暖氣團後退',r:'形成冷鋒',g:'1-2'},
+{c:'暖氣團勢力較強，推擠冷氣團後退',r:'形成暖鋒',g:'1-2'},
+{c:'冷、暖氣團勢均力敵，相互推擠',r:'形成在原地徘徊的滯留鋒',g:'1-2'},
+{c:'每年 5、6 月滯留鋒徘徊臺灣上空',r:'出現陰雨連綿的梅雨季',g:'1-2'},
+{c:'冬季大陸冷氣團南下影響臺灣',r:'氣溫下降',g:'1-2'},
+{c:'夏季臺灣受到太平洋暖氣團影響',r:'天氣溫暖、潮溼',g:'1-2'},
+{c:'衛星雲圖上某地被白色雲層籠罩',r:'當地有雲層分布，有機會下雨',g:'1-2'},
+{c:'熱帶海洋上的熱帶性低氣壓持續發展',r:'形成颱風',g:'1-2'},
+{c:'燃燒煤、石油等化石燃料',r:'產生大量二氧化碳',g:'1-3'},
+{c:'大氣中溫室氣體濃度增加',r:'地表溫度升高，造成氣候變遷',g:'1-3'},
+{c:'牛、羊等家畜排放甲烷',r:'增加大氣中的溫室氣體',g:'1-3'},
+{c:'購買在地、當季的食材',r:'減少運輸過程產生的碳足跡',g:'1-3'},
+{c:'回收雨水、洗米水再利用',r:'減少水足跡',g:'1-3'},
+{c:'把食鹽水倒在淺盤裡放在太陽下',r:'水分蒸發後留下白色的食鹽顆粒',g:'2-1'},
+{c:'食鹽完全溶解在水中',r:'看不見顆粒，但總重量不會改變',g:'2-1'},
+{c:'熬煮甘蔗汁使水分蒸發',r:'製成紅糖',g:'2-1'},
+{c:'把食鹽水連接在有發光二極體的電路中',r:'發光二極體發亮，表示容易導電',g:'2-2'},
+{c:'把砂糖水連接在有發光二極體的電路中',r:'發光二極體不亮，表示不易導電',g:'2-2'},
+{c:'放入水溶液的兩條電線末端互相接觸',r:'造成短路，實驗結果不正確',g:'2-2'},
+{c:'把醋滴在藍色石蕊試紙上',r:'試紙變成紅色',g:'2-3'},
+{c:'把小蘇打水滴在紅色石蕊試紙上',r:'試紙變成藍色',g:'2-3'},
+{c:'在加了蝶豆花瓣汁的醋中慢慢加入小蘇打水',r:'顏色從紫色變成偏藍色',g:'2-3'},
+{c:'胃藥中含有鹼性物質',r:'可以中和過多的胃酸',g:'2-3'},
+{c:'用檸檬酸清洗熱水瓶',r:'去除鹼性的水垢',g:'2-3'},
+{c:'在酸化的土壤上撒石灰粉',r:'調整土壤的酸鹼性',g:'2-3'},
+];
+
+/* ===== 課次名稱 ===== */
+const GK=['1-1','1-2','1-3','2-1','2-2','2-3'];
+const GN=['1-1 天氣變化的主角','1-2 預測天氣變化','1-3 氣候正在改變嗎','2-1 物質溶解後','2-2 水溶液導電性','2-3 水溶液酸鹼性'];
+const QB=QB1.concat(QB2);
+CAUSE.push(
+{c:'把食鹽水放在淺盤中，讓水分慢慢蒸發',r:'盤底出現白色的食鹽結晶',g:'2-1'},
+{c:'杯中的砂糖已經溶到不能再溶，杯底有殘留',r:'再加一些水進去，殘留的砂糖又溶解了',g:'2-1'},
+{c:'在水中溶入食鹽或小蘇打',r:'水溶液變得容易導電，燈泡會亮',g:'2-2'},
+{c:'測完一種水溶液沒有沖洗電線就換下一種',r:'殘留的溶質影響結果，導電測試不準確',g:'2-2'}
+);
+
+/* ===== 圖表判讀 ===== */
+const SVG_WMAP=`<svg viewBox="0 0 320 200" width="100%" style="max-width:320px;background:#fff;border-radius:10px">
+<rect x="0" y="0" width="320" height="200" fill="#eaf4f6"/>
+<path d="M40,30 C90,45 140,40 200,25" fill="none" stroke="#999" stroke-width="1.5"/>
+<path d="M30,60 C90,80 150,70 230,50" fill="none" stroke="#999" stroke-width="1.5"/>
+<path d="M25,95 C90,115 160,105 250,85" fill="none" stroke="#999" stroke-width="1.5"/>
+<text x="245" y="26" font-size="11" fill="#555">等壓線</text>
+<text x="70" y="48" font-size="14" font-weight="bold" fill="#1f4e79">H 甲</text>
+<text x="200" y="120" font-size="14" font-weight="bold" fill="#a33">L 乙</text>
+<path d="M60,140 L120,155 L180,145" fill="none" stroke="#1f6f9f" stroke-width="3"/>
+<polygon points="88,147 96,134 104,150" fill="#1f6f9f"/>
+<polygon points="146,151 154,138 162,154" fill="#1f6f9f"/>
+<text x="46" y="140" font-size="13" font-weight="bold" fill="#1f6f9f">丙</text>
+<path d="M60,180 L140,190 L220,178" fill="none" stroke="#c0392b" stroke-width="3"/>
+<path d="M96,186 a8,8 0 0,1 16,2" fill="none" stroke="#c0392b" stroke-width="3"/>
+<path d="M166,189 a8,8 0 0,1 16,-2" fill="none" stroke="#c0392b" stroke-width="3"/>
+<text x="46" y="182" font-size="13" font-weight="bold" fill="#c0392b">丁</text>
+<path d="M235,150 L300,150" fill="none" stroke="#c0392b" stroke-width="3"/>
+<path d="M235,150 L300,150" fill="none" stroke="#1f6f9f" stroke-width="3" stroke-dasharray="14 14"/>
+<polygon points="252,147 258,136 264,150" fill="#1f6f9f"/>
+<path d="M276,154 a7,7 0 0,1 14,2" fill="none" stroke="#c0392b" stroke-width="3"/>
+<text x="235" y="140" font-size="13" font-weight="bold" fill="#555">戊</text>
+</svg>`;
+
+const SVG_TYPHOON=`<svg viewBox="0 0 320 220" width="100%" style="max-width:320px;background:#fff;border-radius:10px">
+<rect x="0" y="0" width="320" height="220" fill="#eaf4f6"/>
+<path d="M120,180 q10,-22 26,-26 q16,-4 22,10 q6,16 -4,30 q-12,16 -30,14 q-18,-2 -14,-28 z" fill="#d8e9c9" stroke="#7a9b5e" stroke-width="1.5"/>
+<text x="128" y="196" font-size="11" fill="#5a7a3e">臺灣</text>
+<path d="M300,120 C260,116 220,112 180,108 C150,105 125,98 108,86" fill="none" stroke="#c0392b" stroke-width="2" stroke-dasharray="5 4"/>
+<circle cx="300" cy="120" r="7" fill="none" stroke="#333"/><text x="292" y="142" font-size="10">10/1 輕度</text>
+<circle cx="250" cy="115" r="8" fill="none" stroke="#333"/><text x="234" y="96" font-size="10">10/2 輕度</text>
+<circle cx="200" cy="110" r="10" fill="none" stroke="#333" stroke-width="2"/><text x="182" y="136" font-size="10">10/3 中度</text>
+<circle cx="150" cy="100" r="11" fill="none" stroke="#333" stroke-width="2"/><text x="132" y="78" font-size="10">10/4 中度</text>
+<circle cx="108" cy="86" r="9" fill="none" stroke="#333"/><text x="66" y="70" font-size="10">10/5 輕度</text>
+<text x="10" y="18" font-size="11" fill="#555">颱風行進路線圖（圓圈大小代表強度）</text>
+</svg>`;
+
+const SVG_CYCLE=`<svg viewBox="0 0 320 200" width="100%" style="max-width:320px;background:#fff;border-radius:10px">
+<rect x="0" y="0" width="320" height="200" fill="#eaf4f6"/>
+<rect x="0" y="150" width="320" height="50" fill="#bcd9e6"/>
+<path d="M30,150 L70,110 L110,150 Z" fill="#cbd5c0" stroke="#7a8a6a"/>
+<ellipse cx="180" cy="48" rx="46" ry="20" fill="#fff" stroke="#9ab"/>
+<text x="162" y="52" font-size="13" font-weight="bold">乙</text>
+<path d="M60,140 C58,110 60,90 70,74" fill="none" stroke="#1f6f73" stroke-width="2" marker-end="url(#ah)"/>
+<text x="34" y="106" font-size="13" font-weight="bold">甲</text>
+<path d="M200,70 L212,120" fill="none" stroke="#1f6f9f" stroke-width="2" marker-end="url(#ah)"/>
+<text x="216" y="100" font-size="13" font-weight="bold">丙</text>
+<path d="M240,150 C268,146 282,120 272,92" fill="none" stroke="#1f6f73" stroke-width="2" marker-end="url(#ah)"/>
+<text x="276" y="132" font-size="13" font-weight="bold">丁</text>
+<defs><marker id="ah" markerWidth="8" markerHeight="8" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#333"/></marker></defs>
+</svg>`;
+
+const SVG_TREND=`<svg viewBox="0 0 320 200" width="100%" style="max-width:320px;background:#fff;border-radius:10px">
+<rect x="0" y="0" width="320" height="200" fill="#fff"/>
+<line x1="44" y1="20" x2="44" y2="160" stroke="#333"/><line x1="44" y1="160" x2="300" y2="160" stroke="#333"/>
+<polyline points="44,140 92,134 140,126 188,110 236,92 284,66" fill="none" stroke="#c0392b" stroke-width="2.5"/>
+<polyline points="44,150 92,142 140,130 188,112 236,86 284,52" fill="none" stroke="#1f6f73" stroke-width="2.5" stroke-dasharray="6 4"/>
+<text x="6" y="30" font-size="10" fill="#333">高</text><text x="6" y="158" font-size="10" fill="#333">低</text>
+<text x="40" y="176" font-size="10">1900</text><text x="150" y="176" font-size="10">1960</text><text x="262" y="176" font-size="10">2020</text>
+<text x="150" y="194" font-size="11" fill="#555">年分</text>
+<rect x="196" y="18" width="12" height="4" fill="#c0392b"/><text x="212" y="24" font-size="10">平均氣溫</text>
+<rect x="196" y="32" width="12" height="4" fill="#1f6f73"/><text x="212" y="38" font-size="10">二氧化碳濃度</text>
+</svg>`;
+
+const TBL_LITMUS=`<table class="dtab"><tr><th>水溶液</th><th>藍色石蕊試紙</th><th>紅色石蕊試紙</th></tr>
+<tr><td>甲</td><td>變紅色</td><td>沒有變色</td></tr>
+<tr><td>乙</td><td>沒有變色</td><td>沒有變色</td></tr>
+<tr><td>丙</td><td>沒有變色</td><td>變藍色</td></tr>
+<tr><td>丁</td><td>變紅色</td><td>沒有變色</td></tr></table>`;
+
+const TBL_BPEA=`<table class="dtab"><tr><th>水溶液</th><th>滴入蝶豆花瓣汁後的顏色</th></tr>
+<tr><td>甲</td><td>紫紅色</td></tr>
+<tr><td>乙</td><td>藍色</td></tr>
+<tr><td>丙</td><td>綠色</td></tr>
+<tr><td>丁</td><td>紫紅色</td></tr></table>`;
+
+const TBL_COND=`<table class="dtab"><tr><th>水溶液</th><th>燈泡的情形</th></tr>
+<tr><td>食鹽水</td><td>亮</td></tr>
+<tr><td>砂糖水</td><td>不亮</td></tr>
+<tr><td>小蘇打水</td><td>亮</td></tr>
+<tr><td>純水</td><td>不亮</td></tr></table>`;
+
+const TBL_SOLU=`<table class="dtab"><tr><th>加入的砂糖（克重）</th><th>10</th><th>20</th><th>30</th><th>40</th><th>50</th></tr>
+<tr><td>是否完全溶解</td><td>是</td><td>是</td><td>是</td><td>是</td><td>否，杯底有殘留</td></tr></table>`;
+
+const CHART=[
+{g:'1-2',fig:SVG_WMAP,q:'這是一張地面天氣圖。圖中「甲」的符號代表什麼？',o:['高氣壓','低氣壓','冷鋒','暖鋒'],a:0,s:'重點整理1-2',e:'H 代表高氣壓，L 代表低氣壓。'},
+{g:'1-2',fig:SVG_WMAP,q:'圖中「乙」的位置，天氣通常會如何？',o:['天氣晴朗穩定','多雲或下雨','一定會下雪','一定會起霧'],a:1,s:'重點整理1-2',e:'L 是低氣壓，空氣上升容易成雲致雨，天氣多雲或有雨。'},
+{g:'1-2',fig:SVG_WMAP,q:'圖中「丙」是什麼鋒面？',o:['冷鋒','暖鋒','滯留鋒','囚錮鋒'],a:0,s:'重點整理1-2',e:'藍色線加三角形是冷鋒的符號。'},
+{g:'1-2',fig:SVG_WMAP,q:'圖中「丁」是什麼鋒面？',o:['冷鋒','暖鋒','滯留鋒','颱風'],a:1,s:'重點整理1-2',e:'紅色線加半圓形是暖鋒的符號。'},
+{g:'1-2',fig:SVG_WMAP,q:'圖中「戊」是三角形和半圓形交錯出現，代表什麼？',o:['冷鋒','暖鋒','滯留鋒','高氣壓'],a:2,s:'重點整理1-2',e:'三角形和半圓形交錯，表示冷、暖氣團勢力相當，是滯留鋒。'},
+{g:'1-2',fig:SVG_WMAP,q:'圖中彎彎曲曲、把氣壓相同的地方連起來的線叫什麼？',o:['等溫線','等壓線','鋒面','經線'],a:1,s:'重點整理1-2',e:'把氣壓相同的地點連成的線叫做等壓線。'},
+{g:'1-2',fig:SVG_TYPHOON,q:'由這張颱風行進路線圖判斷，颱風是從哪個方向朝臺灣接近？',o:['由西往東','由東往西','由北往南','由南往北'],a:1,s:'期中考B',e:'圓圈的位置由右（東）往左（西）移動，所以颱風由東往西前進。'},
+{g:'1-2',fig:SVG_TYPHOON,q:'這個颱風在哪一天由輕度颱風增強為中度颱風？',o:['10 月 2 日','10 月 3 日','10 月 4 日','10 月 5 日'],a:1,s:'期中考B',e:'10 月 3 日的標示由「輕度」變成「中度」。'},
+{g:'1-2',fig:SVG_TYPHOON,q:'這個颱風哪一天最靠近臺灣？',o:['10 月 1 日','10 月 3 日','10 月 5 日','每天都一樣遠'],a:2,s:'期中考B',e:'10 月 5 日的位置離臺灣最近。'},
+{g:'1-2',fig:SVG_TYPHOON,q:'從這張圖可以知道下列哪一件事？',o:['颱風中心的風速是多少','颱風會不會帶來雨量','颱風移動的方向和強度變化','臺灣當天的氣溫'],a:2,s:'期中考B',e:'颱風行進路線圖顯示的是颱風中心的位置、移動方向和強度變化。'},
+{g:'1-1',fig:SVG_CYCLE,q:'這是水在地球上循環的示意圖。「甲」的過程是什麼？',o:['蒸發','凝結','凝固','融化'],a:0,s:'科學素養題',e:'水從地面變成水蒸氣往上升，是蒸發。'},
+{g:'1-1',fig:SVG_CYCLE,q:'圖中「乙」是空中的雲，水蒸氣要變成雲必須經過什麼過程？',o:['蒸發','凝結','汽化','溶解'],a:1,s:'科學素養題',e:'水蒸氣遇冷凝結成小水滴或冰晶，聚集就形成雲。'},
+{g:'1-1',fig:SVG_CYCLE,q:'圖中「丙」是雲裡的水落回地面，這叫做什麼？',o:['降水','蒸發','凝華','逕流'],a:0,s:'科學素養題',e:'雲中的小水滴或冰晶變大落下，形成雨、雪等降水。'},
+{g:'1-1',fig:SVG_CYCLE,q:'圖中「丁」是海面上的水變成水蒸氣。下列哪一項會讓這個過程變快？',o:['天氣變冷','陽光變強、溫度變高','風完全停止','海水結冰'],a:1,s:'科學素養題',e:'溫度愈高、風愈大、表面積愈大，蒸發愈快。'},
+{g:'1-3',fig:SVG_TREND,q:'由這張圖可以看出，近一百多年來全球平均氣溫的變化趨勢是什麼？',o:['逐漸下降','大致上升','完全沒有改變','先上升後下降回原點'],a:1,s:'隨堂15',e:'紅線整體往上，表示全球平均氣溫逐漸上升。'},
+{g:'1-3',fig:SVG_TREND,q:'圖中大氣中二氧化碳濃度和平均氣溫的關係是什麼？',o:['兩者都上升','二氧化碳上升、氣溫下降','兩者都下降','兩者沒有關係'],a:0,s:'隨堂15',e:'兩條線都往上，二氧化碳濃度上升時氣溫也上升。'},
+{g:'1-3',fig:SVG_TREND,q:'根據這張圖，下列哪一個推論比較合理？',o:['氣溫上升和人類活動完全無關','減少二氧化碳排放有助於減緩暖化','二氧化碳愈多，地球會愈冷','圖中看不出任何趨勢'],a:1,s:'隨堂15',e:'二氧化碳等溫室氣體增加會加強溫室效應，減少排放可減緩暖化。'},
+{g:'2-3',fig:TBL_LITMUS,q:'根據這張石蕊試紙紀錄表，哪一杯是酸性水溶液？',o:['只有甲','甲和丁','只有丙','乙和丙'],a:1,s:'隨堂6',e:'酸性水溶液會使藍色石蕊試紙變紅色，甲和丁都是。'},
+{g:'2-3',fig:TBL_LITMUS,q:'表中「乙」兩種試紙都沒有變色，乙是什麼性質的水溶液？',o:['酸性','鹼性','中性','無法判斷'],a:2,s:'隨堂6',e:'中性水溶液不會使兩種石蕊試紙變色。'},
+{g:'2-3',fig:TBL_LITMUS,q:'表中「丙」最有可能是下列哪一種水溶液？',o:['檸檬汁','食鹽水','小蘇打水','汽水'],a:2,s:'隨堂6',e:'丙使紅色石蕊試紙變藍色，是鹼性，小蘇打水是鹼性水溶液。'},
+{g:'2-3',fig:TBL_BPEA,q:'根據這張蝶豆花瓣汁的顏色紀錄表，哪一杯是鹼性水溶液？',o:['甲','乙','丙','丁'],a:2,s:'隨堂6',e:'蝶豆花瓣汁遇鹼性會變綠色。'},
+{g:'2-3',fig:TBL_BPEA,q:'表中「乙」呈現藍色，表示乙是什麼性質？',o:['酸性','中性','鹼性','強酸'],a:1,s:'隨堂6',e:'蝶豆花瓣汁在中性時維持藍色。'},
+{g:'2-3',fig:TBL_BPEA,q:'如果在「丙」裡慢慢加入檸檬汁，顏色最可能怎麼變化？',o:['綠色→藍色→紫紅色','綠色→紫紅色→藍色','一直是綠色','綠色→黑色'],a:0,s:'素養學習單06',e:'加入酸性的檸檬汁，鹼性會慢慢變中性再變酸性，顏色由綠轉藍再轉紫紅。'},
+{g:'2-2',fig:TBL_COND,q:'根據這張導電性紀錄表，哪些水溶液容易導電？',o:['食鹽水和砂糖水','食鹽水和小蘇打水','砂糖水和純水','全部都會'],a:1,s:'隨堂5',e:'燈泡會亮代表容易導電，食鹽水和小蘇打水燈泡都亮。'},
+{g:'2-2',fig:TBL_COND,q:'這個實驗中加入「純水」這一組的目的是什麼？',o:['增加實驗次數','當作比較用的對照組','讓燈泡更亮','測量水的溫度'],a:1,s:'隨堂5',e:'純水沒有加入任何溶質，是用來比較的對照組。'},
+{g:'2-2',fig:TBL_COND,q:'由這張表可以得到什麼結論？',o:['所有水溶液都能導電','水溶液能不能導電和溶質種類有關','燈泡亮不亮和水量有關','砂糖水比食鹽水更容易導電'],a:1,s:'隨堂5',e:'同樣是水溶液，有的導電有的不導電，和溶解的物質種類有關。'},
+{g:'2-1',fig:TBL_SOLU,q:'根據這張砂糖溶解紀錄表，在這杯水中砂糖最多大約可以溶解多少克重？',o:['10 克重','30 克重','40～50 克重之間','沒有上限'],a:2,s:'重點整理2-1',e:'加到 40 克重還能完全溶解，加到 50 克重就有殘留，所以上限在 40～50 之間。'},
+{g:'2-1',fig:TBL_SOLU,q:'加入 50 克重的砂糖後杯底有殘留，下列哪個做法最可能讓它繼續溶解？',o:['再加一些水','把水倒掉一些','把杯子蓋起來','什麼都不做'],a:0,s:'重點整理2-1',e:'水量增加，可以溶解的量也會增加。'},
+{g:'2-1',fig:TBL_SOLU,q:'當砂糖完全溶解後，整杯砂糖水的重量會怎樣？',o:['比水＋砂糖輕','等於水＋砂糖的重量','比水＋砂糖重','無法得知'],a:1,s:'重點整理2-1',e:'物質溶解前後總重量不變。'}
+];
+
+/* ===== 素養題 ===== */
+const LIT=[
+{g:'1-1',ctx:'小均寒假到韓國首爾旅行。清晨起床時，她看到民宿院子裡的草地和車子的擋風玻璃上，都鋪著一層白白的、像粉末一樣的東西，用手摸起來冰冰的，太陽出來一會兒之後就不見了。',q:'草地和玻璃上白白的東西最可能是什麼？',o:['雪','霜','露','霧'],a:1,s:'素養學習單01',e:'清晨氣溫降到 0 ℃ 以下，近地面的水蒸氣直接凝華成小冰晶附著在物體上，就是霜。'},
+{g:'1-1',ctx:'小均寒假到韓國首爾旅行。清晨起床時，她看到民宿院子裡的草地和車子的擋風玻璃上，都鋪著一層白白的、像粉末一樣的東西。',q:'形成這種現象的過程，是下列哪一種變化？',o:['水蒸氣凝結成小水滴','水蒸氣凝華成小冰晶','水滴蒸發成水蒸氣','冰塊融化成水'],a:1,s:'素養學習單01',e:'霜是水蒸氣沒有經過液態，直接變成固態的冰晶，叫做凝華。'},
+{g:'1-1',ctx:'小均寒假到韓國首爾旅行。某天清晨氣溫在 0 ℃ 以上，她發現草葉上掛著一顆顆透明的小水珠。',q:'這些小水珠是什麼？形成的原因是什麼？',o:['霜；水蒸氣凝華','露；水蒸氣凝結','雨；雲中的水滴落下','霧；空氣中的小水滴'],a:1,s:'素養學習單01',e:'氣溫在 0 ℃ 以上時，水蒸氣遇冷凝結成小水滴附著在物體上，就是露。'},
+{g:'1-2',ctx:'氣象主播說：「明天有一道冷鋒接近臺灣北部，北部地區氣溫將明顯下降，並且有短暫陣雨，中南部仍以多雲為主。」',q:'冷鋒接近時，北部的天氣最可能出現什麼變化？',o:['氣溫上升、天氣晴朗','氣溫下降、可能降雨','氣溫不變、起大霧','完全沒有變化'],a:1,s:'素養學習單02',e:'冷鋒過境時，冷空氣推擠暖空氣，常帶來氣溫下降和陣雨。'},
+{g:'1-2',ctx:'氣象主播說：「明天有一道冷鋒接近臺灣北部，北部地區氣溫將明顯下降，並且有短暫陣雨。」',q:'根據這則報導，小朋友明天出門最適合的準備是什麼？',o:['只穿短袖、不帶傘','加件外套並帶雨具','穿泳衣去海邊','不用做任何準備'],a:1,s:'素養學習單02',e:'氣溫下降又可能下雨，應該保暖並帶雨具。'},
+{g:'1-2',ctx:'氣象報導：「一波大陸冷氣團南下，明天各地氣溫將下降 5 至 7 度，北部低溫只有 13 度，請民眾注意保暖。」',q:'「大陸冷氣團」指的是什麼？',o:['一大塊性質相近的冷空氣','一種颱風','地面上的冷水','一座高山'],a:0,s:'科學素養題',e:'氣團是一大塊溫度、溼度性質相近的空氣，冷氣團的空氣又乾又冷。'},
+{g:'1-2',ctx:'每年 5 月到 6 月，臺灣常常連著好幾天陰雨綿綿，大家稱這段時期為「梅雨季」。這是因為來自北方的冷氣團和來自南方的暖氣團勢力相當，互相推擠而停留在臺灣附近。',q:'造成梅雨的鋒面是哪一種？',o:['冷鋒','暖鋒','滯留鋒','沒有鋒面'],a:2,s:'月考A',e:'冷、暖氣團勢均力敵在原地徘徊，形成滯留鋒，常帶來連續降雨。'},
+{g:'1-2',ctx:'每年 5 月到 6 月，臺灣常常連著好幾天陰雨綿綿，大家稱這段時期為「梅雨季」。',q:'梅雨季期間最需要注意的災害是什麼？',o:['乾旱缺水','長時間降雨造成積水或土石流','沙塵暴','森林大火'],a:1,s:'月考A',e:'連續降雨容易造成低窪地區積水、山區土石流。'},
+{g:'1-3',ctx:'小傑在超市看到一包餅乾上印著碳足跡標籤，標示「550 公克二氧化碳當量」，另一包同樣大小的餅乾標示「320 公克二氧化碳當量」。',q:'碳足跡標籤上的數字代表什麼？',o:['產品的重量','產品從生產到廢棄過程中排放的溫室氣體量','產品的熱量','產品的價格'],a:1,s:'素養學習單03',e:'碳足跡是產品在整個生命週期中排放的溫室氣體總量，以二氧化碳當量表示。'},
+{g:'1-3',ctx:'小傑在超市看到兩包同樣大小的餅乾，一包標示「550 公克二氧化碳當量」，另一包標示「320 公克二氧化碳當量」。',q:'如果小傑想為減緩全球暖化盡一份力，他應該怎麼選？',o:['選 550 公克那一包','選 320 公克那一包','兩包都買','選包裝比較漂亮的'],a:1,s:'素養學習單03',e:'碳足跡數字愈小，代表排放的溫室氣體愈少。'},
+{g:'1-3',ctx:'小傑想在生活中減少碳足跡，他列出四個做法。',q:'下列哪一個做法「無法」減少碳足跡？',o:['近距離改走路或騎腳踏車','選購在地生產的蔬果','隨手關燈、拔插頭','冷氣溫度調得更低'],a:3,s:'隨堂15',e:'冷氣溫度調低會用更多電，排放更多二氧化碳。'},
+{g:'2-1',ctx:'臺南七股的鹽田，工人把海水引進一格一格很淺很寬的池子裡，讓太陽曬上好幾天，池底就會慢慢出現白白的鹽的結晶。',q:'鹽田是利用什麼方法從海水中取得鹽？',o:['過濾','蒸發','溶解','攪拌'],a:1,s:'素養學習單04',e:'讓水分蒸發掉，溶解在水中的鹽就會析出成為結晶。'},
+{g:'2-1',ctx:'臺南七股的鹽田，工人把海水引進一格一格很淺很寬的池子裡，讓太陽曬上好幾天。',q:'鹽田的池子做得「很淺、很寬」，主要的原因是什麼？',o:['比較省水','增加和空氣接觸的表面積，加快蒸發','讓鹽比較好吃','方便魚類生長'],a:1,s:'素養學習單04',e:'表面積愈大、溫度愈高、風愈大，水蒸發得愈快。'},
+{g:'2-1',ctx:'臺南七股的鹽田要曬好幾天才會結晶。',q:'下列哪一種天氣最適合曬鹽？',o:['連日陰雨','晴朗炎熱有風','寒流來襲下雪','起大霧且無風'],a:1,s:'素養學習單04',e:'晴朗炎熱又有風時，水蒸發最快。'},
+{g:'2-1',ctx:'小潔做水果氣泡飲：先在杯子裡倒入氣泡水，再加入兩匙砂糖和一小杯檸檬汁，攪拌後砂糖看不見了。',q:'這杯水果氣泡飲中，砂糖和檸檬汁分別是什麼形態的溶質？',o:['都是固體','固體和液體','固體和氣體','液體和氣體'],a:1,s:'月考B',e:'砂糖是固體溶質，檸檬汁是液體溶質。'},
+{g:'2-1',ctx:'小潔做水果氣泡飲：先在杯子裡倒入氣泡水，再加入兩匙砂糖和一小杯檸檬汁，攪拌後砂糖看不見了。氣泡水裡還含有二氧化碳。',q:'這杯飲料中的「二氧化碳」是什麼形態的溶質？',o:['固體','液體','氣體','不算溶質'],a:2,s:'月考B',e:'溶質可以是固體、液體或氣體，二氧化碳是氣體溶質。'},
+{g:'2-1',ctx:'小潔把砂糖加進氣泡水中攪拌，砂糖看不見了，但飲料喝起來是甜的。',q:'砂糖「看不見」卻還在杯子裡，這說明了什麼？',o:['砂糖消失不見了','砂糖變成很小的微粒均勻分散在水中','砂糖變成水','砂糖浮在空氣中'],a:1,s:'重點整理2-1',e:'溶解是溶質分散成肉眼看不見的微粒，均勻分布在水中，並沒有消失。'},
+{g:'2-2',ctx:'新聞報導：「下大雨後路面積水，民眾看到路燈電線掉落在水窪中，警方立刻拉起封鎖線，禁止民眾靠近。」',q:'警方禁止民眾靠近水窪，最主要的原因是什麼？',o:['積水很髒','積水中溶有物質可能會導電而觸電','水窪很深會跌倒','怕弄溼鞋子'],a:1,s:'素養學習單05',e:'雨水和地面物質形成的水溶液可能容易導電，碰到帶電的電線會觸電。'},
+{g:'2-2',ctx:'電鰻生活在水中，可以放出很強的電來捕捉獵物。',q:'電鰻放電能傷到附近的魚，和水的哪一個性質有關？',o:['水會蒸發','水中溶有物質使它容易導電','水是透明的','水有浮力'],a:1,s:'素養學習單05',e:'溶有食鹽等物質的水容易導電，電流才能傳到附近。'},
+{g:'2-2',ctx:'小明做實驗，把食鹽水、砂糖水、小蘇打水和純水分別接到裝有燈泡的電路中。',q:'這個實驗要探討的問題最可能是什麼？',o:['哪一種水溶液比較甜','水溶液能不能導電和溶質種類有沒有關係','水溶液的重量有沒有改變','水溶液的酸鹼性如何'],a:1,s:'隨堂5',e:'改變溶質種類、觀察燈泡亮不亮，是在探討導電性和溶質種類的關係。'},
+{g:'2-3',ctx:'短文：許多紫色、紅色的花和蔬果，像紫高麗菜、蝶豆花、紫色葡萄皮，都含有一種叫「花青素」的色素。花青素在不同酸鹼性的環境中會呈現不同的顏色，所以常被拿來當作簡易的酸鹼指示劑。',q:'根據短文，花青素可以用來做什麼？',o:['測量溫度','判斷水溶液的酸鹼性','測量重量','判斷能不能導電'],a:1,s:'科學素養題',e:'花青素在不同酸鹼環境中顏色不同，可以當酸鹼指示劑。'},
+{g:'2-3',ctx:'短文：花青素在不同酸鹼性的環境中會呈現不同的顏色。小芸把紫高麗菜汁分別滴入檸檬汁和小蘇打水中。',q:'小芸最可能觀察到什麼？',o:['兩杯顏色完全一樣','兩杯顏色不一樣','兩杯都變透明','兩杯都冒泡'],a:1,s:'科學素養題',e:'檸檬汁是酸性、小蘇打水是鹼性，紫高麗菜汁會呈現不同顏色。'},
+{g:'2-3',ctx:'飲料店的「漸層蝶豆花特調」：店員先在杯子裡倒入藍色的蝶豆花茶，再沿著杯壁慢慢倒入檸檬汁，杯子下半部漸漸變成紫紅色。',q:'下半部變成紫紅色，是因為加入了什麼性質的液體？',o:['酸性','中性','鹼性','無法判斷'],a:0,s:'素養學習單06',e:'檸檬汁是酸性，蝶豆花茶中的色素遇酸性變紫紅色。'},
+{g:'2-3',ctx:'飲料店的「漸層蝶豆花特調」：倒入檸檬汁後，杯子下半部變成紫紅色，上半部還是藍色。',q:'上半部仍是藍色，最主要的原因是什麼？',o:['上半部沒有蝶豆花茶','檸檬汁還沒有和上半部均勻混合','上半部是鹼性','上半部溫度比較高'],a:1,s:'素養學習單06',e:'檸檬汁沉在下層還沒混合均勻，上層仍維持原來的中性藍色。'},
+{g:'2-3',ctx:'飲料店的「漸層蝶豆花特調」做好後，小朋友用吸管把整杯攪拌均勻。',q:'攪拌均勻後，整杯最可能變成什麼顏色？',o:['全部變成藍色','全部變成紫紅色','全部變成綠色','上藍下紅維持不變'],a:1,s:'素養學習單06',e:'攪拌後整杯都變成酸性，蝶豆花色素全部呈現紫紅色。'},
+{g:'1-1',ctx:'小華爬合歡山，到達山頂時覺得四周白茫茫的，能見度很低，衣服和頭髮都溼溼的。他低頭往山下看，發現同樣一片白茫茫的東西飄在半山腰。',q:'小華在山頂看到的白茫茫現象是什麼？',o:['雲','霧','霜','雪'],a:1,s:'月考A',e:'在它裡面、貼近地面看到的叫霧；從遠處、高處看同一團水滴則稱為雲。'},
+{g:'1-1',ctx:'小華在合歡山山頂被白茫茫的東西包圍，從山頂往下看，半山腰也飄著一樣的東西。',q:'這兩個現象的組成「物質」是什麼？',o:['水蒸氣','空氣中的小水滴或小冰晶','灰塵','二氧化碳'],a:1,s:'月考A',e:'雲和霧都是水蒸氣凝結成的小水滴或小冰晶聚集而成，不是看不見的水蒸氣。'},
+{g:'1-3',ctx:'報導指出，臺灣曾經歷「百年大旱」，水庫見底、必須分區供水。科學家說，氣候變遷讓降雨變得更不平均，有時乾旱很久，有時又一次下很大的雨。',q:'根據這段報導，氣候變遷對降雨造成的影響是什麼？',o:['降雨完全消失','降雨變得更不平均，旱澇都更極端','降雨量每年都一樣','只會一直下雨'],a:1,s:'科學素養題',e:'氣候變遷使極端天氣更頻繁，乾旱和豪雨都可能更嚴重。'},
+{g:'1-3',ctx:'報導指出，臺灣曾經歷「百年大旱」，水庫見底、必須分區供水。',q:'面對缺水，下列哪一個做法最合適？',o:['洗澡時間拉長','用洗米水澆花、縮短淋浴時間','常常洗車','讓水龍頭一直開著'],a:1,s:'科學素養題',e:'重複利用水、減少用水量是節約用水的具體做法。'}
+];
+
+/* ===== 小工具 ===== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+function load(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+const hash=s=>{let h=0;for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))|0}return (h>>>0).toString(36)};
+const NUM=['①','②','③','④','⑤','⑥'];
+
+/* ===== 音效（Web Audio 合成，不需下載音檔）===== */
+let sfxOn=load('sci6-sfx',true),actx=null;
+function tone(seq){
+  if(!sfxOn)return;
+  try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();
+    let t=actx.currentTime+0.01;
+    seq.forEach(([f,d,type,v])=>{const o=actx.createOscillator(),g=actx.createGain();o.type=type||'sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(v||0.16,t+0.015);g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+      o.connect(g);g.connect(actx.destination);o.start(t);o.stop(t+d+0.03);t+=d*0.8});
+  }catch(e){}
+}
+const SFX={
+  ok:()=>tone([[659,.12],[880,.12],[1175,.25]]),
+  bad:()=>tone([[311,.18,'triangle',.14],[233,.32,'triangle',.14]]),
+  flip:()=>tone([[540,.05,'triangle',.07]]),
+  match:()=>tone([[784,.09],[1047,.2]]),
+  combo:()=>tone([[784,.08],[988,.08],[1319,.22]]),
+  tick:()=>tone([[1250,.04,'square',.035]]),
+  win:()=>tone([[523,.13],[659,.13],[784,.13],[1047,.13],[784,.1],[1047,.4]]),
+  lose:()=>tone([[392,.2,'triangle'],[330,.2,'triangle'],[262,.45,'triangle']])
+};
+function renderSfx(){const b=$('#sfxBtn');b.setAttribute('aria-pressed',sfxOn);b.textContent='音效：'+(sfxOn?'開':'關')}
+$('#sfxBtn').onclick=()=>{sfxOn=!sfxOn;save('sci6-sfx',sfxOn);renderSfx();if(sfxOn)SFX.ok()};
+renderSfx();
+
+/* ===== 每一關的計時與計分 ===== */
+let tmode=load('sci6-tmode','up'),rt=null;const QLIM=15;
+const rmt=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
+const timeChips=()=>`<div class="modes"><button class="chip" data-tm="up" aria-pressed="${tmode==='up'}">計時計分</button><button class="chip" data-tm="cd" aria-pressed="${tmode==='cd'}">每題 ${QLIM} 秒倒數</button></div>`;
+document.addEventListener('click',e=>{const b=e.target.closest('[data-tm]');if(!b)return;tmode=b.dataset.tm;save('sci6-tmode',tmode);document.querySelectorAll('[data-tm]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.tm===tmode))});
+function rtStart(key){rt={key,t0:Date.now(),score:0,streak:0,best:0,ok:0,n:0,qT:Date.now(),onTimeout:null,last:'',lastTick:-1,done:false}}
+function rtQ(onTimeout){if(!rt)return;rt.qT=Date.now();rt.onTimeout=(tmode==='cd'&&onTimeout)?onTimeout:null;rt.lastTick=-1;rtTick()}
+function rtAns(right){
+  if(!rt)return 0;rt.n++;rt.onTimeout=null;let pts=0;
+  if(right){rt.ok++;rt.streak++;rt.best=Math.max(rt.best,rt.streak);const sec=(Date.now()-rt.qT)/1000;
+    const sp=Math.round(50*Math.max(0,Math.min(1,1-(sec-3)/12))),cb=Math.min(5,rt.streak-1)*10;pts=100+sp+cb;rt.score+=pts;
+    rt.last=`＋${pts}${sp?`（快答 ＋${sp}）`:''}${rt.streak>1?`・${rt.streak} 連對`:''}`}
+  else{rt.streak=0;rt.last='連對中斷'}
+  rtTick();return pts;
+}
+function rtTick(){
+  if(!rt||rt.done)return;
+  const now=Date.now(),el=(now-rt.t0)/1000;
+  let cd='';
+  if(rt.onTimeout){const left=QLIM-(now-rt.qT)/1000,c=Math.ceil(left);
+    if(c<=3&&c>0&&c!==rt.lastTick){rt.lastTick=c;SFX.tick()}
+    cd=`<div class="timebar${left<=5?' warn':''}"><i style="width:${Math.max(0,left/QLIM*100)}%"></i></div>`;
+    if(left<=0){const f=rt.onTimeout;rt.onTimeout=null;f();return}}
+  document.querySelectorAll('.rhud').forEach(h=>{const sec=h.closest('section');if(sec&&sec.hidden)return;
+    h.innerHTML=`<div class="rrow"><span>時間 <b>${rmt(el)}</b></span><span>分數 <b>${rt.score}</b></span><span>連對 <b>${rt.streak}</b></span>${rt.onTimeout?`<span class="cdw">剩 <b>${Math.max(0,Math.ceil(QLIM-(now-rt.qT)/1000))}</b> 秒</span>`:''}</div>${cd}<div class="plus">${rt.last}</div>`})
+}
+setInterval(rtTick,250);
+function rtEnd(label){
+  if(!rt)return '';
+  rt.done=true;rt.onTimeout=null;const el=(Date.now()-rt.t0)/1000,acc=rt.n?Math.round(rt.ok/rt.n*100):0;
+  const key='sci6-rbest-'+rt.key+(label||''),best=load(key,null),rec=!best||rt.score>best.sc;
+  if(rec&&rt.n)save(key,{sc:rt.score,t:el});
+  return `<div class="rsum"><div><b>${rt.score}</b>分數</div><div><b>${rmt(el)}</b>用時</div><div><b>${acc}%</b>正確率</div><div><b>${rt.best}</b>最高連對</div></div>
+   <p class="qask">${rec&&rt.n?'<b style="color:var(--rose-deep)">新紀錄！</b>':`這一關最佳紀錄：${best?best.sc:0} 分`}</p>`;
+}
+
+/* ===== 範圍與錯題紀錄 ===== */
+let wq=load('sci6-wrong',{});
+const st={groups:new Set(GK),onlyWrong:false,sel:CARDS[0].k,selfTest:false,qtype:'all'};
+function qid(q){return hash(q)}
+function addWrong(m,q,a,s,g){const k=qid(q);const o=wq[k]||{n:0,q,a,s,g,m};o.n++;o.q=q;o.a=a;o.s=s;o.g=g;o.m=m;wq[k]=o;save('sci6-wrong',wq);renderScope()}
+const isWrong=q=>!!wq[qid(q)];
+const inScope=x=>st.groups.has(x.g);
+function wrongN(){return Object.keys(wq).length}
+function renderScope(){
+  const n=wrongN();if(!n)st.onlyWrong=false;
+  $('#scope').innerHTML=GN.map((g,i)=>`<button class="chip" data-g="${GK[i]}" aria-pressed="${st.groups.has(GK[i])}">${g}</button>`).join('')+
+   `<button class="chip" data-g="all" aria-pressed="false">全選</button>`+
+   (n?`<button class="chip wrongchip" data-g="wrong" aria-pressed="${st.onlyWrong}">只練錯題（${n}）</button>`:'')+
+   `<span class="count">範圍內 ${quizPool().length} 題</span>`;
+}
+$('#scope').addEventListener('click',e=>{
+  const b=e.target.closest('.chip');if(!b)return;const g=b.dataset.g;
+  if(g==='all')st.groups=new Set(GK);
+  else if(g==='wrong')st.onlyWrong=!st.onlyWrong;
+  else{if(st.groups.has(g)){if(st.groups.size>1)st.groups.delete(g)}else st.groups.add(g)}
+  renderScope();refreshTab();
+});
+
+/* ===== 分頁 ===== */
+let mm=null,tab='quiz';
+document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  tab=b.dataset.tab;rt=null;if(mm&&mm.timer){clearInterval(mm.timer);mm.timer=null}
+  if(ek&&ek.timer){clearInterval(ek.timer);ek.timer=null}
+  document.querySelectorAll('nav.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  document.querySelectorAll('section').forEach(s=>s.hidden=s.id!=='tab-'+tab);
+  refreshTab(true);
+}));
+function refreshTab(fromTab){
+  if(tab==='quiz')quizIntro();
+  if(tab==='cards')renderCards();
+  if(tab==='mem')memIntro();
+  if(tab==='exp')expIntro();
+  if(tab==='sort')sortIntro();
+  if(tab==='pair')pairIntro();
+  if(tab==='chart')chartIntro();
+  if(tab==='lit')litIntro();
+  if(tab==='exam')examIntro();
+  if(tab==='wrong')renderWrong();
+}
+const sizeSel=(id,v)=>`<label class="hint" for="${id}">題數</label> <select id="${id}"><option value="10"${v===10?' selected':''}>10 題</option><option value="20"${v===20?' selected':''}>20 題</option><option value="999">全部</option></select>`;
+const emptyMsg=`<p class="hint">這個範圍裡沒有題目，請在上方多選幾個課次。</p>`;
+
+/* ===== 通用選擇題關卡（練習題、變因判斷、分類、因果配對共用）===== */
+let qz=null;
+function qzStart(cfg){qz=Object.assign({i:0,ok:0,bad:[]},cfg);rtStart(cfg.key);qzQ()}
+function qzQ(){
+  const x=qz.items[qz.i],long=x.o.some(s=>s.length>8);
+  $(qz.area).innerHTML=`<div class="qcard"><div class="rhud"></div>
+   ${x.tag?`<span class="qtag">${esc(x.tag)}</span>`:''}
+   ${x.fig?`<div class="fig">${x.fig}</div>`:''}
+   ${x.ctx?`<div class="ctx">${esc(x.ctx)}</div>`:''}
+   <p class="qbig">${qz.i+1}. ${esc(x.q)}</p>
+   <div class="opts${x.tf?'':(long?' one':'')}">${x.o.map((o,i)=>`<button class="opt${x.tf?' tf':''}" data-k="${i}">${x.tf?'':`<span class="no">${NUM[i]}</span>`}<span>${esc(o)}</span></button>`).join('')}</div>
+   <div class="prog">第 ${qz.i+1} / ${qz.items.length} 題${qz.i?`・已對 ${qz.ok} 題`:''}</div></div>`;
+  document.querySelectorAll(qz.area+' .opt').forEach(b=>b.onclick=()=>qzPick(+b.dataset.k));
+  rtQ(()=>qzPick(-1));
+}
+const ansTxt=x=>x.tf?(x.a?'╳ 錯':'○ 對'):NUM[x.a]+' '+x.o[x.a];
+function qzPick(k){
+  const x=qz.items[qz.i],right=k===x.a;
+  document.querySelectorAll(qz.area+' .opt').forEach(b=>{b.disabled=true;const i=+b.dataset.k;
+    if(i===x.a)b.classList.add('ok'),b.insertAdjacentHTML('beforeend','<span class="mark">正解</span>');
+    else if(i===k)b.classList.add('bad'),b.insertAdjacentHTML('beforeend','<span class="mark">你選的</span>')});
+  rtAns(right);
+  if(right){qz.ok++;SFX.ok()}else{qz.bad.push(x);SFX.bad();addWrong(qz.mod,x.q,ansTxt(x),x.s||'',x.g)}
+  const fb=document.createElement('div');fb.className='fb '+(right?'ok':'bad');
+  fb.innerHTML=`<b>${right?'答對了！':(k<0?'時間到：':'正確答案是 ')}${right?'':esc(ansTxt(x))}</b>${x.e?'<br>'+esc(x.e):''}${x.s?`<span class="src">出處：${esc(x.s)}</span>`:''}`;
+  const card=document.querySelector(qz.area+' .qcard');card.appendChild(fb);
+  const nb=document.createElement('button');nb.className='btn primary';nb.textContent=qz.i+1<qz.items.length?'下一題':'看成績';
+  card.appendChild(nb);nb.onclick=()=>{qz.i++;qz.i<qz.items.length?qzQ():qzEnd()};nb.focus();
+}
+function qzEnd(){
+  const n=qz.items.length,full=qz.ok===n;
+  $(qz.area).innerHTML=`<div class="done-box"><div class="score">${qz.ok} / ${n}</div>
+   ${rtEnd()}
+   ${full?'<p class="qask">全部答對，太強了！</p>':`<p class="qask">答錯的已經記進錯題本了。</p><div class="wlist">${qz.bad.map(b=>`<span class="wz">${esc(b.g)}</span>`).join('')}</div>`}
+   <div class="center"><button class="btn primary" id="qzAgain">再來一輪</button>${qz.bad.length?'<button class="btn rose" id="qzRe">只練這輪錯的</button>':''}<button class="btn" id="qzBack">換設定</button></div></div>`;
+  if(full){setTimeout(()=>celebrate(qz.msg||'自然全對！'),250)}else SFX.lose();
+  $('#qzAgain').onclick=()=>qz.again();
+  $('#qzBack').onclick=()=>qz.back();
+  const r=$('#qzRe');if(r)r.onclick=()=>{const bad=shuffle(qz.bad);qzStart(Object.assign({},qz,{items:bad,i:0,ok:0,bad:[]}))};
+}
+
+/* ===== 練習題（選擇題＋是非題）===== */
+function quizPool(){
+  let p=QB.filter(inScope);
+  if(st.qtype==='mc')p=p.filter(x=>x.t==='mc');
+  if(st.qtype==='tf')p=p.filter(x=>x.t==='tf');
+  if(st.onlyWrong)p=p.filter(x=>isWrong(x.q));
+  return p;
+}
+const toQ=x=>x.t==='tf'
+  ? {q:x.q,o:['○ 對','╳ 錯'],a:x.a,e:x.e,s:x.s,g:x.g,tf:true,tag:'是非題・'+x.g}
+  : {q:x.q,o:x.o,a:x.a,e:x.e,s:x.s,g:x.g,tag:'選擇題・'+x.g};
+function quizIntro(){
+  const p=quizPool(),tc=(v,l)=>`<button class="chip" data-qt="${v}" aria-pressed="${st.qtype===v}">${l}</button>`;
+  $('#quizArea').innerHTML=`<div class="qcard">
+   <p class="qask">期中考範圍的選擇題和是非題，全部取自重點整理、隨堂練習、月考與期中考 A／B 卷的<b>教用版印刷答案</b>。</p>
+   ${timeChips()}
+   <div class="modes">${tc('all','全部')}${tc('mc','只練選擇題')}${tc('tf','只練是非題')}</div>
+   <div class="bar" style="justify-content:center">${sizeSel('qzN',10)}</div>
+   <p class="hint">範圍內有 ${p.length} 題（選擇 ${p.filter(x=>x.t==='mc').length}・是非 ${p.filter(x=>x.t==='tf').length}）</p>
+   ${p.length?'<button class="btn primary" id="qGo">開始練習</button>':emptyMsg}</div>`;
+  document.querySelectorAll('#quizArea [data-qt]').forEach(b=>b.onclick=()=>{st.qtype=b.dataset.qt;quizIntro()});
+  const g=$('#qGo');if(g)g.onclick=()=>{
+    const n=Math.min(+$('#qzN').value,p.length);
+    qzStart({area:'#quizArea',key:'quiz',mod:'練習題',msg:'自然全對！',items:shuffle(p).slice(0,n).map(toQ),again:()=>{const g2=$('#qGo');quizIntro();setTimeout(()=>$('#qGo')&&$('#qGo').click(),0)},back:quizIntro});
+  };
+}
+
+/* ===== 概念卡 ===== */
+const CBY={};CARDS.forEach(c=>CBY[c.k]=c);
+function renderCards(){
+  const p=CARDS.filter(inScope);
+  if(!p.find(c=>c.k===st.sel)&&p.length)st.sel=p[0].k;
+  const x=CBY[st.sel];
+  $('#cDetail').innerHTML=p.length&&x?`<span class="qtag">${esc(x.g)} ${GN[GK.indexOf(x.g)].slice(4)}</span>
+   <div class="term">${esc(x.k)}</div>
+   <div class="dsc">${st.selfTest?`<span class="cover" tabindex="0" role="button">${esc(x.d)}</span>`:esc(x.d)}</div>`
+   :`<p class="hint">這個範圍裡沒有概念卡。</p>`;
+  $('#cardGrid').innerHTML=GK.filter(g=>st.groups.has(g)).map(g=>{
+    const list=p.filter(c=>c.g===g);if(!list.length)return '';
+    return `<div class="groupHead">${GN[GK.indexOf(g)]}</div><div class="cgrid">${list.map(c=>`<button class="cmini${c.k===st.sel?' sel':''}" data-k="${esc(c.k)}">${esc(c.k)}</button>`).join('')}</div>`;
+  }).join('');
+  document.querySelectorAll('#cardGrid .cmini').forEach(b=>b.onclick=()=>{st.sel=b.dataset.k;renderCards()});
+  document.querySelectorAll('#cDetail .cover').forEach(el=>{const op=()=>{el.classList.remove('cover')};el.onclick=op;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();op()}}});
+}
+$('#selfTest').onclick=()=>{st.selfTest=!st.selfTest;$('#selfTest').setAttribute('aria-pressed',st.selfTest);renderCards()};
+
+/* ===== 翻牌配對：名詞 ↔ 說明 ===== */
+let memMode='up',memSize=6;
+const mmt=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
+const memKey=()=>`sci6-best-${memMode}-${memSize}`;
+function memIntro(){
+  if(mm&&mm.timer){clearInterval(mm.timer);mm.timer=null}
+  const best=load(memKey(),null),p=CARDS.filter(inScope);
+  const chip=(k,v,label)=>`<button class="chip" data-${k}="${v}" aria-pressed="${({mode:memMode,size:String(memSize)})[k]===String(v)}">${label}</button>`;
+  $('#memArea').innerHTML=`<div class="qcard"><p class="qask">翻開兩張牌，把<b>名詞</b>和它的<b>說明</b>配成一對。連續配對成功有連擊加分！</p>
+   <div class="modes">${chip('mode','up','計時賽：越快越好')}${chip('mode','down','限時賽：倒數讀秒')}</div>
+   <div class="modes">${chip('size',6,'6 對（12 張）')}${chip('size',8,'8 對（16 張）')}</div>
+   <p class="hint">${best?`這一關的最佳紀錄：${memMode==='up'?`${mmt(best.t)}・翻 ${best.mv} 次`:`${best.sc} 分`}`:'這一關還沒有紀錄，來創第一個吧！'}${memMode==='down'?`　限時 ${memSize===6?90:120} 秒`:''}</p>
+   ${p.length>=memSize?'<button class="btn primary" id="mGo">發牌開始</button>':`<p class="hint">範圍內至少要有 ${memSize} 張概念卡，請多選幾個課次。</p>`}</div>`;
+  document.querySelectorAll('#memArea [data-mode]').forEach(b=>b.onclick=()=>{memMode=b.dataset.mode;memIntro()});
+  document.querySelectorAll('#memArea [data-size]').forEach(b=>b.onclick=()=>{memSize=+b.dataset.size;memIntro()});
+  const g=$('#mGo');if(g)g.onclick=memDeal;
+}
+function memDeal(){
+  if(mm&&mm.timer)clearInterval(mm.timer);
+  const pick=shuffle(CARDS.filter(inScope)).slice(0,memSize);
+  const cards=shuffle(pick.flatMap(x=>[{id:x.k,t:'c',x},{id:x.k,t:'a',x}]));
+  const limit=memMode==='down'?(memSize===6?90:120):0;
+  mm={cards,open:[],done:0,moves:0,n:pick.length,lock:false,score:0,combo:0,maxCombo:0,start:0,el:0,limit,over:false,timer:null,lastTick:-1,msg:''};
+  memRender();
+}
+function memStartClock(){
+  if(mm.start)return;mm.start=Date.now();
+  mm.timer=setInterval(()=>{mm.el=(Date.now()-mm.start)/1000;
+    if(mm.limit){const left=Math.ceil(mm.limit-mm.el);if(left<=10&&left>0&&left!==mm.lastTick){mm.lastTick=left;SFX.tick()}
+      if(mm.el>=mm.limit){mm.el=mm.limit;memEnd(false);return}}
+    memHud()},250);
+}
+function memHud(){
+  const h=$('#mHud');if(!h)return;
+  const left=mm.limit?Math.max(0,mm.limit-mm.el):0,warn=mm.limit&&left<=10;
+  h.innerHTML=`<div class="${warn?'warn':''}">${mm.limit?'剩下':'時間'}<b>${mmt(mm.limit?Math.ceil(left):mm.el)}</b></div><div>翻牌<b>${mm.moves}</b></div><div>配對<b>${mm.done}/${mm.n}</b></div><div>分數<b>${mm.score}</b></div>`;
+  const tb=$('#mBar');if(tb){tb.classList.toggle('warn',!!warn);tb.firstElementChild.style.width=(mm.limit?left/mm.limit*100:mm.done/mm.n*100)+'%'}
+}
+const memFace=c=>c.t==='c'?`<span class="term">${esc(c.x.k)}</span>`:`<span class="dsc">${esc(c.x.d)}</span>`;
+function memRender(fx){
+  $('#memArea').innerHTML=`<div class="hud" id="mHud"></div><div class="timebar" id="mBar"><i></i></div>
+   <div class="combo" id="mCombo">${mm.msg}</div>
+   <div class="mem">${mm.cards.map((c,i)=>`<button class="mc${c.open?' open':''}${c.done?' done':''}${fx&&fx.idx.includes(i)?' '+fx.cls:''}" data-i="${i}" aria-label="${c.open||c.done?'已翻開':'蓋著的牌'}">${c.open||c.done?memFace(c):''}</button>`).join('')}</div>
+   <div class="center"><button class="btn" id="mNew">重新發牌</button><button class="btn" id="mBack">換關卡</button></div>
+   <div id="mMsg"></div>`;
+  memHud();
+  $('#mNew').onclick=memDeal;$('#mBack').onclick=memIntro;
+  document.querySelectorAll('#memArea .mc').forEach(b=>b.onclick=()=>memFlip(+b.dataset.i));
+}
+function memFlip(i){
+  const c=mm.cards[i];if(mm.over||mm.lock||c.open||c.done)return;
+  memStartClock();SFX.flip();
+  c.open=true;mm.open.push(c);
+  if(mm.open.length===2){mm.moves++;const [a,b]=mm.open,ia=mm.cards.indexOf(a),ib=mm.cards.indexOf(b);
+    if(a.id===b.id&&a.t!==b.t){
+      a.done=b.done=true;a.open=b.open=false;mm.done++;mm.open=[];mm.combo++;mm.maxCombo=Math.max(mm.maxCombo,mm.combo);
+      const add=100+(mm.combo-1)*50;mm.score+=add;
+      mm.msg=mm.combo>1?`${mm.combo} 連擊！＋${add}`:`配對成功 ＋${add}`;
+      mm.combo>1?SFX.combo():SFX.match();
+      memRender({idx:[ia,ib],cls:'pop'});
+      if(mm.done===mm.n)memEnd(true);
+    }else{
+      mm.combo=0;mm.msg='';mm.lock=true;memRender({idx:[ia,ib],cls:'shake'});
+      setTimeout(()=>{if(mm.over)return;a.open=b.open=false;mm.open=[];mm.lock=false;memRender()},900);
+    }
+  }else memRender();
+}
+function memEnd(win){
+  mm.over=true;clearInterval(mm.timer);mm.timer=null;
+  if(mm.start)mm.el=Math.min(mm.limit||1e9,(Date.now()-mm.start)/1000);
+  let bonus=0;if(win&&mm.limit)bonus=Math.ceil(mm.limit-mm.el)*10;mm.score+=bonus;
+  memHud();
+  if(!win){SFX.lose();
+    const left=[...new Set(mm.cards.filter(c=>!c.done).map(c=>c.x))];
+    mm.cards.forEach(c=>{if(!c.done)c.open=true});memRender();
+    $('#mMsg').innerHTML=`<div class="done-box"><div class="score">時間到！</div><p class="qask">配了 ${mm.done} / ${mm.n} 對，得 ${mm.score} 分。還沒配到的：</p>
+      <div class="wlist">${left.map(x=>`<span class="wz">${esc(x.k)}</span>`).join('')}</div>
+      <button class="btn primary" id="mAgain">再挑戰一次</button></div>`;
+    $('#mAgain').onclick=memDeal;return;
+  }
+  const stars=mm.moves<=mm.n+2?3:mm.moves<=Math.ceil(mm.n*1.7)?2:1;
+  const key=memKey(),best=load(key,null);let rec=false;
+  if(mm.limit){if(!best||mm.score>best.sc){save(key,{sc:mm.score});rec=true}}
+  else{if(!best||mm.el<best.t){save(key,{t:mm.el,mv:mm.moves});rec=true}}
+  setTimeout(()=>stars===3?celebrate('三顆星過關！'):SFX.win(),250);
+  $('#mMsg').innerHTML=`<div class="done-box"><div class="stars" aria-label="${stars} 顆星">${'★'.repeat(stars)}${'☆'.repeat(3-stars)}</div>
+    <div class="score">${mm.score} 分</div>
+    <p class="qask">用了 ${mmt(mm.el)}、翻 ${mm.moves} 次、最高 ${mm.maxCombo} 連擊${bonus?`，剩餘時間加分 ＋${bonus}`:''}。</p>
+    ${rec?'<p class="qask" style="color:var(--rose-deep)"><b>🏆 新紀錄！</b></p>':''}
+    <div class="center"><button class="btn primary" id="mAgain">再玩一局</button><button class="btn" id="mBack2">換關卡</button></div></div>`;
+  $('#mAgain').onclick=memDeal;$('#mBack2').onclick=memIntro;
+}
+
+/* ===== 實驗：步驟排序＋變因判斷 ===== */
+let expMode='seq',ex=null;
+function expIntro(){
+  const sets=EXPSEQ.filter(inScope),vars=EXPVAR.filter(inScope);
+  const chip=(v,l)=>`<button class="chip" data-xm="${v}" aria-pressed="${expMode===v}">${l}</button>`;
+  $('#expArea').innerHTML=`<div class="qcard">
+   <p class="qask">${expMode==='seq'?'課本活動的步驟被打亂了，請<b>照正確順序</b>一個一個點出來。':'判斷實驗裡<b>要改變的（操作變因）、要固定的（控制變因）、要觀察的（應變變因）</b>各是哪一項。'}</p>
+   <div class="modes">${chip('seq','步驟排序')}${chip('var','變因判斷')}</div>
+   ${expMode==='var'?timeChips():''}
+   <p class="hint">${expMode==='seq'?`範圍內有 ${sets.length} 組實驗步驟`:`範圍內有 ${vars.length} 題變因判斷`}</p>
+   ${(expMode==='seq'?sets.length:vars.length)?`<button class="btn primary" id="xGo">開始</button>`:emptyMsg}</div>`;
+  document.querySelectorAll('#expArea [data-xm]').forEach(b=>b.onclick=()=>{expMode=b.dataset.xm;expIntro()});
+  const g=$('#xGo');if(g)g.onclick=()=>{
+    if(expMode==='var')qzStart({area:'#expArea',key:'expvar',mod:'變因判斷',msg:'變因判斷全對！',items:shuffle(vars).map(x=>Object.assign({},x,{tag:'變因判斷・'+x.g})),again:()=>{expIntro();$('#xGo').click()},back:expIntro});
+    else expSeqStart(sets);
+  };
+}
+function expSeqStart(sets){rtStart('expseq');ex={sets:shuffle(sets),i:0,perfect:0};expSeqQ()}
+function expSeqQ(){
+  const s=ex.sets[ex.i];
+  ex.cur={s,order:shuffle(s.steps),mis:0,placed:[]};
+  expSeqRender();rtQ(null);
+}
+function expSeqRender(fx){
+  const c=ex.cur,s=c.s,n=s.steps.length;
+  $('#expArea').innerHTML=`<div class="qcard"><div class="rhud"></div>
+   <span class="qtag">${esc(s.g)}・${esc(s.s)}</span>
+   <p class="qbig">${esc(s.t)}：請依正確順序點選（第 ${c.placed.length+1} / ${n} 步）</p>
+   <div class="steps">${c.order.map((t,i)=>{const pi=c.placed.indexOf(t);
+     return `<button class="step${pi>=0?' ok':''}${fx===i?' bad':''}" data-i="${i}"${pi>=0?' disabled':''}><span class="no">${pi>=0?pi+1:'?'}</span><span>${esc(t)}</span></button>`}).join('')}</div>
+   <div class="prog">第 ${ex.i+1} / ${ex.sets.length} 組・點錯 ${c.mis} 次</div>
+   <div class="center"><button class="btn" id="xBack">換關卡</button></div></div>`;
+  document.querySelectorAll('#expArea .step').forEach(b=>b.onclick=()=>expSeqTap(+b.dataset.i));
+  $('#xBack').onclick=expIntro;
+}
+function expSeqTap(i){
+  const c=ex.cur,t=c.order[i],want=c.s.steps[c.placed.length];
+  if(t===want){c.placed.push(t);SFX.ok();
+    if(c.placed.length===c.s.steps.length){
+      const perfect=c.mis===0;rtAns(perfect);if(perfect)ex.perfect++;
+      else addWrong('實驗步驟',`${c.s.t}（${c.s.g}）的正確步驟順序`,c.s.steps.map((x,k)=>`${k+1}.${x}`).join('　'),c.s.s,c.s.g);
+      expSeqRender();
+      const card=$('#expArea .qcard'),fb=document.createElement('div');
+      fb.className='fb '+(perfect?'ok':'bad');
+      fb.innerHTML=`<b>${perfect?'順序全對，一次就排好！':`排好了，但中間點錯 ${c.mis} 次。`}</b><br>${c.s.steps.map((x,k)=>`${k+1}. ${esc(x)}`).join('<br>')}<span class="src">出處：${esc(c.s.s)}</span>`;
+      card.appendChild(fb);
+      const nb=document.createElement('button');nb.className='btn primary';nb.textContent=ex.i+1<ex.sets.length?'下一組實驗':'看成績';
+      card.appendChild(nb);nb.onclick=()=>{ex.i++;ex.i<ex.sets.length?expSeqQ():expSeqEnd()};nb.focus();
+      return;
+    }
+    expSeqRender();
+  }else{c.mis++;SFX.bad();expSeqRender(i)}
+}
+function expSeqEnd(){
+  const n=ex.sets.length,full=ex.perfect===n;
+  $('#expArea').innerHTML=`<div class="done-box"><div class="score">${ex.perfect} / ${n}</div>
+   <p class="qask">一次就排對 ${ex.perfect} 組。</p>${rtEnd()}
+   <div class="center"><button class="btn primary" id="xAgain">再排一次</button><button class="btn" id="xBack2">換關卡</button></div></div>`;
+  if(full){setTimeout(()=>celebrate('實驗步驟全對！'),250)}else SFX.lose();
+  $('#xAgain').onclick=()=>expSeqStart(EXPSEQ.filter(inScope));
+  $('#xBack2').onclick=expIntro;
+}
+
+/* ===== 分類題（由分類表自動出題）===== */
+function sortItems(){
+  const out=[];
+  SETS.filter(inScope).forEach(s=>s.items.forEach(([name,ci])=>out.push({
+    q:`「${name}」屬於哪一類？（${s.name}）`,o:s.cats,a:ci,g:s.g,s:'課本・重點歸納',
+    e:`${s.name}：${s.cats.map((c,i)=>`${c}＝${s.items.filter(it=>it[1]===i).map(it=>it[0]).join('、')}`).join('；')}`,
+    tag:'分類・'+s.g+'・'+s.name})));
+  return st.onlyWrong?out.filter(x=>isWrong(x.q)):out;
+}
+function sortIntro(){
+  const p=sortItems(),sets=SETS.filter(inScope);
+  $('#sortArea').innerHTML=`<div class="qcard">
+   <p class="qask">把水的三態、鋒面、溫室氣體、溶質形態、導電性、酸鹼性……一個一個放進正確的類別裡。</p>
+   ${timeChips()}
+   <div class="bar" style="justify-content:center">${sizeSel('stN',10)}</div>
+   <p class="hint">範圍內有 ${sets.length} 組分類表、共 ${p.length} 題${sets.length?`：${sets.map(s=>s.name).join('、')}`:''}</p>
+   ${p.length?'<button class="btn primary" id="sGo">開始分類</button>':emptyMsg}</div>`;
+  const g=$('#sGo');if(g)g.onclick=()=>{
+    const n=Math.min(+$('#stN').value,p.length);
+    qzStart({area:'#sortArea',key:'sort',mod:'分類題',msg:'分類全對！',items:shuffle(p).slice(0,n),again:()=>{sortIntro();$('#sGo').click()},back:sortIntro});
+  };
+}
+
+/* ===== 因果配對 ===== */
+function pairItems(){
+  const p=CAUSE.filter(inScope);if(p.length<4)return [];
+  const out=p.map(x=>{
+    const r2c=Math.random()<0.5;
+    const key=r2c?'c':'r',ask=r2c?'r':'c';
+    let pool=p.filter(y=>y!==x&&y.g===x.g&&y[key]!==x[key]);
+    if(pool.length<3)pool=p.filter(y=>y!==x&&y[key]!==x[key]);
+    const seen=new Set([x[key]]),ds=[];
+    for(const y of shuffle(pool)){if(seen.has(y[key]))continue;seen.add(y[key]);ds.push(y[key]);if(ds.length===3)break}
+    const o=shuffle([x[key],...ds]);
+    return {q:r2c?`「${x.r}」最可能是下列哪一個原因造成的？`:`「${x.c}」會造成下列哪一個結果？`,
+      o,a:o.indexOf(x[key]),g:x.g,s:'課本・重點歸納',
+      e:`${x.c} → ${x.r}`,tag:'因果配對・'+x.g};
+  });
+  return st.onlyWrong?out.filter(x=>isWrong(x.q)):out;
+}
+function pairIntro(){
+  const p=pairItems();
+  $('#pairArea').innerHTML=`<div class="qcard">
+   <p class="qask">自然科最常考的就是<b>「為什麼」</b>。看到原因要能說出結果，看到結果要能找出原因。</p>
+   ${timeChips()}
+   <div class="bar" style="justify-content:center">${sizeSel('prN',10)}</div>
+   <p class="hint">範圍內有 ${p.length} 組因果關係</p>
+   ${p.length?'<button class="btn primary" id="pGo">開始配對</button>':(CAUSE.filter(inScope).length?'<p class="hint">這個範圍的因果題太少（至少要 4 組），請多選幾個課次。</p>':emptyMsg)}</div>`;
+  const g=$('#pGo');if(g)g.onclick=()=>{
+    const n=Math.min(+$('#prN').value,p.length);
+    qzStart({area:'#pairArea',key:'pair',mod:'因果配對',msg:'因果配對全對！',items:shuffle(p).slice(0,n),again:()=>{pairIntro();$('#pGo').click()},back:pairIntro});
+  };
+}
+
+
+/* ===== 圖表判讀 ===== */
+function chartPool(){
+  const p=CHART.filter(inScope);
+  return st.onlyWrong?p.filter(x=>isWrong(x.q)):p;
+}
+function chartIntro(){
+  const p=chartPool();
+  $('#chartArea').innerHTML=`<div class="qcard">
+   <p class="qask">看<b>天氣圖、颱風路線圖、水循環圖、趨勢圖和實驗紀錄表</b>回答問題。圖是照課本的符號重新畫的，考卷上長得差不多。</p>
+   ${timeChips()}
+   <div class="bar" style="justify-content:center">${sizeSel('chN',10)}</div>
+   <p class="hint">範圍內有 ${p.length} 題圖表題</p>
+   ${p.length?'<button class="btn primary" id="cGo">開始看圖</button>':emptyMsg}</div>`;
+  const g=$('#cGo');if(g)g.onclick=()=>{
+    const n=Math.min(+$('#chN').value,p.length);
+    qzStart({area:'#chartArea',key:'chart',mod:'圖表判讀',msg:'圖表判讀全對！',
+      items:shuffle(p).slice(0,n).map(x=>Object.assign({},x,{tag:'圖表判讀・'+x.g})),
+      again:()=>{chartIntro();$('#cGo').click()},back:chartIntro});
+  };
+}
+
+/* ===== 素養題 ===== */
+function litPool(){
+  const p=LIT.filter(inScope);
+  return st.onlyWrong?p.filter(x=>isWrong(x.q)):p;
+}
+function litIntro(){
+  const p=litPool();
+  $('#litArea').innerHTML=`<div class="qcard">
+   <p class="qask">素養題會先給一段<b>生活情境或短文</b>，再問問題。重點是<b>先讀懂情境，再想課本學過的原理</b>。</p>
+   ${timeChips()}
+   <div class="bar" style="justify-content:center">${sizeSel('ltN',10)}</div>
+   <p class="hint">範圍內有 ${p.length} 題素養題</p>
+   ${p.length?'<button class="btn primary" id="lGo">開始讀題</button>':emptyMsg}</div>`;
+  const g=$('#lGo');if(g)g.onclick=()=>{
+    const n=Math.min(+$('#ltN').value,p.length);
+    qzStart({area:'#litArea',key:'lit',mod:'素養題',msg:'素養題全對！',
+      items:shuffle(p).slice(0,n).map(x=>Object.assign({},x,{tag:'素養題・'+x.g})),
+      again:()=>{litIntro();$('#lGo').click()},back:litIntro});
+  };
+}
+
+/* ===== 模擬考：交卷後才公布答案和分數 ===== */
+let ek=null;
+const EX_TF=10,EX_MC=10,EX_HI=8;
+function examBuild(){
+  const out=[];
+  shuffle(QB.filter(x=>x.t==='tf')).slice(0,EX_TF).map(toQ).forEach(q=>out.push({q,pt:3,sec:'一、是非題'}));
+  shuffle(QB.filter(x=>x.t==='mc')).slice(0,EX_MC).map(toQ).forEach(q=>out.push({q,pt:3,sec:'二、選擇題'}));
+  shuffle(LIT.concat(CHART)).slice(0,EX_HI)
+    .map(x=>Object.assign({},x,{tag:(x.fig?'圖表判讀・':'素養題・')+x.g}))
+    .forEach(q=>out.push({q,pt:5,sec:'三、圖表與素養題'}));
+  return out;
+}
+function examIntro(){
+  const best=load('sci6-exam-best',null);
+  $('#examArea').innerHTML=`<div class="qcard">
+   <p class="qask">模擬考的題型和學校的期中考卷一樣：<b>是非題 ${EX_TF} 題（每題 3 分）、選擇題 ${EX_MC} 題（每題 3 分）、圖表與素養題 ${EX_HI} 題（每題 5 分），滿分 100 分</b>。</p>
+   <p class="hint">模擬考<b>不會馬上公布答案</b>，整份寫完按「交卷」才會出現分數和詳解，中途可以回頭改答案。題目從整個期中考範圍（單元一＋單元二）隨機抽出，上面的課次按鈕這一關不作用。</p>
+   ${best!=null?`<p class="hint">這台裝置最高分：<b>${best} 分</b></p>`:''}
+   <button class="btn primary" id="eGo">開始模擬考</button></div>`;
+  $('#eGo').onclick=examStart;
+}
+function examStart(){
+  if(ek&&ek.timer)clearInterval(ek.timer);
+  ek={items:examBuild(),ans:{},t0:Date.now(),done:false,timer:null,warn:false};
+  examRender();
+  ek.timer=setInterval(examHud,1000);
+}
+function examHud(){
+  const h=$('#eHud');if(!h||!ek)return;
+  const t=Math.floor((Date.now()-ek.t0)/1000),n=Object.keys(ek.ans).length;
+  h.textContent=ek.done?`已交卷・用時 ${rmt(t)}`:`已作答 ${n} / ${ek.items.length} 題・用時 ${rmt(t)}`;
+}
+function examRender(){
+  let last='';
+  const body=ek.items.map((it,i)=>{
+    const q=it.q,head=it.sec!==last?`<h3 class="esec">${it.sec}（每題 ${it.pt} 分）</h3>`:'';
+    last=it.sec;
+    const long=q.o.some(s=>s.length>8);
+    return head+`<div class="qcard ecard" id="eq${i}">
+     <span class="qtag">${esc(q.tag||'')}<span class="epts">${it.pt} 分</span></span>
+     ${q.fig?`<div class="fig">${q.fig}</div>`:''}
+     ${q.ctx?`<div class="ctx">${esc(q.ctx)}</div>`:''}
+     <p class="qbig">${i+1}. ${esc(q.q)}</p>
+     <div class="opts${q.tf?'':(long?' one':'')}">${q.o.map((o,k)=>`<button class="opt${q.tf?' tf':''}" aria-pressed="false" data-q="${i}" data-k="${k}">${q.tf?'':`<span class="no">${NUM[k]}</span>`}<span>${esc(o)}</span></button>`).join('')}</div>
+    </div>`;
+  }).join('');
+  $('#examArea').innerHTML=`<div class="ehud" id="eHud"></div>${body}
+   <div class="done-box" id="eFoot"><div class="center"><button class="btn primary" id="eSubmit">交卷</button><button class="btn" id="eQuit">離開模擬考</button></div><div id="eWarn"></div></div>`;
+  document.querySelectorAll('#examArea .opt').forEach(b=>b.onclick=()=>examPick(+b.dataset.q,+b.dataset.k));
+  $('#eSubmit').onclick=examSubmit;
+  $('#eQuit').onclick=()=>{if(ek&&ek.timer)clearInterval(ek.timer);ek=null;examIntro()};
+  examHud();
+}
+function examPick(i,k){
+  if(!ek||ek.done)return;
+  ek.ans[i]=k;SFX.tick&&SFX.tick();
+  document.querySelectorAll(`#eq${i} .opt`).forEach(b=>b.setAttribute('aria-pressed',+b.dataset.k===k));
+  examHud();
+}
+function examSubmit(){
+  if(!ek||ek.done)return;
+  const miss=ek.items.map((x,i)=>i).filter(i=>!(i in ek.ans));
+  if(miss.length&&!ek.warn){
+    ek.warn=true;
+    $('#eWarn').innerHTML=`<p class="ewarn">還有 ${miss.length} 題沒有作答（第 ${miss.map(i=>i+1).join('、')} 題）。沒寫的算錯喔，確定要交卷嗎？</p>
+     <div class="center"><button class="btn rose primary" id="eYes">確定交卷</button><button class="btn" id="eNo">回去寫完</button></div>`;
+    $('#eYes').onclick=()=>{$('#eWarn').innerHTML='';examSubmit()};
+    $('#eNo').onclick=()=>{ek.warn=false;$('#eWarn').innerHTML='';const f=document.getElementById('eq'+miss[0]);if(f&&f.scrollIntoView)f.scrollIntoView({block:'center'})};
+    return;
+  }
+  ek.done=true;if(ek.timer){clearInterval(ek.timer);ek.timer=null}
+  let score=0,ok=0;
+  ek.items.forEach((it,i)=>{
+    const q=it.q,k=(i in ek.ans)?ek.ans[i]:-1,right=k===q.a;
+    if(right){score+=it.pt;ok++}else addWrong('模擬考',q.q,ansTxt(q),q.s||'',q.g);
+    document.querySelectorAll(`#eq${i} .opt`).forEach(b=>{b.disabled=true;const j=+b.dataset.k;
+      if(j===q.a){b.classList.add('ok');b.insertAdjacentHTML('beforeend','<span class="mark">正解</span>')}
+      else if(j===k){b.classList.add('bad');b.insertAdjacentHTML('beforeend','<span class="mark">你選的</span>')}});
+    const card=document.getElementById('eq'+i),fb=document.createElement('div');
+    fb.className='fb '+(right?'ok':'bad');
+    fb.innerHTML=`<b>${right?`答對，得 ${it.pt} 分`:(k<0?'沒有作答，正確答案是 ':'答錯了，正確答案是 ')+(right?'':esc(ansTxt(q)))}</b>${q.e?'<br>'+esc(q.e):''}${q.s?`<span class="src">出處：${esc(q.s)}</span>`:''}`;
+    card.appendChild(fb);
+  });
+  const t=Math.floor((Date.now()-ek.t0)/1000),n=ek.items.length;
+  const best=load('sci6-exam-best',null),nb=(best==null||score>best);
+  if(nb)save('sci6-exam-best',score);
+  const lv=score===100?'滿分！真的很厲害':score>=90?'非常好，再補幾個小地方就完美了':score>=80?'不錯，答錯的再看一次就好':score>=60?'及格了，錯題本要多練幾次':'先把錯題本和概念卡讀一遍，再考一次';
+  $('#eFoot').outerHTML=`<div class="done-box" id="eFoot"><div class="score">${score} 分</div>
+   <p class="qask">答對 ${ok} / ${n} 題・用時 ${rmt(t)}${nb?'・<b>新紀錄！</b>':(best!=null?`・最高分 ${best} 分`:'')}</p>
+   <p class="hint">${lv}。答錯的題目都已經記進錯題本，上面每一題下面都有詳解和出處。</p>
+   <div class="center"><button class="btn primary" id="eAgain">再考一份</button><button class="btn" id="eWrong">去看錯題本</button><button class="btn" id="eOut">離開模擬考</button></div></div>`;
+  $('#eAgain').onclick=examStart;
+  $('#eWrong').onclick=()=>document.querySelector('[data-tab="wrong"]').click();
+  $('#eOut').onclick=()=>{ek=null;examIntro()};
+  examHud();
+  if(score===100)setTimeout(()=>celebrate('模擬考 100 分！'),300);else SFX.lose();
+  const top=$('#examArea .ehud');if(top&&top.scrollIntoView)top.scrollIntoView({block:'start'});
+}
+
+/* ===== 慶祝角色（全部原創，每次隨機兩位出場）===== */
+const FACE=(y,c='var(--ink)')=>`<circle cx="48" cy="${y}" r="5" fill="${c}"/><circle cx="72" cy="${y}" r="5" fill="${c}"/><circle cx="49.5" cy="${y-1.5}" r="1.6" fill="#fff"/><circle cx="73.5" cy="${y-1.5}" r="1.6" fill="#fff"/>
+ <ellipse cx="40" cy="${y+11}" rx="6" ry="4" fill="var(--c2)" opacity=".75"/><ellipse cx="80" cy="${y+11}" rx="6" ry="4" fill="var(--c2)" opacity=".75"/><path d="M51 ${y+14} Q60 ${y+23} 69 ${y+14}" stroke="${c}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+const CHARS=[
+ {name:'水滴妹',body:`<path d="M60 18 C30 46 24 70 24 88 a36 36 0 0 0 72 0 C96 70 90 46 60 18Z" fill="#7fc9d6" stroke="var(--ink)" stroke-width="3"/><path d="M40 60 Q36 74 40 86" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".8"/>`+FACE(80)},
+ {name:'小石頭',body:`<path d="M26 96 C18 72 30 44 56 36 C84 28 104 50 100 78 C98 100 80 118 58 116 C40 114 30 108 26 96Z" fill="#b9bfc2" stroke="var(--ink)" stroke-width="3"/><circle cx="38" cy="58" r="3" fill="#8e9598"/><circle cx="88" cy="96" r="4" fill="#8e9598"/>`+FACE(78)},
+ {name:'魚寶寶',body:`<path d="M92 80 L118 56 L118 104Z" fill="#f2a86a" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><path d="M52 50 L62 34 L72 52Z" fill="#f2a86a" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><ellipse cx="56" cy="80" rx="38" ry="29" fill="#ffc98a" stroke="var(--ink)" stroke-width="3"/>`+FACE(76)},
+ {name:'荷葉弟',body:`<path d="M60 80 m-42 0 a42 42 0 1 1 42 42 Z M60 80 L60 38 A42 42 0 0 1 96 60 Z" fill="#8ac98a" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><path d="M60 80 L24 70 M60 80 L30 102 M60 80 L54 120 M60 80 L88 106" stroke="#5f9c62" stroke-width="2"/>`+FACE(80)},
+ {name:'蝌蚪仔',body:`<path d="M86 86 C104 78 112 96 104 108 C116 112 112 130 96 126" fill="none" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/><circle cx="56" cy="80" r="34" fill="#7f8f9c" stroke="var(--ink)" stroke-width="3"/>`+FACE(78)},
+ {name:'小螃蟹',body:`<path d="M20 70 Q8 56 16 44 Q26 36 34 46" fill="none" stroke="var(--ink)" stroke-width="4"/><path d="M100 70 Q112 56 104 44 Q94 36 86 46" fill="none" stroke="var(--ink)" stroke-width="4"/><ellipse cx="60" cy="90" rx="40" ry="28" fill="#e98a6a" stroke="var(--ink)" stroke-width="3"/><path d="M48 62 L48 52 M72 62 L72 52" stroke="var(--ink)" stroke-width="3"/><circle cx="48" cy="48" r="7" fill="#fff" stroke="var(--ink)" stroke-width="2"/><circle cx="72" cy="48" r="7" fill="#fff" stroke="var(--ink)" stroke-width="2"/><circle cx="48" cy="49" r="3" fill="var(--ink)"/><circle cx="72" cy="49" r="3" fill="var(--ink)"/><path d="M50 96 Q60 104 70 96" stroke="var(--ink)" stroke-width="3" fill="none" stroke-linecap="round"/>`},
+ {name:'小苗芽',body:`<path d="M60 112 L60 56" stroke="#5f9c62" stroke-width="5" stroke-linecap="round"/><path d="M60 68 Q34 56 30 34 Q56 36 60 68Z" fill="#8ac98a" stroke="var(--ink)" stroke-width="3"/><path d="M60 78 Q86 66 90 44 Q64 46 60 78Z" fill="#a8d9a0" stroke="var(--ink)" stroke-width="3"/><path d="M34 112 L86 112 L80 142 L40 142Z" fill="#d9a877" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/>`+FACE(124)},
+ {name:'雲朵哥',body:`<path d="M30 96 a20 20 0 0 1 2-39 a25 25 0 0 1 47-9 a18 18 0 0 1 13 30 a16 16 0 0 1-8 18Z" fill="#dff1f5" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><path d="M40 104 l-4 14 M58 106 l-4 16 M76 102 l-4 13" stroke="#7fc9d6" stroke-width="4" stroke-linecap="round"/>`+FACE(72)},
+ {name:'鹽粒弟',body:`<path d="M34 54 L60 40 L86 54 L86 92 L60 108 L34 92Z" fill="#f2f6f7" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><path d="M34 54 L60 68 L86 54 M60 68 L60 108" stroke="#b6c6c9" stroke-width="2.5" fill="none"/>`+FACE(84)},
+];
+function dancerSVG(c,cls){
+  const hand=['var(--c2)','var(--c3)','var(--c4)','var(--c1)'][Math.floor(Math.random()*4)];
+  return `<svg class="dancer ${cls}" viewBox="0 0 120 150" aria-hidden="true">
+   <g class="arm al"><path d="M28 80 Q12 64 8 46" stroke="var(--ink)" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="8" cy="44" r="6" fill="${hand}"/></g>
+   <g class="arm ar"><path d="M92 80 Q108 64 112 46" stroke="var(--ink)" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="112" cy="44" r="6" fill="${hand}"/></g>
+   <g class="leg ll"><path d="M48 118 L42 144" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/></g>
+   <g class="leg lr"><path d="M72 118 L78 144" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/></g>
+   ${c.body}</svg>`;
+}
+
+/* ===== 滿分慶祝：隨機兩位原創角色跳舞＋彩紙 ===== */
+function celebrate(msg){
+  SFX.win();
+  let ov=document.getElementById('party');if(ov)ov.remove();
+  ov=document.createElement('div');ov.id='party';ov.setAttribute('role','dialog');ov.setAttribute('aria-label','滿分慶祝');
+  const conf=Array.from({length:40},(_,i)=>`<i style="left:${Math.random()*100}%;animation-delay:${(Math.random()*1.2).toFixed(2)}s;animation-duration:${(2.2+Math.random()*1.8).toFixed(2)}s;background:var(--c${i%4+1});transform:rotate(${Math.random()*360}deg)"></i>`).join('');
+  const pair=shuffle(CHARS).slice(0,2);
+  ov.innerHTML=`<div class="confetti">${conf}</div>
+   <div class="party-card">
+    <div class="dancers">
+     ${dancerSVG(pair[0],'d1')}
+     <div class="hundred">100</div>
+     ${dancerSVG(pair[1],'d2')}
+    </div>
+    <div class="party-title">${esc(msg||'100 分！')}</div>
+    <p class="party-sub">${pair[0].name}和${pair[1].name}在幫你跳舞慶祝！</p>
+    <button class="btn primary" id="partyClose">好耶，繼續加油</button>
+   </div>`;
+  document.body.appendChild(ov);
+  const close=()=>{ov.classList.add('out');setTimeout(()=>ov.remove(),300)};
+  ov.querySelector('#partyClose').onclick=close;ov.addEventListener('click',e=>{if(e.target===ov)close()});
+  ov.querySelector('#partyClose').focus();
+  setTimeout(()=>{if(document.body.contains(ov))close()},7000);
+}
+
+/* ===== 錯題本 ===== */
+function renderWrong(confirm){
+  const ks=Object.keys(wq).sort((a,b)=>wq[b].n-wq[a].n||(wq[a].g<wq[b].g?-1:1));
+  $('#wrongArea').innerHTML=ks.length?`<p class="hint">答錯的題目都會記在這裡（只存在這台裝置的瀏覽器裡）。上方點「只練錯題」，練習題、分類、配對、圖表、素養就只出這些題。</p>
+   <div class="tbl"><table><tr><th>課次</th><th>題型</th><th>題目</th><th>正確答案</th><th>出處</th><th>錯幾次</th></tr>
+   ${ks.map(k=>{const w=wq[k];return `<tr><td class="n">${esc(w.g||'')}</td><td class="n">${esc(w.m||'')}</td><td class="q">${esc(w.q)}</td><td class="q">${esc(w.a||'')}</td><td class="n" style="font-size:13px;color:var(--muted)">${esc(w.s||'')}</td><td class="n">${w.n}</td></tr>`}).join('')}</table></div>
+   <div class="bar"><button class="btn rose primary" id="goWrong">只練錯題</button><button class="btn" id="clrW">清空錯題本</button></div>
+   ${confirm?`<div class="confirm">確定清空全部錯題紀錄？<button class="btn rose primary" id="clrYes">清空</button><button class="btn" id="clrNo">取消</button></div>`:''}`
+   :`<div class="done-box"><p class="qask">錯題本是空的。</p><p class="hint">在「練習題」「實驗」「分類」「配對」「圖表」「素養」和「模擬考」答錯的題目都會自動記到這裡。</p></div>`;
+  const g=$('#goWrong');if(g)g.onclick=()=>{st.onlyWrong=true;st.qtype='all';renderScope();document.querySelector('[data-tab="quiz"]').click()};
+  const c=$('#clrW');if(c)c.onclick=()=>renderWrong(true);
+  const y=$('#clrYes');if(y)y.onclick=()=>{wq={};save('sci6-wrong',wq);renderScope();renderWrong()};
+  const n=$('#clrNo');if(n)n.onclick=()=>renderWrong();
+}
+
+renderScope();quizIntro();
+</script>
+
+<script>
+/* =====================================================================
+   site-home.js — "📚 小站" (back to 練習小站) button for every practice page
+   Canonical copy: github.com/iam5980/kids-practice/template/site-home.js
+   Version: 2026-10-24
+
+   HOW TO USE: paste this whole file in its own <script> block just before
+   </body> of EVERY page published to kids-practice (English and 中文部,
+   apps, oral pages, listening players). No other code is needed.
+
+   - Small "📚 小站" pill fixed at the bottom-left (safe-area aware)
+   - Tap → in-page card: "回到練習小站嗎？" [回到練習小站] [繼續練習]
+     (no window.confirm — it is blocked/ugly on iPad and stops speech)
+   - Goes to the site root (…/kids-practice/), or the live site when the
+     page is opened outside it (Artifact preview, local file)
+   - Adds bottom padding so the button never hides the last line
+   ===================================================================== */
+(function () {
+  "use strict";
+  if (window.__siteHome || !document.body) return;
+  window.__siteHome = true;
+  var LIVE = "https://iam5980.github.io/kids-practice/";
+  function homeUrl() {
+    var p = location.pathname, i = p.indexOf("/kids-practice/");
+    if (location.protocol.indexOf("http") === 0 && i >= 0) return location.origin + p.slice(0, i) + "/kids-practice/";
+    return LIVE;
+  }
+  var css = document.createElement("style");
+  css.textContent =
+    "#sh-btn{position:fixed;left:max(12px,env(safe-area-inset-left));bottom:max(12px,env(safe-area-inset-bottom));z-index:9000;" +
+    "height:44px;padding:0 14px 0 10px;border-radius:999px;border:2px solid rgba(255,255,255,.9);background:#334155;color:#fff;font:700 16px/1 -apple-system,'PingFang TC','Noto Sans TC',sans-serif;" +
+    "box-shadow:0 4px 14px rgba(0,0,0,.28);cursor:pointer;opacity:.9;touch-action:manipulation;white-space:nowrap}" +
+    "#sh-btn:active{transform:scale(.94)}" +
+    "#sh-mask{position:fixed;inset:0;z-index:9001;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px}" +
+    "#sh-card{background:#fff;color:#0f172a;border-radius:18px;padding:20px 18px;max-width:340px;width:100%;text-align:center;" +
+    "font:17px/1.5 -apple-system,'PingFang TC','Noto Sans TC',sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.3)}" +
+    "#sh-card h3{margin:0 0 6px;font-size:20px}#sh-card p{margin:0 0 16px;color:#475569;font-size:15px}" +
+    "#sh-card button{font:inherit;min-height:48px;border-radius:12px;border:0;padding:10px 16px;margin:4px;cursor:pointer}" +
+    "#sh-go{background:#0284c7;color:#fff;font-weight:700}#sh-stay{background:#e2e8f0;color:#0f172a}" +
+    "@media (prefers-color-scheme:dark){#sh-card{background:#1e293b;color:#e2e8f0}#sh-card p{color:#94a3b8}#sh-stay{background:#334155;color:#e2e8f0}}" +
+    "body{padding-bottom:max(76px,calc(64px + env(safe-area-inset-bottom)))!important}";
+  document.head.appendChild(css);
+
+  var b = document.createElement("button");
+  b.id = "sh-btn"; b.type = "button";
+  b.setAttribute("aria-label", "回到練習小站"); b.title = "回到練習小站";
+  b.textContent = "📚 小站";
+  b.addEventListener("click", function () {
+    if (document.getElementById("sh-mask")) return;
+    var m = document.createElement("div"); m.id = "sh-mask";
+    m.innerHTML = '<div id="sh-card" role="dialog" aria-modal="true"><h3>📚 回到練習小站？</h3>' +
+      '<p>這一輪的作答不會保留（最高分紀錄會留著）。</p>' +
+      '<button id="sh-go" type="button">回到練習小站</button><button id="sh-stay" type="button">繼續練習</button></div>';
+    document.body.appendChild(m);
+    function close() { m.remove(); }
+    m.addEventListener("click", function (e) { if (e.target === m) close(); });
+    document.getElementById("sh-stay").addEventListener("click", close);
+    document.getElementById("sh-go").addEventListener("click", function () {
+      try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
+      location.href = homeUrl();
+    });
+    document.getElementById("sh-go").focus();
+  });
+  document.body.appendChild(b);
+})();
+</script>
+</body>
+</html>
