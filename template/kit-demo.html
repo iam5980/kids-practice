@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>闖關與素養題組測試</title>
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--ink:#1f2328}
+@media (prefers-color-scheme:dark){:root{--bg:#16181b;--card:#1f2226;--ink:#eceae5}}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 -apple-system,"PingFang TC","Noto Sans TC",sans-serif}
+main{max-width:760px;margin:0 auto;padding:16px}
+.card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:16px}
+</style>
+</head>
+<body>
+<main>
+<h1>🧪 闖關與素養題組測試</h1>
+<p>這是共用元件的測試頁。真正的 App 會用老師的教材做內容。</p>
+<div class="card"><h2>1. 重點卡朗讀</h2>
+  <p><b>蒸發</b> <span id="s1"></span></p>
+  <p>水受熱後變成水蒸氣，散到空氣中的現象。 <span id="s2"></span></p>
+  <p>數學：6 1/2 → 6×2＋1＝13 → 13/2 <span id="s3"></span></p>
+</div>
+<div class="card" id="mapCard"></div>
+<div class="card" id="setCard"></div>
+</main>
+<script src="study-kit.js"></script>
+<script>
+KidKit.injectCSS();
+document.getElementById("s1").innerHTML = KidKit.sayBtn("蒸發", "聽");
+document.getElementById("s2").innerHTML = KidKit.sayBtn("水受熱後變成水蒸氣，散到空氣中的現象。", "聽說明");
+document.getElementById("s3").innerHTML = KidKit.sayBtn("6 1/2 → 6×2＋1＝13 → 13/2", "聽", {math: true});
+
+var SET = {
+  title: "晾衣服的學問", source: "self", lang: "zh-TW",
+  passage: "小安星期六早上洗了兩件一樣的 T 恤。她把一件晾在<b>陽光下、有風的陽台</b>，另一件晾在<b>沒有陽光、不通風的浴室</b>。" +
+           "到了中午，陽台上的 T 恤已經乾了，浴室裡的還是濕濕的。<br>小安想：「衣服裡的水跑到哪裡去了？為什麼兩件乾的速度不一樣？」" +
+           "<br>媽媽說：「水會變成水蒸氣跑到空氣中，這叫做<b>蒸發</b>。溫度越高、風越大，蒸發就越快。」",
+  questions: [
+    {type: "mc", q: "陽台上的 T 恤會乾，是因為衣服裡的水發生了什麼變化？", choices: ["蒸發成水蒸氣", "凝結成小水滴", "結成冰"], exp: "水變成水蒸氣散到空氣中，就是蒸發。"},
+    {type: "tf", q: "浴室裡的 T 恤乾得比較慢，是因為那裡沒有陽光又不通風。", answer: true},
+    {type: "multi", q: "下面哪些做法可以讓衣服乾得更快？", choices: ["晾在有太陽的地方", "晾在通風的地方", "把衣服揉成一團晾", "晾在密閉的櫃子裡"], correct: [0, 1], exp: "溫度高、通風好，蒸發就快。"},
+    {type: "order", q: "請依照發生的順序排列：", items: ["小安洗好 T 恤", "把 T 恤晾到陽台", "衣服裡的水蒸發", "T 恤乾了"]},
+    {type: "open", q: "如果要比較「有風」和「沒有風」哪一個乾得快，實驗時要讓什麼條件一樣？", a: "除了有沒有風以外，其他條件都要一樣，例如同樣的衣服、同樣的溫度和陽光。",
+     points: [["衣服", "T恤", "布"], ["溫度", "陽光", "太陽"]], need: 2}
+  ]
+};
+var map = KidKit.levelMap(document.getElementById("mapCard"), {
+  key: "demo-map", lang: "zh-TW",
+  levels: [{id: "L1", name: "第 1 課 水的三態"}, {id: "L2", name: "第 2 課 蒸發與凝結"}, {id: "L3", name: "第 3 課 水的循環"}, {id: "LIT", name: "素養題組", icon: "🧩"}],
+  onPlay: function (id) {
+    if (id === "LIT") { startSet(); document.getElementById("setCard").scrollIntoView({behavior: "smooth"}); }
+    else { var pct = [100, 75, 45][["L1", "L2", "L3"].indexOf(id)]; KidKit.levelResult("demo-map", id, pct); map.refresh(); }
+  }
+});
+function startSet() {
+  KidKit.passageSet(document.getElementById("setCard"), SET, {onDone: function (r) {
+    KidKit.levelResult("demo-map", "LIT", Math.round(100 * r.correct / r.total)); map.refresh();
+  }});
+}
+startSet();
+</script>
+</body>
+</html>

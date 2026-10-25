@@ -1,7 +1,7 @@
 /* =====================================================================
    app-core.js — shared core for the kids' exam-practice apps
    Canonical copy: github.com/iam5980/kids-practice/template/app-core.js
-   Version: 2026-10-23c (speech/typed short answers scored on key points)
+   Version: 2026-10-25 (reports to site-wide points via SitePoints)
 
    HOW TO USE (for the Reading / Science / Grammar skills)
    - Paste this whole file INSIDE the app's single <script> block, before
@@ -35,7 +35,8 @@
                                automatically on key points (short answers)
      Each draws its own ✔ Check button and calls o.onResult(ok, given).
 
-   GAME LAYER
+   GAME LAYER  (each answer and finished round is also reported to the
+               site-wide 集點卡 through SitePoints from site-home.js)
      game(key)                 points, 🔥 streaks, cheers, confetti,
                                best score per drill on this device
      drillBar({game}) shows the HUD; resultView(log, {game, onRetryWrong})
@@ -239,6 +240,7 @@ var AppCore = (function () {
           "<span>" + (g.newBest ? "🏆 <b>New best score!</b>" : "🏅 Best <b>" + g.best + "</b>") + "</span>"));
       }
       if (r.pct === 100 && r.answered >= 3) setTimeout(function () { confetti(80); }, 200);
+      try { if (window.SitePoints && o.game) window.SitePoints.roundEnd(r.pct); } catch (e) {}
       if (r.wrong.length) {
         var ul = el("div", "ac-review");
         ul.appendChild(el("h3", null, "Review these"));
@@ -784,6 +786,7 @@ var AppCore = (function () {
     return {
       hud: function () { hudEl = el("span", "ac-hud"); draw(); return hudEl; },
       record: function (ok) {
+        try { if (window.SitePoints) window.SitePoints.answer(!!ok); } catch (e) {}
         if (ok) {
           streak++; bestStreak = Math.max(bestStreak, streak);
           pts += 10 + Math.min(10, (streak - 1) * 2);
@@ -863,7 +866,7 @@ var AppCore = (function () {
   }
 
   return {
-    VERSION: "2026-10-23c",
+    VERSION: "2026-10-25",
     esc: esc, el: el, btn: btn, shuffle: shuffle,
     speak: speak, stopSpeech: stopSpeech, getBestVoice: getBestVoice,
     dealer: dealer, stars: stars, result: result,

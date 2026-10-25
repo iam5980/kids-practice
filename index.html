@@ -31,6 +31,13 @@ details.old>summary{cursor:pointer;color:var(--muted);font-size:15px;padding:6px
 details.old>summary::-webkit-details-marker{display:none}
 details.old>summary::before{content:"▸ ";}details.old[open]>summary::before{content:"▾ ";}
 details.old .term{color:var(--muted)}
+.pcard{background:var(--card);border:2px solid var(--c);border-radius:16px;padding:14px;margin-bottom:18px}
+.pcard .top{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px}
+.pcard .big{font-size:28px;font-weight:800;color:var(--c)}
+.pcard .sm{color:var(--muted);font-size:14px}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.bd{font-size:13px;padding:4px 9px;border-radius:999px;border:1px solid var(--line);opacity:.35;filter:grayscale(1)}
+.bd.on{opacity:1;filter:none;border-color:var(--c);background:color-mix(in srgb,var(--c) 12%,transparent)}
 </style>
 </head>
 <body>
@@ -41,6 +48,7 @@ details.old .term{color:var(--muted)}
   <button class="kid" style="--c:var(--au)" data-kid="au">Audrey</button>
   <button class="kid" style="--c:var(--hw)" data-kid="hw">Howard</button>
 </div>
+<div id="pts"></div>
 <div id="list"></div>
 <section class="shared">
   <h2 style="--c:var(--sh)">一起練</h2>
@@ -82,6 +90,22 @@ function cards(kid,list){
   });
   return h+'</div>';
 }
+/* 集點卡：讀取各練習 App 存在這台裝置的點數（與 template/site-home.js 的 BADGES 相同） */
+var BADGES=[["first","🌱","第一次答對"],["perfect","💯","第一次滿分"],["streak10","🔥","連對 10 題"],["streak20","🚀","連對 20 題"],
+  ["days3","📅","連續練習 3 天"],["days7","🗓️","連續練習 7 天"],["lit1","🧩","第一組素養題全對"],["lit10","🎓","素養題達人"],
+  ["p500","⭐","500 點"],["p2000","🌟","2000 點"],["p5000","🏆","5000 點"]];
+function showPoints(kid,c){
+  var d=null;try{d=JSON.parse(localStorage.getItem("kp-points-"+kid)||"null")}catch(e){}
+  d=d||{points:0,todayPts:0,today:"",days:[],badges:{}};
+  var t=new Date(),ts=t.getFullYear()+"-"+("0"+(t.getMonth()+1)).slice(-2)+"-"+("0"+t.getDate()).slice(-2);
+  var days=(d.days||[]).slice().sort(),streak=0;
+  if(days.length){var last=days[days.length-1];if(Math.round((new Date(ts)-new Date(last))/864e5)<=1){streak=1;for(var i=days.length-1;i>0;i--){if(Math.round((new Date(days[i])-new Date(days[i-1]))/864e5)===1)streak++;else break}}}
+  var got=0;BADGES.forEach(function(b){if(d.badges&&d.badges[b[0]])got++});
+  document.getElementById("pts").innerHTML='<div class="pcard" style="--c:'+c+'"><div class="top"><div>🎟 集點卡 <span class="big">⭐ '+d.points+'</span> 點</div>'+
+    '<div class="sm">今天 +'+(d.today===ts?d.todayPts:0)+' 點・連續練習 '+streak+' 天・徽章 '+got+'/'+BADGES.length+'</div></div>'+
+    '<div class="badges">'+BADGES.map(function(b){return '<span class="bd'+(d.badges&&d.badges[b[0]]?' on':'')+'" title="'+b[2]+'">'+b[1]+' '+b[2]+'</span>'}).join("")+'</div>'+
+    (d.points?'':'<div class="sm" style="margin-top:8px">做練習答對就會集點，點數只存在這台裝置。</div>')+'</div>';
+}
 function show(kid){
   document.querySelectorAll(".kid").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.kid==kid)});
   var c=kid=="au"?"var(--au)":"var(--hw)",html="";
@@ -100,6 +124,7 @@ function show(kid){
     }
     html+='</section>';
   });
+  showPoints(kid,c);
   document.getElementById("list").innerHTML=html||'<p class="sub">目前還沒有練習。</p>';
   try{localStorage.setItem("kid",kid)}catch(e){}
 }
