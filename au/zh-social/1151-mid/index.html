@@ -1829,7 +1829,7 @@ renderScope();renderCards();
 /* =====================================================================
    site-home.js — 📚 小站 button + 全站集點 (site-wide points & badges)
    Canonical copy: github.com/iam5980/kids-practice/template/site-home.js
-   Version: 2026-11-08（新增 🔊 念解釋、🎒 抓寶）
+   Version: 2026-11-08b（新增 🔊 念解釋、🎒 抓寶、🎯 每日任務）
 
    HOW TO USE: paste this whole file in its own <script> block just before
    </body> of EVERY page published to kids-practice (English and 中文部,
@@ -1921,6 +1921,21 @@ renderScope();renderCards();
     if (d.points >= 5000) grant(d, "p5000");
     save(kid, d);
   }
+  /* 🎯 每日任務 — reset every day; each one gives +50 once */
+  var QUESTS = [
+    { id: "c20", icon: "✅", name: "今天答對 20 題", goal: 20, f: "correct" },
+    { id: "r3",  icon: "🔁", name: "今天完成 3 輪練習", goal: 3, f: "rounds" },
+    { id: "s10", icon: "🔥", name: "今天連對 10 題", goal: 10, f: "streak" }
+  ];
+  function qDay(d) { var t = today(); if (!d.q || d.q.day !== t) d.q = { day: t, correct: 0, rounds: 0, streak: 0, done: {} }; }
+  function qCheck(d) {
+    QUESTS.forEach(function (q) {
+      if (!d.q.done[q.id] && d.q[q.f] >= q.goal) {
+        d.q.done[q.id] = 1; d.points += 50; d.todayPts += 50;
+        toast("🎯 每日任務完成<br><b>" + q.icon + " " + q.name + "</b><br>＋50 點", true);
+      }
+    });
+  }
   var SitePoints = {
     kid: kid,
     badges: BADGES,
@@ -1931,6 +1946,7 @@ renderScope();renderCards();
           streak++;
           var pts = 10 + Math.min(10, (streak - 1) * 2);
           d.points += pts; d.todayPts += pts; d.correct++;
+          qDay(d); d.q.correct++; d.q.streak = Math.max(d.q.streak, streak); qCheck(d);
           d.bestStreak = Math.max(d.bestStreak, streak);
           grant(d, "first");
           if (streak >= 10) grant(d, "streak10");
@@ -1939,8 +1955,13 @@ renderScope();renderCards();
         } else { streak = 0; }
       });
     },
-    roundEnd: function (pct) {
-      if (pct >= 100) update(function (d) { d.perfects++; grant(d, "perfect"); });
+    quests: QUESTS,
+    roundEnd: function (pct, noPerfect) {
+      update(function (d) { qDay(d); d.q.rounds++; qCheck(d); });
+      if (pct >= 100 && !noPerfect) update(function (d) { d.perfects++; grant(d, "perfect"); });
+    },
+    perfect: function () {
+      update(function (d) { d.perfects++; grant(d, "perfect"); });
     },
     literacy: function (allOk) {
       if (allOk) update(function (d) { d.lit++; grant(d, "lit1"); if (d.lit >= 10) grant(d, "lit10"); });
@@ -1956,7 +1977,7 @@ renderScope();renderCards();
   }
   if (typeof window.celebrate === "function" && !window.celebrate.__sp) {
     var oCel = window.celebrate;
-    window.celebrate = function () { try { SitePoints.roundEnd(100); } catch (e) {} return oCel.apply(this, arguments); };
+    window.celebrate = function () { try { SitePoints.perfect(); } catch (e) {} return oCel.apply(this, arguments); };
     window.celebrate.__sp = true;
   }
 
@@ -1984,7 +2005,7 @@ renderScope();renderCards();
   }
   function raScan() {
     Array.prototype.forEach.call(document.querySelectorAll(RA_SEL), function (el) {
-      if (el.__ra || el.closest("#sh-card,.sd-card,.sp-toast")) return;
+      if (el.__ra || el.closest("#sh-card,.sd-card,.sp-toast") || (el.parentElement && el.parentElement.closest(RA_SEL))) return;
       var t = raText(el); if (t.length < 2) return;
       el.__ra = true;
       var b = document.createElement("button");
@@ -2103,11 +2124,11 @@ renderScope();renderCards();
   };
   window.SiteDex = SiteDex;
   var oRE = SitePoints.roundEnd;
-  SitePoints.roundEnd = function (pct) { oRE(pct); try { SiteDex.maybe(pct); } catch (e) {} };
+  SitePoints.roundEnd = function (pct, noPerfect, n) { oRE(pct, noPerfect); try { SiteDex.maybe(pct, n); } catch (e) {} };
   if (typeof window.rtEnd === "function" && !window.rtEnd.__sd) {
     var oEnd = window.rtEnd;
     window.rtEnd = function () {
-      try { var r = window.rt || (typeof rt !== "undefined" ? rt : null); if (r && !r.done && r.n >= 5) SiteDex.maybe(Math.round(r.ok / r.n * 100), r.n); } catch (e) {}
+      try { var r = window.rt || (typeof rt !== "undefined" ? rt : null); if (r && !r.done && r.n >= 1) SitePoints.roundEnd(Math.round(r.ok / r.n * 100), true, r.n >= 5 ? r.n : 0); } catch (e) {}
       return oEnd.apply(this, arguments);
     };
     window.rtEnd.__sd = true;
@@ -2143,6 +2164,12 @@ renderScope();renderCards();
     ".sp-toast.sp-out{opacity:0;transform:translateY(-14px)}.sp-toast.sp-big.sp-out{transform:translate(-50%,-14px)}";
   document.head.appendChild(css);
 
+  function qHtml() {
+    var d = load(kid); qDay(d);
+    return '<p style="text-align:left;font-size:14px;margin:-8px 0 14px">🎯 今天的任務：<br>' + QUESTS.map(function (q) {
+      var v = Math.min(q.goal, d.q[q.f] || 0); return (d.q.done[q.id] ? "✅ " : "⬜ ") + q.name + "（" + v + "/" + q.goal + "）";
+    }).join("<br>") + "</p>";
+  }
   /* ---------------- 📚 小站 button ---------------- */
   if (!document.body || window.__siteHomeNoBtn) return;
   var b = document.createElement("button");
@@ -2152,7 +2179,7 @@ renderScope();renderCards();
   b.addEventListener("click", function () {
     if (document.getElementById("sh-mask")) return;
     var m = document.createElement("div"); m.id = "sh-mask";
-    var pts = kid ? "<p>目前集點：⭐ " + load(kid).points + " 點・🎒 圖鑑 " + DEX.filter(function (x) { return dxLoad(kid)[x[0]]; }).length + " / " + DEX.length + "</p>" : "";
+    var pts = kid ? "<p>目前集點：⭐ " + load(kid).points + " 點・🎒 圖鑑 " + DEX.filter(function (x) { return dxLoad(kid)[x[0]]; }).length + " / " + DEX.length + "</p>" + qHtml() : "";
     m.innerHTML = '<div id="sh-card" role="dialog" aria-modal="true"><h3>📚 回到練習小站？</h3>' +
       '<p>這一輪的作答不會保留（點數和最高分紀錄會留著）。</p>' + pts +
       '<button id="sh-go" type="button">回到練習小站</button><button id="sh-stay" type="button">繼續練習</button></div>';

@@ -1,7 +1,8 @@
 /* =====================================================================
    app-core.js — shared core for the kids' exam-practice apps
    Canonical copy: github.com/iam5980/kids-practice/template/app-core.js
-   Version: 2026-10-25 (reports to site-wide points via SitePoints)
+   Version: 2026-11-08 (play layer: boss battle, word flip, sort game,
+            evidence hunt, sentence race; reports to SitePoints)
 
    HOW TO USE (for the Reading / Science / Grammar skills)
    - Paste this whole file INSIDE the app's single <script> block, before
@@ -238,6 +239,7 @@ var AppCore = (function () {
         box.appendChild(el("div", "ac-gamebox",
           "<span>⭐ <b>" + g.points + "</b> points</span><span>🔥 Best streak <b>" + g.bestStreak + "</b></span>" +
           "<span>" + (g.newBest ? "🏆 <b>New best score!</b>" : "🏅 Best <b>" + g.best + "</b>") + "</span>"));
+        if (o.game.boss) box.appendChild(el("p", "ac-cheerline", o.game.boss.defeated() ? "👾 Boss defeated! 🏆" : "👾 The boss escaped this time — try again to beat it!"));
       }
       if (r.pct === 100 && r.answered >= 3) setTimeout(function () { confetti(80); }, 200);
       try { if (window.SitePoints && o.game) window.SitePoints.roundEnd(r.pct); } catch (e) {}
@@ -777,14 +779,17 @@ var AppCore = (function () {
     document.body.appendChild(layer);
     setTimeout(function () { layer.remove(); }, 3000);
   }
-  function game(key) {
+  function game(key, gopt) {
+    gopt = gopt || {};
+    var boss = gopt.boss ? bossWidget(gopt.boss) : null;
     var pts = 0, streak = 0, bestStreak = 0, hudEl = null, best = 0, newBest = false;
     try { best = parseInt(localStorage.getItem("ac-best-" + key) || "0", 10) || 0; } catch (e) { best = 0; }
     function draw() {
       if (hudEl) hudEl.innerHTML = "⭐ " + pts + (streak >= 2 ? " &nbsp; 🔥 " + streak + " in a row" : "");
     }
     return {
-      hud: function () { hudEl = el("span", "ac-hud"); draw(); return hudEl; },
+      hud: function () { hudEl = el("span", "ac-hud"); draw(); if (!boss) return hudEl; var w = el("span", "ac-hudwrap"); w.appendChild(hudEl); w.appendChild(boss.el); return w; },
+      boss: boss,
       record: function (ok) {
         try { if (window.SitePoints) window.SitePoints.answer(!!ok); } catch (e) {}
         if (ok) {
@@ -797,6 +802,7 @@ var AppCore = (function () {
           if (streak >= 3) cheer("Good try! Start a new streak 💪");
           streak = 0;
         }
+        if (boss) boss.hit(!!ok, streak);
         draw();
       },
       summary: function () {
@@ -807,6 +813,232 @@ var AppCore = (function () {
         return { points: pts, bestStreak: bestStreak, best: best, newBest: newBest };
       }
     };
+  }
+
+  /* =================================================================
+     PLAY LAYER (2026-11-08) — more game-like practice for English apps
+     ----------------------------------------------------------------
+     1) Boss battle      game(key, {boss: {name, hp}})  — every correct
+                          answer hits the boss (streak = bigger hits);
+                          HP bar in the drill bar; defeat → confetti.
+                          bossFor(n, name) gives a fair HP for n questions.
+     2) Word flip        memory(container, {key, pairs:[[word, meaning]],
+                          size: 6|8, speak: true, onDone(pct)})
+     3) Sort game        sortGame(container, {key, bins:["Solid","Liquid"],
+                          items:[{t:"ice", bin:0, exp:"…"}], onDone(log)})
+                          tap an item card, then tap its bin (no dragging)
+     4) Evidence hunt    evidence(container, {passage:["sentence 1", …],
+                          q:"Why did …?", correct:[2], exp:"…", onResult(ok)})
+                          tap the sentence(s) that PROVE the answer
+     5) Sentence race    sentenceRace(container, {key, seconds: 90,
+                          items:[{answer:"She has eaten.", extra:["eat"], hint:"…"}],
+                          onDone(log)}) — build as many sentences as you can
+     All report to SitePoints (points, quests, 🎒 creatures) automatically.
+     ================================================================= */
+  var BOSS_C = ["#7c3aed", "#0891b2", "#be123c", "#15803d", "#c2410c", "#4338ca"];
+  function bossSvg(seed, hurt) {
+    var c = BOSS_C[seed % BOSS_C.length], k = "#111827";
+    return '<svg viewBox="0 0 100 100" width="100%" height="100%" aria-hidden="true">' +
+      '<path d="M22 34 L14 10 L34 26Z M78 34 L86 10 L66 26Z" fill="' + c + '"/>' +
+      '<path d="M16 60 Q16 22 50 22 Q84 22 84 60 Q84 92 50 92 Q16 92 16 60Z" fill="' + c + '"/>' +
+      '<path d="M16 66 Q6 58 8 72 M84 66 Q94 58 92 72" stroke="' + c + '" stroke-width="7" stroke-linecap="round" fill="none"/>' +
+      (hurt ? '<path d="M32 48 L42 56 M42 48 L32 56 M58 48 L68 56 M68 48 L58 56" stroke="#fff" stroke-width="4" stroke-linecap="round"/>'
+            : '<circle cx="37" cy="52" r="8" fill="#fff"/><circle cx="63" cy="52" r="8" fill="#fff"/><circle cx="38" cy="53" r="4" fill="' + k + '"/><circle cx="62" cy="53" r="4" fill="' + k + '"/>' +
+              '<path d="M28 40 L44 46 M72 40 L56 46" stroke="' + k + '" stroke-width="3.5" stroke-linecap="round"/>') +
+      '<path d="M36 72 Q50 ' + (hurt ? "64" : "80") + ' 64 72" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>' +
+      '<path d="M40 72 L43 77 L46 73 M54 73 L57 77 L60 72" fill="#fff"/></svg>';
+  }
+  function bossFor(n, name) { return { name: name || "Quiz Monster", hp: Math.max(30, Math.round(n * 10 * 0.75)) }; }
+  function bossWidget(b) {
+    var hp = b.hp, max = b.hp, seed = 0, done = false, w = el("span", "ac-boss");
+    for (var i = 0; i < (b.name || "").length; i++) seed += b.name.charCodeAt(i);
+    function draw(fx) {
+      w.innerHTML = '<span class="ac-boss-pic' + (fx ? " " + fx : "") + '">' + bossSvg(seed, hp <= 0) + '</span>' +
+        '<span class="ac-boss-info"><b>' + esc(b.name) + '</b><span class="ac-hp"><i style="width:' + Math.max(0, hp / max * 100) + '%"></i></span>' +
+        '<small>' + (hp > 0 ? "HP " + hp + " / " + max : "Defeated! 🏆") + '</small></span>';
+    }
+    draw();
+    return {
+      el: w,
+      hit: function (ok, streak) {
+        if (done) return;
+        if (ok) {
+          var dmg = 10 + Math.min(10, (streak - 1) * 2);
+          hp = Math.max(0, hp - dmg); draw("ac-hit");
+          if (hp <= 0) { done = true; setTimeout(function () { cheer("🏆 You defeated " + b.name + "!"); confetti(90); }, 300); }
+        } else draw("ac-laugh");
+      },
+      defeated: function () { return done; }
+    };
+  }
+
+  /* ---------- 2) word flip memory ---------- */
+  function memory(container, o) {
+    var size = o.size || 6, key = "ac-mem-" + (o.key || "x") + "-" + size;
+    var pool = shuffle(o.pairs).slice(0, size), cards = [];
+    pool.forEach(function (p, i) { cards.push({ id: i, side: 0, t: p[0] }, { id: i, side: 1, t: p[1] }); });
+    cards = shuffle(cards);
+    var open = [], matched = 0, moves = 0, combo = 0, lock = false, t0 = 0, timer = null;
+    container.innerHTML = "";
+    var hud = el("div", "ac-mem-hud"), grid = el("div", "ac-mem" + (size > 6 ? " ac-mem16" : ""));
+    container.appendChild(hud); container.appendChild(grid);
+    function drawHud() {
+      var s = t0 ? Math.floor((Date.now() - t0) / 1000) : 0;
+      hud.innerHTML = "⏱ " + Math.floor(s / 60) + ":" + ("0" + s % 60).slice(-2) + " &nbsp; 🔄 " + moves + " &nbsp; ✅ " + matched + " / " + size;
+    }
+    function draw() {
+      grid.innerHTML = "";
+      cards.forEach(function (c, i) {
+        var b = el("button", "ac-mc" + (c.open || c.done ? " open" : "") + (c.done ? " done" : "") + (c.side ? " back" : ""),
+          c.open || c.done ? esc(c.t) : "?");
+        b.type = "button";
+        b.addEventListener("click", function () { flip(i); });
+        grid.appendChild(b);
+      });
+      drawHud();
+    }
+    function flip(i) {
+      var c = cards[i];
+      if (lock || c.open || c.done) return;
+      if (!t0) { t0 = Date.now(); timer = setInterval(drawHud, 500); }
+      c.open = true; open.push(c);
+      if (o.speak !== false && c.side === 0) speak(c.t);
+      if (open.length === 2) {
+        moves++;
+        var a = open[0], z = open[1];
+        if (a.id === z.id) {
+          a.done = z.done = true; a.open = z.open = false; open = []; matched++; combo++;
+          try { if (window.SitePoints) window.SitePoints.answer(true); } catch (e) {}
+          if (combo >= 2) cheer("🔥 " + combo + " combo!");
+          draw();
+          if (matched === size) finish();
+        } else {
+          combo = 0; lock = true; draw();
+          setTimeout(function () { a.open = z.open = false; open = []; lock = false; draw(); }, 900);
+        }
+      } else draw();
+    }
+    function finish() {
+      clearInterval(timer);
+      var secs = Math.round((Date.now() - t0) / 1000), st = moves <= size + 2 ? 3 : moves <= Math.ceil(size * 1.7) ? 2 : 1;
+      var pct = Math.round(100 * size / moves), best = null;
+      try { best = JSON.parse(localStorage.getItem(key) || "null"); } catch (e) {}
+      var rec = !best || secs < best.s; if (rec) try { localStorage.setItem(key, JSON.stringify({ s: secs, m: moves })); } catch (e) {}
+      if (st === 3) confetti(70);
+      try { if (window.SitePoints) window.SitePoints.roundEnd(Math.min(100, pct)); } catch (e) {}
+      var box = el("div", "ac-result", '<div class="ac-stars">' + new Array(st + 1).join("⭐") + '</div><h2>All pairs found in ' + secs + ' s, ' + moves + ' flips</h2>' +
+        (rec ? '<p class="ac-cheerline">🏆 New record!</p>' : best ? '<p>Best: ' + best.s + ' s</p>' : ''));
+      var row = el("div", "ac-row ac-center");
+      row.appendChild(btn("🔄 Play again", "ac-primary", function () { memory(container, o); }));
+      if (o.onHome) row.appendChild(btn("🏠 Home", "ac-ghost", o.onHome));
+      box.appendChild(row); container.appendChild(box);
+      if (o.onDone) o.onDone(pct);
+    }
+    draw();
+  }
+
+  /* ---------- 3) sort game (tap item → tap bin) ---------- */
+  function sortGame(container, o) {
+    var items = shuffle(o.items), i = 0, log = [], G = game("sort-" + (o.key || "x"));
+    container.innerHTML = "";
+    var bar = drillBar({ title: o.title || "Sort it!", onBack: o.onHome, game: G, onFinish: done });
+    var card = el("div", "ac-sort-item"), bins = el("div", "ac-bins"), fb = el("div");
+    container.appendChild(bar); container.appendChild(el("p", "ac-hint", "Tap the box where this belongs.")); container.appendChild(card); container.appendChild(bins); container.appendChild(fb);
+    o.bins.forEach(function (name, k) {
+      var b = btn(esc(name), "ac-bin", function () { choose(k, b); });
+      bins.appendChild(b);
+    });
+    function show() {
+      if (i >= items.length) return done();
+      card.innerHTML = '<span class="ac-sort-n">' + (i + 1) + " / " + items.length + '</span><b>' + esc(items[i].t) + '</b>';
+      fb.innerHTML = ""; Array.prototype.forEach.call(bins.children, function (b) { b.disabled = false; b.className = "ac-btn ac-bin"; });
+    }
+    function choose(k, b) {
+      var it = items[i], ok = k === it.bin;
+      G.record(ok); log.push({ q: it.t, given: o.bins[k], correct: o.bins[it.bin], ok: ok, item: it });
+      Array.prototype.forEach.call(bins.children, function (x, j) { x.disabled = true; if (j === it.bin) x.className += " ac-bin-ok"; else if (x === b) x.className += " ac-bin-bad"; });
+      fb.innerHTML = '<div class="ac-fb ' + (ok ? "ok" : "bad") + '">' + (ok ? praise() : "It goes in <b>" + esc(o.bins[it.bin]) + "</b>.") +
+        (it.exp ? '<div class="ac-exp">' + esc(it.exp) + '</div>' : '') + '</div>';
+      var nx = btn(i + 1 < items.length ? "Next ➡" : "See my score", "ac-primary", function () { i++; show(); });
+      fb.appendChild(nx);
+    }
+    function done() {
+      container.innerHTML = "";
+      container.appendChild(resultView(log, { game: G, onAgain: function () { sortGame(container, o); }, onHome: o.onHome,
+        onRetryWrong: function () { sortGame(container, Object.assign({}, o, { items: log.filter(function (x) { return !x.ok; }).map(function (x) { return x.item; }) })); } }));
+      if (o.onDone) o.onDone(log);
+    }
+    show();
+  }
+
+  /* ---------- 4) evidence hunt ---------- */
+  function evidence(container, o) {
+    var picked = [], need = o.correct.length, done = false;
+    container.innerHTML = "";
+    container.appendChild(el("p", "ac-q", "<b>" + esc(o.q) + "</b>"));
+    if (o.answer) container.appendChild(el("p", "ac-hint", "Answer: " + esc(o.answer)));
+    container.appendChild(el("p", "ac-hint", "🔎 Find the evidence: tap the sentence" + (need > 1 ? "s (" + need + ")" : "") + " that prove" + (need > 1 ? "" : "s") + " it."));
+    var box = el("div", "ac-passage"), fb = el("div");
+    o.passage.forEach(function (s, k) {
+      var sp = el("span", "ac-sent", esc(s) + " ");
+      sp.setAttribute("role", "button"); sp.tabIndex = 0;
+      sp.addEventListener("click", function () {
+        if (done) return;
+        var at = picked.indexOf(k);
+        if (at >= 0) { picked.splice(at, 1); sp.classList.remove("ac-picked"); }
+        else if (picked.length < need) { picked.push(k); sp.classList.add("ac-picked"); }
+        chk.disabled = picked.length !== need;
+      });
+      box.appendChild(sp);
+    });
+    container.appendChild(box);
+    var chk = btn("✔ Check", "ac-primary", function () {
+      done = true; chk.disabled = true;
+      var ok = picked.length === need && picked.every(function (k) { return o.correct.indexOf(k) >= 0; });
+      Array.prototype.forEach.call(box.children, function (sp, k) {
+        if (o.correct.indexOf(k) >= 0) sp.classList.add("ac-evid");
+        else if (picked.indexOf(k) >= 0) sp.classList.add("ac-wrongpick");
+      });
+      fb.innerHTML = '<div class="ac-fb ' + (ok ? "ok" : "bad") + '">' + (ok ? "🔎 Great detective work! " + praise() : "The highlighted sentence is the evidence.") +
+        (o.exp ? '<div class="ac-exp">' + esc(o.exp) + '</div>' : '') + '</div>';
+      if (o.onResult) o.onResult(ok, picked);
+    });
+    chk.disabled = true;
+    container.appendChild(chk); container.appendChild(fb);
+  }
+
+  /* ---------- 5) sentence race ---------- */
+  function sentenceRace(container, o) {
+    var secs = o.seconds || 90, items = shuffle(o.items), i = 0, log = [], G = game("race-" + (o.key || "x")), t0 = Date.now(), timer, over = false;
+    container.innerHTML = "";
+    var bar = drillBar({ title: "⏱ Sentence Race", onBack: function () { clearInterval(timer); if (o.onHome) o.onHome(); }, game: G, onFinish: end });
+    var clock = el("div", "ac-race-clock"), area = el("div");
+    container.appendChild(bar); container.appendChild(clock); container.appendChild(area);
+    function tick() {
+      var left = Math.max(0, secs - Math.floor((Date.now() - t0) / 1000));
+      clock.innerHTML = '<span class="ac-hp ac-time"><i style="width:' + (left / secs * 100) + '%"></i></span> ' + left + " s";
+      if (left <= 0) end();
+    }
+    timer = setInterval(tick, 250); tick();
+    function next() {
+      if (over) return;
+      if (i >= items.length) { items = items.concat(shuffle(o.items)); }
+      var it = items[i];
+      tiles(area, { answer: it.answer, extra: it.extra || [], hint: it.hint || "Build the sentence:", exp: it.exp }, {
+        onResult: function (ok, given) {
+          G.record(ok); log.push({ q: it.hint || "Build the sentence", given: given, correct: Array.isArray(it.answer) ? it.answer[0] : it.answer, ok: ok, item: it });
+          i++; setTimeout(next, ok ? 450 : 1300);
+        }
+      });
+    }
+    function end() {
+      if (over) return; over = true; clearInterval(timer);
+      container.innerHTML = "";
+      container.appendChild(el("h2", "ac-center", "⏱ Time! You built " + log.filter(function (x) { return x.ok; }).length + " correct sentences."));
+      container.appendChild(resultView(log, { game: G, onAgain: function () { sentenceRace(container, o); }, onHome: o.onHome }));
+      if (o.onDone) o.onDone(log);
+    }
+    next();
   }
 
   /* ---------- styles (call once) ---------- */
@@ -858,6 +1090,17 @@ var AppCore = (function () {
     ".ac-kps{margin:6px 0;display:flex;flex-wrap:wrap;gap:6px}.ac-kp{padding:3px 10px;border-radius:999px;font-weight:700}" +
     ".ac-kp.hit{background:rgba(22,163,74,.18);color:#15803d}.ac-kp.miss{background:rgba(220,38,38,.12);color:#b91c1c}" +
     ".ac-flag{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:#fde68a;color:#78350f;font-size:.85rem}" +
+    ".ac-hudwrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px;flex-basis:100%;order:3}" +
+    ".ac-boss{display:flex;align-items:center;gap:8px;flex:1;min-width:200px}.ac-boss-pic{width:52px;height:52px;flex:none;display:inline-block}.ac-boss-info{flex:1;display:flex;flex-direction:column;font-size:.85rem}" +
+    ".ac-hp{display:block;height:10px;border-radius:99px;background:rgba(127,127,127,.25);overflow:hidden;margin:3px 0}.ac-hp i{display:block;height:100%;background:linear-gradient(90deg,#dc2626,#f59e0b);transition:width .4s}.ac-time i{background:linear-gradient(90deg,#0284c7,#22c55e)}" +
+    ".ac-hit{animation:ac-hit .35s}.ac-laugh{animation:ac-laugh .5s}@keyframes ac-hit{30%{transform:translateX(-6px) rotate(-8deg);filter:brightness(1.8)}70%{transform:translateX(6px)}}@keyframes ac-laugh{50%{transform:scale(1.15) translateY(-4px)}}" +
+    ".ac-mem-hud{font-weight:700;margin:6px 0 10px}.ac-mem{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}" +
+    ".ac-mc{font:inherit;min-height:84px;border-radius:12px;border:2px solid #0284c7;background:#0284c7;color:#fff;font-size:1.6rem;cursor:pointer;padding:6px;touch-action:manipulation;word-break:break-word}" +
+    ".ac-mc.open{background:transparent;color:inherit;font-size:1rem;line-height:1.25}.ac-mc.open.back{font-size:.85rem}.ac-mc.done{border-color:#16a34a;background:rgba(22,163,74,.15);color:inherit;font-size:.9rem}" +
+    ".ac-sort-item{font-size:1.5rem;text-align:center;padding:18px;border-radius:16px;border:2px dashed #0284c7;margin:8px 0 12px}.ac-sort-n{display:block;font-size:.8rem;opacity:.7}" +
+    ".ac-bins{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}.ac-bin{background:rgba(2,132,199,.1);color:inherit;border-color:#0284c7;min-height:70px;font-weight:700}.ac-bin-ok{background:#16a34a!important;color:#fff!important}.ac-bin-bad{background:#dc2626!important;color:#fff!important}" +
+    ".ac-passage{line-height:2;font-size:1.1rem;margin:8px 0 12px}.ac-sent{cursor:pointer;border-radius:6px;padding:2px 0}.ac-picked{background:#fde68a;color:#1f2937}.ac-evid{background:rgba(22,163,74,.25);outline:2px solid #16a34a}.ac-wrongpick{background:rgba(220,38,38,.18);text-decoration:line-through}" +
+    ".ac-race-clock{font-weight:800;font-size:1.1rem;margin:4px 0 10px}" +
     "@media (prefers-reduced-motion:reduce){.ac-confetti{display:none}.ac-cheer{animation:none}}";
   function injectCSS() {
     if (document.getElementById("ac-css")) return;
@@ -866,7 +1109,7 @@ var AppCore = (function () {
   }
 
   return {
-    VERSION: "2026-10-25",
+    VERSION: "2026-11-08",
     esc: esc, el: el, btn: btn, shuffle: shuffle,
     speak: speak, stopSpeech: stopSpeech, getBestVoice: getBestVoice,
     dealer: dealer, stars: stars, result: result,
@@ -875,6 +1118,7 @@ var AppCore = (function () {
     norm: norm, matches: matches, scorePoints: function (t, p) { return scorePoints(t, keyPoints({points: p})); },
     wordBank: wordBank, tiles: tiles, openAnswer: openAnswer,
     game: game, praise: praise, cheer: cheer, confetti: confetti,
+    bossFor: bossFor, memory: memory, sortGame: sortGame, evidence: evidence, sentenceRace: sentenceRace,
     WEBVIEW_NOTICE: WEBVIEW_NOTICE, injectCSS: injectCSS
   };
 })();
