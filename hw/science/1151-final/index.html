@@ -1857,7 +1857,8 @@ function home() {
   root.appendChild(el("h2", "hs-h2", "🎮 Games"));
   var g = el("div", "hs-games");
   g.appendChild(AppCore.btn("🃏 Word Flip", "ac-primary", function () { pickLesson("🃏 Word Flip — which lesson?", flip, true); }));
-  g.appendChild(AppCore.btn("🧺 Sort It", "ac-primary", function () { pickLesson("🧺 Sort It — which lesson?", sortIt); }));
+  if (typeof SORTS !== "undefined") g.appendChild(AppCore.btn("🧺 Sort It", "ac-primary", function () { pickLesson("🧺 Sort It — which lesson?", sortIt, false, false, function (id) { return !!SORTS[id]; }); }));
+  if (BANK.some(function (q) { return q.ty === "evid"; })) g.appendChild(AppCore.btn("🔎 Find the Proof", "ac-primary", function () { pickLesson("🔎 Find the Proof — which story?", proof, true, false, function (id) { return BANK.some(function (q) { return q.L === id && q.ty === "evid"; }); }); }));
   root.appendChild(g);
   root.appendChild(el("h2", "hs-h2", "🎤 Speak · 🎧 Listen · 🔤 Spell"));
   var g2 = el("div", "hs-games");
@@ -1867,13 +1868,13 @@ function home() {
   if (HAS_TV) g2.appendChild(AppCore.btn("📒 Teacher's Word List", "ac-primary", function () { pickLesson("📒 Teacher's Word List — which lesson?", wordList, false, true); }));
   root.appendChild(g2);
   var n = 0; LESSONS.forEach(function (l) { n += pool(l.id).length; });
-  root.appendChild(el("p", "hs-note", "Question bank: " + n + " questions" + (HAS_ORAL ? " + " + ORAL.length + " oral questions" : "") + " + " + LESSONS.length + " sort games. Scope: " + APP.scope));
+  root.appendChild(el("p", "hs-note", "Question bank: " + n + " questions" + (HAS_ORAL ? " + " + ORAL.length + " oral questions" : "") + (typeof SORTS !== "undefined" ? " + " + Object.keys(SORTS).length + " sort games" : "") + ". Scope: " + APP.scope));
 }
-function pickLesson(title, fn, withAll, tvOnly) {
+function pickLesson(title, fn, withAll, tvOnly, keep) {
   root.innerHTML = "";
   root.appendChild(AppCore.btn("⬅ Back", "ac-ghost", home));
   root.appendChild(el("h2", "hs-h2", title));
-  LESSONS.forEach(function (l) { if (tvOnly && !TVOCAB[l.id]) return; root.appendChild(AppCore.btn(l.icon + " " + l.name, "ac-primary hs-wide", function () { fn(l.id); })); });
+  LESSONS.forEach(function (l) { if (tvOnly && !TVOCAB[l.id]) return; if (keep && !keep(l.id)) return; root.appendChild(AppCore.btn(l.icon + " " + l.name, "ac-primary hs-wide", function () { fn(l.id); })); });
   if (withAll) root.appendChild(AppCore.btn("🌍 All lessons", "ac-finish hs-wide", function () { fn("ALL"); }));
 }
 function flip(L) {
@@ -1881,7 +1882,7 @@ function flip(L) {
   (L === "ALL" ? LESSONS.map(function (l) { return l.id; }) : [L]).forEach(function (k) { pairs = pairs.concat(VOCAB[k]); });
   root.innerHTML = "";
   root.appendChild(AppCore.btn("⬅ Back", "ac-ghost", home));
-  root.appendChild(el("p", "ac-hint", "Match each science word with its meaning. Flip two cards at a time!"));
+  root.appendChild(el("p", "ac-hint", (APP.flipHint || "Match each word with its meaning.") + " Flip two cards at a time!"));
   var box = el("div"); root.appendChild(box);
   AppCore.memory(box, {key: KEY + "-flip-" + L, pairs: pairs, size: pairs.length >= 8 ? 8 : 6, onHome: home});
 }
@@ -1901,6 +1902,11 @@ function spelling(L) {
   var it = []; lessonsOf(L).forEach(function (k) { it = it.concat(spellItems(k)); });
   it = AppCore.shuffle(it).slice(0, 12);
   run(it, {title: "🔤 " + labelOf(L), gameKey: KEY + "-spell-" + L, boss: AppCore.bossFor(it.length, "Letter Lizard"), again: function () { spelling(L); }});
+}
+function proof(L) {
+  var it = BANK.filter(function (q) { return q.ty === "evid" && (L === "ALL" || q.L === L); });
+  it = AppCore.shuffle(it).slice(0, 10);
+  run(it, {title: "🔎 " + labelOf(L), gameKey: KEY + "-proof-" + L, boss: AppCore.bossFor(it.length, "Riddle Raven"), again: function () { proof(L); }});
 }
 function oral(L) {
   var it = AppCore.shuffle(oralItems(L));
@@ -1941,6 +1947,8 @@ function mock() {
     pick(function (q) { return q.tv; }, 3),
     pick(function (q) { return q.ty === "listen"; }, 4),
     pick(function (q) { return q.ty === "spell"; }, 2),
+    pick(function (q) { return q.ty === "evid"; }, APP.mockEvid || 0),
+    pick(function (q) { return q.ty === "scramble"; }, APP.mockScramble || 0),
     pick(function (q) { return q.ty === "order"; }, 2),
     pick(function (q) { return (q.ty === "mc" || q.ty === "tf") && !q.vocab; }, 9),
     pick(function (q) { return q.vocab; }, 3),
@@ -1958,7 +1966,7 @@ function run(items, o) {
     root.innerHTML = "";
     root.appendChild(AppCore.drillBar({title: o.title + " · " + (i + 1) + " / " + items.length, onBack: home, onFinish: end, game: G}));
     var card = el("div", "hs-card"); root.appendChild(card);
-    var tag = q.vocab ? "Vocabulary" : q.tv ? "Teacher's word list" : q.ty === "oral" ? "Oral" + (typeof ORAL_EST !== "undefined" && ORAL_EST ? " · Estimated — confirm with teacher" : "") : {listen: "Listening", spell: "Spelling", mc: "Multiple choice", tf: "True or False", fill: Array.isArray(q.a) ? "Outline" : "Fill in the blank", order: "Put in order", open: "Critical thinking", cloze: "Cloze Activity", match: "Vocabulary matching", label: "Label the diagram"}[q.ty];
+    var tag = q.vocab ? "Vocabulary" : q.tv ? "Teacher's word list" : q.ty === "oral" ? "Oral" + (typeof ORAL_EST !== "undefined" && ORAL_EST ? " · Estimated — confirm with teacher" : "") : {listen: "Listening", spell: "Spelling", evid: "Find the evidence", scramble: "Build the sentence", mc: "Multiple choice", tf: "True or False", fill: Array.isArray(q.a) ? "Outline" : "Fill in the blank", order: "Put in order", open: "Critical thinking", cloze: "Cloze Activity", match: "Vocabulary matching", label: "Label the diagram"}[q.ty];
     card.appendChild(el("div", "hs-tag", lessonById(q.L).icon + " " + esc(lessonById(q.L).name) + " · " + tag));
     var area = el("div"); card.appendChild(area);
     var next = el("div", "hs-next"); card.appendChild(next);
@@ -2014,6 +2022,14 @@ function run(items, o) {
       try { AppCore.speak(q.a); } catch (e) {}
       var sb = el("div"); area.appendChild(sb);
       AppCore.tiles(sb, {answer: q.a, unit: "letter", hint: "Meaning: " + q.def, exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a); }});
+    } else if (q.ty === "evid") {
+      var eb = el("div"); area.appendChild(eb);
+      AppCore.evidence(eb, {passage: q.passage, q: q.q, answer: q.answer, correct: q.correct, exp: q.exp, onResult: function (ok) {
+        done(ok, ok ? "Found the evidence" : "Picked another sentence", q.correct.map(function (k) { return q.passage[k]; }).join(" "));
+      }});
+    } else if (q.ty === "scramble") {
+      var tb = el("div"); area.appendChild(tb);
+      AppCore.tiles(tb, {answer: q.a, unit: "word", extra: q.extra, hint: q.q, exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a); }});
     } else if (q.ty === "oral") {
       if (i === 0) area.appendChild(el("div", "", AppCore.WEBVIEW_NOTICE));
       var ob = el("div"); area.appendChild(ob);
@@ -2028,7 +2044,7 @@ function run(items, o) {
       var wb = el("div"); area.appendChild(wb);
       AppCore.wordBank(wb, {text: q.t, bank: AppCore.shuffle(q.bank), answers: q.a, exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a.join(" / ")); }});
     } else if (q.ty === "fill") {
-      var others = AppCore.shuffle(VOCAB[q.L].map(function (v) { return v[0]; }).filter(function (w) { return w.toLowerCase() !== q.a.toLowerCase() && w !== q.base; })).slice(0, 3);
+      var others = q.w ? q.w.slice() : AppCore.shuffle(VOCAB[q.L].map(function (v) { return v[0]; }).filter(function (w) { return w.toLowerCase() !== q.a.toLowerCase() && w !== q.base; })).slice(0, 3);
       AppCore.wordBank(area, {text: q.t, bank: AppCore.shuffle([q.a].concat(others)), answers: [q.a], exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a); }});
     } else if (q.ty === "order") {
       AppCore.tiles(area, {unit: "item", items: q.items, hint: q.q, exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.items.join(" → ")); }});

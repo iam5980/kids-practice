@@ -1,0 +1,2532 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Audrey · Reading Final · Reading 3.1</title><style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:1.05rem;line-height:1.5;background:#0b1730;color:#e2e8f0}
+#app{max-width:760px;margin:0 auto;padding:12px 14px 90px}
+.hs-hero{background:linear-gradient(135deg,#0c4a6e,#1e3a8a);border-radius:18px;padding:16px 18px;margin:6px 0 14px}
+.hs-hero h1{margin:0 0 4px;font-size:1.5rem}.hs-hero p{margin:0;opacity:.9}
+.hs-h2{font-size:1.15rem;margin:18px 0 8px}
+.hs-games{display:flex;flex-wrap:wrap;gap:8px}
+.hs-note{opacity:.7;font-size:.9rem;margin-top:18px}
+.hs-wide{display:block;width:100%;text-align:left}
+.hs-card{background:#13254a;border:1px solid #1e3a8a;border-radius:16px;padding:14px 16px;margin-top:6px}
+.hs-tag{font-size:.85rem;color:#7dd3fc;margin-bottom:6px}
+.hs-q{font-size:1.15rem;font-weight:600;margin:4px 0 10px}
+.hs-opts{display:flex;flex-direction:column;gap:8px}.hs-tf{flex-direction:row}.hs-tf .hs-opt{flex:1;text-align:center;font-weight:800}
+.hs-opt{font:inherit;text-align:left;min-height:54px;padding:10px 14px;border-radius:12px;border:2px solid #38bdf8;background:rgba(56,189,248,.08);color:inherit;cursor:pointer;touch-action:manipulation}
+.hs-opt.hs-ok{background:#16a34a;border-color:#16a34a;color:#fff}.hs-opt.hs-bad{background:#dc2626;border-color:#dc2626;color:#fff}
+.hs-next{margin-top:10px}
+.ac-bar{background:#0b1730!important}
+.ac-fb.ok{color:#bbf7d0}.ac-fb.bad{color:#fde68a}.ac-correct{color:#86efac}
+.ac-mc.open,.ac-mc.done{color:#e2e8f0}
+.kk-lv{color:inherit}
+
+
+.hs-card svg{background:#0f1f3d;border-radius:12px}
+
+.ac-sentence{white-space:pre-line}
+.hs-card svg{background:#0f1f3d;border-radius:12px}
+.ac-ans,.ac-fb b{white-space:pre-line}
+</style></head><body><div id="app"></div>
+<script>
+/* =====================================================================
+   app-core.js — shared core for the kids' exam-practice apps
+   Canonical copy: github.com/iam5980/kids-practice/template/app-core.js
+   Version: 2026-11-08 (play layer: boss battle, word flip, sort game,
+            evidence hunt, sentence race; reports to SitePoints)
+
+   HOW TO USE (for the Reading / Science / Grammar skills)
+   - Paste this whole file INSIDE the app's single <script> block, before
+     the app's own code. Do NOT link it with <script src>. Each app stays
+     one self-contained HTML file (offline, Artifact preview, no shared
+     breakage).
+   - Call AppCore.injectCSS() once at start-up.
+   - Use these helpers instead of writing your own versions.
+   - Wire buttons with addEventListener or AppCore.btn(). Do NOT build
+     inline onclick="..." strings with escaped double quotes (iPad Safari
+     fails to parse them).
+
+   WHAT IS IN HERE (each part was fixed after a real bug on iPad)
+     shuffle(arr)              Fisher-Yates, returns a NEW array
+     speak(text, opts)         best English voice, rate .88, onDone callback
+     stopSpeech()              cancel TTS
+     dealer()                  MC answer positions evenly spread A/B/C/D,
+                               never 3 in a row
+     stars(pct) / result(log)  scoring + 1-5 stars
+     drillBar(opts)            sticky bar: Back + Finish & Score
+     resultView(log, opts)     score screen, wrong answers first, Try Again
+     recorder(opts)            iOS-safe recording + playback
+     oralCard(el, q, opts)     record-first, reveal-later oral flow
+     WEBVIEW_NOTICE            "open in Safari/Chrome" notice HTML
+
+   TAP-TO-ANSWER (iPad/phone friendly — avoid the keyboard)
+     wordBank(el, spec, o)     tap a word-bank chip → it fills the blank
+     tiles(el, spec, o)        tap word / letter / step tiles to build the
+                               answer (unscramble, spelling, ordering)
+     openAnswer(el, spec, o)   🎤 speak (speech → text) or type → scored
+                               automatically on key points (short answers)
+     Each draws its own ✔ Check button and calls o.onResult(ok, given).
+
+   GAME LAYER  (each answer and finished round is also reported to the
+               site-wide 集點卡 through SitePoints from site-home.js)
+     game(key)                 points, 🔥 streaks, cheers, confetti,
+                               best score per drill on this device
+     drillBar({game}) shows the HUD; resultView(log, {game, onRetryWrong})
+     shows points, best streak, new-best badge and "Practise my mistakes".
+   ===================================================================== */
+var AppCore = (function () {
+  "use strict";
+
+  /* ---------- small DOM helpers ---------- */
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function el(tag, cls, html) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (html != null) e.innerHTML = html;
+    return e;
+  }
+  function btn(label, cls, onClick) {
+    var b = el("button", "ac-btn " + (cls || ""), label);
+    b.type = "button";
+    if (onClick) b.addEventListener("click", onClick);
+    return b;
+  }
+
+  /* ---------- shuffle: always returns a new array ---------- */
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  /* ---------- TTS ----------
+     speak(text)                         default rate 0.88
+     speak(text, {rate: 0.7})
+     speak(text, {onDone: function(){}}) onDone fires on end OR error
+     The 2nd argument is ALWAYS an options object (a past bug passed a
+     callback where a number was expected and the button got stuck). */
+  var _voices = [];
+  function loadVoices() {
+    if (window.speechSynthesis) _voices = window.speechSynthesis.getVoices() || [];
+  }
+  if (window.speechSynthesis) {
+    loadVoices();
+    if (window.speechSynthesis.addEventListener) {
+      window.speechSynthesis.addEventListener("voiceschanged", loadVoices);
+    } else {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+  }
+  function getBestVoice() {
+    var v = _voices.length ? _voices : (window.speechSynthesis ? window.speechSynthesis.getVoices() : []);
+    var tests = [
+      function (x) { return x.name === "Samantha"; },
+      function (x) { return x.name === "Karen"; },
+      function (x) { return x.name === "Daniel"; },
+      function (x) { return x.name.indexOf("Google US English") >= 0; },
+      function (x) { return x.name.indexOf("Google UK English") >= 0; },
+      function (x) { return x.name.indexOf("Microsoft Aria") >= 0; },
+      function (x) { return x.lang === "en-US" && x.localService; },
+      function (x) { return x.lang === "en-GB" && x.localService; },
+      function (x) { return x.lang.indexOf("en") === 0; }
+    ];
+    for (var t = 0; t < tests.length; t++) {
+      for (var i = 0; i < v.length; i++) if (tests[t](v[i])) return v[i];
+    }
+    return null;
+  }
+  function speak(text, opts) {
+    opts = (opts && typeof opts === "object") ? opts : {};
+    var done = typeof opts.onDone === "function" ? opts.onDone : null;
+    if (!window.speechSynthesis) { if (done) done(); return; }
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(String(text));
+    u.lang = "en-US";
+    u.rate = typeof opts.rate === "number" ? opts.rate : 0.88;
+    u.pitch = 1.0;
+    var voice = getBestVoice();
+    if (voice) u.voice = voice;
+    var fired = false;
+    function fin() { if (fired) return; fired = true; if (done) done(); }
+    u.onend = fin; u.onerror = fin;
+    speak._last = u; // keep a reference so Safari does not drop it mid-sentence
+    window.speechSynthesis.speak(u);
+  }
+  function stopSpeech() {
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+  }
+
+  /* ---------- MC answer positions ----------
+     var D = AppCore.dealer();          // one per drill / mock exam
+     var r = D.place(correctText, [wrong1, wrong2]);
+     r.choices -> array to show as A, B, C ...   r.answer -> correct index
+     var m = D.placeMulti([c1, c2], [w1]);   // "choose two"
+     m.answers -> sorted indexes
+     Positions are dealt from a balanced deck, so A/B/C come up equally
+     often and the same letter never appears 3 times in a row.
+     Store choices in the bank as TEXT, never as a fixed letter. */
+  function dealer() {
+    var decks = {}, last = [], pairs = [];
+    function runOK(deck, prev) {
+      var s = prev.concat(deck);
+      for (var i = 2; i < s.length; i++) if (s[i] === s[i - 1] && s[i] === s[i - 2]) return false;
+      return true;
+    }
+    function build(n) {
+      var base = [], d, k = 0;
+      for (var r = 0; r < 3; r++) for (var i = 0; i < n; i++) base.push(i);
+      do { d = shuffle(base); k++; } while (!runOK(d, last.slice(-2)) && k < 300);
+      return d;
+    }
+    function nextPos(n) {
+      if (!decks[n] || !decks[n].length) decks[n] = build(n);
+      var p = decks[n].shift();
+      if (last.length >= 2 && last[last.length - 1] === p && last[last.length - 2] === p) {
+        // deck boundary produced a triple: swap with the next different one
+        for (var i = 0; i < decks[n].length; i++) if (decks[n][i] !== p) {
+          var q = decks[n][i]; decks[n][i] = p; p = q; break;
+        }
+      }
+      last.push(p); if (last.length > 4) last.shift();
+      return p;
+    }
+    function fill(out, wrong) {
+      var w = shuffle(wrong);
+      for (var i = 0; i < out.length; i++) if (out[i] === undefined) out[i] = w.shift();
+      return out;
+    }
+    return {
+      place: function (correct, wrong) {
+        var n = wrong.length + 1, pos = nextPos(n), out = new Array(n);
+        out[pos] = correct;
+        return { choices: fill(out, wrong), answer: pos };
+      },
+      placeMulti: function (correct, wrong) {
+        var n = correct.length + wrong.length, out = new Array(n), slots;
+        if (correct.length === 2 && n === 3) {
+          if (!pairs.length) pairs = shuffle([[0, 1], [0, 2], [1, 2], [0, 1], [0, 2], [1, 2]]);
+          slots = pairs.shift();
+        } else {
+          slots = shuffle(Array.apply(null, { length: n }).map(function (_, i) { return i; }))
+            .slice(0, correct.length);
+        }
+        var c = shuffle(correct);
+        slots.forEach(function (s, k) { out[s] = c[k]; });
+        return { choices: fill(out, wrong), answers: slots.slice().sort() };
+      }
+    };
+  }
+
+  /* ---------- scoring ----------
+     log = [{q:"question text", given:"student answer", correct:"answer", ok:true}] */
+  function stars(pct) {
+    return pct >= 90 ? 5 : pct >= 75 ? 4 : pct >= 55 ? 3 : pct >= 40 ? 2 : 1;
+  }
+  function result(log) {
+    var n = log.length, c = 0;
+    for (var i = 0; i < n; i++) if (log[i].ok) c++;
+    var pct = n ? Math.round(100 * c / n) : 0;
+    return { answered: n, correct: c, pct: pct, stars: n ? stars(pct) : 0,
+             wrong: log.filter(function (x) { return !x.ok; }) };
+  }
+
+  /* ---------- sticky Back + Finish & Score bar ----------
+     Put it at the top of EVERY drill (topic, story, mock exam, oral).
+     drillBar({title:"Vocab · 3 / 20", onBack: goHome, onFinish: showResult}) */
+  function drillBar(o) {
+    var bar = el("div", "ac-bar");
+    if (o.onBack) bar.appendChild(btn("⬅ Back", "ac-ghost", o.onBack));
+    bar.appendChild(el("span", "ac-bar-title", esc(o.title || "")));
+    if (o.game) bar.appendChild(o.game.hud());
+    bar.appendChild(btn("🏁 Finish &amp; Score", "ac-finish", function () {
+      stopSpeech(); if (o.onFinish) o.onFinish();
+    }));
+    return bar;
+  }
+
+  /* ---------- result screen ----------
+     resultView(log, {onAgain: restartSameDrill, onHome: goHome}) -> element */
+  var CHEERS = {5: "Perfect! You are a star! 🌟", 4: "Great work — almost perfect! 🎉", 3: "Good job! Keep practising 👍",
+                2: "Nice try! Practise your mistakes and try again 💪", 1: "Every try makes you stronger. Let's practise again! 🌱"};
+  function resultView(log, o) {
+    o = o || {};
+    var r = result(log), box = el("div", "ac-result");
+    if (!r.answered) {
+      box.appendChild(el("h2", null, "You have not answered any questions yet."));
+    } else {
+      box.appendChild(el("div", "ac-stars", new Array(r.stars + 1).join("⭐")));
+      box.appendChild(el("h2", null, "Answered " + r.answered + " question" + (r.answered > 1 ? "s" : "") +
+        " — " + r.correct + " correct (" + r.pct + "%)"));
+      box.appendChild(el("p", "ac-cheerline", CHEERS[r.stars]));
+      if (o.game) {
+        var g = o.game.summary();
+        box.appendChild(el("div", "ac-gamebox",
+          "<span>⭐ <b>" + g.points + "</b> points</span><span>🔥 Best streak <b>" + g.bestStreak + "</b></span>" +
+          "<span>" + (g.newBest ? "🏆 <b>New best score!</b>" : "🏅 Best <b>" + g.best + "</b>") + "</span>"));
+        if (o.game.boss) box.appendChild(el("p", "ac-cheerline", o.game.boss.defeated() ? "👾 Boss defeated! 🏆" : "👾 The boss escaped this time — try again to beat it!"));
+      }
+      if (r.pct === 100 && r.answered >= 3) setTimeout(function () { confetti(80); }, 200);
+      try { if (window.SitePoints && o.game) window.SitePoints.roundEnd(r.pct); } catch (e) {}
+      if (r.wrong.length) {
+        var ul = el("div", "ac-review");
+        ul.appendChild(el("h3", null, "Review these"));
+        r.wrong.forEach(function (w) {
+          ul.appendChild(el("div", "ac-review-item",
+            "<div>" + esc(w.q) + "</div>" +
+            (w.given != null && w.given !== "" ? "<div class='ac-given'>Your answer: " + esc(w.given) + "</div>" : "") +
+            "<div class='ac-correct'>Answer: " + esc(w.correct) + "</div>" +
+            (w.appeal ? "<div><span class='ac-flag'>🙋 Ask a parent to check</span></div>" : "")));
+        });
+        box.appendChild(ul);
+      } else {
+        box.appendChild(el("p", null, "Perfect — no mistakes! 🎉"));
+      }
+    }
+    var row = el("div", "ac-row ac-center");
+    if (o.onRetryWrong && r.wrong.length) row.appendChild(btn("🎯 Practise my " + r.wrong.length + " mistake" + (r.wrong.length > 1 ? "s" : ""), "ac-finish", o.onRetryWrong));
+    if (o.onAgain) row.appendChild(btn("🔄 Try Again", "ac-primary", o.onAgain));
+    if (o.onHome) row.appendChild(btn("🏠 Home", "ac-ghost", o.onHome));
+    box.appendChild(row);
+    return box;
+  }
+
+  /* ---------- recording (iOS Safari safe) ----------
+     var R = AppCore.recorder({maxSecs: 60, onTick, onState, onError});
+     recordBtn.addEventListener("click", function(){ R.toggle(); });  // direct
+     playBtn.addEventListener("click",   function(){ R.play();   });  // direct
+     Rules baked in:
+       - getUserMedia is called synchronously inside start() — so start()
+         / toggle() must be called DIRECTLY from a click handler
+       - MIME type is chosen after permission is granted
+       - play() calls audio.play() synchronously — call it from a click
+       - nothing plays from onstop
+     States: "idle" | "asking" | "recording" | "ready"  */
+  var WEBVIEW_NOTICE =
+    '<div class="ac-notice"><strong>🎙 Recording needs Safari or Chrome</strong><br>' +
+    'Open this page in Safari (iPad/iPhone) or Chrome — not inside another app.<br>' +
+    'iPad: tap ••• or the share button → <b>Open in Safari</b></div>';
+
+  function pickMime() {
+    if (!window.MediaRecorder || !MediaRecorder.isTypeSupported) return "";
+    var t = ["audio/mp4", "audio/aac", "audio/webm;codecs=opus", "audio/webm", "audio/ogg"];
+    for (var i = 0; i < t.length; i++) { try { if (MediaRecorder.isTypeSupported(t[i])) return t[i]; } catch (e) {} }
+    return "";
+  }
+  function recorder(o) {
+    o = o || {};
+    var max = o.maxSecs || 60, rec = null, stream = null, chunks = [], url = null,
+        timer = null, secs = 0, audio = null, state = "idle";
+    function set(s) { state = s; if (o.onState) o.onState(s); }
+    function fail(msg) {
+      cleanup(); set(url ? "ready" : "idle");
+      if (o.onError) o.onError(msg);
+    }
+    function cleanup() {
+      clearInterval(timer); timer = null;
+      if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
+    }
+    function supported() {
+      return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+    }
+    function start() {
+      if (state === "recording" || state === "asking") return;
+      if (!supported()) { fail("This browser cannot record here. Open the page in Safari or Chrome."); return; }
+      if (audio) { audio.pause(); audio = null; }
+      stopSpeech();
+      var gum = navigator.mediaDevices.getUserMedia({ audio: true, video: false }); // inside the tap
+      set("asking");
+      var to = setTimeout(function () { if (state === "asking") fail("No microphone permission. Open the page in Safari or Chrome and allow the microphone."); }, 8000);
+      gum.then(function (s) {
+        clearTimeout(to);
+        if (state !== "asking") { s.getTracks().forEach(function (t) { t.stop(); }); return; }
+        stream = s; chunks = [];
+        var mime = pickMime();
+        try { rec = mime ? new MediaRecorder(s, { mimeType: mime }) : new MediaRecorder(s); }
+        catch (e) { rec = new MediaRecorder(s); }
+        rec.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+        rec.onstop = function () {
+          var b = new Blob(chunks, { type: (rec && rec.mimeType) || mime || "audio/webm" });
+          if (url) URL.revokeObjectURL(url);
+          url = URL.createObjectURL(b);
+          cleanup(); set("ready");           // only store the clip — never auto-play
+        };
+        rec.start(200);
+        secs = 0; set("recording"); if (o.onTick) o.onTick(0, max);
+        timer = setInterval(function () {
+          secs++; if (o.onTick) o.onTick(secs, max);
+          if (secs >= max) stop();
+        }, 1000);
+      }).catch(function (err) {
+        clearTimeout(to);
+        var n = err && err.name;
+        fail(n === "NotAllowedError" ? "Microphone blocked. Allow the microphone in Safari settings, or open the page in Safari/Chrome."
+           : n === "NotFoundError" ? "No microphone found on this device."
+           : "Could not start recording. Open the page in Safari or Chrome.");
+      });
+    }
+    function stop() {
+      clearInterval(timer); timer = null;
+      if (rec && rec.state !== "inactive") { try { rec.stop(); } catch (e) { cleanup(); set(url ? "ready" : "idle"); } }
+    }
+    function play() {                       // call DIRECTLY from the Play button's click
+      if (!url) return;
+      if (audio) audio.pause();
+      audio = new Audio();
+      audio.src = url;
+      var p = audio.play();
+      if (p && p.catch) p.catch(function (e) { if (o.onError) o.onError("Playback failed: " + e.message); });
+    }
+    function reset() {
+      stop(); cleanup();
+      if (audio) { audio.pause(); audio = null; }
+      if (url) { URL.revokeObjectURL(url); url = null; }
+      set("idle");
+    }
+    return {
+      start: start, stop: stop, play: play, reset: reset, supported: supported,
+      toggle: function () { if (state === "recording") stop(); else start(); },
+      hasClip: function () { return !!url; },
+      state: function () { return state; }
+    };
+  }
+
+  /* ---------- oral question card: record first, reveal later ----------
+     AppCore.oralCard(container, {
+        q: "What is a fossil?", a: "A fossil is ...",
+        keywords: ["remains", "rock"],   // shown ONLY after Reveal
+        mustKnow: true                   // red "Exam Must-Know" badge
+     }, {onSelfScore: function(ok){ ... }, maxSecs: 60});
+     Flow: 🔊 Hear Q → 🎙 Record → ⏹ Stop → ▶ My Voice → 👁 Reveal Answer
+           → model answer + 🔊 Hear Model → ✓ Got it / ✗ Still learning.
+     The model answer and keywords are never in the page before Reveal.
+     If recording is impossible, the student taps "I said my answer" to
+     unlock Reveal, so practice can continue. Returns {destroy()}. */
+  function oralCard(container, q, o) {
+    o = o || {};
+    container.innerHTML = "";
+    var card = el("div", "ac-oral");
+    if (q.mustKnow) card.appendChild(el("span", "ac-badge", "⭐ Exam Must-Know"));
+    card.appendChild(el("div", "ac-oral-q", esc(q.q)));
+    var row = el("div", "ac-row"), status = el("div", "ac-status"), out = el("div", "ac-oral-out");
+
+    var hearQ = btn("🔊 Hear Question", "ac-ghost", function () { speak(q.q); });
+    var recB = btn("🎙 Record", "ac-rec");
+    var playB = btn("▶ My Voice", "ac-ghost"); playB.hidden = true;
+    var saidB = btn("I said my answer", "ac-ghost"); saidB.hidden = true;
+    var revealB = btn("👁 Reveal Answer", "ac-primary"); revealB.hidden = true;
+    var revealed = false;
+
+    var R = recorder({
+      maxSecs: o.maxSecs || 60,
+      onTick: function (s, m) { status.textContent = "● Recording " + s + "s / " + m + "s"; },
+      onState: function (s) {
+        card.classList.toggle("ac-recording", s === "recording");
+        if (s === "asking") { status.textContent = "⏳ Asking for the microphone…"; recB.disabled = true; }
+        if (s === "recording") { recB.disabled = false; recB.innerHTML = "⏹ Stop"; }
+        if (s === "ready") {
+          recB.disabled = false; recB.innerHTML = "🎙 Record Again";
+          status.textContent = "✓ Recorded. Listen to yourself, then reveal the answer.";
+          playB.hidden = false; revealB.hidden = revealed;
+        }
+        if (s === "idle") { recB.disabled = false; recB.innerHTML = "🎙 Record"; }
+      },
+      onError: function (msg) {
+        status.textContent = msg;
+        if (!R.hasClip()) saidB.hidden = revealed;
+      }
+    });
+    recB.addEventListener("click", function () { R.toggle(); });     // direct tap → getUserMedia
+    playB.addEventListener("click", function () { R.play(); });      // direct tap → audio.play()
+    saidB.addEventListener("click", function () { saidB.hidden = true; revealB.hidden = false; });
+    revealB.addEventListener("click", function () {
+      revealed = true; revealB.hidden = true; saidB.hidden = true;
+      var m = el("div", "ac-model", "<b>📖 Model Answer</b><div>" + esc(q.a) + "</div>" +
+        (q.keywords && q.keywords.length ? "<div class='ac-kw'>Key words: " + q.keywords.map(esc).join(" · ") + "</div>" : ""));
+      m.appendChild(btn("🔊 Hear Model Answer", "ac-ghost", function () { speak(q.a); }));
+      out.appendChild(m);
+      var self = el("div", "ac-row");
+      function pick(ok) {
+        self.innerHTML = "<div class='ac-fb " + (ok ? "ok" : "bad") + "'>" +
+          (ok ? "Great job! ✓" : "Keep practising — try it again later.") + "</div>";
+        if (o.onSelfScore) o.onSelfScore(ok);
+      }
+      self.appendChild(btn("✓ Got it", "ac-ok", function () { pick(true); }));
+      self.appendChild(btn("✗ Still learning", "ac-ghost", function () { pick(false); }));
+      out.appendChild(self);
+    });
+
+    [hearQ, recB, playB, saidB, revealB].forEach(function (b) { row.appendChild(b); });
+    card.appendChild(row); card.appendChild(status); card.appendChild(out);
+    container.appendChild(card);
+    return { destroy: function () { R.reset(); stopSpeech(); } };
+  }
+
+  /* ---------- answer normalising (for Check) ---------- */
+  function norm(s) {
+    return String(s == null ? "" : s).toLowerCase()
+      .replace(/[’‘`]/g, "'").replace(/[“”]/g, '"')
+      .replace(/[.,!?;:"]/g, " ").replace(/\s+/g, " ").trim();
+  }
+  function matches(given, answers) {
+    var list = Array.isArray(answers) ? answers : [answers];
+    for (var i = 0; i < list.length; i++) if (norm(given) === norm(list[i])) return true;
+    return false;
+  }
+
+  /* ---------- TAP-TO-ANSWER widgets (no keyboard needed on iPad/phone) ----
+     All three share the same contract:
+       AppCore.xxx(container, spec, {onResult: function(ok, given){...}})
+     They draw their own ✔ Check button (Enter also checks when typing),
+     lock after checking, and show green ✓ or the yellow correct-answer box.
+     Every widget has a small "⌨ Type instead" link for older kids.        */
+
+  function checkRow(onCheck) {
+    var row = el("div", "ac-row");
+    var b = btn("✔ Check", "ac-primary ac-check", onCheck);
+    b.disabled = true;
+    row.appendChild(b);
+    return { row: row, btn: b };
+  }
+  function feedback(box, ok, correctText, exp) {
+    var f = el("div", "ac-fb " + (ok ? "ok" : "bad"),
+      ok ? "✓ " + praise() :
+      "✗ Not quite. The answer is:<div class='ac-ans'>" + esc(correctText) + "</div>" +
+      (exp ? "<div class='ac-exp'>" + esc(exp) + "</div>" : ""));
+    box.appendChild(f);
+    return f;
+  }
+  function typeToggle(box, onType) {
+    var t = el("button", "ac-link", "⌨ Type instead");
+    t.type = "button";
+    t.addEventListener("click", function () { t.remove(); onType(); });
+    box.appendChild(t);
+  }
+  function typedInput(box, answers, done, exp, shown) {
+    var inp = el("input", "ac-input"); inp.setAttribute("autocapitalize", "off");
+    inp.setAttribute("autocomplete", "off"); inp.setAttribute("spellcheck", "false");
+    box.appendChild(inp);
+    var c = checkRow(function () { go(); });
+    box.appendChild(c.row);
+    inp.addEventListener("input", function () { c.btn.disabled = !inp.value.trim(); });
+    inp.addEventListener("keydown", function (e) { if (e.key === "Enter" && inp.value.trim()) go(); });
+    var used = false;
+    function go() {
+      if (used) return; used = true; inp.disabled = true; c.row.remove();
+      var ok = matches(inp.value, answers);
+      feedback(box, ok, shown, exp);
+      done(ok, inp.value);
+    }
+    inp.focus();
+  }
+
+  /* 1) Word bank → tap a word to fill the blank(s)
+     AppCore.wordBank(el, {
+        text: "The cat is ___ the box.",      // "___" marks each blank
+        bank: ["in", "on", "under"],          // chips shown under the sentence
+        answers: ["under"],                   // one per blank (string or array of accepted)
+        exp: "optional explanation"
+     }, {onResult})
+     Tap a chip → it goes into the first empty blank. Tap a filled blank → it
+     goes back. Words can be re-used if the bank has duplicates.            */
+  function wordBank(container, spec, o) {
+    o = o || {};
+    container.innerHTML = "";
+    var box = el("div", "ac-q"), parts = String(spec.text).split("___");
+    var n = parts.length - 1, filled = [], used = false;
+    for (var z = 0; z < n; z++) filled.push(null);
+    var line = el("div", "ac-sentence"), chips = el("div", "ac-chips");
+    var pool = spec.bank.map(function (w, i) { return { w: w, id: i, out: false }; });
+    var c = checkRow(check);
+    function render() {
+      line.innerHTML = "";
+      parts.forEach(function (p, i) {
+        line.appendChild(document.createTextNode(p));
+        if (i < n) {
+          var slot = el("button", "ac-slot" + (filled[i] ? " ac-filled" : ""), filled[i] ? esc(filled[i].w) : "&nbsp;");
+          slot.type = "button";
+          slot.addEventListener("click", function () {
+            if (used || !filled[i]) return;
+            filled[i].out = false; filled[i] = null; render();
+          });
+          line.appendChild(slot);
+        }
+      });
+      chips.innerHTML = "";
+      pool.forEach(function (it) {
+        var ch = el("button", "ac-chip" + (it.out ? " ac-used" : ""), esc(it.w));
+        ch.type = "button"; ch.disabled = used || it.out;
+        ch.addEventListener("click", function () {
+          var k = filled.indexOf(null);
+          if (k < 0) return;
+          filled[k] = it; it.out = true; render();
+        });
+        chips.appendChild(ch);
+      });
+      c.btn.disabled = used || filled.filter(Boolean).length < n;
+    }
+    function check() {
+      if (used) return; used = true; c.row.remove(); render();
+      var given = filled.map(function (f) { return f ? f.w : ""; });
+      var ok = given.every(function (g, i) { return matches(g, spec.answers[i]); });
+      var full = parts.map(function (p, i) {
+        var a = spec.answers[i]; return p + (i < n ? (Array.isArray(a) ? a[0] : a) : "");
+      }).join("");
+      feedback(box, ok, full, spec.exp);
+      if (o.onResult) o.onResult(ok, given.join(" / "));
+    }
+    box.appendChild(line); box.appendChild(chips); box.appendChild(c.row);
+    container.appendChild(box);
+    render();
+  }
+
+  /* 2) Build from tiles → unscramble a sentence, spell a word, order steps
+     AppCore.tiles(el, {
+        answer: "She always eats breakfast at seven.",   // or ["acceptable", ...]
+        unit: "word" | "letter" | "item",   // word: split on spaces, letter: per letter
+        items: [...],        // only for unit "item": the pieces in the CORRECT order
+        extra: ["never"],    // optional distractor tiles
+        hint: "optional instruction shown above",
+        exp: "optional explanation"
+     }, {onResult})
+     Tap a tile → it moves to the answer line; tap it there → it moves back.
+     Spelling (unit "letter") also offers "⌨ Type instead".                  */
+  function tiles(container, spec, o) {
+    o = o || {};
+    container.innerHTML = "";
+    var box = el("div", "ac-q"), unit = spec.unit || "word";
+    var first = Array.isArray(spec.answer) ? spec.answer[0] : spec.answer;
+    var pieces = unit === "item" ? spec.items.slice()
+      : unit === "letter" ? String(first).replace(/\s+/g, "").split("")
+      : String(first).replace(/[.!?]$/, "").split(/\s+/);
+    var tail = unit === "word" ? (String(first).match(/[.!?]$/) || [""])[0] : "";
+    var all = pieces.concat(spec.extra || []).map(function (t, i) { return { t: t, id: i }; });
+    var src;
+    do { src = shuffle(all); } while (all.length > 1 && src.map(function (x) { return x.t; }).join("|") === pieces.join("|"));
+    var ans = [], used = false;
+    if (spec.hint) box.appendChild(el("div", "ac-hint", esc(spec.hint)));
+    var line = el("div", "ac-tiles ac-answer-line"), pool = el("div", "ac-tiles");
+    var c = checkRow(check);
+    function joinUp(arr) {
+      var s = arr.map(function (x) { return x.t; });
+      return unit === "letter" ? s.join("") : unit === "item" ? s.join(" → ") : s.join(" ") + tail;
+    }
+    function render() {
+      line.innerHTML = ""; pool.innerHTML = "";
+      if (!ans.length) line.appendChild(el("span", "ac-placeholder", "Tap the tiles below in order"));
+      ans.forEach(function (x, i) {
+        var b = btn(esc(x.t), "ac-tile ac-in", function () { if (used) return; src.push(ans.splice(i, 1)[0]); render(); });
+        line.appendChild(b);
+      });
+      src.forEach(function (x, i) {
+        var b = btn(esc(x.t), "ac-tile", function () { if (used) return; ans.push(src.splice(i, 1)[0]); render(); });
+        pool.appendChild(b);
+      });
+      c.btn.disabled = used || !ans.length;
+    }
+    function check() {
+      if (used) return; used = true; c.row.remove(); render();
+      var given = joinUp(ans);
+      var target = unit === "item" ? [pieces.join(" → ")] : (Array.isArray(spec.answer) ? spec.answer : [spec.answer]);
+      var ok = unit === "letter" ? matches(given, target.map(function (a) { return String(a).replace(/\s+/g, ""); }))
+                                 : matches(given, target);
+      feedback(box, ok, unit === "item" ? pieces.join(" → ") : first, spec.exp);
+      if (o.onResult) o.onResult(ok, given);
+    }
+    box.appendChild(line); box.appendChild(pool); box.appendChild(c.row);
+    if (unit === "letter") typeToggle(box, function () {
+      line.remove(); pool.remove(); c.row.remove();
+      typedInput(box, spec.answer, function (ok, g) { used = true; if (o.onResult) o.onResult(ok, g); }, spec.exp, first);
+    });
+    container.appendChild(box);
+    render();
+  }
+
+  /* 3) Open answer (short answer, "write a sentence", "name 3 things")
+     Speak (🎤 → text) or type, then the answer is scored AUTOMATICALLY on
+     key points, the way a teacher marks a short answer.
+     AppCore.openAnswer(el, {
+        a: "Plants need water, sunlight and air.",          // model answer
+        points: [["water"], ["sunlight", "sun", "sunshine"], ["air"]],
+                     // each key point = accepted words/phrases (first = label)
+                     // or {label: "sunlight", any: ["sun", "sunshine"]}
+        need: 2,     // points needed to count as correct (default: all if
+                     // 1–2 points, otherwise ~70% rounded up)
+        exp: "optional explanation"
+     }, {onResult: function(ok, given, info){}})
+     info = {hits, total, appeal}. Matching ignores case, punctuation,
+     plurals (-s/-es/-ies), -ed/-ing and number words (three = 3).
+     "🙋 I think I'm right" marks the answer for a parent to check
+     (info.appeal = true); it does NOT change the score.               */
+  var NUMS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+              "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"];
+  function stem(w) {
+    var n = NUMS.indexOf(w); if (n >= 0) return String(n);
+    w = w.replace(/'s$/, "");
+    if (w.length > 4 && /ies$/.test(w)) return w.slice(0, -3) + "y";
+    if (w.length > 4 && /(ches|shes|sses|xes)$/.test(w)) return w.slice(0, -2);
+    if (w.length > 5 && /ing$/.test(w)) return w.slice(0, -3);
+    if (w.length > 4 && /ied$/.test(w)) return w.slice(0, -3) + "y";
+    if (w.length > 4 && /ed$/.test(w)) return w.slice(0, -2);
+    if (w.length > 3 && /s$/.test(w) && !/ss$/.test(w)) return w.slice(0, -1);
+    return w;
+  }
+  function stems(s) { return norm(s).split(" ").filter(Boolean).map(stem); }
+  function hasPhrase(words, phrase) {
+    var p = stems(phrase); if (!p.length) return false;
+    for (var i = 0; i + p.length <= words.length; i++) {
+      var ok = true;
+      for (var k = 0; k < p.length; k++) if (words[i + k] !== p[k]) { ok = false; break; }
+      if (ok) return true;
+    }
+    return false;
+  }
+  function keyPoints(spec) {
+    var src = spec.points && spec.points.length ? spec.points : (spec.keywords || []).map(function (k) { return [k]; });
+    return src.map(function (p) {
+      if (Array.isArray(p)) return { label: p[0], any: p };
+      return { label: p.label, any: [p.label].concat(p.any || []) };
+    });
+  }
+  function scorePoints(text, pts) {
+    var w = stems(text);
+    return pts.map(function (p) {
+      for (var i = 0; i < p.any.length; i++) if (hasPhrase(w, p.any[i])) return true;
+      return false;
+    });
+  }
+  function speechSupported() { return !!(window.SpeechRecognition || window.webkitSpeechRecognition); }
+
+  function openAnswer(container, spec, o) {
+    o = o || {};
+    container.innerHTML = "";
+    var pts = keyPoints(spec), total = pts.length;
+    var need = spec.need || (total <= 2 ? total : Math.ceil(total * 0.7));
+    var box = el("div", "ac-q"), done = false, rec = null, listening = false;
+    box.appendChild(el("div", "ac-hint", speechSupported()
+      ? "🎤 Tap the mic and say your answer, or type it. Then tap ✔ Check."
+      : "⌨ Type your answer (tip: the 🎤 key on the iPad keyboard lets you speak it). Then tap ✔ Check."));
+    var inp = el("textarea", "ac-input");
+    inp.setAttribute("autocapitalize", "sentences"); inp.setAttribute("spellcheck", "false");
+    inp.placeholder = "Your answer…";
+    var row = el("div", "ac-row"), status = el("div", "ac-status");
+    var mic = btn("🎤 Speak", "ac-rec");
+    var c = checkRow(check);
+    row.appendChild(mic); row.appendChild(c.btn);
+    if (!speechSupported()) mic.hidden = true;
+    inp.addEventListener("input", function () { c.btn.disabled = done || !inp.value.trim(); });
+    inp.addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey && inp.value.trim()) { e.preventDefault(); check(); } });
+
+    mic.addEventListener("click", function () {          // start inside the tap (iOS)
+      if (done) return;
+      if (listening && rec) { rec.stop(); return; }
+      var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      stopSpeech();
+      rec = new SR(); rec.lang = "en-US"; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
+      var base = inp.value.trim() ? inp.value.trim() + " " : "";
+      rec.onresult = function (e) {
+        var t = "";
+        for (var i = 0; i < e.results.length; i++) t += e.results[i][0].transcript;
+        inp.value = base + t; c.btn.disabled = !inp.value.trim();
+      };
+      rec.onerror = function (e) {
+        status.textContent = e.error === "not-allowed" || e.error === "service-not-allowed"
+          ? "Microphone or speech not allowed. Open in Safari/Chrome, allow the mic — or type your answer."
+          : e.error === "no-speech" ? "I didn't hear anything. Tap 🎤 and try again." : "Speech didn't work — please type your answer.";
+      };
+      rec.onend = function () { listening = false; mic.innerHTML = "🎤 Speak"; card(false); if (inp.value.trim()) status.textContent = "✓ Check the words, fix any mistakes, then tap ✔ Check."; };
+      try { rec.start(); listening = true; mic.innerHTML = "⏹ Stop"; card(true); status.textContent = "● Listening…"; }
+      catch (err) { status.textContent = "Speech didn't start — please type your answer."; }
+    });
+    function card(on) { box.classList.toggle("ac-recording", on); }
+
+    function check() {
+      if (done || !inp.value.trim()) return;
+      if (listening && rec) { try { rec.stop(); } catch (e) {} }
+      done = true; inp.disabled = true; row.remove();
+      var hits = scorePoints(inp.value, pts), n = hits.filter(Boolean).length, ok = n >= need;
+      var list = pts.map(function (p, i) {
+        return "<span class='ac-kp " + (hits[i] ? "hit" : "miss") + "'>" + (hits[i] ? "✓ " : "✗ ") + esc(p.label) + "</span>";
+      }).join(" ");
+      var f = el("div", "ac-fb " + (ok ? "ok" : "bad"),
+        (ok ? "✓ " + praise() : "Not quite — keep going! 💪") +
+        "<div class='ac-kps'>" + list + "</div><div class='ac-exp'>Key points: " + n + " / " + total +
+        (ok ? "" : " (need " + need + ")") + "</div>");
+      box.appendChild(f);
+      var m = el("div", "ac-model", "<b>Model answer</b><div>" + esc(spec.a) + "</div>" +
+        (spec.exp ? "<div class='ac-kw'>" + esc(spec.exp) + "</div>" : ""));
+      m.appendChild(btn("🔊 Hear it", "ac-ghost", function () { speak(spec.a); }));
+      box.appendChild(m);
+      var info = { hits: n, total: total, appeal: false };
+      if (!ok) {
+        var ap = btn("🙋 I think I'm right", "ac-ghost", function () {
+          info.appeal = true; ap.remove();
+          box.appendChild(el("div", "ac-exp", "Marked for a parent to check. 👍"));
+          if (o.onAppeal) o.onAppeal(inp.value, info);
+        });
+        box.appendChild(ap);
+      }
+      if (o.onResult) o.onResult(ok, inp.value, info);
+    }
+    box.appendChild(inp); box.appendChild(row); box.appendChild(status);
+    container.appendChild(box);
+  }
+
+  /* ---------- GAME LAYER: points, streaks, praise, confetti, best score ----
+     var G = AppCore.game("audrey-reading-1151-vocab");   // one per drill, key = unique
+     G.hud()                -> element: ⭐ points · 🔥 streak  (put it in the drill bar area)
+     G.record(ok)           -> call after EVERY judged answer (any mode)
+     G.summary()            -> {points, bestStreak, best, newBest}
+     resultView(log, {game: G, onRetryWrong: fn, ...}) shows it all.
+     Scoring: correct +10, streak bonus +2 per answer in a row (max +10).
+     Streak milestones (3, 5, 10, …) pop a cheer; 5+ and 100% fire confetti.
+     The best score per drill is kept on this device (localStorage, safe).  */
+  var PRAISE = ["Great job!", "Awesome!", "You got it!", "Super!", "Well done!", "Nice work!", "Brilliant!", "Fantastic!", "Way to go!", "Excellent!"];
+  function praise() { return PRAISE[Math.floor(Math.random() * PRAISE.length)]; }
+  function cheer(text) {
+    var t = el("div", "ac-cheer", esc(text));
+    document.body.appendChild(t);
+    setTimeout(function () { t.classList.add("ac-out"); }, 1100);
+    setTimeout(function () { t.remove(); }, 1600);
+  }
+  function confetti(n) {
+    var colors = ["#f59e0b", "#0284c7", "#16a34a", "#dc2626", "#a855f7", "#ec4899"];
+    var layer = el("div", "ac-confetti");
+    for (var i = 0; i < (n || 60); i++) {
+      var p = el("i");
+      p.style.left = Math.random() * 100 + "vw";
+      p.style.background = colors[i % colors.length];
+      p.style.animationDelay = (Math.random() * 0.4) + "s";
+      p.style.animationDuration = (1.2 + Math.random() * 1.2) + "s";
+      p.style.transform = "rotate(" + Math.floor(Math.random() * 360) + "deg)";
+      layer.appendChild(p);
+    }
+    document.body.appendChild(layer);
+    setTimeout(function () { layer.remove(); }, 3000);
+  }
+  function game(key, gopt) {
+    gopt = gopt || {};
+    var boss = gopt.boss ? bossWidget(gopt.boss) : null;
+    var pts = 0, streak = 0, bestStreak = 0, hudEl = null, best = 0, newBest = false;
+    try { best = parseInt(localStorage.getItem("ac-best-" + key) || "0", 10) || 0; } catch (e) { best = 0; }
+    function draw() {
+      if (hudEl) hudEl.innerHTML = "⭐ " + pts + (streak >= 2 ? " &nbsp; 🔥 " + streak + " in a row" : "");
+    }
+    return {
+      hud: function () { hudEl = el("span", "ac-hud"); draw(); if (!boss) return hudEl; var w = el("span", "ac-hudwrap"); w.appendChild(hudEl); w.appendChild(boss.el); return w; },
+      boss: boss,
+      record: function (ok) {
+        try { if (window.SitePoints) window.SitePoints.answer(!!ok); } catch (e) {}
+        if (ok) {
+          streak++; bestStreak = Math.max(bestStreak, streak);
+          pts += 10 + Math.min(10, (streak - 1) * 2);
+          if (streak === 3) cheer("🔥 3 in a row!");
+          else if (streak === 5) { cheer("🚀 5 in a row! Amazing!"); confetti(40); }
+          else if (streak > 5 && streak % 5 === 0) { cheer("🏆 " + streak + " in a row! Unstoppable!"); confetti(60); }
+        } else {
+          if (streak >= 3) cheer("Good try! Start a new streak 💪");
+          streak = 0;
+        }
+        if (boss) boss.hit(!!ok, streak);
+        draw();
+      },
+      summary: function () {
+        if (pts > best) {
+          newBest = best > 0 || pts > 0; best = pts;
+          try { localStorage.setItem("ac-best-" + key, String(pts)); } catch (e) {}
+        }
+        return { points: pts, bestStreak: bestStreak, best: best, newBest: newBest };
+      }
+    };
+  }
+
+  /* =================================================================
+     PLAY LAYER (2026-11-08) — more game-like practice for English apps
+     ----------------------------------------------------------------
+     1) Boss battle      game(key, {boss: {name, hp}})  — every correct
+                          answer hits the boss (streak = bigger hits);
+                          HP bar in the drill bar; defeat → confetti.
+                          bossFor(n, name) gives a fair HP for n questions.
+     2) Word flip        memory(container, {key, pairs:[[word, meaning]],
+                          size: 6|8, speak: true, onDone(pct)})
+     3) Sort game        sortGame(container, {key, bins:["Solid","Liquid"],
+                          items:[{t:"ice", bin:0, exp:"…"}], onDone(log)})
+                          tap an item card, then tap its bin (no dragging)
+     4) Evidence hunt    evidence(container, {passage:["sentence 1", …],
+                          q:"Why did …?", correct:[2], exp:"…", onResult(ok)})
+                          tap the sentence(s) that PROVE the answer
+     5) Sentence race    sentenceRace(container, {key, seconds: 90,
+                          items:[{answer:"She has eaten.", extra:["eat"], hint:"…"}],
+                          onDone(log)}) — build as many sentences as you can
+     All report to SitePoints (points, quests, 🎒 creatures) automatically.
+     ================================================================= */
+  var BOSS_C = ["#7c3aed", "#0891b2", "#be123c", "#15803d", "#c2410c", "#4338ca"];
+  function bossSvg(seed, hurt) {
+    var c = BOSS_C[seed % BOSS_C.length], k = "#111827";
+    return '<svg viewBox="0 0 100 100" width="100%" height="100%" aria-hidden="true">' +
+      '<path d="M22 34 L14 10 L34 26Z M78 34 L86 10 L66 26Z" fill="' + c + '"/>' +
+      '<path d="M16 60 Q16 22 50 22 Q84 22 84 60 Q84 92 50 92 Q16 92 16 60Z" fill="' + c + '"/>' +
+      '<path d="M16 66 Q6 58 8 72 M84 66 Q94 58 92 72" stroke="' + c + '" stroke-width="7" stroke-linecap="round" fill="none"/>' +
+      (hurt ? '<path d="M32 48 L42 56 M42 48 L32 56 M58 48 L68 56 M68 48 L58 56" stroke="#fff" stroke-width="4" stroke-linecap="round"/>'
+            : '<circle cx="37" cy="52" r="8" fill="#fff"/><circle cx="63" cy="52" r="8" fill="#fff"/><circle cx="38" cy="53" r="4" fill="' + k + '"/><circle cx="62" cy="53" r="4" fill="' + k + '"/>' +
+              '<path d="M28 40 L44 46 M72 40 L56 46" stroke="' + k + '" stroke-width="3.5" stroke-linecap="round"/>') +
+      '<path d="M36 72 Q50 ' + (hurt ? "64" : "80") + ' 64 72" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>' +
+      '<path d="M40 72 L43 77 L46 73 M54 73 L57 77 L60 72" fill="#fff"/></svg>';
+  }
+  function bossFor(n, name) { return { name: name || "Quiz Monster", hp: Math.max(30, Math.round(n * 10 * 0.75)) }; }
+  function bossWidget(b) {
+    var hp = b.hp, max = b.hp, seed = 0, done = false, w = el("span", "ac-boss");
+    for (var i = 0; i < (b.name || "").length; i++) seed += b.name.charCodeAt(i);
+    function draw(fx) {
+      w.innerHTML = '<span class="ac-boss-pic' + (fx ? " " + fx : "") + '">' + bossSvg(seed, hp <= 0) + '</span>' +
+        '<span class="ac-boss-info"><b>' + esc(b.name) + '</b><span class="ac-hp"><i style="width:' + Math.max(0, hp / max * 100) + '%"></i></span>' +
+        '<small>' + (hp > 0 ? "HP " + hp + " / " + max : "Defeated! 🏆") + '</small></span>';
+    }
+    draw();
+    return {
+      el: w,
+      hit: function (ok, streak) {
+        if (done) return;
+        if (ok) {
+          var dmg = 10 + Math.min(10, (streak - 1) * 2);
+          hp = Math.max(0, hp - dmg); draw("ac-hit");
+          if (hp <= 0) { done = true; setTimeout(function () { cheer("🏆 You defeated " + b.name + "!"); confetti(90); }, 300); }
+        } else draw("ac-laugh");
+      },
+      defeated: function () { return done; }
+    };
+  }
+
+  /* ---------- 2) word flip memory ---------- */
+  function memory(container, o) {
+    var size = o.size || 6, key = "ac-mem-" + (o.key || "x") + "-" + size;
+    var pool = shuffle(o.pairs).slice(0, size), cards = [];
+    pool.forEach(function (p, i) { cards.push({ id: i, side: 0, t: p[0] }, { id: i, side: 1, t: p[1] }); });
+    cards = shuffle(cards);
+    var open = [], matched = 0, moves = 0, combo = 0, lock = false, t0 = 0, timer = null;
+    container.innerHTML = "";
+    var hud = el("div", "ac-mem-hud"), grid = el("div", "ac-mem" + (size > 6 ? " ac-mem16" : ""));
+    container.appendChild(hud); container.appendChild(grid);
+    function drawHud() {
+      var s = t0 ? Math.floor((Date.now() - t0) / 1000) : 0;
+      hud.innerHTML = "⏱ " + Math.floor(s / 60) + ":" + ("0" + s % 60).slice(-2) + " &nbsp; 🔄 " + moves + " &nbsp; ✅ " + matched + " / " + size;
+    }
+    function draw() {
+      grid.innerHTML = "";
+      cards.forEach(function (c, i) {
+        var b = el("button", "ac-mc" + (c.open || c.done ? " open" : "") + (c.done ? " done" : "") + (c.side ? " back" : ""),
+          c.open || c.done ? esc(c.t) : "?");
+        b.type = "button";
+        b.addEventListener("click", function () { flip(i); });
+        grid.appendChild(b);
+      });
+      drawHud();
+    }
+    function flip(i) {
+      var c = cards[i];
+      if (lock || c.open || c.done) return;
+      if (!t0) { t0 = Date.now(); timer = setInterval(drawHud, 500); }
+      c.open = true; open.push(c);
+      if (o.speak !== false && c.side === 0) speak(c.t);
+      if (open.length === 2) {
+        moves++;
+        var a = open[0], z = open[1];
+        if (a.id === z.id) {
+          a.done = z.done = true; a.open = z.open = false; open = []; matched++; combo++;
+          try { if (window.SitePoints) window.SitePoints.answer(true); } catch (e) {}
+          if (combo >= 2) cheer("🔥 " + combo + " combo!");
+          draw();
+          if (matched === size) finish();
+        } else {
+          combo = 0; lock = true; draw();
+          setTimeout(function () { a.open = z.open = false; open = []; lock = false; draw(); }, 900);
+        }
+      } else draw();
+    }
+    function finish() {
+      clearInterval(timer);
+      var secs = Math.round((Date.now() - t0) / 1000), st = moves <= size + 2 ? 3 : moves <= Math.ceil(size * 1.7) ? 2 : 1;
+      var pct = Math.round(100 * size / moves), best = null;
+      try { best = JSON.parse(localStorage.getItem(key) || "null"); } catch (e) {}
+      var rec = !best || secs < best.s; if (rec) try { localStorage.setItem(key, JSON.stringify({ s: secs, m: moves })); } catch (e) {}
+      if (st === 3) confetti(70);
+      try { if (window.SitePoints) window.SitePoints.roundEnd(Math.min(100, pct)); } catch (e) {}
+      var box = el("div", "ac-result", '<div class="ac-stars">' + new Array(st + 1).join("⭐") + '</div><h2>All pairs found in ' + secs + ' s, ' + moves + ' flips</h2>' +
+        (rec ? '<p class="ac-cheerline">🏆 New record!</p>' : best ? '<p>Best: ' + best.s + ' s</p>' : ''));
+      var row = el("div", "ac-row ac-center");
+      row.appendChild(btn("🔄 Play again", "ac-primary", function () { memory(container, o); }));
+      if (o.onHome) row.appendChild(btn("🏠 Home", "ac-ghost", o.onHome));
+      box.appendChild(row); container.appendChild(box);
+      if (o.onDone) o.onDone(pct);
+    }
+    draw();
+  }
+
+  /* ---------- 3) sort game (tap item → tap bin) ---------- */
+  function sortGame(container, o) {
+    var items = shuffle(o.items), i = 0, log = [], G = game("sort-" + (o.key || "x"));
+    container.innerHTML = "";
+    var bar = drillBar({ title: o.title || "Sort it!", onBack: o.onHome, game: G, onFinish: done });
+    var card = el("div", "ac-sort-item"), bins = el("div", "ac-bins"), fb = el("div");
+    container.appendChild(bar); container.appendChild(el("p", "ac-hint", "Tap the box where this belongs.")); container.appendChild(card); container.appendChild(bins); container.appendChild(fb);
+    o.bins.forEach(function (name, k) {
+      var b = btn(esc(name), "ac-bin", function () { choose(k, b); });
+      bins.appendChild(b);
+    });
+    function show() {
+      if (i >= items.length) return done();
+      card.innerHTML = '<span class="ac-sort-n">' + (i + 1) + " / " + items.length + '</span><b>' + esc(items[i].t) + '</b>';
+      fb.innerHTML = ""; Array.prototype.forEach.call(bins.children, function (b) { b.disabled = false; b.className = "ac-btn ac-bin"; });
+    }
+    function choose(k, b) {
+      var it = items[i], ok = k === it.bin;
+      G.record(ok); log.push({ q: it.t, given: o.bins[k], correct: o.bins[it.bin], ok: ok, item: it });
+      Array.prototype.forEach.call(bins.children, function (x, j) { x.disabled = true; if (j === it.bin) x.className += " ac-bin-ok"; else if (x === b) x.className += " ac-bin-bad"; });
+      fb.innerHTML = '<div class="ac-fb ' + (ok ? "ok" : "bad") + '">' + (ok ? praise() : "It goes in <b>" + esc(o.bins[it.bin]) + "</b>.") +
+        (it.exp ? '<div class="ac-exp">' + esc(it.exp) + '</div>' : '') + '</div>';
+      var nx = btn(i + 1 < items.length ? "Next ➡" : "See my score", "ac-primary", function () { i++; show(); });
+      fb.appendChild(nx);
+    }
+    function done() {
+      container.innerHTML = "";
+      container.appendChild(resultView(log, { game: G, onAgain: function () { sortGame(container, o); }, onHome: o.onHome,
+        onRetryWrong: function () { sortGame(container, Object.assign({}, o, { items: log.filter(function (x) { return !x.ok; }).map(function (x) { return x.item; }) })); } }));
+      if (o.onDone) o.onDone(log);
+    }
+    show();
+  }
+
+  /* ---------- 4) evidence hunt ---------- */
+  function evidence(container, o) {
+    var picked = [], need = o.correct.length, done = false;
+    container.innerHTML = "";
+    container.appendChild(el("p", "ac-q", "<b>" + esc(o.q) + "</b>"));
+    if (o.answer) container.appendChild(el("p", "ac-hint", "Answer: " + esc(o.answer)));
+    container.appendChild(el("p", "ac-hint", "🔎 Find the evidence: tap the sentence" + (need > 1 ? "s (" + need + ")" : "") + " that prove" + (need > 1 ? "" : "s") + " it."));
+    var box = el("div", "ac-passage"), fb = el("div");
+    o.passage.forEach(function (s, k) {
+      var sp = el("span", "ac-sent", esc(s) + " ");
+      sp.setAttribute("role", "button"); sp.tabIndex = 0;
+      sp.addEventListener("click", function () {
+        if (done) return;
+        var at = picked.indexOf(k);
+        if (at >= 0) { picked.splice(at, 1); sp.classList.remove("ac-picked"); }
+        else if (picked.length < need) { picked.push(k); sp.classList.add("ac-picked"); }
+        chk.disabled = picked.length !== need;
+      });
+      box.appendChild(sp);
+    });
+    container.appendChild(box);
+    var chk = btn("✔ Check", "ac-primary", function () {
+      done = true; chk.disabled = true;
+      var ok = picked.length === need && picked.every(function (k) { return o.correct.indexOf(k) >= 0; });
+      Array.prototype.forEach.call(box.children, function (sp, k) {
+        if (o.correct.indexOf(k) >= 0) sp.classList.add("ac-evid");
+        else if (picked.indexOf(k) >= 0) sp.classList.add("ac-wrongpick");
+      });
+      fb.innerHTML = '<div class="ac-fb ' + (ok ? "ok" : "bad") + '">' + (ok ? "🔎 Great detective work! " + praise() : "The highlighted sentence is the evidence.") +
+        (o.exp ? '<div class="ac-exp">' + esc(o.exp) + '</div>' : '') + '</div>';
+      if (o.onResult) o.onResult(ok, picked);
+    });
+    chk.disabled = true;
+    container.appendChild(chk); container.appendChild(fb);
+  }
+
+  /* ---------- 5) sentence race ---------- */
+  function sentenceRace(container, o) {
+    var secs = o.seconds || 90, items = shuffle(o.items), i = 0, log = [], G = game("race-" + (o.key || "x")), t0 = Date.now(), timer, over = false;
+    container.innerHTML = "";
+    var bar = drillBar({ title: "⏱ Sentence Race", onBack: function () { clearInterval(timer); if (o.onHome) o.onHome(); }, game: G, onFinish: end });
+    var clock = el("div", "ac-race-clock"), area = el("div");
+    container.appendChild(bar); container.appendChild(clock); container.appendChild(area);
+    function tick() {
+      var left = Math.max(0, secs - Math.floor((Date.now() - t0) / 1000));
+      clock.innerHTML = '<span class="ac-hp ac-time"><i style="width:' + (left / secs * 100) + '%"></i></span> ' + left + " s";
+      if (left <= 0) end();
+    }
+    timer = setInterval(tick, 250); tick();
+    function next() {
+      if (over) return;
+      if (i >= items.length) { items = items.concat(shuffle(o.items)); }
+      var it = items[i];
+      tiles(area, { answer: it.answer, extra: it.extra || [], hint: it.hint || "Build the sentence:", exp: it.exp }, {
+        onResult: function (ok, given) {
+          G.record(ok); log.push({ q: it.hint || "Build the sentence", given: given, correct: Array.isArray(it.answer) ? it.answer[0] : it.answer, ok: ok, item: it });
+          i++; setTimeout(next, ok ? 450 : 1300);
+        }
+      });
+    }
+    function end() {
+      if (over) return; over = true; clearInterval(timer);
+      container.innerHTML = "";
+      container.appendChild(el("h2", "ac-center", "⏱ Time! You built " + log.filter(function (x) { return x.ok; }).length + " correct sentences."));
+      container.appendChild(resultView(log, { game: G, onAgain: function () { sentenceRace(container, o); }, onHome: o.onHome }));
+      if (o.onDone) o.onDone(log);
+    }
+    next();
+  }
+
+  /* ---------- styles (call once) ---------- */
+  var CSS =
+    ".ac-btn{font:inherit;font-size:1.05rem;min-height:50px;padding:10px 16px;border-radius:12px;border:2px solid transparent;cursor:pointer;margin:4px 6px 4px 0;touch-action:manipulation}" +
+    ".ac-btn[disabled]{opacity:.5}" +
+    ".ac-primary{background:#0284c7;color:#fff}.ac-ok{background:#16a34a;color:#fff}" +
+    ".ac-rec{background:#dc2626;color:#fff}.ac-finish{background:#f59e0b;color:#1f2937;font-weight:700}" +
+    ".ac-ghost{background:transparent;color:inherit;border-color:currentColor}" +
+    ".ac-bar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 10px;margin:0 -10px 12px;background:inherit;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-bottom:1px solid rgba(127,127,127,.3)}" +
+    ".ac-bar-title{flex:1;min-width:120px;opacity:.8}" +
+    ".ac-row{display:flex;flex-wrap:wrap;align-items:center}" +
+    ".ac-result{text-align:center}.ac-stars{font-size:2.2rem;margin:8px 0}" +
+    ".ac-review{text-align:left;margin:16px 0}.ac-review-item{padding:10px 12px;border-left:4px solid #dc2626;margin:8px 0;border-radius:8px;background:rgba(220,38,38,.08)}" +
+    ".ac-given{opacity:.8}.ac-correct{font-weight:700;color:#15803d}" +
+    ".ac-notice{background:#1a0a2a;border:2px solid #a855f7;color:#e9d5ff;border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:.92rem;line-height:1.7}" +
+    ".ac-notice strong{color:#c084fc}" +
+    ".ac-oral{padding:14px;border-radius:14px;border:1px solid rgba(127,127,127,.35);margin-bottom:14px}" +
+    ".ac-oral-q{font-size:1.25rem;font-weight:700;margin:8px 0 10px}" +
+    ".ac-badge{display:inline-block;background:#dc2626;color:#fff;border-radius:999px;padding:2px 10px;font-size:.85rem}" +
+    ".ac-recording{box-shadow:0 0 0 3px #dc2626}" +
+    ".ac-status{min-height:1.4em;margin:6px 0;opacity:.85}" +
+    ".ac-model{background:rgba(22,163,74,.12);border:2px solid #16a34a;border-radius:12px;padding:12px;margin:10px 0}" +
+    ".ac-kw{margin-top:6px;opacity:.85}" +
+    ".ac-fb{padding:10px 14px;border-radius:10px;font-weight:700;margin-top:8px}.ac-fb.ok{background:rgba(22,163,74,.15);color:#15803d}.ac-fb.bad{background:rgba(245,158,11,.18)}" +
+    ".ac-ans{font-size:1.25rem;margin-top:4px}.ac-exp{font-weight:400;margin-top:4px;opacity:.85}" +
+    ".ac-q{margin:6px 0}.ac-hint{opacity:.8;margin-bottom:8px}" +
+    ".ac-sentence{font-size:1.2rem;line-height:2.4;margin-bottom:10px}" +
+    ".ac-slot{font:inherit;min-width:90px;min-height:44px;margin:0 4px;padding:4px 12px;border:none;border-bottom:3px solid #0284c7;border-radius:6px;background:rgba(2,132,199,.08);color:inherit;cursor:pointer}" +
+    ".ac-slot.ac-filled{background:#0284c7;color:#fff;border-bottom-color:#075985}" +
+    ".ac-chips,.ac-tiles{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}" +
+    ".ac-chip,.ac-tile{font:inherit;font-size:1.1rem;min-height:48px;min-width:48px;padding:8px 14px;border-radius:12px;border:2px solid #0284c7;background:transparent;color:inherit;cursor:pointer;touch-action:manipulation}" +
+    ".ac-chip.ac-used{opacity:.3}.ac-tile.ac-in{background:#0284c7;color:#fff}" +
+    ".ac-answer-line{min-height:62px;padding:6px;border:2px dashed rgba(127,127,127,.5);border-radius:12px;align-items:center}" +
+    ".ac-placeholder{opacity:.55;padding:0 6px}" +
+    ".ac-input{font:inherit;font-size:1.15rem;width:100%;max-width:520px;min-height:50px;padding:8px 12px;border-radius:10px;border:2px solid rgba(127,127,127,.5);background:transparent;color:inherit;display:block;margin:8px 0}" +
+    "textarea.ac-input{min-height:90px}" +
+    ".ac-link{font:inherit;font-size:.9rem;background:none;border:none;color:#0284c7;text-decoration:underline;cursor:pointer;padding:6px 0;margin-top:4px}" +
+    ".ac-hud{font-weight:700;white-space:nowrap}" +
+    ".ac-cheer{position:fixed;left:50%;top:22%;transform:translate(-50%,0) scale(1);z-index:9999;background:#f59e0b;color:#1f2937;font-weight:800;font-size:1.4rem;padding:14px 24px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:ac-pop .35s ease-out;transition:opacity .5s,transform .5s;pointer-events:none}" +
+    ".ac-cheer.ac-out{opacity:0;transform:translate(-50%,-30px)}" +
+    "@keyframes ac-pop{from{transform:translate(-50%,0) scale(.4)}to{transform:translate(-50%,0) scale(1)}}" +
+    ".ac-confetti{position:fixed;inset:0;pointer-events:none;z-index:9998;overflow:hidden}" +
+    ".ac-confetti i{position:absolute;top:-12px;width:10px;height:14px;border-radius:2px;animation:ac-fall linear forwards}" +
+    "@keyframes ac-fall{to{top:105vh;transform:rotate(720deg)}}" +
+    ".ac-cheerline{font-size:1.15rem;font-weight:700}" +
+    ".ac-gamebox{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin:10px 0;padding:10px;border-radius:12px;background:rgba(245,158,11,.14)}" +
+    ".ac-center{justify-content:center}" +
+    ".ac-kps{margin:6px 0;display:flex;flex-wrap:wrap;gap:6px}.ac-kp{padding:3px 10px;border-radius:999px;font-weight:700}" +
+    ".ac-kp.hit{background:rgba(22,163,74,.18);color:#15803d}.ac-kp.miss{background:rgba(220,38,38,.12);color:#b91c1c}" +
+    ".ac-flag{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:#fde68a;color:#78350f;font-size:.85rem}" +
+    ".ac-hudwrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px;flex-basis:100%;order:3}" +
+    ".ac-boss{display:flex;align-items:center;gap:8px;flex:1;min-width:200px}.ac-boss-pic{width:52px;height:52px;flex:none;display:inline-block}.ac-boss-info{flex:1;display:flex;flex-direction:column;font-size:.85rem}" +
+    ".ac-hp{display:block;height:10px;border-radius:99px;background:rgba(127,127,127,.25);overflow:hidden;margin:3px 0}.ac-hp i{display:block;height:100%;background:linear-gradient(90deg,#dc2626,#f59e0b);transition:width .4s}.ac-time i{background:linear-gradient(90deg,#0284c7,#22c55e)}" +
+    ".ac-hit{animation:ac-hit .35s}.ac-laugh{animation:ac-laugh .5s}@keyframes ac-hit{30%{transform:translateX(-6px) rotate(-8deg);filter:brightness(1.8)}70%{transform:translateX(6px)}}@keyframes ac-laugh{50%{transform:scale(1.15) translateY(-4px)}}" +
+    ".ac-mem-hud{font-weight:700;margin:6px 0 10px}.ac-mem{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}" +
+    ".ac-mc{font:inherit;min-height:84px;border-radius:12px;border:2px solid #0284c7;background:#0284c7;color:#fff;font-size:1.6rem;cursor:pointer;padding:6px;touch-action:manipulation;word-break:break-word}" +
+    ".ac-mc.open{background:transparent;color:inherit;font-size:1rem;line-height:1.25}.ac-mc.open.back{font-size:.85rem}.ac-mc.done{border-color:#16a34a;background:rgba(22,163,74,.15);color:inherit;font-size:.9rem}" +
+    ".ac-sort-item{font-size:1.5rem;text-align:center;padding:18px;border-radius:16px;border:2px dashed #0284c7;margin:8px 0 12px}.ac-sort-n{display:block;font-size:.8rem;opacity:.7}" +
+    ".ac-bins{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}.ac-bin{background:rgba(2,132,199,.1);color:inherit;border-color:#0284c7;min-height:70px;font-weight:700}.ac-bin-ok{background:#16a34a!important;color:#fff!important}.ac-bin-bad{background:#dc2626!important;color:#fff!important}" +
+    ".ac-passage{line-height:2;font-size:1.1rem;margin:8px 0 12px}.ac-sent{cursor:pointer;border-radius:6px;padding:2px 0}.ac-picked{background:#fde68a;color:#1f2937}.ac-evid{background:rgba(22,163,74,.25);outline:2px solid #16a34a}.ac-wrongpick{background:rgba(220,38,38,.18);text-decoration:line-through}" +
+    ".ac-race-clock{font-weight:800;font-size:1.1rem;margin:4px 0 10px}" +
+    "@media (prefers-reduced-motion:reduce){.ac-confetti{display:none}.ac-cheer{animation:none}}";
+  function injectCSS() {
+    if (document.getElementById("ac-css")) return;
+    var s = document.createElement("style"); s.id = "ac-css"; s.textContent = CSS;
+    document.head.appendChild(s);
+  }
+
+  return {
+    VERSION: "2026-11-08",
+    esc: esc, el: el, btn: btn, shuffle: shuffle,
+    speak: speak, stopSpeech: stopSpeech, getBestVoice: getBestVoice,
+    dealer: dealer, stars: stars, result: result,
+    drillBar: drillBar, resultView: resultView,
+    recorder: recorder, oralCard: oralCard, pickMime: pickMime,
+    norm: norm, matches: matches, scorePoints: function (t, p) { return scorePoints(t, keyPoints({points: p})); },
+    wordBank: wordBank, tiles: tiles, openAnswer: openAnswer,
+    game: game, praise: praise, cheer: cheer, confetti: confetti,
+    bossFor: bossFor, memory: memory, sortGame: sortGame, evidence: evidence, sentenceRace: sentenceRace,
+    WEBVIEW_NOTICE: WEBVIEW_NOTICE, injectCSS: injectCSS
+  };
+})();
+
+/* =====================================================================
+   study-kit.js — read-aloud, level map and 素養題組 for any practice app
+   Canonical copy: github.com/iam5980/kids-practice/template/study-kit.js
+   Version: 2026-10-25
+
+   HOW TO USE: paste the whole file inside the page's main <script> (before
+   the app code). Works for 中文部 apps and English apps alike. Call
+   KidKit.injectCSS() once. Points/badges are reported to SitePoints
+   (from site-home.js) automatically when it is on the page.
+
+   1) READ-ALOUD
+      KidKit.say(text, {lang: "zh-TW" | "en-US", rate, math: true})
+      KidKit.sayBtn(text, label, opts)  -> HTML string for a 🔊 button
+        Clicks are handled by one delegated listener (no inline onclick).
+        math: true turns 6 1/2 → 6又2分之1, 13/2 → 2分之13, × → 乘 …
+        Put the definition's 🔊 INSIDE the element that "考自己" covers,
+        so it cannot be heard before the answer is revealed.
+
+   2) LEVEL MAP (闖關地圖) — one level per lesson/unit, 1–3 stars, never locked
+      var map = KidKit.levelMap(container, {
+          key: "au-zh-science-1151-mid",          // unique per app
+          levels: [{id: "L1", name: "第 1 課 …"}, …, {id: "LIT", name: "素養題組"}],
+          lang: "zh-TW",
+          onPlay: function (id) { … start that level … } });
+      KidKit.levelResult(key, id, pct)   -> stars earned (call when a level ends)
+      Stars: ≥90% ★★★, ≥70% ★★, ≥40% ★, else 0. Best result is kept.
+
+   3) 素養題組 (reading-heavy question sets)
+      KidKit.passageSet(container, {
+          title: "颱風來了",
+          source: "teacher" | "self",               // self → 「自編」 label
+          passage: "長文…（可含 <b>、<br>、<img>）",
+          figure: "data:image/…",                    // optional
+          lang: "zh-TW",
+          questions: [
+            {type: "mc",    q: "…", choices: ["對的", "錯1", "錯2"], exp: "…"},  // first choice = correct
+            {type: "tf",    q: "…", answer: true, exp: "…"},
+            {type: "multi", q: "…（選出兩個）", choices: [...], correct: [0, 2], exp: "…"},
+            {type: "order", q: "…", items: ["第1步", "第2步", "第3步"], exp: "…"},       // items in correct order
+            {type: "open",  q: "…", a: "參考答案", points: [["蒸發"], ["凝結", "變成水滴"]], need: 2}
+          ]}, {onDone: function (r) { … r = {correct, total, allOk} … }});
+      Passage stays one tap away (📖 看文章), can be read aloud, questions are
+      judged one by one, choices are shuffled, and the set reports to
+      SitePoints.literacy() when finished.
+   ===================================================================== */
+var KidKit = (function () {
+  "use strict";
+  function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+  function sp(name) { return window.SitePoints && window.SitePoints[name] ? window.SitePoints : null; }
+
+  /* ---------- read-aloud ---------- */
+  var voices = [];
+  function loadVoices() { try { voices = speechSynthesis.getVoices() || []; } catch (e) {} }
+  if (window.speechSynthesis) {
+    loadVoices();
+    try { speechSynthesis.addEventListener("voiceschanged", loadVoices); } catch (e) { speechSynthesis.onvoiceschanged = loadVoices; }
+  }
+  function pickVoice(lang) {
+    var v = voices.length ? voices : (window.speechSynthesis ? speechSynthesis.getVoices() : []);
+    var tests = lang.indexOf("zh") === 0
+      ? [/zh[-_]TW/i, /zh[-_](HK|Hant)/i, /^(zh|cmn)/i]
+      : [/^Samantha$/, /^Karen$/, /Google US English/, /en[-_]US/i, /^en/i];
+    for (var t = 0; t < tests.length; t++) for (var i = 0; i < v.length; i++) {
+      if (tests[t].test(lang.indexOf("zh") === 0 ? v[i].lang : (t < 3 ? v[i].name : v[i].lang))) return v[i];
+    }
+    return null;
+  }
+  function plain(html) { var d = document.createElement("div"); d.innerHTML = String(html); return (d.textContent || "").replace(/\s+/g, " ").trim(); }
+  function mathSpeech(s) {
+    return s
+      .replace(/(\d+)\s+(\d+)\s*\/\s*(\d+)/g, "$1又$3分之$2")
+      .replace(/(\d+)\s*\/\s*(\d+)/g, "$2分之$1")
+      .replace(/[×xX＊*](?=\s*\d)/g, "乘").replace(/[÷]/g, "除以")
+      .replace(/[＋+]/g, "加").replace(/(\d)\s*[－-]\s*(\d)/g, "$1減$2")
+      .replace(/[＝=]/g, "等於").replace(/[→⇒]/g, "，變成").replace(/＞|>/g, "大於").replace(/＜|</g, "小於")
+      .replace(/≒/g, "約等於").replace(/（例/g, "（例如");
+  }
+  function say(text, o) {
+    o = o || {};
+    var lang = o.lang || "zh-TW";
+    if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined") { hint("這個瀏覽器不支援朗讀，請改用 Safari 或 Chrome。"); return; }
+    var t = plain(text);
+    if (o.math) t = mathSpeech(t);
+    try {
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(t);
+      u.lang = lang; u.rate = o.rate || (lang.indexOf("zh") === 0 ? 0.85 : 0.88);
+      var v = pickVoice(lang); if (v) u.voice = v;
+      say._u = u;
+      speechSynthesis.speak(u);
+      if (!v && lang.indexOf("zh") === 0) hint("找不到中文語音，聲音可能不正確。可在 iPad 設定裡加裝「中文（台灣）」語音。");
+    } catch (e) { hint("朗讀失敗，請再按一次。"); }
+  }
+  function hint(msg) {
+    var t = document.getElementById("kk-hint");
+    if (!t) { t = el("div"); t.id = "kk-hint"; t.setAttribute("role", "status"); document.body.appendChild(t); }
+    t.textContent = msg; t.className = "kk-hint kk-show";
+    clearTimeout(hint._t); hint._t = setTimeout(function () { t.className = "kk-hint"; }, 3200);
+  }
+  function sayBtn(text, label, o) {
+    o = o || {};
+    return '<button type="button" class="kk-say" data-kk-say="' + esc(plain(text)) + '"' +
+      (o.lang ? ' data-kk-lang="' + esc(o.lang) + '"' : "") + (o.math ? ' data-kk-math="1"' : "") +
+      ' aria-label="' + esc((label || "朗讀") + "：" + plain(text).slice(0, 40)) + '">🔊' + (label ? " " + esc(label) : "") + "</button>";
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("[data-kk-say]");
+    if (!b) return;
+    e.stopPropagation(); e.preventDefault();
+    say(b.getAttribute("data-kk-say"), { lang: b.getAttribute("data-kk-lang") || "zh-TW", math: b.hasAttribute("data-kk-math") });
+  }, true);
+
+  /* ---------- level map ---------- */
+  function lvLoad(key) { try { return JSON.parse(localStorage.getItem("kk-lv-" + key) || "{}"); } catch (e) { return {}; } }
+  function starsFor(pct) { return pct >= 90 ? 3 : pct >= 70 ? 2 : pct >= 40 ? 1 : 0; }
+  function levelResult(key, id, pct) {
+    var d = lvLoad(key), s = starsFor(pct);
+    if (!d[id] || s > d[id]) { d[id] = s; try { localStorage.setItem("kk-lv-" + key, JSON.stringify(d)); } catch (e) {} }
+    var p = sp("roundEnd"); if (p) p.roundEnd(pct);
+    return s;
+  }
+  function levelMap(container, o) {
+    var zh = (o.lang || "zh-TW").indexOf("zh") === 0;
+    function draw() {
+      var d = lvLoad(o.key), total = 0;
+      var h = '<div class="kk-map">';
+      o.levels.forEach(function (lv, i) {
+        var s = d[lv.id] || 0; total += s;
+        h += '<button type="button" class="kk-lv' + (s === 3 ? " kk-full" : "") + '" data-lv="' + esc(lv.id) + '">' +
+          '<span class="kk-no">' + (lv.icon || (i + 1)) + '</span><span class="kk-name">' + esc(lv.name) + "</span>" +
+          '<span class="kk-stars" aria-label="' + s + ' stars">' + "★★★".slice(0, s) + '<i>' + "☆☆☆".slice(0, 3 - s) + "</i></span></button>";
+      });
+      h += "</div>";
+      var max = o.levels.length * 3;
+      h = '<div class="kk-maphead">' + (zh ? "🗺️ 闖關地圖" : "🗺️ Level map") + ' <span>⭐ ' + total + " / " + max + "</span></div>" +
+        '<p class="kk-maptip">' + (zh ? "每一關都可以直接玩。答對 90% 以上拿 3 顆星！" : "Play any level. Get 90%+ for 3 stars!") + "</p>" + h;
+      container.innerHTML = h;
+      Array.prototype.forEach.call(container.querySelectorAll(".kk-lv"), function (b) {
+        b.addEventListener("click", function () { if (o.onPlay) o.onPlay(b.getAttribute("data-lv")); });
+      });
+    }
+    draw();
+    return { refresh: draw };
+  }
+
+  /* ---------- 素養題組 ---------- */
+  function normZh(s) { return String(s || "").toLowerCase().replace(/[\s，。、！？；：「」『』（）()．.,!?;:"'—-]/g, ""); }
+  function passageSet(container, spec, o) {
+    o = o || {};
+    var lang = spec.lang || "zh-TW", zh = lang.indexOf("zh") === 0;
+    var T = zh ? { read: "📖 看文章", hide: "收起文章", listen: "🔊 朗讀文章", check: "✔ 對答案", next: "下一題 ▶", done: "完成題組 🏁",
+                   ok: "答對了！", no: "再想想，答案是：", q: "第 {n} 題 / 共 {t} 題", self: "自編", teacher: "老師的題目",
+                   res: "題組完成：{c} / {t} 題答對", all: "全部答對！素養題達人 🧩", again: "🔄 再做一次", tip: "先讀完文章再作答，作答時可以隨時點「📖 看文章」。",
+                   order: "依照順序點選", pick2: "（可以選多個）", say: "🎤 用說的", typ: "或在這裡打字…" }
+               : { read: "📖 Read the passage", hide: "Hide passage", listen: "🔊 Read aloud", check: "✔ Check", next: "Next ▶", done: "Finish set 🏁",
+                   ok: "Correct!", no: "Not quite. The answer is:", q: "Question {n} of {t}", self: "Practice set", teacher: "Teacher's question",
+                   res: "Set finished: {c} / {t} correct", all: "All correct! 🧩", again: "🔄 Try again", tip: "Read the passage first. Tap 📖 any time to look back.",
+                   order: "Tap in order", pick2: "(choose all that apply)", say: "🎤 Speak", typ: "or type here…" };
+    var qs = spec.questions, i = 0, correct = 0;
+    container.innerHTML = "";
+    var box = el("div", "kk-set");
+    box.appendChild(el("div", "kk-sethead", '<span class="kk-tag' + (spec.source === "self" ? " kk-self" : "") + '">' +
+      (spec.source === "self" ? T.self : T.teacher) + "</span> <b>" + esc(spec.title || "") + "</b>"));
+    var pas = el("div", "kk-passage");
+    pas.innerHTML = (spec.figure ? '<img src="' + esc(spec.figure) + '" alt="">' : "") + '<div class="kk-ptext">' + spec.passage + "</div>";
+    var bar = el("div", "kk-pbar");
+    var toggle = el("button", "kk-btn kk-ghost", T.hide); toggle.type = "button";
+    var listen = el("button", "kk-btn kk-ghost", T.listen); listen.type = "button";
+    listen.addEventListener("click", function () { say(spec.passage, { lang: lang, math: !!spec.math }); });
+    toggle.addEventListener("click", function () {
+      var open = pas.classList.toggle("kk-closed") === false;
+      toggle.textContent = open ? T.hide : T.read;
+      if (open) pas.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    bar.appendChild(toggle); bar.appendChild(listen);
+    box.appendChild(el("p", "kk-maptip", T.tip));
+    box.appendChild(pas); box.appendChild(bar);
+    var qbox = el("div", "kk-qbox"); box.appendChild(qbox);
+    container.appendChild(box);
+
+    function finishQ(ok, answerHtml, exp, showAlways) {
+      if (ok) correct++;
+      var p = sp("answer"); if (p) p.answer(ok);
+      var f = el("div", "kk-fb " + (ok ? "kk-ok" : "kk-bad"),
+        ok ? "✓ " + T.ok + (showAlways ? '<div class="kk-ans">' + answerHtml + "</div>" : "") : "✗ " + T.no + '<div class="kk-ans">' + answerHtml + "</div>");
+      if (exp) f.appendChild(el("div", "kk-exp", esc(exp)));
+      qbox.appendChild(f);
+      var last = i === qs.length - 1;
+      var nb = el("button", "kk-btn kk-primary", last ? T.done : T.next); nb.type = "button";
+      nb.addEventListener("click", function () { if (last) done(); else { i++; show(); } });
+      qbox.appendChild(nb);
+    }
+    function show() {
+      var q = qs[i]; qbox.innerHTML = "";
+      qbox.appendChild(el("div", "kk-qno", T.q.replace("{n}", i + 1).replace("{t}", qs.length)));
+      qbox.appendChild(el("div", "kk-q", esc(q.q) + " " + sayBtn(q.q, "", { lang: lang, math: !!spec.math }) +
+        (q.type === "multi" ? ' <small>' + T.pick2 + "</small>" : "")));
+      var area = el("div", "kk-area"); qbox.appendChild(area);
+      if (q.type === "mc" || q.type === "tf") {
+        var opts = q.type === "tf" ? [zh ? "⭕ 對" : "TRUE", zh ? "❌ 錯" : "FALSE"] : shuffle(q.choices);
+        var right = q.type === "tf" ? (q.answer ? 0 : 1) : opts.indexOf(q.choices[0]);
+        var used = false;
+        opts.forEach(function (c, k) {
+          var b = el("button", "kk-opt", (q.type === "tf" ? "" : "ABCD"[k] + ". ") + esc(c)); b.type = "button";
+          b.addEventListener("click", function () {
+            if (used) return; used = true;
+            b.classList.add(k === right ? "kk-right" : "kk-wrong");
+            area.children[right].classList.add("kk-right");
+            finishQ(k === right, esc(opts[right]), q.exp);
+          });
+          area.appendChild(b);
+        });
+      } else if (q.type === "multi") {
+        var ord = shuffle(q.choices.map(function (c, k) { return k; })), sel = [];
+        var chk = el("button", "kk-btn kk-primary", T.check); chk.type = "button"; chk.disabled = true;
+        ord.forEach(function (orig) {
+          var b = el("button", "kk-opt", esc(q.choices[orig])); b.type = "button";
+          b.addEventListener("click", function () {
+            if (chk.hidden) return;
+            var at = sel.indexOf(orig);
+            if (at < 0) sel.push(orig); else sel.splice(at, 1);
+            b.classList.toggle("kk-sel"); chk.disabled = !sel.length;
+          });
+          area.appendChild(b);
+        });
+        chk.addEventListener("click", function () {
+          chk.hidden = true;
+          var want = q.correct.slice().sort().join(), got = sel.slice().sort().join();
+          Array.prototype.forEach.call(area.children, function (b, k) {
+            if (q.correct.indexOf(ord[k]) >= 0) b.classList.add("kk-right"); else if (sel.indexOf(ord[k]) >= 0) b.classList.add("kk-wrong");
+          });
+          finishQ(want === got, q.correct.map(function (k) { return esc(q.choices[k]); }).join("、"), q.exp);
+        });
+        qbox.appendChild(chk);
+      } else if (q.type === "order") {
+        var src = shuffle(q.items), ans = [];
+        if (src.join("|") === q.items.join("|") && q.items.length > 1) src.push(src.shift());
+        var line = el("div", "kk-tiles kk-line"), pool = el("div", "kk-tiles");
+        var c2 = el("button", "kk-btn kk-primary", T.check); c2.type = "button";
+        function draw() {
+          line.innerHTML = ans.length ? "" : '<span class="kk-ph">' + T.order + "</span>"; pool.innerHTML = "";
+          ans.forEach(function (t, k) { var b = el("button", "kk-tile kk-in", (k + 1) + ". " + esc(t)); b.type = "button";
+            b.addEventListener("click", function () { if (c2.hidden) return; src.push(ans.splice(k, 1)[0]); draw(); }); line.appendChild(b); });
+          src.forEach(function (t, k) { var b = el("button", "kk-tile", esc(t)); b.type = "button";
+            b.addEventListener("click", function () { if (c2.hidden) return; ans.push(src.splice(k, 1)[0]); draw(); }); pool.appendChild(b); });
+          c2.disabled = src.length > 0;
+        }
+        c2.addEventListener("click", function () { c2.hidden = true; finishQ(ans.join("|") === q.items.join("|"), q.items.map(esc).join(" → "), q.exp); });
+        area.appendChild(line); area.appendChild(pool); qbox.appendChild(c2); draw();
+      } else if (q.type === "open") {
+        var ta = el("textarea", "kk-input"); ta.placeholder = T.typ;
+        var row = el("div", "kk-row");
+        var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        var mic = el("button", "kk-btn kk-ghost", T.say); mic.type = "button";
+        if (!SR) mic.hidden = true;
+        mic.addEventListener("click", function () {
+          try { var r = new SR(); r.lang = lang; r.interimResults = true;
+            var base = ta.value ? ta.value + " " : "";
+            r.onresult = function (e) { var s = ""; for (var k = 0; k < e.results.length; k++) s += e.results[k][0].transcript; ta.value = base + s; c3.disabled = !ta.value.trim(); };
+            r.start(); mic.textContent = "● …"; r.onend = function () { mic.textContent = T.say; };
+          } catch (e) { mic.hidden = true; }
+        });
+        var c3 = el("button", "kk-btn kk-primary", T.check); c3.type = "button"; c3.disabled = true;
+        ta.addEventListener("input", function () { c3.disabled = !ta.value.trim(); });
+        c3.addEventListener("click", function () {
+          c3.hidden = true; mic.hidden = true; ta.disabled = true;
+          var pts = q.points || [], txt = normZh(ta.value), hits = 0, list = [];
+          pts.forEach(function (alts) {
+            var hit = alts.some(function (a) { return txt.indexOf(normZh(a)) >= 0; });
+            if (hit) hits++; list.push((hit ? "✓ " : "✗ ") + esc(alts[0]));
+          });
+          var need = q.need || (pts.length <= 2 ? pts.length : Math.ceil(pts.length * 0.7));
+          finishQ(pts.length ? hits >= need : false, (zh ? "參考答案：" : "Model answer: ") + esc(q.a) + '<div class="kk-exp">' + list.join("　") + "</div>", q.exp, true);
+        });
+        area.appendChild(ta); row.appendChild(mic); row.appendChild(c3); qbox.appendChild(row);
+      }
+      qbox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+    function done() {
+      var allOk = correct === qs.length;
+      qbox.innerHTML = '<div class="kk-result"><div class="kk-big">' + T.res.replace("{c}", correct).replace("{t}", qs.length) + "</div>" +
+        (allOk ? "<div>" + T.all + "</div>" : "") + "</div>";
+      var again = el("button", "kk-btn kk-primary", T.again); again.type = "button";
+      again.addEventListener("click", function () { passageSet(container, spec, o); });
+      qbox.appendChild(again);
+      var p = sp("literacy"); if (p) p.literacy(allOk);
+      if (o.onDone) o.onDone({ correct: correct, total: qs.length, allOk: allOk });
+    }
+    show();
+  }
+
+  /* ---------- styles ---------- */
+  function injectCSS() {
+    if (document.getElementById("kk-css")) return;
+    var s = document.createElement("style"); s.id = "kk-css";
+    s.textContent =
+      ".kk-say{font:inherit;font-size:14px;line-height:1;min-height:34px;padding:6px 10px;margin:2px 4px;border-radius:999px;border:1.5px solid currentColor;background:transparent;color:inherit;cursor:pointer;opacity:.85;vertical-align:middle;touch-action:manipulation}" +
+      ".kk-hint{position:fixed;left:50%;bottom:calc(70px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1f2937;color:#fff;padding:10px 14px;border-radius:12px;font-size:14px;z-index:9003;opacity:0;pointer-events:none;transition:opacity .3s;max-width:90vw}" +
+      ".kk-hint.kk-show{opacity:.95}" +
+      ".kk-maphead{font-size:20px;font-weight:800;display:flex;justify-content:space-between;align-items:center}.kk-maphead span{font-size:16px}" +
+      ".kk-maptip{opacity:.75;font-size:14px;margin:4px 0 10px}" +
+      ".kk-map{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}" +
+      ".kk-lv{font:inherit;display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:12px;border-radius:14px;border:2px solid rgba(127,127,127,.35);background:transparent;color:inherit;cursor:pointer;text-align:left;min-height:96px;touch-action:manipulation}" +
+      ".kk-lv.kk-full{border-color:#f59e0b;background:rgba(245,158,11,.12)}" +
+      ".kk-no{display:inline-grid;place-items:center;min-width:30px;height:30px;border-radius:50%;background:#0284c7;color:#fff;font-weight:800;padding:0 6px}" +
+      ".kk-name{font-weight:700;font-size:15px}.kk-stars{color:#f59e0b;font-size:20px;letter-spacing:2px}.kk-stars i{font-style:normal;opacity:.35}" +
+      ".kk-set{border-radius:16px}.kk-sethead{font-size:18px;margin-bottom:6px}" +
+      ".kk-tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;background:#16a34a;color:#fff;vertical-align:2px}.kk-tag.kk-self{background:#7c3aed}" +
+      ".kk-passage{border:2px solid rgba(127,127,127,.3);border-radius:14px;padding:14px;line-height:1.9;font-size:17px;max-height:46vh;overflow:auto;background:rgba(127,127,127,.06)}" +
+      ".kk-passage.kk-closed{display:none}.kk-passage img{max-width:100%;border-radius:8px;display:block;margin:0 auto 8px}" +
+      ".kk-pbar{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 12px}" +
+      ".kk-btn{font:inherit;font-size:16px;min-height:48px;padding:10px 16px;border-radius:12px;border:2px solid transparent;cursor:pointer;margin:6px 6px 0 0;touch-action:manipulation}" +
+      ".kk-btn[disabled]{opacity:.45}.kk-primary{background:#0284c7;color:#fff}.kk-ghost{background:transparent;color:inherit;border-color:currentColor}" +
+      ".kk-qno{font-size:13px;opacity:.7}.kk-q{font-size:18px;font-weight:700;margin:4px 0 10px;line-height:1.6}" +
+      ".kk-opt{font:inherit;display:block;width:100%;text-align:left;min-height:50px;padding:10px 14px;margin:6px 0;border-radius:12px;border:2px solid rgba(127,127,127,.45);background:transparent;color:inherit;cursor:pointer;touch-action:manipulation}" +
+      ".kk-opt.kk-sel{border-color:#0284c7;background:rgba(2,132,199,.12)}.kk-opt.kk-right{border-color:#16a34a;background:rgba(22,163,74,.15)}.kk-opt.kk-wrong{border-color:#dc2626;background:rgba(220,38,38,.12)}" +
+      ".kk-tiles{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.kk-line{min-height:58px;padding:6px;border:2px dashed rgba(127,127,127,.5);border-radius:12px;align-items:center}" +
+      ".kk-ph{opacity:.55;padding:0 6px}.kk-tile{font:inherit;min-height:48px;padding:8px 12px;border-radius:12px;border:2px solid #0284c7;background:transparent;color:inherit;cursor:pointer}.kk-tile.kk-in{background:#0284c7;color:#fff}" +
+      ".kk-input{font:inherit;font-size:17px;width:100%;min-height:90px;padding:10px;border-radius:12px;border:2px solid rgba(127,127,127,.5);background:transparent;color:inherit}" +
+      ".kk-row{display:flex;flex-wrap:wrap;align-items:center}" +
+      ".kk-fb{margin-top:10px;padding:10px 14px;border-radius:12px;font-weight:700}.kk-ok{background:rgba(22,163,74,.15);color:#15803d}.kk-bad{background:rgba(245,158,11,.18)}" +
+      ".kk-ans{font-size:17px;margin-top:4px}.kk-exp{font-weight:400;margin-top:6px;opacity:.9}" +
+      ".kk-result{text-align:center;padding:14px}.kk-big{font-size:22px;font-weight:800;margin-bottom:6px}";
+    document.head.appendChild(s);
+  }
+  return { say: say, sayBtn: sayBtn, mathSpeech: mathSpeech, levelMap: levelMap, levelResult: levelResult,
+           starsFor: starsFor, passageSet: passageSet, injectCSS: injectCSS, esc: esc, VERSION: "2026-10-25" };
+})();
+
+/* ===== Audrey · Reading Final (Reading 3.1) — scope from the Final Vocabulary booklet (Weeks 9–16) ===== */
+var APP = {key: "au-reading-1151-final", title: "📖 Audrey's Reading Final", sub: "Reading 3.1 · 3 stories + word work · defeat every boss, then beat the Final Boss!",
+  scope: "When Charlie McButton Lost Power (p.28–45); Prudy's Problem and How She Solved It (p.275–289) + its worksheets (compound words, irregular plurals, final -le, draw conclusions); Writing an Email (p.260–263).",
+  flipHint: "Match each word with its meaning. Flip two cards at a time!", mockEvid: 2, mockScramble: 2};
+var LESSONS = [
+  {id: "CB", name: "When Charlie McButton Lost Power", icon: "⚡", boss: "Blackout Beast"},
+  {id: "PP", name: "Prudy's Problem", icon: "🧸", boss: "Clutter Monster"},
+  {id: "SK", name: "Prudy Word Work", icon: "🔤", boss: "Plural Pirate"},
+  {id: "EM", name: "Writing an Email", icon: "✉️", boss: "Spam Goblin"}
+];
+var VOCAB = {
+  CB: [], PP: [], EM: [],
+  SK: [
+    ["sunglasses", "glasses that protect your eyes from the sun"],
+    ["football", "a game where players kick or carry a ball"],
+    ["homework", "school work you do at home"],
+    ["haircut", "when someone cuts your hair"],
+    ["popcorn", "a snack that pops when you heat it"],
+    ["railroad", "the track that trains run on"],
+    ["snowstorm", "a storm with lots of snow"],
+    ["earring", "jewelry you wear in your ear"],
+    ["scarecrow", "a figure in a field that keeps birds away"],
+    ["blueberry", "a small blue berry that is good to eat"],
+    ["butterflies", "some caterpillars turn into these"],
+    ["lawnmower", "you use it to cut the grass"],
+    ["campground", "a place where people set up tents"],
+    ["sandbox", "a box of sand where children play"],
+    ["toothbrush", "you use this to keep your teeth clean"]
+  ]
+};
+/* ty: mc (a + w) | tf | fill (t with ___, a, optional w) | order (items) | open (a + points) | cloze | evid | scramble */
+var BANK = [
+  /* ---------- When Charlie McButton Lost Power ---------- */
+  {L:"CB",ty:"mc",q:"Who wrote When Charlie McButton Lost Power?",a:"Suzanne Collins",w:["Mike Lester","Carey Armstrong-Ellis"]},
+  {L:"CB",ty:"mc",q:"Who drew the pictures (illustrator) for the story?",a:"Mike Lester",w:["Suzanne Collins","Joe Hayes"]},
+  {L:"CB",ty:"mc",q:"What kind of writing is When Charlie McButton Lost Power?",a:"a narrative poem that tells a funny story",w:["a nonfiction science article","a letter to a friend"]},
+  {L:"CB",ty:"mc",q:"What things did Charlie like?",a:"handsets, bots and computer games",w:["clay, books and songs","dolls and alphabet blocks"]},
+  {L:"CB",ty:"mc",q:"Why did Charlie's power go out?",a:"A lightning bolt struck an electrical tower.",w:["Charlie broke the TV.","His mom turned off the lights."]},
+  {L:"CB",ty:"mc",q:"When the blackout started, how did Charlie feel?",a:"His heart filled with dread.",w:["He was happy and calm.","He was sleepy."]},
+  {L:"CB",ty:"mc",q:"What did Mom tell Charlie to do?",a:"find something without plugs to play",w:["go outside in the storm","fix the power lines"]},
+  {L:"CB",ty:"mc",q:"Why did Charlie think clay was dull?",a:"He could only make snowmen and snails, and it got under his nails.",w:["It was too colorful.","It needed a battery."]},
+  {L:"CB",ty:"mc",q:"What did the old handheld gadget need?",a:"one triple-A battery",w:["a plug","two big batteries"]},
+  {L:"CB",ty:"mc",q:"What did Charlie find when he opened the hatch of his gadget?",a:"The battery was gone.",w:["A new battery","A spider"]},
+  {L:"CB",ty:"mc",q:"How old is Isabel Jane?",a:"three years old",w:["five years old","ten years old"]},
+  {L:"CB",ty:"mc",q:"Why was Isabel Jane's doll talking?",a:"It had a battery inside.",w:["It was magic.","It was plugged in."]},
+  {L:"CB",ty:"mc",q:"What did Charlie do to the doll?",a:"He pounced on it and plucked out the battery.",w:["He gave it a bath.","He hid it under the bed."]},
+  {L:"CB",ty:"mc",q:"Where did Charlie have to go after taking the battery?",a:"the time-out chair at the foot of the stairs",w:["the bathtub","his blanket fort"]},
+  {L:"CB",ty:"mc",q:"Why is Isabel Jane called the Battery Queen?",a:"She had more triple-A batteries than Charlie had ever seen.",w:["She sold batteries.","She ate batteries."]},
+  {L:"CB",ty:"mc",q:"What did Charlie shout at his sister?",a:"\"How come you can't ever just leave me alone?\"",w:["\"Let's play hide-and-go-seek!\"","\"Thank you for the battery!\""]},
+  {L:"CB",ty:"mc",q:"Where did Isabel Jane hide after Charlie yelled?",a:"in the bathtub",w:["in the guinea pig pen","under the time-out chair"]},
+  {L:"CB",ty:"mc",q:"Why did Charlie feel totally rotten?",a:"He made his sister cry.",w:["He lost his game.","The clay was dry."]},
+  {L:"CB",ty:"mc",q:"Which game did Charlie and Isabel Jane play first?",a:"hide-and-go-seek",w:["a computer game","soccer"]},
+  {L:"CB",ty:"mc",q:"What did they build together?",a:"a big blanket fort",w:["a robot","a snowman"]},
+  {L:"CB",ty:"mc",q:"Who did Charlie pretend to be?",a:"the great wizard McSmells",w:["a battery king","a firefighter"]},
+  {L:"CB",ty:"mc",q:"Who did Isabel Jane pretend to be?",a:"his faithful old troll",w:["a princess","a dragon"]},
+  {L:"CB",ty:"mc",q:"What did the family eat supper under?",a:"real candlelight",w:["bright lamps","the TV light"]},
+  {L:"CB",ty:"mc",q:"What happened when the power came back?",a:"There was a big surge of power.",w:["The house fell down.","Another storm came."]},
+  {L:"CB",ty:"mc",q:"At the end, what else might Charlie do tomorrow?",a:"find dragons with Isabel Jane",w:["throw away his games","never play again"]},
+  {L:"CB",ty:"mc",q:"What lesson does Charlie learn?",a:"Trying new things (like playing with his sister) can be fun.",w:["Games are bad.","You should never share."]},
+  {L:"CB",ty:"tf",q:"Charlie's whole world lost power because of a thunderstorm.",a:true},
+  {L:"CB",ty:"tf",q:"Charlie loved playing with clay.",a:false,exp:"He thought clay was dull on a soggy gray day."},
+  {L:"CB",ty:"tf",q:"Charlie's mother had ears like a bat.",a:true,exp:"She heard his small squeak and came to his room."},
+  {L:"CB",ty:"tf",q:"Isabel Jane was Charlie's older sister.",a:false,exp:"She was his three-year-old little sister."},
+  {L:"CB",ty:"tf",q:"Isabel Jane's batteries powered her puppies, clocks and talkative alphabet blocks.",a:true},
+  {L:"CB",ty:"tf",q:"Charlie made a quick decision that showed a real lack of vision.",a:true,exp:"Taking the doll's battery was bad judgment — a folly."},
+  {L:"CB",ty:"tf",q:"Isabel Jane secretly ate Charlie's peas at dinner.",a:true},
+  {L:"CB",ty:"tf",q:"They hid in the plants and the guinea pig pen.",a:true},
+  {L:"CB",ty:"tf",q:"Charlie stayed bored all day long.",a:false,exp:"Charlie McButton forgot to be bored."},
+  {L:"CB",ty:"tf",q:"The power came back during supper.",a:false,exp:"It came back after they had been asleep for an hour."},
+  {L:"CB",ty:"fill",t:"A lightning ___ struck an electrical tower.",a:"bolt",w:["battery","plug","fort"]},
+  {L:"CB",ty:"fill",t:"The ___ had blacked out his power to speak.",a:"blackout",w:["battery","wizard","quilt"]},
+  {L:"CB",ty:"fill",t:"He clutched the old toy like a ___ that day.",a:"lifeline",w:["blackout","troll","supper"]},
+  {L:"CB",ty:"fill",t:"\"The battery is gone from my ___ device!\"",a:"backup",w:["handheld","talkative","faithful"]},
+  {L:"CB",ty:"fill",t:"Dolls need a power source, some kind of ___.",a:"fuel",w:["gloom","folly","grin"]},
+  {L:"CB",ty:"fill",t:"He ___ on that dolly.",a:"pounced",w:["brewed","toddled","denied"]},
+  {L:"CB",ty:"fill",t:"___ by nonstop mechanical chatter, Charlie got madder and madder.",a:"Assaulted",w:["Rescued","Adored","Forged"]},
+  {L:"CB",ty:"fill",t:"For sisters that ___, Isabel Jane was a pretty good model.",a:"toddle",w:["pounce","forge","snap"]},
+  {L:"CB",ty:"fill",t:"\"Oh, it's finally back,\" Charlie thought with a ___.",a:"grin",w:["dread","surge","pen"]},
+  {L:"CB",ty:"fill",t:"Tomorrow I'll wake up and I can ___ in!",a:"plug",w:["battle","seek","brew"]},
+  {L:"CB",ty:"order",q:"Put the story events in order.",items:["A lightning bolt makes the power go out.","Charlie tries to play with clay.","His gadget has no battery.","He takes the battery from Isabel Jane's doll.","Charlie sits in the time-out chair.","Charlie and Isabel Jane play hide-and-go-seek and build a fort.","The power comes back with a big surge."]},
+  {L:"CB",ty:"order",q:"Put these events in order.",items:["Charlie snaps at his sister.","Isabel Jane hides in the tub.","Charlie feels totally rotten.","He asks, \"Are we playing hide-and-go-seek?\""]},
+  {L:"CB",ty:"open",q:"Why did Charlie take the battery from Isabel Jane's doll?",a:"He wanted a battery for his handheld game because the power was out and his game had no battery.",points:[["battery","batteries"],["game","gadget","handheld","toy","device"]],need:2},
+  {L:"CB",ty:"open",q:"How did Charlie change by the end of the story?",a:"At first he only liked electronic games, but he learned that playing with his sister without power can be fun.",points:[["sister","isabel"],["fun","play","playing","like","liked","enjoy"]],need:2},
+  {L:"CB",ty:"open",q:"Name two things Charlie and Isabel Jane did together without power.",a:"They played hide-and-go-seek, built a blanket fort and pretended to be a wizard and a troll.",points:[["hide","seek"],["fort","blanket"],["wizard","troll","dragon","dragons","pretend"]],need:2},
+  {L:"CB",ty:"evid",q:"Why did Charlie feel totally rotten?",answer:"He made his sister cry.",passage:["He snapped at his sis from his time-out time zone.","Her eyes filled with tears and she gave them a rub.","She went to the bathroom and hid in the tub.","Then Charlie McButton felt totally rotten."],correct:[1],exp:"Her tears show that Charlie hurt her feelings."},
+  {L:"CB",ty:"evid",q:"How do we know Isabel Jane loved Charlie?",answer:"She adored him.",passage:["Mainly he thought that, for sisters that toddle, Isabel Jane was a pretty good model.","She clearly adored him.","She didn't have fleas.","He sat and he thought and he stared at the rain."],correct:[1],exp:"Adore means to love someone very much."},
+  {L:"CB",ty:"evid",q:"Why did the power go out?",answer:"Lightning hit a tower.",passage:["Charlie McButton had likes and like-nots.","Then one day a thunderstorm blew into town.","A lightning bolt struck an electrical tower.","The TV, the lights and his clock were all dead."],correct:[2],exp:"The lightning bolt hitting the electrical tower caused the blackout."},
+  {L:"CB",ty:"evid",q:"Why was Charlie excited about the old gadget?",answer:"It ran on one battery, not a plug.",passage:["He dove for a gadget he'd outgrown last spring.","It was handheld, outdated, not much of a thing.","See, it ran on one battery. The size? Triple-A.","He flicked the On/Off switch to On double quick."],correct:[2],exp:"A battery game could work without electricity from the wall."},
+  {L:"CB",ty:"scramble",q:"Build the sentence from the story.",a:"His whole world lost power.",extra:["plug"]},
+  {L:"CB",ty:"scramble",q:"Build the sentence from the story.",a:"Charlie McButton forgot to be bored.",extra:["happy"]},
+  /* ---------- Prudy's Problem ---------- */
+  {L:"PP",ty:"mc",q:"Who wrote and illustrated Prudy's Problem and How She Solved It?",a:"Carey Armstrong-Ellis",w:["Suzanne Collins","Mike Lester"]},
+  {L:"PP",ty:"mc",q:"What is the big idea of the story?",a:"You have to be creative to solve problems.",w:["Never collect anything.","Museums are boring."]},
+  {L:"PP",ty:"mc",q:"Why did Prudy seem like a normal little girl?",a:"She had a sister, a dog, two white mice, a mom and dad and her own room.",w:["She never collected anything.","She lived in a museum."]},
+  {L:"PP",ty:"mc",q:"What did Egbert collect?",a:"butterflies",w:["stamps","tin foil"]},
+  {L:"PP",ty:"mc",q:"What did Belinda have?",a:"a stamp collection",w:["a butterfly collection","a rock collection"]},
+  {L:"PP",ty:"mc",q:"What did Harold do with his tin foil?",a:"He made it into a big ball.",w:["He wrapped food in it.","He sent it to Neptune."]},
+  {L:"PP",ty:"mc",q:"How was Prudy's collecting different from her friends'?",a:"Prudy collected everything.",w:["Prudy collected nothing.","Prudy only collected stamps."]},
+  {L:"PP",ty:"mc",q:"Where did Prudy keep interesting fungi?",a:"in the bottom drawer of her dresser",w:["in her desk drawer","in the bathtub"]},
+  {L:"PP",ty:"mc",q:"How many stuffed animals did Prudy have?",a:"six hundred and fourteen",w:["sixty-four","fourteen"]},
+  {L:"PP",ty:"mc",q:"What drove Prudy's dad to distraction?",a:"Prudy's messy collections",w:["the dog","the lawnmower"]},
+  {L:"PP",ty:"mc",q:"Why didn't Prudy's dad like her collections?",a:"He was a very tidy person who did not like clutter.",w:["He wanted them for himself.","He was afraid of mice."]},
+  {L:"PP",ty:"mc",q:"Why did it get to be too much for Prudy's mom?",a:"She could no longer navigate the living room.",w:["She hated mushrooms.","She wanted a museum."]},
+  {L:"PP",ty:"mc",q:"Where did Mom suggest taking Prudy's things?",a:"to the thrift shop",w:["to the moon","to school"]},
+  {L:"PP",ty:"mc",q:"Where did Dad suggest hauling everything?",a:"to the dump",w:["to the thrift shop","to Neptune"]},
+  {L:"PP",ty:"mc",q:"What did Egbert suggest doing with Prudy's stuff?",a:"stuff it into a rocket and send it to Neptune",w:["take it to the dump","build a museum"]},
+  {L:"PP",ty:"mc",q:"What did Prudy's little sister Evie start collecting?",a:"pine twigs and used toothbrushes",w:["stamps and coins","gym socks"]},
+  {L:"PP",ty:"mc",q:"What shiny thing did Prudy find on the way home from school?",a:"a silver gum wrapper",w:["a gold coin","a silver spoon"]},
+  {L:"PP",ty:"mc",q:"What happened when Prudy squeezed the gum wrapper into her room?",a:"The walls bulged, the door strained and the room exploded.",w:["Her mom cleaned the room.","The mice ran away."]},
+  {L:"PP",ty:"mc",q:"What did Prudy finally say after her room exploded?",a:"\"Holy smokes, I guess maybe I do have a little problem.\"",w:["\"There is no problem!\"","\"I like that mushroom.\""]},
+  {L:"PP",ty:"mc",q:"How long did everyone pitch in to gather Prudy's scattered collections?",a:"six weeks",w:["six days","six months"]},
+  {L:"PP",ty:"mc",q:"Where did Prudy look for inspiration?",a:"an art collection, a fish collection, a rock collection and the library",w:["the dump and the thrift shop","the moon and Neptune"]},
+  {L:"PP",ty:"mc",q:"What was Prudy's brilliant plan?",a:"The Prudy Museum of Indescribable Wonderment",w:["a big yard sale","a rocket to Neptune"]},
+  {L:"PP",ty:"mc",q:"Within a year, what did the museum become?",a:"the biggest tourist attraction in Prudy's town",w:["a thrift shop","a library"]},
+  {L:"PP",ty:"mc",q:"What did Prudy's mother find fascinating at the museum?",a:"cheese rinds",w:["gym socks","butterflies"]},
+  {L:"PP",ty:"mc",q:"What did Evie ask at the museum?",a:"\"Can I go to the gift shop?\"",w:["\"Where are the mice?\"","\"Can we go home?\""]},
+  {L:"PP",ty:"mc",q:"How did the last page show that Prudy never really stopped collecting?",a:"Prudy and her dog push an elephant into museum storage.",w:["Prudy throws everything away.","Prudy closes the museum."]},
+  {L:"PP",ty:"mc",q:"What was the setting at the beginning and at the end of the story?",a:"Prudy's home at the beginning, the museum at the end",w:["the library at both times","the beach, then school"]},
+  {L:"PP",ty:"mc",q:"Which part of the story is make-believe (fantasy)?",a:"Prudy's room exploding from too much stuff",w:["Egbert collecting butterflies","Prudy going to the library"]},
+  {L:"PP",ty:"tf",q:"Prudy said, \"I do not have a problem,\" for most of the story.",a:true},
+  {L:"PP",ty:"tf",q:"Prudy's mom did not mind clutter.",a:true,exp:"But even she could no longer navigate the living room."},
+  {L:"PP",ty:"tf",q:"Prudy could easily get to her desk to feed her mice.",a:false,exp:"She could barely get to her desk."},
+  {L:"PP",ty:"tf",q:"Prudy could not get out of her room without setting off an avalanche of things.",a:true},
+  {L:"PP",ty:"tf",q:"Prudy threw her collections away at the dump.",a:false,exp:"She put them in her museum."},
+  {L:"PP",ty:"tf",q:"Prudy went to the library and scrutinized stacks of books.",a:true},
+  {L:"PP",ty:"tf",q:"Saws were whirring and hammers were pounding as everyone built the museum.",a:true},
+  {L:"PP",ty:"tf",q:"At last Prudy's collections were neat and orderly and appreciated by everyone.",a:true},
+  {L:"PP",ty:"tf",q:"After the museum opened, Prudy stopped collecting forever.",a:false,exp:"\"But she could never really stop collecting!\""},
+  {L:"PP",ty:"fill",t:"Prudy collected ___.",a:"everything",w:["nothing","stamps","rocks"]},
+  {L:"PP",ty:"fill",t:"It drove her dad to ___.",a:"distraction",w:["the dump","clutter","inspiration"]},
+  {L:"PP",ty:"fill",t:"She could not even get out of her room without setting off an ___ of one thing or another.",a:"avalanche",w:["inspiration","attraction","collection"]},
+  {L:"PP",ty:"fill",t:"The walls started to ___. The door started to strain at the hinges.",a:"bulge",w:["whir","pound","navigate"]},
+  {L:"PP",ty:"fill",t:"For six weeks, everyone ___ to gather Prudy's scattered collections.",a:"pitched in",w:["scrutinized","hauled","navigated"]},
+  {L:"PP",ty:"fill",t:"Prudy looked around for ___.",a:"inspiration",w:["distraction","clutter","wonderment"]},
+  {L:"PP",ty:"fill",t:"The Prudy Museum of Indescribable Wonderment was an amazing sight to ___.",a:"behold",w:["haul","strain","bulge"]},
+  {L:"PP",ty:"cloze",title:"Cloze — Prudy's Problem",t:"Prudy collected everything, so her room was full of ___. After her room exploded, everyone pitched in to gather her ___ collections. At the library she came up with a ___ plan. Her museum became the biggest tourist ___ in town.",a:["clutter","scattered","brilliant","attraction"],bank:["clutter","scattered","brilliant","attraction","enormous","barely"]},
+  {L:"PP",ty:"order",q:"Put the story events in order.",items:["Prudy collects everything.","Her family and friends say she has a problem.","Prudy finds a silver gum wrapper.","Her room explodes.","Prudy looks for inspiration at the library.","Everyone builds the museum.","The museum becomes the biggest tourist attraction in town."]},
+  {L:"PP",ty:"open",q:"How did Prudy solve her problem?",a:"She looked for inspiration and built The Prudy Museum of Indescribable Wonderment, where her collections were neat and everyone could enjoy them.",points:[["museum"],["neat","orderly","display","enjoy","appreciated","visit"]],need:1},
+  {L:"PP",ty:"open",q:"What evidence shows that Prudy's collections were out of control?",a:"She could barely get to her desk, her mom could not navigate the living room, and her room exploded.",points:[["desk","barely"],["navigate","living room"],["explode","exploded","bang","avalanche","bulge"]],need:2},
+  {L:"PP",ty:"open",q:"Name two places Prudy visited for inspiration.",a:"She visited an art collection, a fish collection, a rock collection and the library.",points:[["art"],["fish"],["rock","rocks"],["library","books"]],need:2},
+  {L:"PP",ty:"evid",q:"Why did Prudy's dad have a problem with her collections?",answer:"He did not like clutter.",passage:["It drove her dad to distraction.","He was a very tidy person who did not like clutter.","He started saying unpleasant things as he tried to mow the lawn.","\"Prudy, you have a problem,\" he said."],correct:[1],exp:"A tidy person does not like a messy room."},
+  {L:"PP",ty:"evid",q:"Why did it get to be too much for her mom?",answer:"She could not walk through the living room.",passage:["It even got to be too much for her mom,","who did not mind clutter","but could no longer navigate the living room.","\"Maybe you could take all this to the thrift shop,\" she said."],correct:[2],exp:"Navigate means to find your way — she couldn't get through the room."},
+  {L:"PP",ty:"evid",q:"Which details tell the reader that something is about to happen?",answer:"The room is getting too full.",passage:["She ran home and tried to squeeze it into her room.","The walls started to bulge.","The door started to strain at the hinges.","Her dog wagged its tail."],correct:[1,2],exp:"Bulging walls and a straining door show the room is about to burst."},
+  {L:"PP",ty:"evid",q:"How do we know the museum was a success?",answer:"Everyone wanted to visit.",passage:["Prudy went to the library to find ideas.","Within a year, it was the biggest tourist attraction in Prudy's town.","Prudy's mice rested on the pillow."],correct:[1],exp:"The biggest tourist attraction means lots of people came."},
+  {L:"PP",ty:"scramble",q:"Build the sentence from the story.",a:"Prudy collected everything.",extra:["nothing"]},
+  {L:"PP",ty:"scramble",q:"Build the sentence from the story.",a:"Everyone wanted to go visit!",extra:["nobody"]},
+  /* ---------- Prudy Word Work (worksheets) ---------- */
+  {L:"SK",ty:"mc",q:"What is a compound word?",a:"two smaller words joined together",w:["a word with -s at the end","a word that means the opposite"]},
+  {L:"SK",ty:"mc",q:"Which is a compound word?",a:"toothbrush",w:["collection","enormous"]},
+  {L:"SK",ty:"mc",q:"Which is spelled correctly?",a:"popcorn",w:["pop korn","pop corn"]},
+  {L:"SK",ty:"mc",q:"Which is spelled correctly?",a:"scarecrow",w:["scarcrow","scare crow"]},
+  {L:"SK",ty:"mc",q:"Which is spelled correctly?",a:"homework",w:["homwork","home work"]},
+  {L:"SK",ty:"mc",q:"Which is spelled correctly?",a:"sandbox",w:["sand box","sandbocks"]},
+  {L:"SK",ty:"mc",q:"Which is spelled correctly?",a:"butterflies",w:["butterflys","butter flies"]},
+  {L:"SK",ty:"mc",q:"rail + road = ?",a:"railroad",w:["roadrail","railroads"]},
+  {L:"SK",ty:"mc",q:"lawn + mower = ?",a:"lawnmower",w:["lawnmover","mowerlawn"]},
+  {L:"SK",ty:"mc",q:"What is the plural of child?",a:"children",w:["childs","childen"]},
+  {L:"SK",ty:"mc",q:"What is the plural of foot?",a:"feet",w:["foots","fice"]},
+  {L:"SK",ty:"mc",q:"What is the plural of mouse?",a:"mice",w:["mouses","meese"]},
+  {L:"SK",ty:"mc",q:"What is the plural of man?",a:"men",w:["mans","manes"]},
+  {L:"SK",ty:"mc",q:"What is the plural of sheep?",a:"sheep",w:["sheeps","sheepes"]},
+  {L:"SK",ty:"mc",q:"What is the plural of tooth?",a:"teeth",w:["tooths","teeths"]},
+  {L:"SK",ty:"mc",q:"What is the plural of leaf?",a:"leaves",w:["leafs","leafes"]},
+  {L:"SK",ty:"mc",q:"What is the plural of goose?",a:"geese",w:["gooses","geeses"]},
+  {L:"SK",ty:"mc",q:"What is the plural of woman?",a:"women",w:["womans","womens"]},
+  {L:"SK",ty:"mc",q:"What is the plural of life?",a:"lives",w:["lifes","lifies"]},
+  {L:"SK",ty:"mc",q:"What is an irregular plural noun?",a:"a plural that is not made by adding -s or -es",w:["a noun that names one thing","a word made of two words"]},
+  {L:"SK",ty:"mc",q:"How do you split \"puzzle\" into syllables?",a:"puz + zle",w:["pu + zzle","puzz + le"]},
+  {L:"SK",ty:"mc",q:"How do you split \"candle\" into syllables?",a:"can + dle",w:["cand + le","ca + ndle"]},
+  {L:"SK",ty:"mc",q:"How do you split \"marble\" into syllables?",a:"mar + ble",w:["marb + le","ma + rble"]},
+  {L:"SK",ty:"mc",q:"How do you split \"trouble\" into syllables?",a:"trou + ble",w:["troub + le","tr + ouble"]},
+  {L:"SK",ty:"mc",q:"What is a conclusion?",a:"a decision or opinion that makes sense based on facts and details",w:["the title of a story","a word with two syllables"]},
+  {L:"SK",ty:"mc",q:"Kendra stuffed rocks into her backpack, and on the walk home her steps grew slower. What can you conclude?",a:"The rocks made her backpack heavy.",w:["She was not hungry.","She did not like rocks."]},
+  {L:"SK",ty:"mc",q:"Kendra shared her rocks with her friends. Why was this a good solution?",a:"Her backpack got lighter and her friends were happy.",w:["She threw the rocks away.","She kept all the rocks."]},
+  {L:"SK",ty:"mc",q:"People surrounded by clutter waste time searching. People who organize have more time for fun. What is the conclusion?",a:"Getting organized saves time.",w:["Clutter is fun.","Searching is a good hobby."]},
+  {L:"SK",ty:"tf",q:"When you spell a compound word, you keep all the letters: home + work = homework.",a:true},
+  {L:"SK",ty:"tf",q:"\"Collection\" is a compound word.",a:false,exp:"Collection is one word, not two smaller words joined together."},
+  {L:"SK",ty:"tf",q:"Deer is the same in the singular and the plural.",a:true},
+  {L:"SK",ty:"tf",q:"The plural of mouse is mouses.",a:false,exp:"The plural of mouse is mice."},
+  {L:"SK",ty:"fill",t:"I squeezed toothpaste onto my ___.",a:"toothbrush",w:["sandbox","earring","haircut"]},
+  {L:"SK",ty:"fill",t:"School was cancelled because of the ___.",a:"snowstorm",w:["scarecrow","popcorn","railroad"]},
+  {L:"SK",ty:"fill",t:"A good pair of ___ will protect your eyes.",a:"sunglasses",w:["earrings","shoelaces","blueberries"]},
+  {L:"SK",ty:"fill",t:"The ___ wore an old straw hat.",a:"scarecrow",w:["lawnmower","campground","football"]},
+  {L:"SK",ty:"fill",t:"We set up our tent at a great ___.",a:"campground",w:["sandbox","railroad","homework"]},
+  {L:"SK",ty:"fill",t:"All the ___ collect something.",a:"children",w:["childs","child","childen"]},
+  {L:"SK",ty:"fill",t:"Carlo has 20 ___ of string.",a:"feet",w:["foots","foot","feets"]},
+  {L:"SK",ty:"fill",t:"Jo has 8 stuffed ___.",a:"mice",w:["mouses","mouse","meese"]},
+  {L:"SK",ty:"fill",t:"Jake has 100 toy army ___.",a:"men",w:["mans","man","mens"]},
+  {L:"SK",ty:"fill",t:"Nan has 15 pictures of fall ___.",a:"leaves",w:["leafs","leaf","leafes"]},
+  {L:"SK",ty:"fill",t:"The workers saw several deer and ___ during the day.",a:"geese",w:["gooses","goose","geeses"]},
+  {L:"SK",ty:"scramble",q:"Build the sentence.",a:"The children picked up papers.",extra:["childs"]},
+  {L:"SK",ty:"scramble",q:"Build the sentence.",a:"Men cut branches and raked leaves.",extra:["leafs"]},
+  /* ---------- Writing an Email ---------- */
+  {L:"EM",ty:"mc",q:"Which part of an email shows the topic?",a:"the subject",w:["the attachment","the CC line"]},
+  {L:"EM",ty:"mc",q:"You want to send a photo file with your email. What do you add?",a:"an attachment",w:["a subject","a BCC"]},
+  {L:"EM",ty:"mc",q:"You want your teacher to get a copy of your email to your friend. What do you use?",a:"CC",w:["subject","format"]},
+  {L:"EM",ty:"mc",q:"You want to send a copy, but keep that person's email address hidden. What do you use?",a:"BCC",w:["CC","to"]},
+  {L:"EM",ty:"mc",q:"An email to your principal should be…",a:"formal",w:["informal","talkative"]},
+  {L:"EM",ty:"mc",q:"An email to your best friend can be…",a:"informal",w:["formal","official"]},
+  {L:"EM",ty:"mc",q:"Which line shows who you will send the email to?",a:"To",w:["Subject","Attachment"]},
+  {L:"EM",ty:"tf",q:"When you BCC someone, everyone can see their email address.",a:false,exp:"With BCC the address is hidden, so it's private."},
+  {L:"EM",ty:"tf",q:"Formal means official; informal means relaxed and friendly.",a:true},
+  {L:"EM",ty:"tf",q:"\"Game on Saturday\" could be the subject of an email.",a:true}
+];
+var SORTS = {
+  CB: {title: "Needs power or no power?", bins: ["🔌 Needs power", "🕯️ No power needed"], items: [
+    {t: "TV", bin: 0}, {t: "lights", bin: 0}, {t: "handset", bin: 0}, {t: "computer games", bin: 0}, {t: "talking doll", bin: 0}, {t: "alphabet blocks that talk", bin: 0},
+    {t: "modeling clay", bin: 1}, {t: "reading a book", bin: 1}, {t: "singing a song", bin: 1}, {t: "hide-and-go-seek", bin: 1}, {t: "blanket fort", bin: 1}, {t: "candlelight supper", bin: 1}]},
+  SK: {title: "One or more than one?", bins: ["1️⃣ Singular", "👥 Plural"], items: [
+    {t: "mouse", bin: 0}, {t: "mice", bin: 1}, {t: "child", bin: 0}, {t: "children", bin: 1}, {t: "tooth", bin: 0}, {t: "teeth", bin: 1},
+    {t: "goose", bin: 0}, {t: "geese", bin: 1}, {t: "leaf", bin: 0}, {t: "leaves", bin: 1}, {t: "woman", bin: 0}, {t: "women", bin: 1}]}
+};
+
+/* Teacher's Final Vocabulary (1151-Final-Vocabulary-Beethoven, Reading 3.1).
+   [word, 中文, part of speech, definition, sentence with ___, word form in the sentence] */
+var TVOCAB = {
+  CB: [
+    ["involve", "包括", "v.", "include; to be part of something", "They said that the job would ___ traveling to Paris.", "involve"],
+    ["handset", "電玩手機設備；電話聽筒", "n.", "a mobile phone or smartphone, especially the main part of the phone", "I was just reaching for the ___ when you hung up.", "handset"],
+    ["bot", "機器人", "n.", "a robot", "Some restaurants use ___ to serve food.", "robots"],
+    ["battle", "戰鬥", "v.", "to fight", "They had to ___ to save his life.", "battle"],
+    ["creature", "生物", "n.", "living thing", "Blue whales are the largest ___ ever to have lived.", "creatures"],
+    ["tech", "科技", "n.", "technology; scientific knowledge used in designing new machines", "This ___ enables computers to read handwriting.", "technology"],
+    ["tower", "塔", "n.", "a tall narrow building", "There's a clock on the church ___.", "tower"],
+    ["dread", "恐懼", "n.", "a strong feeling of fear or worry", "He was filled with a great sense of ___.", "dread"],
+    ["cling", "抓緊", "v.", "to hold something or someone tightly (cling – clung)", "Patrick ___ to my hand as we entered the clinic.", "clung"],
+    ["blackout", "停電", "n.", "a time when there is no light or power because of an electricity failure", "Power lines were blown down and we had a ___ for several hours.", "blackout"],
+    ["empire", "帝國", "n.", "a group of countries ruled by a single person, government, or country", "The soldiers of the Roman ___ served for twenty years.", "Empire"],
+    ["tumble down", "倒塌；毀掉", "v.", "to fall quickly and without control", "At any moment the whole building could ___.", "tumble down"],
+    ["lightning bolt", "閃電", "n.", "a flash of very bright light in the sky caused by electricity", "The house next to ours was struck by a ___.", "lightning bolt"],
+    ["strike", "擊中", "v.", "to hit or attack someone (strike – struck)", "The child ran into the road and was ___ by a car.", "struck"],
+    ["gadget", "小器具；小玩意兒", "n.", "a small tool or device that does something useful", "Modern ___ like these make a huge difference to home life.", "gadgets"],
+    ["battery", "電池", "n.", "a device that produces electricity to provide power", "I left my car lights on all night and now the ___ is flat.", "battery"],
+    ["plug", "插頭", "n.", "a small plastic object with two or three metal pins that connects the equipment to supply electricity", "I'll have to change the ___ on my hairdryer.", "plug"],
+    ["handheld", "手提的", "adj.", "something that is small to be held in the hand", "A ___ device is convenient.", "handheld"],
+    ["lifeline", "救生索", "n.", "a line or rope thrown to rescue somebody who is in danger in the water", "He clung to the ___ and the woman pulled him towards the bank.", "lifeline"],
+    ["backup device", "備用裝置", "n.", "extra stuff that you can get if necessary", "I use my old cell phone as a ___.", "backup device"],
+    ["seek", "尋找", "v.", "to try to find or get something", "Police are ___ witnesses to the accident.", "seeking"],
+    ["rescue", "解救", "v.", "to save someone or something from a dangerous situation", "They shouted for help, but nobody came to ___ them.", "rescue"],
+    ["insane", "瘋狂的", "adj.", "very stupid, crazy or dangerous", "I must have been ___ to agree to the idea.", "insane"],
+    ["fuel", "燃料", "n.", "a substance that is used to provide heat or power, usually by being burned", "Today's vehicles use two kinds of ___ – petrol and diesel.", "fuel"],
+    ["vision", "遠見", "n.", "the ability to think about or plan the future", "Sophia has a clear-sighted ___ of the company's future.", "vision"],
+    ["lack of", "缺乏", "n.", "not have enough of something", "Her only problem is a ___ confidence.", "lack of"],
+    ["folly", "愚蠢的念頭", "n.", "the fact of being stupid", "Ariel said that the idea was ___.", "folly"],
+    ["reside", "居住", "v.", "to live", "The family now ___ in southern France.", "resides"],
+    ["term", "期間", "n.", "a period of time for which something lasts", "The contract was for a fixed ___ of five years.", "term"],
+    ["assaulted by", "被…攻擊", "v.", "being attacked by", "Many healthcare workers say they have been physically ___ patients.", "assaulted by"],
+    ["pounce", "撲過去抓住", "v.", "to jump or move quickly in order to catch something", "The cat sat in the tree, ready to ___ on the ducks below.", "pounce"],
+    ["pluck", "拔；扯", "v.", "to pull something with a sudden movement in order to remove it", "Olivia ___ her gray hair.", "plucked"],
+    ["distress", "悲傷；痛苦", "n.", "a feeling of extreme worry, sadness, or pain", "The animal was clearly in ___, so we called the vet.", "distress"],
+    ["talkative", "多話的", "adj.", "talking a lot", "Who is ___ in our class?", "talkative"],
+    ["rotten", "糟糕的；心情極差的", "adj.", "very bad", "I've had a ___ day!", "rotten"],
+    ["nonstop", "不停的", "adj.", "without stopping", "Lucus took a ___ flight to Tokyo.", "nonstop"],
+    ["mechanical", "機械的", "adj.", "operated by a machine, or connected with machines", "The company produces ___ parts for airplane engines.", "mechanical"],
+    ["chatter", "嘮叨；喋喋不休", "v.", "to talk for a long time about things that are not important", "She spent the morning ___ away to her friends.", "chattering"],
+    ["snap", "厲聲責罵", "v.", "to say something suddenly in an angry way", "There's no need to ___ at me – it's not my fault that you lost your wallet.", "snap"],
+    ["zone", "區域", "n.", "an area", "She stood some distance away from him to maintain a safety ___.", "zone"],
+    ["toddle", "(幼兒)東倒西歪地學走路", "v.", "to walk with short steps, trying to keep the body balanced", "I have to watch him all the time now that he's ___.", "toddling"],
+    ["adore", "崇拜；愛慕", "v.", "to love someone very much", "It's obvious that she ___ him.", "adores"],
+    ["deny", "否認", "v.", "to say that something is not true", "Kyle ___ that he broke the window, but I'm sure he did.", "denies"],
+    ["guinea pig", "天竺鼠", "n.", "a small animal covered in fur with rounded ears, short legs, and no tail", "___ are very active. They can be awake for up to 20 hours a day.", "Guinea pigs"],
+    ["quilt", "棉被", "n.", "a warm bed covering", "Star got back into bed and pulled the ___ over his head.", "quilt"],
+    ["hotly", "憤怒地；激烈地", "adv.", "in an angry or excited way", "She ___ denied having taken the money.", "hotly"],
+    ["pen", "柵欄", "n.", "a small area surrounded by a fence", "A sheep ___ is on the farm.", "pen"],
+    ["faithful", "忠誠的", "adj.", "believing or supporting a person or organization", "Alice has been a very ___ friend to me.", "faithful"],
+    ["troll", "侏儒", "n.", "a creature that looks like an ugly person", "Each ___ held a double-headed ax.", "troll"],
+    ["brew", "泡(茶)；煮(咖啡)", "v.", "to make a hot drink of tea or coffee", "Iris ___ some coffee for us.", "brewed"],
+    ["fort", "堡壘", "n.", "a strong building where soldiers can stay and be safe from the enemy", "The ___ was under attack for three days.", "fort"],
+    ["gloom", "黑暗", "n.", "darkness; lack of light", "Alexander peered into the ___ of the hallway.", "gloom"],
+    ["wizard", "魔法師", "n.", "a man who is believed to have magical powers", "The ___ waved his magic wand and disappeared into the air.", "wizard"],
+    ["desire", "渴望想要", "v.", "to want something, especially strongly", "Most countries sincerely ___ peace.", "desired"],
+    ["power", "電力", "n.", "electricity", "Storms caused ___ outages in hundreds of homes last night.", "power"],
+    ["forge", "鍛造", "v.", "to shape metal by heating it in a fire and hitting it", "Swords are ___ from steel.", "forged"],
+    ["supper", "晚餐", "n.", "dinner", "They had an early ___ before going to the theater.", "supper"],
+    ["surge", "湧現；奔湧", "n.", "a sudden and great movement forward", "At the end of the game, there was a ___ of fans onto the field.", "surge"],
+    ["grin", "露齒笑", "n.", "a wide smile", "Molly gave the photographer a big ___.", "grin"],
+    ["plug in", "插上插頭以接通電源", "phr.", "to connect a piece of electrical equipment to the main supply of electricity", "Is the printer ___?", "plugged in"]
+  ],
+  PP: [
+    ["normal", "正常的", "adj.", "ordinary or usual", "Jared's temperature is ___.", "normal"],
+    ["collect", "收集", "v.", "to get and keep things such as stamps or coins as a hobby", "Sally likes to ___ different types of fish.", "collect"],
+    ["butterfly", "蝴蝶", "n.", "a type of insect with large, often brightly colored wings", "This caterpillar will become a beautiful ___.", "butterfly"],
+    ["stamp", "郵票", "n.", "a small piece of paper with a picture on it that is stuck onto a letter", "The post office has some new Christmas ___.", "stamps"],
+    ["collection", "收藏品", "n.", "a group of objects of one type that have been collected by one person", "The museum's ___ is growing all the time.", "collection"],
+    ["tin foil", "錫箔紙", "n.", "shiny, metal material, as thin as paper, that is used for wrapping food", "Cover with ___ and bake for 20 minutes.", "tin foil"],
+    ["interesting", "有趣的", "adj.", "getting your attention because it is exciting or fun", "It was always ___ to hear his stories.", "interesting"],
+    ["fungi", "菌類植物", "n.", "organisms that are similar to plants without leaves and get their food from decaying material or other living things", "Mushrooms and mold are ___.", "fungi"],
+    ["valentine", "情人卡", "n.", "a card that you send to somebody that you love on Valentine's Day (February 14)", "Did you get any ___?", "valentines"],
+    ["stuffed animals", "填充動物玩偶", "n.", "a toy animal made from cloth and filled with a soft material", "Abby's bed is covered with ___.", "stuffed animals"],
+    ["unnatural", "不自然的", "adj.", "not natural; different from what is normal", "There was an ___ silence and then a scream.", "unnatural"],
+    ["ribbon", "緞帶", "n.", "a long strip of material used to tie things together or as a decoration", "Jenny's present was tied with yellow ___.", "ribbon"],
+    ["shoelace", "鞋帶", "n.", "a long string that goes through the holes on a shoe and is used to fasten it", "Bruce bent down to tie his ___.", "shoelace"],
+    ["souvenir", "紀念品", "n.", "something you buy or keep to help you remember a holiday or special event", "We brought back a few ___ from our holiday in Mexico.", "souvenirs"],
+    ["breed", "品種", "n.", "a type of animal or plant", "What ___ of dog are especially good with children?", "breeds"],
+    ["distraction", "心煩意亂／分心的事", "n.", "the state of being very bored or annoyed; thing that takes your attention away", "She was alone in the house all day and bored to ___.", "distraction"],
+    ["flowered fabric scraps", "花布碎片", "n.", "small pieces of cloth with flowers on them", "She had collections of ___ and pencils.", "flowered fabric scraps"],
+    ["polka dots", "圓點花樣", "n.", "one of many small round marks that together form a pattern", "Amber's shirt was green with purple ___.", "polka dots"],
+    ["mow the lawn", "割草", "phr.", "to cut the grass", "Will you ___ on the weekend?", "mow the lawn"],
+    ["clutter", "雜亂", "n.", "a state of being untidy or messy", "There's always so much ___ on your desk!", "clutter"],
+    ["unpleasant", "粗魯的；不客氣的", "adj.", "rude and angry; not polite", "She said some very ___ things about you.", "unpleasant"],
+    ["suggest", "建議", "v.", "to give an idea or action for other people to think about", "I ___ we go out to eat.", "suggest"],
+    ["hopefully", "懷抱希望地", "adv.", "in a hopeful way", "\"Are you free tonight?\" Joseph asked ___.", "hopefully"],
+    ["navigate", "導航", "v.", "to find a direction", "Ships used to be ___ by the stars.", "navigated"],
+    ["baffled", "困惑的", "adj.", "feeling confused and not able to understand something", "His explanation of this math question will have you more ___ than before.", "baffled"],
+    ["haul", "拖拉", "v.", "to pull something heavy", "They ___ the boat out of the water.", "hauled"],
+    ["dump", "垃圾場", "n.", "a place where people are allowed to leave their trash", "They took the mattress to the ___.", "dump"],
+    ["thrift shop", "慈善性質的二手商店", "n.", "a shop that sells used things such as clothes, books, and furniture, typically in order to raise money for a charity", "She found an old machine at a local ___.", "thrift store"],
+    ["barely", "幾乎不能", "adv.", "by the smallest amount; almost not", "Cindy was ___ able to stand.", "barely"],
+    ["avalanche", "雪崩", "n.", "a large amount of ice and snow falling; too many things that arrive or happen at the same time", "We received an ___ of letters in reply to our advertisement.", "avalanche"],
+    ["bulge", "膨脹", "v.", "to stick out in a round shape; to be full of something", "Kyle's pockets were ___ with presents.", "bulging"],
+    ["strain", "拉緊", "v.", "to push hard against something; to pull hard on something", "I ___ a muscle in my back playing basketball.", "strained"],
+    ["hinge", "鉸鏈", "n.", "a piece of metal on which a door, lid or gate moves freely as it opens or closes", "The door had been pulled off its ___.", "hinges"],
+    ["pitch in", "共同協力", "phr.", "to start to do something as part of a group, especially something helpful", "When I bought this house, all my friends ___ to help fix it up.", "pitched in"],
+    ["enormous", "巨大的", "adj.", "very large", "Mia has bought an ___ house in the country.", "enormous"],
+    ["scattered", "散亂的", "adj.", "spread far apart over a wide area", "Joseph gathered up the newspapers that were ___ around the floor.", "scattered"],
+    ["inspiration", "靈感", "n.", "a sudden good idea / something that gives you good ideas", "One day the ___ just came.", "inspiration"],
+    ["scrutinize", "詳細檢查", "v.", "to examine something very carefully", "Olivia leaned forward to ___ their faces.", "scrutinize"],
+    ["brilliant", "絕佳的", "adj.", "very good", "Sophia is very artistic. The cake looks ___.", "brilliant"],
+    ["stack of", "大量；堆", "n.", "a pile of things arranged one on top of another", "Jared's got ___ money.", "stacks of"],
+    ["whir", "發出呼呼聲", "v.", "(especially of machines) to make a low, soft, continuous sound", "I could hear the washing machine ___ in the kitchen.", "whirring"],
+    ["pound", "猛烈敲打", "v.", "to hit or beat repeatedly with a lot of force", "Someone was ___ at the door.", "pounding"],
+    ["indescribable", "難以形容的", "adj.", "impossible to describe, especially because of being very good or bad", "She felt a sense of ___ joy when she won the game.", "indescribable"],
+    ["wonderment", "驚奇", "n.", "great surprise", "His big blue eyes opened wide in ___.", "wonderment"],
+    ["behold", "看", "v.", "to see or look at someone or something (behold – beheld)", "They ___ a bright star shining in the sky.", "beheld"],
+    ["tourist attraction", "旅遊勝地", "n.", "a place that people visit for fun, usually while they are on holiday", "Yellowstone National Park is one of the most famous ___ in the world.", "tourist attractions"],
+    ["realize", "了解", "v.", "to understand a situation", "He ___ the importance of teamwork during the group project.", "realized"],
+    ["cheese rind", "乳酪皮", "n.", "an outer layer of skin that grows on a piece of cheese", "___ are natural and usually edible.", "Cheese rinds"],
+    ["fascinating", "迷人的", "adj.", "very interesting", "Your trip to Alaska sounds absolutely ___.", "fascinating"],
+    ["appreciate", "欣賞", "v.", "to know how good someone or something is", "Over the years he came to ___ the beauty of the river.", "appreciate"]
+  ],
+  EM: [
+    ["save", "儲存", "v.", "to keep something for use in the future", "I ___ all my old letters in case I want to read them again.", "save"],
+    ["to", "給", "prep.", "showing who you will send the email to", "Who's the email ___?", "to"],
+    ["CC (carbon copy)", "副本", "", "written in an email before the names of the people who will receive a copy", "When you send an email and you ___ someone, it means you are sending them a copy of the email.", "CC"],
+    ["BCC (blind carbon copy)", "密件副本", "", "used on emails to show that a copy is being sent to another person whose name and email address cannot be seen by the other person", "When you ___ someone, they get the email, but their email address is hidden, so it's private.", "BCC"],
+    ["subject", "主旨", "n.", "the topic in the email", "The ___ of this email is Game on Saturday.", "subject"],
+    ["attachment", "附件", "n.", "a computer file that is sent together with an email message", "No ___ was included.", "attachment"],
+    ["formal", "正式的", "adj.", "official", "The greeting was polite, almost ___.", "formal"],
+    ["informal", "非正式的", "adj.", "relaxed and friendly", "People chatting at a party will usually be talking in an ___ way.", "informal"],
+    ["format", "格式", "n.", "the way in which information is arranged and stored on a computer", "What is the correct email ___?", "format"],
+    ["notice", "注意", "v.", "to see or be aware of something or someone", "People were making fun of him but he didn't seem to ___.", "notice"]
+  ]
+};
+
+/* Oral practice — Estimated from the stories (no teacher Oral sheet yet). */
+var ORAL_EST = true;
+var ORAL = [
+  {L: "CB", q: "What things did Charlie McButton like?", a: "Charlie liked electronic things like handsets, bots and computer games.", keywords: ["handsets", "bots", "computer games"]},
+  {L: "CB", q: "What happened to the power in Charlie's town?", a: "A thunderstorm came and a lightning bolt struck an electrical tower, so the power went out.", keywords: ["thunderstorm", "lightning bolt", "tower"]},
+  {L: "CB", q: "Why did Charlie have to sit in the time-out chair?", a: "He pounced on his sister's doll and plucked out its battery, and she cried.", keywords: ["doll", "battery", "sister"]},
+  {L: "CB", q: "What did Charlie and Isabel Jane do together?", a: "They played hide-and-go-seek, built a blanket fort and pretended to be a wizard and a troll.", keywords: ["hide-and-go-seek", "blanket fort", "wizard", "troll"]},
+  {L: "CB", q: "What did Charlie learn in the story?", a: "He learned that trying new things, like playing with his sister without power, can be fun.", keywords: ["new things", "sister", "fun"]},
+  {L: "PP", q: "What was Prudy's problem?", a: "Prudy collected everything, and her room was full of clutter.", keywords: ["collected everything", "clutter", "room"]},
+  {L: "PP", q: "What did Prudy's friends collect?", a: "Egbert collected butterflies, Belinda collected stamps, and Harold collected tin foil.", keywords: ["butterflies", "stamps", "tin foil"]},
+  {L: "PP", q: "What happened when Prudy brought home the silver gum wrapper?", a: "The walls bulged, the door strained, and her room exploded.", keywords: ["bulge", "strain", "exploded"]},
+  {L: "PP", q: "How did Prudy solve her problem?", a: "She looked for inspiration and built The Prudy Museum of Indescribable Wonderment.", keywords: ["inspiration", "museum"]},
+  {L: "PP", q: "Do you have a collection? What would you put in a museum?", a: "Yes, I collect stickers. I would put my stickers in a museum so everyone could see them.", keywords: ["I collect", "because"]},
+  {L: "SK", q: "What is a compound word? Give an example.", a: "A compound word is two smaller words joined together, like toothbrush.", keywords: ["two words", "joined", "example"]},
+  {L: "SK", q: "Tell me the plural of child, mouse and foot.", a: "Children, mice and feet.", keywords: ["children", "mice", "feet"]},
+  {L: "EM", q: "What are the parts of an email?", a: "An email has a To line, a subject, a message, and sometimes CC, BCC or an attachment.", keywords: ["to", "subject", "attachment"]},
+  {L: "EM", q: "What is the difference between a formal and an informal email?", a: "A formal email is official, like to a teacher. An informal email is relaxed and friendly, like to a friend.", keywords: ["formal", "informal", "friend"]}
+];
+
+/* ===== App code ===== */
+AppCore.injectCSS(); KidKit.injectCSS();
+(function () { var st = document.createElement("style"); st.textContent = ".hs-word{padding:12px 14px;margin:8px 0}.hs-wtop{font-size:1.15em}.hs-zh{color:#fbbf24;font-weight:700;margin-left:4px}.hs-word .explain{margin:6px 0;opacity:.95}.hs-sent{font-style:italic;opacity:.9}.hs-sent u{text-decoration-thickness:2px}"; document.head.appendChild(st); })();
+var KEY = APP.key, MAPKEY = KEY + "-map";
+var root = document.getElementById("app");
+var esc = AppCore.esc, el = AppCore.el;
+function lessonById(id) { return LESSONS.filter(function (l) { return l.id === id; })[0]; }
+function saveStars(id, pct) {
+  var s = KidKit.starsFor(pct), d = {};
+  try { d = JSON.parse(localStorage.getItem("kk-lv-" + MAPKEY) || "{}"); } catch (e) {}
+  if (!d[id] || s > d[id]) { d[id] = s; try { localStorage.setItem("kk-lv-" + MAPKEY, JSON.stringify(d)); } catch (e) {} }
+}
+var ZH = {};
+var HAS_TV = typeof TVOCAB !== "undefined", HAS_ORAL = typeof ORAL !== "undefined";
+if (HAS_TV) Object.keys(TVOCAB).forEach(function (L) {
+  VOCAB[L] = VOCAB[L] || [];
+  TVOCAB[L].forEach(function (t) {
+    ZH[t[0].toLowerCase()] = t[1];
+    var hit = VOCAB[L].filter(function (v) { return v[0].toLowerCase() === t[0].toLowerCase(); })[0];
+    if (hit) hit[1] = t[3]; else VOCAB[L].push([t[0], t[3]]);
+  });
+});
+function zhOf(w) { var z = ZH[String(w).toLowerCase()]; return z ? " (" + z + ")" : ""; }
+function tvItems(L) {
+  if (!HAS_TV || !TVOCAB[L]) return [];
+  return TVOCAB[L].map(function (t) { return {L: L, ty: "fill", t: t[4], a: t[5], base: t[0], tv: true, exp: t[0] + " (" + t[1] + ", " + t[2] + "): " + t[3]}; });
+}
+function listenItems(L) {
+  var all = VOCAB[L], out = [];
+  all.forEach(function (v) {
+    var others = AppCore.shuffle(all.filter(function (x) { return x !== v; }));
+    out.push({L: L, ty: "listen", say: v[1], a: v[0], w: [others[0][0], others[1][0]], prompt: "🎧 Listen to the meaning. Which word is it?", exp: v[0] + zhOf(v[0]) + ": " + v[1]});
+  });
+  BANK.forEach(function (q) { if (q.L === L && q.ty === "tf") out.push({L: L, ty: "listen", tf: true, say: q.q, a: q.a, prompt: "🎧 Listen. Is it TRUE or FALSE?", exp: q.q + (q.exp ? "\n" + q.exp : "")}); });
+  return out;
+}
+function spellItems(L) {
+  return VOCAB[L].filter(function (v) { return /^[a-z]{3,12}$/i.test(v[0]); }).map(function (v) {
+    return {L: L, ty: "spell", a: v[0], def: v[1], exp: v[0] + zhOf(v[0]) + ": " + v[1]};
+  });
+}
+function oralItems(L) {
+  if (!HAS_ORAL) return [];
+  return ORAL.filter(function (o) { return L === "ALL" || o.L === L; }).map(function (o) { return {L: o.L, ty: "oral", q: o.q, a: o.a, keywords: o.keywords, mustKnow: o.mustKnow}; });
+}
+function vocabItems(L) {
+  var all = VOCAB[L], out = [];
+  all.forEach(function (v) {
+    var others = AppCore.shuffle(all.filter(function (x) { return x !== v; }));
+    var ex = v[0] + zhOf(v[0]) + ": " + v[1];
+    out.push({L: L, ty: "mc", q: "Which word means: “" + v[1] + "”?", a: v[0], w: [others[0][0], others[1][0]], vocab: true, exp: ex});
+    out.push({L: L, ty: "mc", q: "What does “" + v[0] + "” mean?", a: v[1], w: [others[2][1], others[3][1]], vocab: true, exp: ex});
+  });
+  return out;
+}
+function matchItems(L) {
+  var out = [], v = AppCore.shuffle(VOCAB[L]);
+  for (var k = 0; k + 4 <= v.length && out.length < 2; k += 4) {
+    var set = v.slice(k, k + 4), extra = v[(k + 4) % v.length][0];
+    out.push({L: L, ty: "match", title: "Match each word with its meaning.", t: set.map(function (x, i) { return (i + 1) + ". ___ — " + x[1]; }).join("\n"),
+      a: set.map(function (x) { return x[0]; }), bank: set.map(function (x) { return x[0]; }).concat([extra])});
+  }
+  return out;
+}
+function pool(L) { return BANK.filter(function (q) { return q.L === L; }).concat(vocabItems(L), matchItems(L), tvItems(L), listenItems(L), spellItems(L)); }
+function isWordy(q) { return q.vocab || q.tv || q.ty === "listen" || q.ty === "spell" || q.ty === "match"; }
+
+/* ---------- Home ---------- */
+function home() {
+  AppCore.stopSpeech(); window.scrollTo(0, 0);
+  root.innerHTML = "";
+  root.appendChild(el("div", "hs-hero", "<h1>" + APP.title + "</h1><p>" + APP.sub + "</p>"));
+  var map = el("div"); root.appendChild(map);
+  var lv = LESSONS.map(function (l) { return {id: l.id, name: l.name, icon: l.icon}; });
+  lv.push({id: "MOCK", name: "Mock Exam — Final Boss", icon: "👑"});
+  KidKit.levelMap(map, {key: MAPKEY, lang: "en-US", levels: lv, onPlay: function (id) { id === "MOCK" ? mock() : drill(id); }});
+  root.appendChild(el("h2", "hs-h2", "🎮 Games"));
+  var g = el("div", "hs-games");
+  g.appendChild(AppCore.btn("🃏 Word Flip", "ac-primary", function () { pickLesson("🃏 Word Flip — which lesson?", flip, true); }));
+  if (typeof SORTS !== "undefined") g.appendChild(AppCore.btn("🧺 Sort It", "ac-primary", function () { pickLesson("🧺 Sort It — which lesson?", sortIt, false, false, function (id) { return !!SORTS[id]; }); }));
+  if (BANK.some(function (q) { return q.ty === "evid"; })) g.appendChild(AppCore.btn("🔎 Find the Proof", "ac-primary", function () { pickLesson("🔎 Find the Proof — which story?", proof, true, false, function (id) { return BANK.some(function (q) { return q.L === id && q.ty === "evid"; }); }); }));
+  root.appendChild(g);
+  root.appendChild(el("h2", "hs-h2", "🎤 Speak · 🎧 Listen · 🔤 Spell"));
+  var g2 = el("div", "hs-games");
+  if (HAS_ORAL) g2.appendChild(AppCore.btn("🎤 Oral Practice", "ac-primary", function () { pickLesson("🎤 Oral Practice — which lesson?", oral, true); }));
+  g2.appendChild(AppCore.btn("🎧 Listening", "ac-primary", function () { pickLesson("🎧 Listening — which lesson?", listening, true); }));
+  g2.appendChild(AppCore.btn("🔤 Spelling", "ac-primary", function () { pickLesson("🔤 Spelling — which lesson?", spelling, true); }));
+  if (HAS_TV) g2.appendChild(AppCore.btn("📒 Teacher's Word List", "ac-primary", function () { pickLesson("📒 Teacher's Word List — which lesson?", wordList, false, true); }));
+  root.appendChild(g2);
+  var n = 0; LESSONS.forEach(function (l) { n += pool(l.id).length; });
+  root.appendChild(el("p", "hs-note", "Question bank: " + n + " questions" + (HAS_ORAL ? " + " + ORAL.length + " oral questions" : "") + (typeof SORTS !== "undefined" ? " + " + Object.keys(SORTS).length + " sort games" : "") + ". Scope: " + APP.scope));
+}
+function pickLesson(title, fn, withAll, tvOnly, keep) {
+  root.innerHTML = "";
+  root.appendChild(AppCore.btn("⬅ Back", "ac-ghost", home));
+  root.appendChild(el("h2", "hs-h2", title));
+  LESSONS.forEach(function (l) { if (tvOnly && !TVOCAB[l.id]) return; if (keep && !keep(l.id)) return; root.appendChild(AppCore.btn(l.icon + " " + l.name, "ac-primary hs-wide", function () { fn(l.id); })); });
+  if (withAll) root.appendChild(AppCore.btn("🌍 All lessons", "ac-finish hs-wide", function () { fn("ALL"); }));
+}
+function flip(L) {
+  var pairs = [];
+  (L === "ALL" ? LESSONS.map(function (l) { return l.id; }) : [L]).forEach(function (k) { pairs = pairs.concat(VOCAB[k]); });
+  root.innerHTML = "";
+  root.appendChild(AppCore.btn("⬅ Back", "ac-ghost", home));
+  root.appendChild(el("p", "ac-hint", (APP.flipHint || "Match each word with its meaning.") + " Flip two cards at a time!"));
+  var box = el("div"); root.appendChild(box);
+  AppCore.memory(box, {key: KEY + "-flip-" + L, pairs: pairs, size: pairs.length >= 8 ? 8 : 6, onHome: home});
+}
+function sortIt(L) {
+  var s = SORTS[L];
+  AppCore.sortGame(root, {key: KEY + "-sort-" + L, title: s.title, bins: s.bins, items: s.items, onHome: home});
+}
+
+function lessonsOf(L) { return L === "ALL" ? LESSONS.map(function (l) { return l.id; }) : [L]; }
+function labelOf(L) { return L === "ALL" ? "All lessons" : lessonById(L).name; }
+function listening(L) {
+  var it = []; lessonsOf(L).forEach(function (k) { it = it.concat(listenItems(k)); });
+  it = AppCore.shuffle(it).slice(0, 15);
+  run(it, {title: "🎧 " + labelOf(L), gameKey: KEY + "-listen-" + L, boss: AppCore.bossFor(it.length, "Echo Bat"), again: function () { listening(L); }});
+}
+function spelling(L) {
+  var it = []; lessonsOf(L).forEach(function (k) { it = it.concat(spellItems(k)); });
+  it = AppCore.shuffle(it).slice(0, 12);
+  run(it, {title: "🔤 " + labelOf(L), gameKey: KEY + "-spell-" + L, boss: AppCore.bossFor(it.length, "Letter Lizard"), again: function () { spelling(L); }});
+}
+function proof(L) {
+  var it = BANK.filter(function (q) { return q.ty === "evid" && (L === "ALL" || q.L === L); });
+  it = AppCore.shuffle(it).slice(0, 10);
+  run(it, {title: "🔎 " + labelOf(L), gameKey: KEY + "-proof-" + L, boss: AppCore.bossFor(it.length, "Riddle Raven"), again: function () { proof(L); }});
+}
+function oral(L) {
+  var it = AppCore.shuffle(oralItems(L));
+  run(it, {title: "🎤 " + labelOf(L), gameKey: KEY + "-oral-" + L, again: function () { oral(L); }, oral: true});
+}
+function wordList(L) {
+  window.scrollTo(0, 0); root.innerHTML = "";
+  root.appendChild(AppCore.btn("⬅ Back", "ac-ghost", home));
+  root.appendChild(el("h2", "hs-h2", "📒 " + esc(lessonById(L).name) + " — Teacher's Word List"));
+  root.appendChild(el("p", "ac-hint", "Tap 🔊 to hear each word, meaning and sentence. Then try 🎧 Listening and 🔤 Spelling!"));
+  TVOCAB[L].forEach(function (t, i) {
+    var sent = t[4].replace("___", t[5]);
+    var c = el("div", "hs-card hs-word");
+    c.innerHTML = '<div class="hs-wtop"><b>' + (i + 1) + ". " + esc(t[0]) + "</b> " + KidKit.sayBtn(t[0], "Hear", {lang: "en-US"}) +
+      ' <span class="hs-zh">' + esc(t[1]) + " (" + esc(t[2]) + ")</span></div>" +
+      '<div class="explain">' + esc(t[3]) + "</div>" +
+      '<div class="sp-read hs-sent">' + esc(t[4]).replace("___", "<u>" + esc(t[5]) + "</u>") + "</div>";
+    root.appendChild(c);
+  });
+  root.appendChild(AppCore.btn("🎧 Listening practice", "ac-primary hs-wide", function () { listening(L); }));
+  root.appendChild(AppCore.btn("🔤 Spelling practice", "ac-primary hs-wide", function () { spelling(L); }));
+}
+
+/* ---------- Drills ---------- */
+function drill(L) {
+  var l = lessonById(L), P = pool(L);
+  var a = AppCore.shuffle(P.filter(function (q) { return !isWordy(q); })).slice(0, 12);
+  var b = AppCore.shuffle(P.filter(isWordy)).slice(0, 20 - a.length);
+  run(AppCore.shuffle(a.concat(b)), {title: l.icon + " " + l.name, gameKey: KEY + "-" + L, boss: AppCore.bossFor(Math.min(20, pool(L).length), l.boss), mapId: L, limit: 20});
+}
+function mock() {
+  function pick(f, n) { var all = []; LESSONS.forEach(function (l) { all = all.concat(pool(l.id).filter(f)); }); return AppCore.shuffle(all).slice(0, n); }
+  var items = [].concat(
+    pick(function (q) { return q.ty === "match"; }, 2),
+    pick(function (q) { return q.ty === "cloze"; }, 3),
+    pick(function (q) { return q.ty === "label"; }, 1),
+    pick(function (q) { return q.ty === "fill" && !q.tv; }, 5),
+    pick(function (q) { return q.tv; }, 3),
+    pick(function (q) { return q.ty === "listen"; }, 4),
+    pick(function (q) { return q.ty === "spell"; }, 2),
+    pick(function (q) { return q.ty === "evid"; }, APP.mockEvid || 0),
+    pick(function (q) { return q.ty === "scramble"; }, APP.mockScramble || 0),
+    pick(function (q) { return q.ty === "order"; }, 2),
+    pick(function (q) { return (q.ty === "mc" || q.ty === "tf") && !q.vocab; }, 9),
+    pick(function (q) { return q.vocab; }, 3),
+    pick(function (q) { return q.ty === "open"; }, 3));
+  run(items, {title: "👑 Mock Exam", gameKey: KEY + "-mock", boss: AppCore.bossFor(items.length, "Final Boss"), mapId: "MOCK", mock: true});
+}
+function run(items, o) {
+  if (o.limit) items = items.slice(0, o.limit);
+  var D = AppCore.dealer(), G = AppCore.game(o.gameKey, {boss: o.boss}), log = [], i = 0, live = null;
+  function show() {
+    if (live) { live.destroy(); live = null; }
+    if (i >= items.length) return end();
+    window.scrollTo(0, 0);
+    var q = items[i];
+    root.innerHTML = "";
+    root.appendChild(AppCore.drillBar({title: o.title + " · " + (i + 1) + " / " + items.length, onBack: home, onFinish: end, game: G}));
+    var card = el("div", "hs-card"); root.appendChild(card);
+    var tag = q.vocab ? "Vocabulary" : q.tv ? "Teacher's word list" : q.ty === "oral" ? "Oral" + (typeof ORAL_EST !== "undefined" && ORAL_EST ? " · Estimated — confirm with teacher" : "") : {listen: "Listening", spell: "Spelling", evid: "Find the evidence", scramble: "Build the sentence", mc: "Multiple choice", tf: "True or False", fill: Array.isArray(q.a) ? "Outline" : "Fill in the blank", order: "Put in order", open: "Critical thinking", cloze: "Cloze Activity", match: "Vocabulary matching", label: "Label the diagram"}[q.ty];
+    card.appendChild(el("div", "hs-tag", lessonById(q.L).icon + " " + esc(lessonById(q.L).name) + " · " + tag));
+    var area = el("div"); card.appendChild(area);
+    var next = el("div", "hs-next"); card.appendChild(next);
+    function done(ok, given, correct, extra) {
+      G.record(ok);
+      var e = {q: q.q || q.t || (q.ty === "listen" ? "🎧 " + q.say : q.ty === "spell" ? "🔤 Spell the word that means: " + q.def : ""), given: given, correct: correct, ok: ok, item: q};
+      if (extra && extra.appeal) e.appeal = true;
+      log.push(e);
+      next.innerHTML = "";
+      next.appendChild(AppCore.btn(i + 1 < items.length ? "Next ▶" : "🏁 See my score", "ac-primary", function () { i++; show(); }));
+    }
+    if (q.ty === "mc" || q.ty === "tf") {
+      area.appendChild(el("p", "hs-q", esc(q.q) + " " + KidKit.sayBtn(q.q, "Hear", {lang: "en-US"})));
+      var r = q.ty === "tf" ? {choices: ["TRUE", "FALSE"], answer: q.a ? 0 : 1} : D.place(q.a, q.w);
+      var opts = el("div", "hs-opts" + (q.ty === "tf" ? " hs-tf" : "")); area.appendChild(opts);
+      var fb = el("div"); area.appendChild(fb);
+      var letters = "ABC";
+      r.choices.forEach(function (c, k) {
+        var b = AppCore.btn((q.ty === "tf" ? "" : "<b>" + letters[k] + "</b> ") + esc(c), "hs-opt", function () {
+          var ok = k === r.answer;
+          Array.prototype.forEach.call(opts.children, function (x, j) { x.disabled = true; if (j === r.answer) x.classList.add("hs-ok"); else if (x === b) x.classList.add("hs-bad"); });
+          var right = r.choices[r.answer];
+          fb.innerHTML = '<div class="ac-fb ' + (ok ? "ok" : "bad") + '">' + (ok ? "✓ " + AppCore.praise() : "Not quite — the answer is:<div class=\"ac-ans\"><b>" + esc(right) + "</b></div>") +
+            (q.exp ? '<div class="ac-exp">' + esc(q.exp) + "</div>" : "") + "</div>";
+          done(ok, c, right);
+        });
+        opts.appendChild(b);
+      });
+    } else if (q.ty === "listen") {
+      area.appendChild(el("p", "hs-q", esc(q.prompt)));
+      var pr = el("div", "ac-row"); area.appendChild(pr);
+      pr.appendChild(AppCore.btn("🔊 Play", "ac-primary", function () { AppCore.speak(q.say); }));
+      pr.appendChild(AppCore.btn("🐢 Slow", "ac-ghost", function () { AppCore.speak(q.say, {rate: 0.7}); }));
+      try { AppCore.speak(q.say); } catch (e) {}
+      var lr = q.tf ? {choices: ["TRUE", "FALSE"], answer: q.a ? 0 : 1} : D.place(q.a, q.w);
+      var lo = el("div", "hs-opts" + (q.tf ? " hs-tf" : "")); area.appendChild(lo);
+      var lfb = el("div"); area.appendChild(lfb);
+      lr.choices.forEach(function (c, k) {
+        var b = AppCore.btn((q.tf ? "" : "<b>" + "ABC"[k] + "</b> ") + esc(c), "hs-opt", function () {
+          var ok = k === lr.answer;
+          Array.prototype.forEach.call(lo.children, function (x, j) { x.disabled = true; if (j === lr.answer) x.classList.add("hs-ok"); else if (x === b) x.classList.add("hs-bad"); });
+          lfb.innerHTML = '<div class="ac-fb ' + (ok ? "ok" : "bad") + '">' + (ok ? "✓ " + AppCore.praise() : "Not quite — the answer is:<div class=\"ac-ans\"><b>" + esc(lr.choices[lr.answer]) + "</b></div>") +
+            '<div class="ac-exp">You heard: ' + esc(q.exp) + "</div></div>";
+          done(ok, c, lr.choices[lr.answer]);
+        });
+        lo.appendChild(b);
+      });
+    } else if (q.ty === "spell") {
+      area.appendChild(el("p", "hs-q", "🔤 Listen and spell the word."));
+      var sr = el("div", "ac-row"); area.appendChild(sr);
+      sr.appendChild(AppCore.btn("🔊 Hear the word", "ac-primary", function () { AppCore.speak(q.a); }));
+      sr.appendChild(AppCore.btn("🐢 Slow", "ac-ghost", function () { AppCore.speak(q.a, {rate: 0.6}); }));
+      try { AppCore.speak(q.a); } catch (e) {}
+      var sb = el("div"); area.appendChild(sb);
+      AppCore.tiles(sb, {answer: q.a, unit: "letter", hint: "Meaning: " + q.def, exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a); }});
+    } else if (q.ty === "evid") {
+      var eb = el("div"); area.appendChild(eb);
+      AppCore.evidence(eb, {passage: q.passage, q: q.q, answer: q.answer, correct: q.correct, exp: q.exp, onResult: function (ok) {
+        done(ok, ok ? "Found the evidence" : "Picked another sentence", q.correct.map(function (k) { return q.passage[k]; }).join(" "));
+      }});
+    } else if (q.ty === "scramble") {
+      var tb = el("div"); area.appendChild(tb);
+      AppCore.tiles(tb, {answer: q.a, unit: "word", extra: q.extra, hint: q.q, exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a); }});
+    } else if (q.ty === "oral") {
+      if (i === 0) area.appendChild(el("div", "", AppCore.WEBVIEW_NOTICE));
+      var ob = el("div"); area.appendChild(ob);
+      var scored = false;
+      live = AppCore.oralCard(ob, {q: q.q, a: q.a, keywords: q.keywords, mustKnow: q.mustKnow}, {maxSecs: 60, onSelfScore: function (ok) {
+        if (scored) { var last = log[log.length - 1]; last.ok = ok; last.given = ok ? "Got it" : "Still learning"; return; }
+        scored = true; done(ok, ok ? "Got it" : "Still learning", q.a);
+      }});
+    } else if (q.ty === "cloze" || q.ty === "match" || q.ty === "label" || (q.ty === "fill" && Array.isArray(q.a))) {
+      if (q.title) area.appendChild(el("p", "hs-q", esc(q.title)));
+      if (q.svg) area.appendChild(el("div", "", q.svg));
+      var wb = el("div"); area.appendChild(wb);
+      AppCore.wordBank(wb, {text: q.t, bank: AppCore.shuffle(q.bank), answers: q.a, exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a.join(" / ")); }});
+    } else if (q.ty === "fill") {
+      var others = q.w ? q.w.slice() : AppCore.shuffle(VOCAB[q.L].map(function (v) { return v[0]; }).filter(function (w) { return w.toLowerCase() !== q.a.toLowerCase() && w !== q.base; })).slice(0, 3);
+      AppCore.wordBank(area, {text: q.t, bank: AppCore.shuffle([q.a].concat(others)), answers: [q.a], exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a); }});
+    } else if (q.ty === "order") {
+      AppCore.tiles(area, {unit: "item", items: q.items, hint: q.q, exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.items.join(" → ")); }});
+    } else if (q.ty === "open") {
+      area.appendChild(el("p", "hs-q", esc(q.q) + " " + KidKit.sayBtn(q.q, "Hear", {lang: "en-US"})));
+      var box = el("div"); area.appendChild(box);
+      var appealed = false;
+      AppCore.openAnswer(box, {a: q.a, points: q.points, need: q.need}, {onResult: function (ok, given) { done(ok, given, q.a, {appeal: appealed}); }, onAppeal: function () { appealed = true; var last = log[log.length - 1]; if (last) last.appeal = true; }});
+    }
+  }
+  function end() {
+    if (live) { live.destroy(); live = null; }
+    root.innerHTML = "";
+    var r = AppCore.result(log);
+    if (r.answered && o.mapId) saveStars(o.mapId, r.pct);
+    root.appendChild(AppCore.resultView(log, {game: G, onAgain: function () { o.again ? o.again() : o.mock ? mock() : drill(o.mapId); }, onHome: home,
+      onRetryWrong: function () { run(log.filter(function (x) { return !x.ok; }).map(function (x) { return x.item; }), {title: o.title + " · mistakes", gameKey: o.gameKey + "-retry", boss: AppCore.bossFor(r.wrong.length, (o.boss && o.boss.name) || "Boss"), mapId: o.mapId, mock: o.mock, again: o.again}); }}));
+  }
+  show();
+}
+home();
+
+</script>
+<script>
+/* =====================================================================
+   site-home.js — 📚 小站 button + 全站集點 (site-wide points & badges)
+   Canonical copy: github.com/iam5980/kids-practice/template/site-home.js
+   Version: 2026-11-08c（🔊 念解釋、🎒 抓寶＋進化／閃亮／巨大化、🎯 每日任務）
+
+   HOW TO USE: paste this whole file in its own <script> block just before
+   </body> of EVERY page published to kids-practice (English and 中文部,
+   apps, oral pages, listening players). Nothing else is required.
+
+   1) "📚 小站" pill, bottom-left → in-page confirm card → site home.
+   2) SitePoints — points and badges per kid, shared by every app on the
+      site (same origin), shown on the home page 集點卡. Kept only on
+      this device (localStorage).
+        SitePoints.answer(ok)       after every judged answer
+        SitePoints.roundEnd(pct)    when a round / drill ends (0–100)
+        SitePoints.literacy(allOk)  when a 素養題組 is finished
+      Points: correct +10, streak bonus +2 per answer in a row (max +10).
+      No speed bonus — accuracy only.
+   3) Auto-hooks, so older apps need no code changes:
+        中文部 engine:  rtAns(right) → answer;  celebrate() → perfect round
+        AppCore apps:   AppCore calls SitePoints itself (app-core ≥ 2026-10-25)
+   ===================================================================== */
+(function () {
+  "use strict";
+  if (window.__siteHome) return;
+  window.__siteHome = true;
+  var LIVE = "https://iam5980.github.io/kids-practice/";
+  function homeUrl() {
+    var p = location.pathname, i = p.indexOf("/kids-practice/");
+    if (location.protocol.indexOf("http") === 0 && i >= 0) return location.origin + p.slice(0, i) + "/kids-practice/";
+    return LIVE;
+  }
+
+  /* ---------------- SitePoints ---------------- */
+  var BADGES = [
+    { id: "first",   icon: "🌱", name: "第一次答對" },
+    { id: "perfect", icon: "💯", name: "第一次滿分" },
+    { id: "streak10",icon: "🔥", name: "連對 10 題" },
+    { id: "streak20",icon: "🚀", name: "連對 20 題" },
+    { id: "days3",   icon: "📅", name: "連續練習 3 天" },
+    { id: "days7",   icon: "🗓️", name: "連續練習 7 天" },
+    { id: "lit1",    icon: "🧩", name: "第一組素養題全對" },
+    { id: "lit10",   icon: "🎓", name: "素養題達人（10 組全對）" },
+    { id: "p500",    icon: "⭐", name: "累積 500 點" },
+    { id: "p2000",   icon: "🌟", name: "累積 2000 點" },
+    { id: "p5000",   icon: "🏆", name: "累積 5000 點" }
+  ];
+  function kidFromPath() {
+    var m = location.pathname.match(/\/kids-practice\/([a-z0-9]+)\//i);
+    return m && m[1] !== "template" && m[1] !== "shadowing" ? m[1] : null;
+  }
+  function today() { var d = new Date(); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+  function dayDiff(a, b) { return Math.round((new Date(b) - new Date(a)) / 864e5); }
+  function load(kid) {
+    var d = null;
+    try { d = JSON.parse(localStorage.getItem("kp-points-" + kid) || "null"); } catch (e) {}
+    return d || { points: 0, today: "", todayPts: 0, days: [], badges: {}, correct: 0, perfects: 0, lit: 0, bestStreak: 0 };
+  }
+  function save(kid, d) { try { localStorage.setItem("kp-points-" + kid, JSON.stringify(d)); } catch (e) {} }
+  function dayStreak(days) {
+    if (!days.length) return 0;
+    var s = days.slice().sort(), n = 1;
+    if (dayDiff(s[s.length - 1], today()) > 1) return 0;
+    for (var i = s.length - 1; i > 0; i--) { if (dayDiff(s[i - 1], s[i]) === 1) n++; else break; }
+    return n;
+  }
+  var kid = kidFromPath(), streak = 0;
+  function toast(html, big) {
+    var t = document.createElement("div");
+    t.className = "sp-toast" + (big ? " sp-big" : "");
+    t.innerHTML = html;
+    document.body.appendChild(t);
+    setTimeout(function () { t.classList.add("sp-out"); }, big ? 2200 : 900);
+    setTimeout(function () { t.remove(); }, big ? 2700 : 1300);
+  }
+  function grant(d, id) {
+    if (d.badges[id]) return;
+    d.badges[id] = today();
+    var b = BADGES.filter(function (x) { return x.id === id; })[0];
+    if (b) toast("🏅 獲得徽章<br><b>" + b.icon + " " + b.name + "</b>", true);
+  }
+  function update(fn) {
+    if (!kid) return;
+    var d = load(kid), t = today();
+    if (d.today !== t) { d.today = t; d.todayPts = 0; }
+    if (d.days.indexOf(t) < 0) { d.days.push(t); if (d.days.length > 60) d.days = d.days.slice(-60); }
+    fn(d);
+    var ds = dayStreak(d.days);
+    if (ds >= 3) grant(d, "days3");
+    if (ds >= 7) grant(d, "days7");
+    if (d.points >= 500) grant(d, "p500");
+    if (d.points >= 2000) grant(d, "p2000");
+    if (d.points >= 5000) grant(d, "p5000");
+    save(kid, d);
+  }
+  /* 🎯 每日任務 — reset every day; each one gives +50 once */
+  var QUESTS = [
+    { id: "c20", icon: "✅", name: "今天答對 20 題", goal: 20, f: "correct" },
+    { id: "r3",  icon: "🔁", name: "今天完成 3 輪練習", goal: 3, f: "rounds" },
+    { id: "s10", icon: "🔥", name: "今天連對 10 題", goal: 10, f: "streak" }
+  ];
+  function qDay(d) { var t = today(); if (!d.q || d.q.day !== t) d.q = { day: t, correct: 0, rounds: 0, streak: 0, done: {} }; }
+  function qCheck(d) {
+    QUESTS.forEach(function (q) {
+      if (!d.q.done[q.id] && d.q[q.f] >= q.goal) {
+        d.q.done[q.id] = 1; d.points += 50; d.todayPts += 50;
+        toast("🎯 每日任務完成<br><b>" + q.icon + " " + q.name + "</b><br>＋50 點", true);
+      }
+    });
+  }
+  var SitePoints = {
+    kid: kid,
+    badges: BADGES,
+    read: function (k) { var d = load(k || kid); d.dayStreak = dayStreak(d.days); return d; },
+    answer: function (ok) {
+      update(function (d) {
+        if (ok) {
+          streak++;
+          var pts = 10 + Math.min(10, (streak - 1) * 2);
+          d.points += pts; d.todayPts += pts; d.correct++;
+          qDay(d); d.q.correct++; d.q.streak = Math.max(d.q.streak, streak); qCheck(d);
+          d.bestStreak = Math.max(d.bestStreak, streak);
+          grant(d, "first");
+          if (streak >= 10) grant(d, "streak10");
+          if (streak >= 20) grant(d, "streak20");
+          toast("+" + pts);
+        } else { streak = 0; }
+      });
+    },
+    quests: QUESTS,
+    roundEnd: function (pct, noPerfect) {
+      update(function (d) { qDay(d); d.q.rounds++; qCheck(d); });
+      if (pct >= 100 && !noPerfect) update(function (d) { d.perfects++; grant(d, "perfect"); });
+    },
+    perfect: function () {
+      update(function (d) { d.perfects++; grant(d, "perfect"); });
+    },
+    literacy: function (allOk) {
+      if (allOk) update(function (d) { d.lit++; grant(d, "lit1"); if (d.lit >= 10) grant(d, "lit10"); });
+    }
+  };
+  window.SitePoints = SitePoints;
+
+  /* auto-hooks for the 中文部 engine (global rtAns / celebrate) */
+  if (typeof window.rtAns === "function" && !window.rtAns.__sp) {
+    var oAns = window.rtAns;
+    window.rtAns = function (right) { try { SitePoints.answer(!!right); } catch (e) {} return oAns.apply(this, arguments); };
+    window.rtAns.__sp = true;
+  }
+  if (typeof window.celebrate === "function" && !window.celebrate.__sp) {
+    var oCel = window.celebrate;
+    window.celebrate = function () { try { SitePoints.perfect(); } catch (e) {} return oCel.apply(this, arguments); };
+    window.celebrate.__sp = true;
+  }
+
+
+  /* ---------------- 🔊 念解釋（ReadAloud）----------------
+     Every explanation / definition box on every app gets a small 🔊 button:
+     .fb .ac-fb .ac-exp .ac-ans td.hint .qmean .why .explain .sp-read
+     Chinese text → zh-TW voice; otherwise en-US. */
+  var RA_SEL = ".fb,.ac-fb,.ac-exp,.ac-ans,td.hint,.qmean,.why,.explain,.sp-read";
+  function raText(el) {
+    var c = el.cloneNode(true);
+    Array.prototype.forEach.call(c.querySelectorAll("button,.sp-say,script,style"), function (x) { x.remove(); });
+    return (c.textContent || "").replace(/\s+/g, " ").trim();
+  }
+  function raSpeak(t) {
+    if (!window.speechSynthesis || !t) return;
+    try {
+      speechSynthesis.cancel();
+      var zh = /[一-鿿]/.test(t), u = new SpeechSynthesisUtterance(t);
+      u.lang = zh ? "zh-TW" : "en-US"; u.rate = zh ? 0.95 : 0.9;
+      var vs = speechSynthesis.getVoices() || [], pref = zh ? ["zh-TW", "zh_TW", "zh-HK", "zh"] : ["en-US", "en_US", "en-GB", "en"];
+      for (var i = 0; i < pref.length && !u.voice; i++) for (var j = 0; j < vs.length; j++) if (vs[j].lang && vs[j].lang.indexOf(pref[i]) === 0) { u.voice = vs[j]; break; }
+      speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+  function raScan() {
+    Array.prototype.forEach.call(document.querySelectorAll(RA_SEL), function (el) {
+      if (el.__ra || el.closest("#sh-card,.sd-card,.sp-toast") || (el.parentElement && el.parentElement.closest(RA_SEL))) return;
+      var t = raText(el); if (t.length < 2) return;
+      el.__ra = true;
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "sp-say"; b.textContent = "🔊";
+      b.title = b.ariaLabel = /[一-鿿]/.test(t) ? "念給我聽" : "Read aloud";
+      b.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); raSpeak(raText(el)); }, true);
+      el.appendChild(b);
+    });
+  }
+  var raPending = false;
+  function raQueue() { if (raPending) return; raPending = true; setTimeout(function () { raPending = false; raScan(); }, 120); }
+  if (window.MutationObserver && document.body) new MutationObserver(raQueue).observe(document.body, { childList: true, subtree: true });
+  raQueue();
+
+  /* ---------------- 🎒 抓寶（SiteDex）----------------
+     After a good round, an original creature may appear; tap 🫙 to catch it.
+     Collection per kid in localStorage "kp-dex-<kid>", shown on the home page 圖鑑.
+     SiteDex.maybe(pct, n)  — called from roundEnd and the 中文部 rtEnd hook.
+     All creatures are original designs (no existing characters). */
+  var DEX = [
+    ["ink","墨墨兔",0,"#94a3b8","bunny","drop"],["plane","紙飛鼠",0,"#cbd5e1","round","wing"],["eraser","橡皮熊",0,"#f9a8d4","round","none"],
+    ["chalk","粉筆鴨",0,"#fde68a","none","beak"],["mark","書籤狐",0,"#fb923c","cat","tail"],["pencil","鉛筆刺蝟",0,"#a16207","spike","pencil"],
+    ["ruler","尺子龜",0,"#86efac","none","shell"],["crayon","蠟筆貓",0,"#c4b5fd","cat","stripe"],["glue","膠水蝸牛",0,"#67e8f9","antenna","swirl"],
+    ["clip","迴紋小蛇",0,"#a3e635","none","clip"],["note","便利貼蛙",0,"#facc15","frog","note"],["compass","圓規鳥",0,"#7dd3fc","tuft","beak"],
+    ["zhuyin","注音龍寶",1,"#34d399","horn","wing"],["radical","部首獅",1,"#f59e0b","mane","none"],["idiom","成語鹿",1,"#d97706","antler","spots"],
+    ["rhet","修辭孔雀",1,"#2dd4bf","tuft","fan"],["spell","拼字海豚",1,"#38bdf8","none","fin"],["poem","詩詞鶴",1,"#e2e8f0","tuft","beak"],
+    ["abacus","算盤狸",1,"#b45309","round","stripe"],["globe","地球儀龜",1,"#60a5fa","none","globe"],
+    ["phoenix","金榜鳳凰",2,"#f97316","crest","fire"],["qilin","滿分麒麟",2,"#fbbf24","horn","star"],
+    ["dragon","智慧神龍",2,"#22d3ee","horn","wing"],["uni","星光獨角獸",2,"#f0abfc","uni","star"]
+  ];
+  var RARE = ["一般", "稀有", "傳說"], RARE_C = ["#64748b", "#2563eb", "#d97706"];
+  function dxStage(n) { return n >= 6 ? 3 : n >= 3 ? 2 : 1; }
+  function dxSvg(id, hidden, o) {
+    o = o || {};
+    var d = DEX.filter(function (x) { return x[0] === id; })[0]; if (!d) return "";
+    var c = hidden ? "#94a3b8" : d[3], k = hidden ? "#94a3b8" : "#1f2937", ear = d[4], f = d[5], s = "";
+    var lite = hidden ? "#cbd5e1" : "rgba(255,255,255,.55)";
+    if (ear === "bunny") s += '<ellipse cx="38" cy="22" rx="7" ry="18" fill="' + c + '"/><ellipse cx="62" cy="22" rx="7" ry="18" fill="' + c + '"/>';
+    if (ear === "cat" || ear === "mane") s += '<path d="M26 40 L32 16 L46 32Z M74 40 L68 16 L54 32Z" fill="' + c + '"/>';
+    if (ear === "round") s += '<circle cx="30" cy="30" r="10" fill="' + c + '"/><circle cx="70" cy="30" r="10" fill="' + c + '"/>';
+    if (ear === "horn" || ear === "uni") s += ear === "uni" ? '<path d="M50 4 L45 30 L55 30Z" fill="' + (hidden ? c : "#fde047") + '"/>' : '<path d="M36 30 L32 8 L44 26Z M64 30 L68 8 L56 26Z" fill="' + (hidden ? c : "#fde68a") + '"/>';
+    if (ear === "antler") s += '<path d="M36 30 L28 8 M30 16 L22 12 M64 30 L72 8 M70 16 L78 12" stroke="' + (hidden ? c : "#78350f") + '" stroke-width="4" stroke-linecap="round" fill="none"/>';
+    if (ear === "tuft" || ear === "crest") s += '<path d="M50 10 Q44 22 48 30 Q50 18 56 12 Q52 22 54 30" fill="' + c + '"/>';
+    if (ear === "antenna") s += '<path d="M42 30 L36 10 M58 30 L64 10" stroke="' + c + '" stroke-width="3"/><circle cx="36" cy="10" r="4" fill="' + c + '"/><circle cx="64" cy="10" r="4" fill="' + c + '"/>';
+    if (ear === "frog") s += '<circle cx="34" cy="30" r="11" fill="' + c + '"/><circle cx="66" cy="30" r="11" fill="' + c + '"/>';
+    if (ear === "spike") s += '<path d="M20 50 L14 34 L30 40 L28 22 L42 32 L50 16 L58 32 L72 22 L70 40 L86 34 L80 50Z" fill="' + (hidden ? c : "#78350f") + '"/>';
+    if (ear === "mane") s += '<circle cx="50" cy="56" r="38" fill="' + (hidden ? c : "#b45309") + '"/>';
+    if (f === "wing" || f === "fire") s += '<path d="M16 56 Q2 40 8 70 Q14 66 22 68Z M84 56 Q98 40 92 70 Q86 66 78 68Z" fill="' + (f === "fire" && !hidden ? "#ef4444" : c) + '" opacity=".85"/>';
+    if (f === "tail") s += '<path d="M78 74 Q100 60 92 40 Q86 62 70 70Z" fill="' + c + '"/><path d="M92 40 Q90 50 86 52" stroke="#fff" stroke-width="4"/>';
+    if (f === "fan") s += '<path d="M50 60 L10 30 L22 20 L40 14 L60 14 L78 20 L90 30Z" fill="' + (hidden ? c : "#0d9488") + '" opacity=".7"/>';
+    if (f === "shell" || f === "globe") s += '<ellipse cx="50" cy="70" rx="40" ry="20" fill="' + (hidden ? c : f === "globe" ? "#16a34a" : "#15803d") + '"/>';
+    if (f === "fin") s += '<path d="M50 30 L60 12 L64 34Z" fill="' + c + '"/>';
+    s += '<ellipse cx="50" cy="60" rx="30" ry="28" fill="' + c + '"/><ellipse cx="50" cy="70" rx="17" ry="13" fill="' + lite + '"/>';
+    if (!hidden) {
+      s += '<circle cx="40" cy="55" r="5" fill="' + k + '"/><circle cx="60" cy="55" r="5" fill="' + k + '"/><circle cx="41.5" cy="53.5" r="1.6" fill="#fff"/><circle cx="61.5" cy="53.5" r="1.6" fill="#fff"/>';
+      s += '<ellipse cx="33" cy="64" rx="4" ry="2.5" fill="#fb7185" opacity=".55"/><ellipse cx="67" cy="64" rx="4" ry="2.5" fill="#fb7185" opacity=".55"/>';
+      s += f === "beak" ? '<path d="M44 62 L56 62 L50 69Z" fill="#f59e0b"/>' : '<path d="M45 63 Q50 67 55 63" stroke="' + k + '" stroke-width="2" fill="none" stroke-linecap="round"/>';
+      if (f === "spots") s += '<circle cx="30" cy="70" r="3" fill="#fff"/><circle cx="70" cy="72" r="3" fill="#fff"/><circle cx="64" cy="80" r="2.5" fill="#fff"/>';
+      if (f === "stripe") s += '<path d="M24 52 L32 54 M22 60 L30 61 M76 52 L68 54 M78 60 L70 61" stroke="#1f2937" stroke-width="2" opacity=".5"/>';
+      if (f === "star") s += '<path d="M80 16 L83 24 L91 24 L85 29 L87 37 L80 32 L73 37 L75 29 L69 24 L77 24Z" fill="#fde047"/>';
+      if (f === "pencil") s += '<rect x="74" y="64" width="18" height="6" rx="1" fill="#facc15" transform="rotate(-30 83 67)"/>';
+      if (f === "note") s += '<rect x="70" y="66" width="16" height="16" fill="#fef08a" stroke="#ca8a04"/>';
+      if (f === "drop") s += '<path d="M80 60 Q86 70 80 74 Q74 70 80 60Z" fill="#1e293b"/>';
+      if (f === "swirl") s += '<path d="M74 78 a8 8 0 1 1 8 -8 a5 5 0 1 1 -5 5" stroke="#0e7490" stroke-width="3" fill="none"/>';
+      if (f === "clip") s += '<path d="M76 58 v18 a5 5 0 0 0 10 0 v-14 a3 3 0 0 0 -6 0 v12" stroke="#64748b" stroke-width="2.5" fill="none"/>';
+    }
+    var pre = "", post = "", st = hidden ? 1 : (o.stage || 1);
+    if (!hidden && o.giant) pre += '<circle cx="50" cy="56" r="47" fill="none" stroke="#ef4444" stroke-width="4" stroke-dasharray="6 4" opacity=".8"/><circle cx="50" cy="56" r="44" fill="#fecaca" opacity=".35"/>';
+    if (st >= 3) pre += '<circle cx="50" cy="56" r="45" fill="#fde68a" opacity=".45"/>';
+    if (st >= 2) post += '<path d="M24 74 Q50 86 76 74 L74 80 Q50 92 26 80Z" fill="#ef4444"/><path d="M66 80 L72 94 L62 88Z" fill="#dc2626"/>';
+    if (st >= 3) post += '<path d="M36 26 L40 14 L46 22 L50 10 L54 22 L60 14 L64 26Z" fill="#facc15" stroke="#ca8a04" stroke-width="1.5"/>';
+    if (!hidden && o.shiny) post += '<path d="M12 20 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3Z M88 70 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2Z" fill="#fde047"/>';
+    var g = !hidden && o.shiny ? '<g style="filter:hue-rotate(150deg) saturate(1.5) brightness(1.05)">' + s + "</g>" : s;
+    var tr = !hidden && o.giant ? ' transform="translate(50 56) scale(1.12) translate(-50 -56)"' : "";
+    return '<svg viewBox="0 0 100 100" width="100%" height="100%" aria-hidden="true">' + pre + "<g" + tr + ">" + g + post + "</g></svg>";
+  }
+  function dxLoad(k) { try { return JSON.parse(localStorage.getItem("kp-dex-" + k) || "{}") || {}; } catch (e) { return {}; } }
+  function dxSave(k, d) { try { localStorage.setItem("kp-dex-" + k, JSON.stringify(d)); } catch (e) {} }
+  var dxLast = 0;
+  function dxPick(pct) {
+    var r = Math.random(), tier = 0;
+    if (pct >= 100 && r < 0.12) tier = 2; else if (pct >= 90 && r < 0.4) tier = 1;
+    var pool = DEX.filter(function (x) { return x[2] === tier; });
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  function dxEncounter(pct) {
+    if (!kid || !document.body || document.querySelector(".sd-mask")) return;
+    var d = dxPick(pct), dx0 = dxLoad(kid), rec0 = dx0[d[0]], st0 = rec0 ? dxStage(rec0.n) : 1;
+    var shiny = Math.random() < 1 / 15, giant = pct >= 100 && st0 >= 2 && Math.random() < 0.3;
+    var tries = 3, rate = ([0.55, 0.35, 0.2][d[2]] + (pct >= 100 ? 0.1 : 0)) * (giant ? 0.6 : 1);
+    var label = (shiny ? "✨閃亮 " : "") + d[1];
+    var m = document.createElement("div"); m.className = "sd-mask";
+    m.innerHTML = '<div class="sd-card" role="dialog" aria-modal="true"><p class="sd-tag" style="color:' + RARE_C[d[2]] + '">✨ ' + RARE[d[2]] + (giant ? "・🌟 巨大化" : "") + (shiny ? "・閃亮" : "") + '</p>' +
+      '<h3>' + (giant ? "巨大化的" : "野生的") + "「" + label + '」出現了！</h3><div class="sd-pic sd-bob">' + dxSvg(d[0], false, { stage: st0, shiny: shiny, giant: giant }) + '</div><p class="sd-msg">' + (giant ? "巨大化的夥伴比較難抓！" : "答得好！") + '快丟星星瓶抓住牠（還有 <b>3</b> 次機會）</p>' +
+      '<button type="button" class="sd-throw">🫙 丟星星瓶</button><button type="button" class="sd-skip">先不要</button></div>';
+    document.body.appendChild(m);
+    var pic = m.querySelector(".sd-pic"), msg = m.querySelector(".sd-msg"), th = m.querySelector(".sd-throw"), sk = m.querySelector(".sd-skip");
+    function close() { m.remove(); }
+    sk.onclick = close;
+    th.onclick = function () {
+      th.disabled = true; pic.className = "sd-pic sd-shake";
+      setTimeout(function () {
+        tries--;
+        if (Math.random() < rate) {
+          var dx = dxLoad(kid), r = dx[d[0]] || { n: 0, d: today(), s: 0, g: 0 }, first = !dx[d[0]], before = dxStage(r.n);
+          r.n++; if (shiny) r.s = (r.s || 0) + 1; if (giant) r.g = (r.g || 0) + 1; dx[d[0]] = r; dxSave(kid, dx);
+          var after = dxStage(r.n), have = DEX.filter(function (x) { return dx[x[0]]; }).length;
+          var evo = after > before;
+          pic.innerHTML = dxSvg(d[0], false, { stage: after, shiny: shiny, giant: giant });
+          pic.className = "sd-pic sd-got";
+          msg.innerHTML = "🎉 抓到了！" + (first ? "新夥伴加入圖鑑" : "又抓到一隻（第 " + r.n + " 隻）") +
+            (evo ? "<br>✨ <b>" + d[1] + " 進化了！</b>現在是 " + "★★★".slice(0, after) + (after === 3 ? "（完全體）" : "") : (after < 3 ? "<br>再抓 " + ((after === 1 ? 3 : 6) - r.n) + " 隻就會進化" : "")) +
+            (shiny ? "<br>✨ 閃亮版收集 +1" : "") + (giant ? "<br>🌟 巨大化收集 +1" : "") +
+            "<br>圖鑑 <b>" + have + " / " + DEX.length + "</b>（回小站可以看）";
+          th.remove(); sk.textContent = "好耶，繼續練習";
+        } else if (tries > 0) {
+          pic.className = "sd-pic sd-bob"; th.disabled = false;
+          msg.innerHTML = "差一點！牠跳出來了，再試一次（還有 <b>" + tries + "</b> 次機會）";
+        } else {
+          pic.className = "sd-pic sd-run"; th.remove(); sk.textContent = "下次再來";
+          msg.innerHTML = "牠跑走了… 下一輪答得好，還有機會再遇到！";
+        }
+      }, 900);
+    };
+  }
+  var SiteDex = {
+    list: DEX, rarity: RARE, svg: dxSvg, stage: dxStage, read: function (k) { return dxLoad(k || kid); },
+    maybe: function (pct, n) {
+      if (!kid || n === 0 || pct < 70) return;
+      var now = Date.now(); if (now - dxLast < 5000) return; dxLast = now;
+      var p = pct >= 100 ? 1 : pct >= 90 ? 0.6 : 0.35;
+      if (Math.random() < p) setTimeout(function () { dxEncounter(pct); }, 1800);
+    }
+  };
+  window.SiteDex = SiteDex;
+  var oRE = SitePoints.roundEnd;
+  SitePoints.roundEnd = function (pct, noPerfect, n) { oRE(pct, noPerfect); try { SiteDex.maybe(pct, n); } catch (e) {} };
+  if (typeof window.rtEnd === "function" && !window.rtEnd.__sd) {
+    var oEnd = window.rtEnd;
+    window.rtEnd = function () {
+      try { var r = window.rt || (typeof rt !== "undefined" ? rt : null); if (r && !r.done && r.n >= 1) SitePoints.roundEnd(Math.round(r.ok / r.n * 100), true, r.n >= 5 ? r.n : 0); } catch (e) {}
+      return oEnd.apply(this, arguments);
+    };
+    window.rtEnd.__sd = true;
+  }
+
+  /* ---------------- styles ---------------- */
+  var css = document.createElement("style");
+  css.textContent =
+    "#sh-btn{position:fixed;left:max(12px,env(safe-area-inset-left));bottom:max(12px,env(safe-area-inset-bottom));z-index:9000;" +
+    "height:44px;padding:0 14px 0 10px;border-radius:999px;border:2px solid rgba(255,255,255,.9);background:#334155;color:#fff;font:700 16px/1 -apple-system,'PingFang TC','Noto Sans TC',sans-serif;" +
+    "box-shadow:0 4px 14px rgba(0,0,0,.28);cursor:pointer;opacity:.9;touch-action:manipulation;white-space:nowrap}" +
+    "#sh-btn:active{transform:scale(.94)}" +
+    "#sh-mask{position:fixed;inset:0;z-index:9001;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px}" +
+    "#sh-card{background:#fff;color:#0f172a;border-radius:18px;padding:20px 18px;max-width:340px;width:100%;text-align:center;" +
+    "font:17px/1.5 -apple-system,'PingFang TC','Noto Sans TC',sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.3)}" +
+    "#sh-card h3{margin:0 0 6px;font-size:20px}#sh-card p{margin:0 0 16px;color:#475569;font-size:15px}" +
+    "#sh-card button{font:inherit;min-height:48px;border-radius:12px;border:0;padding:10px 16px;margin:4px;cursor:pointer}" +
+    "#sh-go{background:#0284c7;color:#fff;font-weight:700}#sh-stay{background:#e2e8f0;color:#0f172a}" +
+    "@media (prefers-color-scheme:dark){#sh-card{background:#1e293b;color:#e2e8f0}#sh-card p{color:#94a3b8}#sh-stay{background:#334155;color:#e2e8f0}}" +
+    ".sp-say{font:14px/1 sans-serif;border:1px solid rgba(100,116,139,.45);background:transparent;border-radius:999px;padding:3px 7px;margin-left:6px;cursor:pointer;vertical-align:middle;color:inherit}" +
+    ".sd-mask{position:fixed;inset:0;z-index:9003;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px}" +
+    ".sd-card{background:#fff;color:#0f172a;border-radius:20px;padding:18px;max-width:340px;width:100%;text-align:center;font:16px/1.5 -apple-system,'PingFang TC','Noto Sans TC',sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.35)}" +
+    ".sd-card h3{margin:0 0 4px;font-size:20px}.sd-tag{margin:0;font-weight:800}.sd-msg{color:#475569;margin:6px 0 12px}" +
+    ".sd-pic{width:150px;height:150px;margin:6px auto}.sd-bob{animation:sdb 1.1s ease-in-out infinite}.sd-shake{animation:sds .3s linear 3}.sd-got{animation:sdg .6s ease-out}.sd-run{animation:sdr .8s ease-in forwards}" +
+    "@keyframes sdb{50%{transform:translateY(-10px)}}@keyframes sds{25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}@keyframes sdg{0%{transform:scale(.6)}70%{transform:scale(1.15)}}@keyframes sdr{to{transform:translateX(220px);opacity:0}}" +
+    ".sd-card button{font:inherit;min-height:48px;border-radius:12px;border:0;padding:10px 16px;margin:4px;cursor:pointer}.sd-throw{background:#7c3aed;color:#fff;font-weight:800}.sd-skip{background:#e2e8f0;color:#0f172a}" +
+    "@media (prefers-color-scheme:dark){.sd-card{background:#1e293b;color:#e2e8f0}.sd-msg{color:#94a3b8}.sd-skip{background:#334155;color:#e2e8f0}}" +
+    "body{padding-bottom:max(76px,calc(64px + env(safe-area-inset-bottom)))!important}" +
+    ".sp-toast{position:fixed;left:max(84px,calc(72px + env(safe-area-inset-left)));bottom:max(18px,calc(6px + env(safe-area-inset-bottom)));z-index:9002;" +
+    "background:#f59e0b;color:#1f2937;font:800 16px/1.3 -apple-system,'PingFang TC',sans-serif;padding:8px 12px;border-radius:999px;" +
+    "box-shadow:0 4px 12px rgba(0,0,0,.25);pointer-events:none;transition:opacity .4s,transform .4s}" +
+    ".sp-toast.sp-big{left:50%;bottom:auto;top:30%;transform:translateX(-50%);text-align:center;font-size:18px;padding:14px 22px;border-radius:18px}" +
+    ".sp-toast.sp-out{opacity:0;transform:translateY(-14px)}.sp-toast.sp-big.sp-out{transform:translate(-50%,-14px)}";
+  document.head.appendChild(css);
+
+  function qHtml() {
+    var d = load(kid); qDay(d);
+    return '<p style="text-align:left;font-size:14px;margin:-8px 0 14px">🎯 今天的任務：<br>' + QUESTS.map(function (q) {
+      var v = Math.min(q.goal, d.q[q.f] || 0); return (d.q.done[q.id] ? "✅ " : "⬜ ") + q.name + "（" + v + "/" + q.goal + "）";
+    }).join("<br>") + "</p>";
+  }
+  /* ---------------- 📚 小站 button ---------------- */
+  if (!document.body || window.__siteHomeNoBtn) return;
+  var b = document.createElement("button");
+  b.id = "sh-btn"; b.type = "button";
+  b.setAttribute("aria-label", "回到練習小站"); b.title = "回到練習小站";
+  b.textContent = "📚 小站";
+  b.addEventListener("click", function () {
+    if (document.getElementById("sh-mask")) return;
+    var m = document.createElement("div"); m.id = "sh-mask";
+    var pts = kid ? "<p>目前集點：⭐ " + load(kid).points + " 點・🎒 圖鑑 " + DEX.filter(function (x) { return dxLoad(kid)[x[0]]; }).length + " / " + DEX.length + "</p>" + qHtml() : "";
+    m.innerHTML = '<div id="sh-card" role="dialog" aria-modal="true"><h3>📚 回到練習小站？</h3>' +
+      '<p>這一輪的作答不會保留（點數和最高分紀錄會留著）。</p>' + pts +
+      '<button id="sh-go" type="button">回到練習小站</button><button id="sh-stay" type="button">繼續練習</button></div>';
+    document.body.appendChild(m);
+    function close() { m.remove(); }
+    m.addEventListener("click", function (e) { if (e.target === m) close(); });
+    document.getElementById("sh-stay").addEventListener("click", close);
+    document.getElementById("sh-go").addEventListener("click", function () {
+      try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
+      location.href = homeUrl();
+    });
+    document.getElementById("sh-go").focus();
+  });
+  document.body.appendChild(b);
+})();
+
+</script>
+</body></html>

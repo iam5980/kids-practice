@@ -63,6 +63,7 @@ var SUBJ={reading:"📖 Reading",science:"🔬 Science",grammar:"✏️ Grammar"
 var TERM=function(t){var m=t.match(/^(\d{3})(\d)-(mid|final)$/);return m?m[1]+"-"+m[2]+(m[3]=="mid"?" 期中":" 期末"):t};
 var CATALOG={
   au:[
+    {s:"reading",t:"1151-final"},
     {s:"science",t:"1151-final"},
     {s:"zh-social",t:"1151-mid"},
     {s:"math",t:"1151-mid"},
@@ -73,6 +74,7 @@ var CATALOG={
     {s:"chinese",t:"1151-mid"}
   ],
   hw:[
+    {s:"reading",t:"1151-final"},
     {s:"science",t:"1151-final"},
     {s:"chinese",t:"1151-final"},
     {s:"chinese",t:"1151-mid"},
