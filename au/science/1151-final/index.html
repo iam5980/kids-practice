@@ -1490,11 +1490,12 @@ var KidKit = (function () {
            starsFor: starsFor, passageSet: passageSet, injectCSS: injectCSS, esc: esc, VERSION: "2026-10-25" };
 })();
 
-/* ===== Audrey · Science Final · A Closer Look 2 — scope from the lesson recordings (Ch1 L4 still missing) ===== */
-var APP = {key: "au-science-1151-final", title: "🔬 Audrey's Science Final", sub: "A Closer Look · 4 lessons · defeat every boss, then beat the Final Boss!",
-  scope: "Ch1 L3 Animals and Their Parts; Ch2 L1 Plant Life Cycles; Ch2 L2 Animal Life Cycles; Ch2 L3 From Parents to Young (from the lesson recordings). Ch1 L4 Classifying Animals will be added when its recording arrives."};
+/* ===== Audrey · Science Final · A Closer Look 2 — scope from the lesson recordings  ===== */
+var APP = {key: "au-science-1151-final", title: "🔬 Audrey's Science Final", sub: "A Closer Look · 5 lessons · defeat every boss, then beat the Final Boss!",
+  scope: "Ch1 L3 Animals and Their Parts; Ch1 L4 Classifying Animals; Ch2 L1 Plant Life Cycles; Ch2 L2 Animal Life Cycles; Ch2 L3 From Parents to Young (from the lesson recordings)."};
 var LESSONS = [
   {id: "AP", name: "Animals and Their Parts", icon: "🦁", boss: "Claw Critter"},
+  {id: "CA", name: "Classifying Animals", icon: "🐢", boss: "Backbone Beast"},
   {id: "PL", name: "Plant Life Cycles", icon: "🌻", boss: "Seed Snatcher"},
   {id: "AL", name: "Animal Life Cycles", icon: "🐸", boss: "Tadpole Titan"},
   {id: "PY", name: "From Parents to Young", icon: "👪", boss: "Trait Troll"}
@@ -1510,6 +1511,18 @@ var VOCAB = {
     ["quills", "sharp spines that keep other animals away from a porcupine"],
     ["beak", "the hard mouth of a bird, used to pick up food and water"],
     ["trunk", "the long nose an elephant uses to pick up water and plants"]
+  ],
+  CA: [
+    ["backbone", "many small bones running down the center of an animal's back"],
+    ["vertebrate", "an animal with a backbone"],
+    ["invertebrate", "an animal without a backbone"],
+    ["exoskeleton", "a thin, hard outer covering that protects some invertebrates"],
+    ["bird", "a vertebrate with a beak, feathers, two wings and two legs"],
+    ["reptile", "a vertebrate with scaly skin, like a snake or turtle"],
+    ["amphibian", "an animal that lives part of its life in water and part on land"],
+    ["fish", "a vertebrate that lives its whole life in water and breathes with gills"],
+    ["mammal", "a vertebrate with hair or fur that feeds its young milk"],
+    ["classify", "to sort things into groups"]
   ],
   PL: [
     ["seed", "a structure that can grow into a new plant"],
@@ -1577,6 +1590,35 @@ var BANK = [
   {L:"AP",ty:"fill",t:"Animals need water, food and ___.",a:"oxygen"},
   {L:"AP",ty:"open",q:"Name three things animals need.",a:"Animals need water, food and oxygen.",points:[["water"],["food"],["oxygen","air"]],need:3},
   {L:"AP",ty:"open",q:"Name two ways animals stay safe.",a:"They find shelter, like holes or nests, or they have body parts that protect them, like shells, quills or fur.",points:[["shelter","hole","holes","nest","nests","rock","rocks"],["shell","shells","quills","fur"]],need:2},
+
+  /* ---------- CA: Classifying Animals ---------- */
+  {L:"CA",ty:"mc",q:"Why do scientists classify animals into smaller groups?",a:"It makes them easier to study.",w:["It makes animals bigger.","It helps animals find food."]},
+  {L:"CA",ty:"mc",q:"Which structure is useful for classifying animals?",a:"a backbone",w:["a flower","a cone"]},
+  {L:"CA",ty:"mc",q:"Which animal is a vertebrate?",a:"a tiger",w:["a spider","a worm"]},
+  {L:"CA",ty:"mc",q:"Which animal is an invertebrate?",a:"an insect",w:["a goldfish","an eagle"]},
+  {L:"CA",ty:"mc",q:"Most of the animals on Earth are…",a:"invertebrates",w:["vertebrates","mammals"]},
+  {L:"CA",ty:"mc",q:"Which invertebrate can grow as long as a school bus?",a:"the giant squid",w:["a jelly","an ant"]},
+  {L:"CA",ty:"mc",q:"What do reptiles have that helps protect them?",a:"tough scales",w:["feathers","fur"]},
+  {L:"CA",ty:"mc",q:"Which animals are amphibians?",a:"frogs, toads and salamanders",w:["crocodiles, turtles and snakes","dolphins and whales"]},
+  {L:"CA",ty:"mc",q:"How do young amphibians breathe when they first hatch?",a:"through gills",w:["through lungs","through feathers"]},
+  {L:"CA",ty:"mc",q:"What do female mammals make to feed their young?",a:"milk",w:["nectar","pollen"]},
+  {L:"CA",ty:"mc",q:"How do dolphins and whales breathe?",a:"They poke their heads out of the water to breathe air.",w:["They use gills.","They breathe through their skin."]},
+  {L:"CA",ty:"mc",q:"Which group is covered in scales and a slimy coating?",a:"fish",w:["birds","mammals"]},
+  {L:"CA",ty:"tf",q:"Invertebrates have no bones inside their bodies at all.",a:true},
+  {L:"CA",ty:"tf",q:"Birds breathe air with gills.",a:false,exp:"Birds breathe air with lungs."},
+  {L:"CA",ty:"tf",q:"Some reptiles give birth to live young.",a:true},
+  {L:"CA",ty:"tf",q:"Fish spend their whole lives in water.",a:true},
+  {L:"CA",ty:"tf",q:"Most mammals hatch from eggs.",a:false,exp:"Most mammals are born live."},
+  {L:"CA",ty:"tf",q:"Elephants and people have thick fur like bears.",a:false,exp:"Elephants and people have thinner hair."},
+  {L:"CA",ty:"fill",t:"Animals with backbones are called ___.",a:"vertebrates"},
+  {L:"CA",ty:"fill",t:"Animals without backbones are called ___.",a:"invertebrates"},
+  {L:"CA",ty:"fill",t:"A thin, hard outer covering on an insect is an ___.",a:"exoskeleton"},
+  {L:"CA",ty:"fill",t:"Mammals are vertebrates with hair or ___.",a:"fur"},
+  {L:"CA",ty:"fill",t:"Birds have a beak, ___, two wings and two legs.",a:"feathers"},
+  {L:"CA",ty:"cloze",title:"Cloze Activity — Vertebrates",t:"A ___ has feathers and is built to fly. A ___ has scaly skin. A ___ starts life in water and later lives on land. A ___ has hair or fur and feeds its young milk.",a:["bird","reptile","amphibian","mammal"],bank:["bird","reptile","amphibian","mammal","fish","insect"]},
+  {L:"CA",ty:"fill",t:"As amphibians get older, they grow legs and ___ and begin to live on ___.",a:["lungs","land"],bank:["lungs","land","gills","water"]},
+  {L:"CA",ty:"order",q:"Put an amphibian's life in order.",items:["an egg floating in water","hatches and looks like a fish","breathes with gills","grows legs and lungs and lives on land"]},
+  {L:"CA",ty:"open",q:"What is the difference between a vertebrate and an invertebrate? Give an example of each.",a:"A vertebrate has a backbone, like a dog. An invertebrate has no backbone, like an insect.",points:[["backbone"],["dog","tiger","eagle","goldfish","fish","bird","cat","people","person"],["insect","spider","worm","jelly","squid","ant"]],need:2},
 
   /* ---------- PL: Plant Life Cycles ---------- */
   {L:"PL",ty:"mc",q:"What is inside a seed?",a:"a young plant called an embryo",w:["a flower","a cone"]},
@@ -1649,6 +1691,7 @@ var BANK = [
 ];
 var SORTS = {
   AP: {title:"Which body part helps it?",bins:["Moving","Breathing","Staying safe"],items:[{t:"a cheetah's strong legs",bin:0},{t:"a bird's wings",bin:0},{t:"a fish's fins",bin:0},{t:"a fish's gills",bin:1},{t:"a dog's lungs",bin:1},{t:"a worm's skin",bin:1,exp:"Worms take in oxygen through their skin."},{t:"a snail's shell",bin:2},{t:"a porcupine's quills",bin:2},{t:"thick fur in the cold",bin:2}]},
+  CA: {title:"Which group?",bins:["Bird","Reptile","Amphibian","Fish","Mammal"],items:[{t:"eagle",bin:0},{t:"bluebird",bin:0},{t:"crocodile",bin:1},{t:"turtle",bin:1},{t:"snake",bin:1},{t:"frog",bin:2},{t:"salamander",bin:2},{t:"goldfish",bin:3},{t:"shark",bin:3},{t:"dolphin",bin:4,exp:"Dolphins are mammals that live in water."},{t:"elephant",bin:4},{t:"mouse",bin:4}]},
   PL: {title:"How does it make new plants?",bins:["Seeds in flowers","Seeds in cones","No seeds"],items:[{t:"apple tree",bin:0},{t:"sunflower",bin:0},{t:"pine tree",bin:1},{t:"spruce",bin:1},{t:"hemlock",bin:1},{t:"fern (spores)",bin:2},{t:"potato (eyes)",bin:2},{t:"onion (bulb)",bin:2}]},
   AL: {title:"Metamorphosis or not?",bins:["Metamorphosis","No metamorphosis"],items:[{t:"butterfly",bin:0},{t:"frog",bin:0},{t:"most insects",bin:0},{t:"bird",bin:1},{t:"fish",bin:1},{t:"snake (reptile)",bin:1},{t:"dog (mammal)",bin:1}]},
   PY: {title:"Inherited or learned?",bins:["Inherited","Learned / environment"],items:[{t:"eye color",bin:0},{t:"hair color",bin:0},{t:"number of legs",bin:0},{t:"flower color",bin:0},{t:"riding a bicycle",bin:1},{t:"speaking a language",bin:1},{t:"a scar",bin:1},{t:"hair lighter from sunlight",bin:1}]}
