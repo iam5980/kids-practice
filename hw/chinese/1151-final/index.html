@@ -172,6 +172,7 @@ select{font:inherit;padding:6px 8px;border-radius:8px;border:1.5px solid var(--l
 .qchar{font-family:var(--kai);font-size:96px;line-height:1.05}
 .qask{font-size:17px;margin:0;text-align:center}
 .opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.opt.sel{border-color:var(--ink);box-shadow:inset 0 0 0 2px var(--ink)}
 .opt{border:2px solid var(--line);background:var(--paper);border-radius:12px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:76px;justify-content:center}
 .opt .o1{font-size:30px;font-family:var(--kai);line-height:1.1}
 .opt .o1.zy{font-family:var(--sans);font-size:24px}
@@ -249,6 +250,7 @@ details.passage summary{cursor:pointer;font-weight:700;padding:4px 0}
     <button role="tab" data-tab="txt" aria-selected="false">課文理解</button>
     <button role="tab" data-tab="read" aria-selected="false">享閱讀</button>
     <button role="tab" data-tab="mem" aria-selected="false">翻牌</button>
+    <button role="tab" data-tab="mock" aria-selected="false">模擬考</button>
     <button role="tab" data-tab="wrong" aria-selected="false">錯題</button>
   </nav>
 
@@ -285,6 +287,7 @@ details.passage summary{cursor:pointer;font-weight:700;padding:4px 0}
   <section id="tab-txt" hidden><div id="txtArea"></div></section>
   <section id="tab-read" hidden><div id="readArea"></div></section>
   <section id="tab-mem" hidden><div id="memArea"></div></section>
+  <section id="tab-mock" hidden><div id="mockArea"></div></section>
 
   <!-- 錯題本 -->
   <section id="tab-wrong" hidden><div id="wrongArea"></div></section>
@@ -538,6 +541,7 @@ function refreshTab(fromTab){
   if(MQ[tab])mqIntro(tab);
   if(tab==='mem')memIntro();
   if(tab==='wrong')renderWrong();
+  if(tab==='mock')mockIntro();
 }
 const sizeSel=id=>`<label class="hint" for="${id}">題數</label> <select id="${id}"><option value="10">10 題</option><option value="20">20 題</option><option value="999">全部</option></select>`;
 const emptyMsg=`<p class="hint">這個範圍裡沒有字，請在上方選擇組別。</p>`;
@@ -1088,7 +1092,7 @@ function idmIntro(){
   const sets=IDM.filter(s=>s.g.some(g=>st.groups.has(g))),it=idmPool();
   $('#idmArea').innerHTML=`<div class="qcard"><p class="qask">考卷的<b>成語填空</b>：看句子選出最適合的成語。先看下面的意思整理，再挑戰。</p>
     ${it.length?`${timeChips()}<div class="bar">${sizeSel('iN')}<button class="btn primary" id="iGo">開始挑戰</button></div>`:`<p class="hint">${st.onlyWrong?'目前沒有選錯的成語。':'這個範圍裡沒有成語題目。'}</p>`}</div>
-    ${sets.map(s=>`<div class="groupHead">第${s.g.map(g=>'一二三四五六'[g-1]).join('、')}課</div><div class="tbl"><table>${s.ws.split(' ').map(w=>`<tr><td class="kai" style="font-size:20px">${w}</td><td class="hint" style="white-space:normal">${IDM_MEAN[w]||''}</td></tr>`).join('')}</table></div>`).join('')}`;
+    ${sets.map(s=>`<div class="groupHead">${s.g.map(g=>GN[g-1]+'　'+TITLE[g-1]).join('、')}</div><div class="tbl"><table>${s.ws.split(' ').map(w=>`<tr><td class="kai" style="font-size:20px;white-space:nowrap">${w}<br>${sayBtn(w,'念')}</td><td class="hint" style="white-space:normal">${IDM_MEAN[w]||''}</td></tr>`).join('')}</table></div>`).join('')}`;
   const g=$('#iGo');if(g)g.onclick=()=>{rtStart('idm');is={q:shuffle(idmPool()).slice(0,+$('#iN').value),i:0,ok:0,bad:[]};idmQ()};
 }
 function idmQ(){
@@ -1097,14 +1101,14 @@ function idmQ(){
   $('#idmArea').innerHTML=`<div class="qcard"><div class="rhud"></div><span class="prog">第 ${is.i+1} / ${is.q.length} 題・答對 ${is.ok}</span>
     <p class="kai" style="font-size:22px;line-height:1.7;margin:0">${esc(x.t).replace('（　）','<span class="box" style="min-width:5em">＿＿＿＿</span>')}</p>
     <div class="opts">${opts.map(o=>`<button class="opt" data-v="${o}"><span class="o1" style="font-size:22px">${o}</span><span class="mark"></span></button>`).join('')}</div>
-    <div id="iFb" style="width:100%"></div></div>`;
+    <p class="hint" style="margin:6px 0 0">聽成語：${opts.map(o=>sayBtn(o,o)).join(' ')}</p><div id="iFb" style="width:100%"></div></div>`;
   const answer=b=>{
     if(is.answered)return;is.answered=true;const right=!!b&&b.dataset.v===x.a;rtAns(right);
     document.querySelectorAll('#idmArea .opt').forEach(o=>{o.disabled=true;
       if(o.dataset.v===x.a){o.classList.add('ok');o.querySelector('.mark').textContent='✓ 正確答案'}
       else if(o===b){o.classList.add('bad');o.querySelector('.mark').textContent='✗ 你選的'}});
     if(right){is.ok++;SFX.ok()}else{SFX.bad();is.bad.push(x);wrongI[x.a]=(wrongI[x.a]||0)+1;save('hw6cf-wrongi',wrongI);renderScope()}
-    $('#iFb').innerHTML=`<div class="fb ${right?'ok':'bad'}">${right?'答對了！':b?'再記一次：':'時間到！'}<b class="kai">${x.a}</b>：${IDM_MEAN[x.a]}。${right||!b?'':`<br>你選的「${b.dataset.v}」是：${IDM_MEAN[b.dataset.v]}。`}<br>${sayBtn(x.a,'念成語')}</div>
+    $('#iFb').innerHTML=`<div class="fb ${right?'ok':'bad'}">${right?'答對了！':b?'再記一次：':'時間到！'}<b class="kai">${x.a}</b>：${IDM_MEAN[x.a]}。${right||!b?'':`<br>你選的「${b.dataset.v}」是：${IDM_MEAN[b.dataset.v]}。`}<br>${sayBtn(x.a,'念成語')}${right||!b?'':sayBtn(b.dataset.v,'念你選的')}${sayBtn(x.t.replace('（　）',x.a),'念整句')}</div>
       <div class="center" style="margin-top:10px"><button class="btn primary" id="iNext">${is.i+1<is.q.length?'下一題':'看成績'}</button></div>`;
     $('#iNext').onclick=()=>{is.i++;is.answered=false;idmQ()};$('#iNext').focus();
   };
@@ -1147,9 +1151,99 @@ const READ=[
 {t:"統整活動三：採訪稿與動靜態描寫",by:"第三單元統整活動",body:RP("重點：①採訪稿的結構——引言（採訪背景：時間、地點、受訪者）、正文（問答紀錄）、結尾（心得）。②蒐集延伸資料的方法：查書籍、上網搜尋（用關鍵詞）、實地查訪、訪談。③靜態描寫寫出外貌特徵；動態描寫呈現動作與變化；動靜結合讓人印象更深刻。"),qs:[{"q": "關於靜態描寫的敘述，下面哪一項錯誤？", "opts": ["是指對於外貌特徵寫得清楚明白", "呈現靜態人物或景物的變化", "「她有一頭烏黑的秀髮，精緻的菱形臉蛋，配上小巧的櫻桃嘴，真是漂亮！」這屬於靜態描寫的寫作手法", "靜態結合動態的描寫可以讓讀者產生更深刻的印象"], "a": 1, "why": "②這是動態描寫的特色。"}, {"q": "採訪稿中的採訪背景適合以哪一種方式來說明？", "opts": ["問答記錄", "分項列點", "通篇敘述", "個人觀點"], "a": 1}, {"q": "下面哪一項不是採訪稿中必要的內容？", "opts": ["採訪的背景說明", "採訪內容整理", "採訪者的心得", "採訪者對受訪者的評分"], "a": 3}, {"q": "下面哪一種方式可以幫助我們了解想要延伸的主題？", "opts": ["到圖書館查詢書籍", "上網蒐集資料", "實地走訪進行訪談", "以上皆是"], "a": 3}, {"q": "「閱讀告示牌」屬於哪一種獲得資料的方法？", "opts": ["上網查詢", "人物訪談", "查詢書籍", "實地查訪"], "a": 3}, {"q": "下面哪一個採訪稿的內容順序安排較適當？", "opts": ["記錄採訪背景寫下採訪心得進行訪談整理訪談內容", "寫下採訪心得記錄採訪背景進行訪談整理訪談內容", "進行訪談整理訪談內容寫下採訪心得記錄採訪背景", "記錄採訪背景進行訪談整理訪談內容寫下採訪心得"], "a": 3}, {"q": "關於搜索主題延伸資料的敘述，下面哪一項錯誤？", "opts": ["可以到圖書館查閱資料", "可以使用關鍵字上網搜尋", "可以實地查訪索取導覽資訊", "可以在家自行推測並杜撰需要的資料"], "a": 3, "why": "④必須確實搜索需要的資料，而不是自己胡亂編造。"}, {"q": "下面哪一項屬於採訪後的心得？", "opts": ["惠真：「我心裡想著，如果我不符合這世代的審美，那我就要成為新的標竿。」", "受訪人：安惠真／時間：7　月　23　日", "透過跟惠真的對話，我發現有自信的人能夠由內而外散發出美", "小明：「惠真，我很好奇，在大家都不看好妳的時候，妳是如何調適心情的？」"], "a": 2}, {"q": "小林想將這次與社區長輩訪談的採訪稿整理成主題報導，下面哪些是他在撰寫時需要注意的？ ㄅ適當引用長輩的原話 ㄆ確保資訊正確 ㄇ公開受訪者資料 ㄈ不得加入個人的觀點", "opts": ["ㄅㄆ", "ㄆㄇ", "ㄅㄇ", "ㄇㄈ"], "a": 0}, {"q": "作者使用靜態結合動態描寫的寫作技巧，是想達到什麼效果？", "opts": ["滿足作者的寫作欲望", "提升作者名氣", "使文章長度變長", "使讀者對作者描述的對象印象更深刻"], "a": 3}]},
 {t:"統整活動四：律詩、小說情節與寄情於物",by:"第四單元統整活動",body:RP("重點：①律詩每首八句，分五言、七言；偶數句押韻（第一句可押可不押）；三、四句和五、六句對仗。絕句是四句。②小說由人物、場景、情節構成；情節包含開端、發展、高潮、結尾。③抒發情感可以直接抒情，也可以藉事物、透過事件間接抒情（寄情於物）。"),qs:[{"q": "關於律詩的敘述，下面哪一項正確？", "opts": ["七言律詩有四十個字", "第一句和偶數句要押韻", "律詩盛行於唐朝", "總句數可以是四句也可以是八句"], "a": 2, "why": "①七言律詩有五十六個字；②第一句可押韻，也可以不押韻，而偶數句必須押韻；④絕句是四句，律詩是八句。"}, {"q": "關於鹿柴和過故人莊的比較，下面哪一項錯誤？", "opts": ["兩者偶數句都必須押韻", "過故人莊總句數有四句，鹿柴總句數有八句", "兩者每句的字數都固定", "過故人莊三、四句和五、六句語詞組成相似"], "a": 1, "why": "②過故人莊總句數有八句，鹿柴有四句。"}, {"q": "「青山橫北郭，白水繞東城。此地一為別，孤蓬萬里征。 浮雲遊子意，落日故人情。揮手自茲去，蕭蕭班馬鳴。」 小明：這首詩的偶數句押ㄥ韻。 小如：這首詩的三、四句和五、六句語詞組成相似。 小萱：這首詩總共有四十個字。 根據這三個人的說法，我們可以判斷這首詩最可能是", "opts": ["律詩", "宋詞", "絕句", "新詩"], "a": 0}, {"q": "(甲)每首詩總句數要八句(乙)可分成五言和七言(丙)三、四句和五、六句語詞的組成相似(丁)奇數句必須押韻，上面敘述哪些屬於「律詩」的規則？", "opts": ["甲乙丙", "甲乙丁", "甲丙丁", "甲乙丙丁"], "a": 0, "why": "(丁)是偶數句必須押韻。"}, {"q": "「意料之外卻又合理的真相大白」，這個部分通常會出現在小說情節的哪裡？", "opts": ["開端", "發展", "高潮", "結尾"], "a": 2}, {"q": "律詩因為遵循特別的規則，所以能呈現出對稱的美感。 「昔人已乘黃鶴去，此地空餘黃鶴樓。 黃鶴一去不復返，白雲千載空悠悠。 晴川歷歷漢陽樹，芳草萋萋鸚鵡洲。 日暮鄉關何處是？煙波江上使人愁。」 其中「晴川歷歷漢陽樹」與下面哪一個句子呈現出對稱的美感？", "opts": ["芳草萋萋鸚鵡洲", "昔人已乘黃鶴去", "黃鶴一去不復返", "白雲千載空悠悠"], "a": 0, "why": "律詩的三、四句和五、六句語詞組成相似，使其呈現出對稱的美感，故此處應選①。"}, {"q": "關於小說情節的說明，下面哪一項錯誤？", "opts": ["小說情節是經過作者精心安排的", "閱讀小說時只要注意事情的發展順序，無須顧及因果關係", "讀者可以藉由讀懂小說情節，獲得閱讀的樂趣", "讀懂故事裡的前因後果及人物性格，就能體會書中人物的感受"], "a": 1, "why": "②閱讀小說時要注意事情的發展順序、因果關係，並讀懂人物的特質和情節，才能從中得到樂趣。"}, {"q": "小說是由哪些內容構成的？", "opts": ["評論、場景、情節", "人物、場景、情節", "人物、場景、情感", "人物、旁白、情節"], "a": 1}, {"q": "一般而言，完整的小說情節會包含哪些部分？", "opts": ["發展、高潮、延宕、結尾", "開端、發展、轉折、高潮", "衝突、開端、高潮、結尾", "開端、發展、高潮、結尾"], "a": 3}, {"q": "關於「藉事物抒發情感」的敘述，下面哪個說法不正確？", "opts": ["可以先寫出事物的特色", "再描寫令人記憶深刻的互動過程與細節", "最後再抒發對事物的情感", "藉描寫事物的細膩過程，對抒發情感沒有幫助"], "a": 3}, {"q": "「還能跟母親任性撒嬌，這可是世上最幸福的事了。」這段話是用哪種方式抒發心中的情感？", "opts": ["直接抒情", "透過事件間接抒情", "直述句，沒有抒發情感", "直接與間接抒情並用"], "a": 2}, {"q": "下面哪一項是用「透過事件間接抒情」的寫作方式抒發情感？", "opts": ["母親很可愛，她通常只買肉羹，然後回家自己煮麵，一碗肉羹就能變出兩人份來", "在宜蘭，無論是熱鬧或隱密的大街小巷，總會找到賣羹的店家", "有時候是筍絲加黑木耳和大白菜，有時候是香菇加紅蘿蔔和菜頭", "要不，還可以直接淋在白飯上當作肉羹飯，或是再多加入一些青菜"], "a": 0}]}
 ];
+const EXAM=[{"q": "下面選項「　」中的字，注音都是「繳」，哪一個使用錯誤呢？", "opts": ["外面突然傳來敲鑼打鼓聲，讓我的思緒被「攪」亂了", "小貓咪躺在「角」落睡覺", "班上同學正在練習兩人三「腳」的競賽活動", "鐘聲一響，監考老師請考生們停筆，然後把考卷「餃」到臺前"], "a": 3, "src": "期末考卷"}, {"q": "「明天是放假日，所以我今晚決定留在老朋友家，彼此□□，徹夜不眠。」□中應填入哪一個語詞？", "opts": ["暢遊", "流暢", "順暢", "暢談"], "a": 3, "src": "期末考卷"}, {"q": "請問下面哪一個句子的意思前後矛盾不合理？", "opts": ["這家蛋糕非常有名氣，大家一拿到就迫不及待的開始品嘗", "想到過去窮困的生活，他不禁悲從中來", "將軍指示士兵們按兵不動，集結兵力展開速戰速決的攻勢", "挑戰者挖空心思要在時間內解開謎題，但是每一位最後都挑戰失敗"], "a": 2, "src": "期末考卷"}, {"q": "「我隊打敗眾敵，奪得本屆□標賽冠軍。」□中應填入", "opts": ["棉", "錦", "綿", "帛"], "a": 1, "src": "期末考卷"}, {"q": "下面哪一個可以用「賣力」來形容呢？", "opts": ["街頭的喇叭聲此起彼落、響徹雲霄", "客人不斷上門，店家生意興隆", "爸爸揮灑著汗水，專注於眼前工作", "豔陽高照，行人紛紛躲到騎樓下"], "a": 2, "src": "期末考卷"}, {"q": "「即使食物放在冰箱，時間太久了也會壞掉，只能丟掉真是糟蹋！」上面這句話的意思是什麼？", "opts": ["食物還是要放久一點比較好吃", "食物存放過久會壞，最後只能丟棄，實在很浪費", "食物放在冰箱是很平常的事，不用太在意期限", "為了不要浪費，壞掉的食物還是把它們吃下肚"], "a": 1, "src": "期末考卷"}, {"q": "「難道您不明白這些南瓜都是我辛苦拉拔長大的嗎？」這句話運用了哪一種寫作技巧呢？", "opts": ["譬喻", "頂真", "摹寫", "設問"], "a": 3, "src": "期末考卷"}, {"q": "小欣交了日記，老師發現裡面有多餘的語詞，請問是哪一句？", "opts": ["今天我跟著媽媽去市場買菜", "在熱鬧的氣氛下，菜販大聲吆喝", "婆婆媽媽們逗留逗趣在琳瑯滿目的生鮮蔬果前", "迫不及待的要將自己需要的東西買回家"], "a": 2, "src": "期末考卷"}, {"q": "下面哪一個「冽」字的用法錯誤？", "opts": ["冷「冽」", "羅「冽」", "凜「冽」", "清「冽」"], "a": 1, "src": "期末考卷"}, {"q": "下面哪一個「駁」字的用法錯誤？", "opts": ["反「駁」", "「駁」學", "「駁」斥", "「駁」回"], "a": 1, "src": "期末考卷"}, {"q": "跟著公共藝術去旅行一課中，將公共藝術比喻成什麼，引領大家接近觀看？", "opts": ["青銅和不鏽鋼", "梅子和蕨類", "花朵和蝴蝶", "公鹿和花苞"], "a": 2, "src": "課文"}, {"q": "街頭藝術家一課中，提到地鐵的乘客「按兵不動」是指什麼意思？", "opts": ["車廂擁擠，乘客無法動彈", "受到攻擊，乘客飽受驚嚇", "乘客對表演反應冷淡", "表演精彩，乘客聽得入迷"], "a": 2, "src": "課文"}, {"q": "戲臺上的她與他一課中，「反串」是指什麼情形？", "opts": ["甘草人物多是悲劇性角色", "個性剛強的角色要畫大花臉", "小生的角色大多由女性扮演", "主角出場需結合燦爛美麗的特效"], "a": 2, "src": "課文"}, {"q": "過故人莊一課中，作者與好友相約下次相聚要做什麼？", "opts": ["聊天", "賞花", "賞月", "賞梅"], "a": 1, "src": "課文"}, {"q": "來一碗溫暖的羹湯一課中，作者描述小時候「偷吃」的情節是運用什麼寫作技巧？", "opts": ["聽覺摹寫", "味覺摹寫", "視覺摹寫", "觸覺摹寫"], "a": 2, "src": "課文"}, {"q": "存根一課中，布大爺將自己的南瓜取名字的原因可能是什麼？", "opts": ["方便介紹", "真心喜歡它們", "為了讓別人能分辨", "被偷時可以及時找回"], "a": 1, "src": "課文"}, {"q": "「這灘綠色的黏□液體具有毒性，十分危險，你千萬不可以觸摸。」□中應填入哪一個字？", "opts": ["稠", "週", "調", "凋"], "a": 0, "src": "期末考卷"}, {"q": "下面哪一個「甘」字的用法錯誤？", "opts": ["「甘」願", "「甘」苦", "「甘」尬", "「甘」潤"], "a": 2, "src": "期末考卷"}, {"q": "「頭銜」是指什麼意思？", "opts": ["第一個拿到", "第一個傳給第二個，接連的意思", "低聲說話", "職位、官位的名稱"], "a": 3, "src": "期末考卷"}, {"q": "下面哪一個情境可以用「亮眼」來形容？", "opts": ["表姐穿著一襲紅色改良式旗袍，玲瓏有致的身段驚豔全場", "爸爸敏銳的眼力能識別一個人的優劣，實在是太厲害了", "弟弟的視力絕佳，百米遠的景物看得一清二楚", "雪地反射的光線太強，大家都睜不開雙眼"], "a": 0, "src": "期末考卷"}, {"q": "「作者透過這件作品，告訴我們鄒族的獵鹿傳說。」上面這句話的意思是什麼？", "opts": ["作者是鄒族人，創造了獵鹿傳說", "這件作品出自鄒族的獵鹿傳說", "鄒族的獵鹿傳說源於這件作品", "鄒族人用這件作品表達獵鹿傳說"], "a": 1, "src": "期末考卷"}, {"q": "下面哪一個「　」中的語詞使用錯誤？", "opts": ["大學畢業前，姐姐需要在醫護單位「實習」半年", "一場大雨使樂團被迫「露天」演出", "見主人神情不對，賓客們都「知趣」的離開了", "他在鄉間過著人人「稱羨」的退休生活"], "a": 1, "src": "期末考卷"}, {"q": "在跟著公共藝術去旅行一課中，哪一件公共藝術作品提醒人們需留意生活中的植物之美？", "opts": ["分合隨緣", "大地之書", "花間小鹿", "牡蠣人"], "a": 1, "src": "課文"}, {"q": "在街頭藝術家一課中，作者建議大家應該給街頭藝術家什麼反饋？", "opts": ["觀賞時要穿著正式且規規矩矩，表示對藝術家的尊重", "全程拍照、攝影，並上傳社群媒體", "抽空駐足欣賞，多給一些鼓勵", "如果打擾大眾安寧，請警察來驅離"], "a": 2, "src": "課文"}, {"q": "在過故人莊一課中，作者主要想表達的是什麼？", "opts": ["才能無法施展，只能向朋友訴苦", "和朋友分享自己的生活近況", "珍惜朋友之間深厚的情誼和田園生活的情趣", "想要前往農村重新生活"], "a": 2, "src": "課文"}, {"q": "在來一碗溫暖的羹湯一課中，作者說宜蘭人特別愛吃羹，是因為羹湯有哪一種特點？", "opts": ["羹湯裡的配料多有飽足感", "羹湯的料理方式能保溫", "會加入澱粉勾芡，喝了能補充熱量", "羹湯一定要加入魚肉，因為宜蘭人愛吃肉"], "a": 1, "src": "課文"}];
+/* ===== 模擬考（仿翰林期末考卷題型，交卷後才公布答案）===== */
+const MOCK_SECS=[['一、看注音選國字',6],['二、選出正確的注音',4],['三、改錯字',8],['四、部首',4],['五、選出正確的語詞',4],['六、選擇題',12],['七、成語運用',5],['八、課文文意',7]];
+let mk=null;
+function mkUniq(a){return a.filter((v,i)=>a.indexOf(v)===i)}
+function mkBuild(){
+  const G=st.groups,inG=g=>g===0||G.has(g);
+  const qs=[];const take=(arr,n)=>shuffle(arr).slice(0,n);
+  const ws=W.filter(x=>inG(x.g));
+  // 一 看注音選國字
+  take(ws,6).forEach(x=>{
+    const fam=FAM.flatMap(f=>f.m.some(m=>m.c===x.c)?f.m.map(m=>m.c):[]).filter(c=>c!==x.c);
+    const oth=mkUniq([...shuffle(fam),...shuffle(W.map(y=>y.c).filter(c=>c!==x.c))]).slice(0,3);
+    const w=x.w.replace('○',`<span class="zy" style="border:2px solid var(--line);border-radius:6px;padding:0 4px">${x.z}</span>`);
+    qs.push({sec:0,g:x.g,q:`<p class="kai sentq">${w}</p><p class="qask">框框裡的注音是哪一個字？</p>`,opts:shuffle([x.c,...oth]),a:x.c,why:`${x.w.replace('○',x.c)}（${x.c}：${x.z}）`,big:true});
+  });
+  // 二 選注音
+  take(ws,4).forEach(x=>qs.push({sec:1,g:x.g,q:`<p class="kai sentq">${x.w.replace('○','「'+x.c+'」')}</p><p class="qask">「${x.c}」的注音是哪一個？</p>`,opts:zyOpts(x.z),a:x.z,why:`「${x.c}」念 ${x.z}`,zy:true}));
+  // 三 改錯字
+  take(ERR.filter(e=>e.fx.length===1&&e.s.length>6&&e.g.some(inG)),8).forEach(e=>{
+    const [w,c]=e.fx[0];
+    const oth=shuffle(mkUniq([...e.s].filter(ch=>/[一-鿿]/.test(ch)&&ch!==w))).slice(0,3);
+    qs.push({sec:2,g:e.g[0],q:`<p class="kai sentq">${esc(e.s)}</p><p class="qask">這句話裡哪一個字寫錯了？</p>`,opts:shuffle([w,...oth]),a:w,why:`「${w}」應改為「${c}」`,big:true});
+  });
+  // 四 部首
+  take(ws,4).forEach(x=>qs.push({sec:3,g:x.g,q:`<div class="qword kai">${x.c}</div><p class="qask">「${x.c}」的部首是哪一個？</p>`,opts:radOpts(x),a:x.r,why:`「${x.c}」是「${x.r}」部${VAR[x.c]?`（寫成「${VAR[x.c]}」）`:''}`,big:true}));
+  // 五 選詞
+  const wf=MD.flatMap(L=>(L.word_fill||[]).filter(()=>inG(L.lesson)).map(x=>({...x,g:L.lesson})));
+  take(wf,4).forEach(x=>{const opts=x.opts.length<=4?shuffle(x.opts):shuffle([x.a,...shuffle(x.opts.filter(o=>o!==x.a)).slice(0,3)]);
+    qs.push({sec:4,g:x.g,q:`<p class="kai sentq">${blank(x.s)}</p><p class="qask">選出最適合的語詞：</p>`,opts,a:x.a,why:`答案是「${esc(x.a)}」`})});
+  // 六 選擇題：期末考卷題＋題庫字音字形、語詞＋修辭
+  const ex=EXAM.filter(x=>x.src!=='課文').map(x=>({...x,g:0}));
+  const mc=MD.flatMap(L=>inG(L.lesson)?(L.mcq||[]).filter(x=>x.src!=='課文').map(x=>({...x,g:L.lesson})):[]);
+  const rh=MD.flatMap(L=>inG(L.lesson)?(L.rhetoric||[]).map(x=>({q:'下面的句子用了哪一種修辭？　'+x.s,opts:x.opts,a:x.opts.indexOf(x.a),g:L.lesson})):[]);
+  mkUniq([...take(ex,5),...take(rh,2),...take(mc,12)]).slice(0,12).forEach(x=>qs.push({sec:5,g:x.g,q:`<p class="qask" style="text-align:left">${esc(x.q)}</p>`,opts:x.opts.map((o,k)=>NUMO[k]+' '+o),a:NUMO[x.a]+' '+x.opts[x.a],why:x.why?esc(x.why):'',long:true,keep:true}));
+  // 七 成語
+  const id=IDM.filter(s=>s.g.some(inG)).flatMap(s=>s.q.map(([t,a])=>({t,a,ws:s.ws.split(' '),g:s.g[0]})));
+  take(id,5).forEach(x=>qs.push({sec:6,g:x.g,q:`<p class="kai sentq">${blank(x.t)}</p><p class="qask">選出最適合的成語：</p>`,opts:shuffle([x.a,...shuffle(x.ws.filter(w=>w!==x.a)).slice(0,3)]),a:x.a,why:`${x.a}：${IDM_MEAN[x.a]||''}`}));
+  // 八 課文
+  const kt=[...EXAM.filter(x=>x.src==='課文').map(x=>({...x,g:0})),...MD.flatMap(L=>inG(L.lesson)?(L.mcq||[]).filter(x=>x.src==='課文').map(x=>({...x,g:L.lesson})):[])];
+  const tf=MD.flatMap(L=>inG(L.lesson)?(L.tf||[]).map(x=>({...x,g:L.lesson})):[]);
+  take(kt,5).forEach(x=>qs.push({sec:7,g:x.g,q:`<p class="qask" style="text-align:left">${esc(x.q)}</p>`,opts:x.opts.map((o,k)=>NUMO[k]+' '+o),a:NUMO[x.a]+' '+x.opts[x.a],why:x.why?esc(x.why):'',long:true}));
+  take(tf,2).forEach(x=>qs.push({sec:7,g:x.g,q:`<p class="qask">這句話對不對？</p><p class="kai sentq">${esc(x.s)}</p>`,opts:['○ 對','✗ 不對'],a:x.a?'○ 對':'✗ 不對',why:x.why?esc(x.why):''}));
+  return qs;
+}
+function mockIntro(){
+  const best=load('hw6cf-mock-best',null);
+  $('#mockArea').innerHTML=`<div class="qcard"><p class="qask"><b>模擬考</b>：照學校期末考卷的題型出題（看注音寫字、改錯字、部首、選詞、選擇題、成語、課文文意），共 50 題、每題 2 分。</p>
+   <p class="hint">作答時不會顯示對錯，全部寫完按「交卷」才公布分數和答案。每次出的題目都不一樣。範圍依上方選的課次。${best?`<br>最佳成績：<b>${best.sc} 分</b>（${best.t}）`:''}</p>
+   <div class="center"><button class="btn primary" id="mkGo">開始模擬考</button></div></div>`;
+  $('#mkGo').onclick=()=>{mk={q:mkBuild(),ans:{},t0:Date.now(),done:false};mockRender()};
+}
+function mockRender(){
+  const n=mk.q.length;let h='',last=-1;
+  mk.q.forEach((x,i)=>{
+    if(x.sec!==last){last=x.sec;h+=`<div class="groupHead">${MOCK_SECS[x.sec][0]}</div>`}
+    const pick=mk.ans[i];
+    h+=`<div class="qcard mkq" id="mk${i}"><span class="prog">第 ${i+1} 題</span>${x.q}
+      <div class="opts">${x.opts.map(o=>{
+        let cls='opt',mark='';
+        if(mk.done){if(o===x.a){cls+=' ok';mark='✓ 正確答案'}else if(o===pick){cls+=' bad';mark='✗ 你選的'}}
+        else if(o===pick){cls+=' sel';mark='● 已選'}
+        return `<button class="${cls}" data-mk="${i}" data-v="${esc(o)}" ${mk.done?'disabled':''} style="${x.long?'align-items:flex-start;text-align:left':''}"><span class="o1" style="font-size:${x.big?'28px':x.zy?'22px':'17px'}">${esc(o)}</span><span class="mark">${mark}</span></button>`}).join('')}</div>
+      ${mk.done&&(pick!==x.a)&&x.why?`<div class="fb bad">${x.why}</div>`:''}</div>`;
+  });
+  const cnt=Object.keys(mk.ans).length;
+  const head=mk.done?mockScoreHtml():`<div class="qcard" style="position:sticky;top:0;z-index:5"><p class="qask" style="margin:0">已作答 <b id="mkCnt">${cnt}</b> / ${n} 題</p></div>`;
+  $('#mockArea').innerHTML=head+h+(mk.done?`<div class="center"><button class="btn primary" id="mkAgain">再考一次（換新題目）</button></div>`:`<div class="center" id="mkSubmitBox"><button class="btn primary" id="mkSubmit">交卷</button></div>`);
+  if(!mk.done){
+    document.querySelectorAll('[data-mk]').forEach(b=>b.onclick=()=>{const i=+b.dataset.mk;mk.ans[i]=b.dataset.v;
+      document.querySelectorAll(`[data-mk="${i}"]`).forEach(o=>{const on=o===b;o.classList.toggle('sel',on);o.querySelector('.mark').textContent=on?'● 已選':''});
+      $('#mkCnt').textContent=Object.keys(mk.ans).length;SFX.tick&&SFX.tick()});
+    $('#mkSubmit').onclick=()=>{
+      const left=n-Object.keys(mk.ans).length;
+      if(left>0&&!mk.warned){mk.warned=true;$('#mkSubmitBox').insertAdjacentHTML('afterbegin',`<p class="hint">還有 ${left} 題沒寫，確定要交卷嗎？再按一次「交卷」就會交出。</p>`);return}
+      mk.done=true;mk.t=Math.round((Date.now()-mk.t0)/1000);mockRender();window.scrollTo(0,0);
+      const sc=mockScore();const best=load('hw6cf-mock-best',null);
+      if(!best||sc>best.sc)save('hw6cf-mock-best',{sc,t:`${Math.floor(mk.t/60)} 分 ${mk.t%60} 秒`});
+      if(sc===100)celebrate('模擬考 100 分！');else if(sc>=90)SFX.ok();
+    };
+  }else{$('#mkAgain').onclick=()=>{mk={q:mkBuild(),ans:{},t0:Date.now(),done:false};mockRender();window.scrollTo(0,0)}}
+}
+function mockScore(){return mk.q.reduce((s,x,i)=>s+(mk.ans[i]===x.a?2:0),0)}
+function mockScoreHtml(){
+  const sc=mockScore();
+  const rows=MOCK_SECS.map((s,k)=>{const it=mk.q.map((x,i)=>[x,i]).filter(([x])=>x.sec===k);const ok=it.filter(([x,i])=>mk.ans[i]===x.a).length;return it.length?`<tr><td>${s[0]}</td><td>${ok} / ${it.length}</td><td>${ok*2} 分</td></tr>`:''}).join('');
+  return `<div class="done-box"><div class="score">${sc} 分</div><p class="hint">用時 ${Math.floor(mk.t/60)} 分 ${mk.t%60} 秒。下面標 ✗ 的是寫錯的題目，綠色是正確答案。</p>
+   <div class="tbl"><table>${rows}</table></div></div>`;
+}
+
 /* ===== 通用選擇題引擎（語詞、選詞填空、修辭、課文理解、素養閱讀）===== */
 let wrongM=load('hw6cf-wrongm',{});
-const CN='一二三四五六';
+const CN=['七','八','九','十','十一','十二'];
 const NUMO=['①','②','③','④','⑤','⑥'];
 function mqItems(key){
   const out=[];
@@ -1160,15 +1254,15 @@ function mqItems(key){
       const vs=L.vocab;const ws=vs.map(v=>v.w);
       vs.forEach((v,i)=>{
         const om=shuffle(allM.filter(m=>m!==v.m)).slice(0,3);
-        out.push({id:`voc:${v.w}:m`,g:L.lesson,lab:v.w,q:`<div class="qword kai">${esc(v.w)}</div><p class="qask">這個語詞是什麼意思？${sayBtn(v.w,'念語詞')}</p>`,opts:shuffle([v.m,...om]),a:v.m,why:`<b class="kai">${esc(v.w)}</b>：${esc(v.m)}`,long:true});
+        out.push({id:`voc:${v.w}:m`,g:L.lesson,lab:v.w,q:`<div class="qword kai">${esc(v.w)}</div><p class="qask">這個語詞是什麼意思？${sayBtn(v.w,'念語詞')}</p>`,opts:shuffle([v.m,...om]),a:v.m,why:`<b class="kai">${esc(v.w)}</b>：${esc(v.m)}　${sayBtn(v.w,'念語詞')}`,long:true});
         const allW=MD.flatMap(L2=>L2.vocab.map(x=>x.w)).filter(w=>w!==v.w);
         const ow=shuffle(ws.filter(w=>w!==v.w)).concat(shuffle(allW)).filter((w,k,a)=>a.indexOf(w)===k).slice(0,3);
-        out.push({id:`voc:${v.w}:w`,g:L.lesson,lab:v.w,q:`<p class="qask">哪一個語詞的意思是：</p><div class="qmean">${esc(v.m)}</div>`,opts:shuffle([v.w,...ow]),a:v.w,why:`<b class="kai">${esc(v.w)}</b>：${esc(v.m)}`});
+        out.push({id:`voc:${v.w}:w`,g:L.lesson,lab:v.w,q:`<p class="qask">哪一個語詞的意思是：</p><div class="qmean">${esc(v.m)}</div>`,opts:shuffle([v.w,...ow]),a:v.w,why:`<b class="kai">${esc(v.w)}</b>：${esc(v.m)}　${sayBtn(v.w,'念語詞')}`});
       });
       (L.idioms||[]).forEach(d=>{
         const others=MD.flatMap(L2=>(L2.idioms||[]).flatMap(x=>[...(x.near||[]),...(x.anti||[])]));
-        (d.near||[]).forEach(n=>out.push({id:`voc:${d.w}:near:${n}`,g:L.lesson,lab:`${d.w}（近義）`,q:`<div class="qword kai">${esc(d.w)}</div><p class="qask">哪一個是它的<b>近義詞</b>（意思相近）？</p>`,opts:shuffle([n,...shuffle([...(d.anti||[]),...others].filter(o=>o!==n&&!(d.near||[]).includes(o))).filter((o,k,a)=>a.indexOf(o)===k).slice(0,3)]),a:n,why:`「${esc(d.w)}」的近義詞：${(d.near||[]).map(esc).join('、')}${d.anti&&d.anti.length?`；反義詞：${d.anti.map(esc).join('、')}`:''}`}));
-        (d.anti||[]).forEach(n=>out.push({id:`voc:${d.w}:anti:${n}`,g:L.lesson,lab:`${d.w}（反義）`,q:`<div class="qword kai">${esc(d.w)}</div><p class="qask">哪一個是它的<b>反義詞</b>（意思相反）？</p>`,opts:shuffle([n,...shuffle([...(d.near||[]),...others].filter(o=>o!==n&&!(d.anti||[]).includes(o))).filter((o,k,a)=>a.indexOf(o)===k).slice(0,3)]),a:n,why:`「${esc(d.w)}」的反義詞：${(d.anti||[]).map(esc).join('、')}${d.near&&d.near.length?`；近義詞：${d.near.map(esc).join('、')}`:''}`}));
+        (d.near||[]).forEach(n=>out.push({id:`voc:${d.w}:near:${n}`,g:L.lesson,lab:`${d.w}（近義）`,q:`<div class="qword kai">${esc(d.w)}</div><p class="qask">哪一個是它的<b>近義詞</b>（意思相近）？${sayBtn(d.w,'念成語')}</p>`,opts:shuffle([n,...shuffle([...(d.anti||[]),...others].filter(o=>o!==n&&!(d.near||[]).includes(o))).filter((o,k,a)=>a.indexOf(o)===k).slice(0,3)]),a:n,why:`${sayBtn(d.w,'念成語')}「${esc(d.w)}」的近義詞：${(d.near||[]).map(esc).join('、')}${d.anti&&d.anti.length?`；反義詞：${d.anti.map(esc).join('、')}`:''}`}));
+        (d.anti||[]).forEach(n=>out.push({id:`voc:${d.w}:anti:${n}`,g:L.lesson,lab:`${d.w}（反義）`,q:`<div class="qword kai">${esc(d.w)}</div><p class="qask">哪一個是它的<b>反義詞</b>（意思相反）？${sayBtn(d.w,'念成語')}</p>`,opts:shuffle([n,...shuffle([...(d.near||[]),...others].filter(o=>o!==n&&!(d.anti||[]).includes(o))).filter((o,k,a)=>a.indexOf(o)===k).slice(0,3)]),a:n,why:`${sayBtn(d.w,'念成語')}「${esc(d.w)}」的反義詞：${(d.anti||[]).map(esc).join('、')}${d.near&&d.near.length?`；近義詞：${d.near.map(esc).join('、')}`:''}`}));
       });
     });
   }
@@ -1203,7 +1297,7 @@ const MQ={
 function mqPool(key){let it=mqItems(key);if(key!=='read')it=it.filter(x=>st.groups.has(x.g));if(st.onlyWrong)it=it.filter(x=>wrongM[x.id]);return it}
 function mqReview(key){
   if(key==='rhe')return `<div class="tbl"><table>${Object.entries(RHE).map(([k,v])=>`<tr><td class="kai" style="font-size:20px;white-space:nowrap">${k}</td><td class="hint" style="white-space:normal">${v}</td></tr>`).join('')}</table></div>`;
-  if(key==='voc')return [1,2,3,4,5,6].filter(g=>st.groups.has(g)).map(g=>{const L=MD[g-1];return `<div class="groupHead">${GN[g-1]}　${TITLE[g-1]}</div><div class="tbl"><table>${L.vocab.map(v=>`<tr><td class="kai" style="font-size:20px;white-space:nowrap">${esc(v.w)}</td><td class="hint" style="white-space:normal">${esc(v.m)}</td></tr>`).join('')}</table></div>`}).join('');
+  if(key==='voc')return [1,2,3,4,5,6].filter(g=>st.groups.has(g)).map(g=>{const L=MD[g-1];return `<div class="groupHead">${GN[g-1]}　${TITLE[g-1]}</div><div class="tbl"><table>${L.vocab.map(v=>`<tr><td class="kai" style="font-size:20px;white-space:nowrap">${esc(v.w)}<br>${sayBtn(v.w,'念')}</td><td class="hint" style="white-space:normal">${esc(v.m)}</td></tr>`).join('')}</table></div>`}).join('');
   if(key==='read')return READ.map(p=>`<details class="passage"><summary>${esc(p.t)}<span class="hint">　${esc(p.by||'')}</span></summary><div class="ptext">${p.body}</div></details>`).join('');
   return '';
 }
