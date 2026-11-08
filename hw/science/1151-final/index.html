@@ -21,6 +21,13 @@ body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:1
 .ac-fb.ok{color:#bbf7d0}.ac-fb.bad{color:#fde68a}.ac-correct{color:#86efac}
 .ac-mc.open,.ac-mc.done{color:#e2e8f0}
 .kk-lv{color:inherit}
+
+
+.hs-card svg{background:#0f1f3d;border-radius:12px}
+
+.ac-sentence{white-space:pre-line}
+.hs-card svg{background:#0f1f3d;border-radius:12px}
+.ac-ans,.ac-fb b{white-space:pre-line}
 </style></head><body><div id="app"></div>
 <script>
 /* =====================================================================
@@ -1480,6 +1487,8 @@ var KidKit = (function () {
 })();
 
 /* ===== Howard · Science Final · A Closer Look 4 — scope from the 5 lesson recordings ===== */
+var APP = {key: "hw-science-1151-final", title: "🔬 Howard's Science Final", sub: "A Closer Look 4 · 5 lessons · defeat every boss, then beat the Final Boss!",
+  scope: "Changes Caused by the Weather; Minerals and Rocks; Soil; Resources from the Past; Water (from the lesson recordings). Question types follow the midterm workbook pages: Outline, Cloze Activity, Vocabulary matching, Label the diagram, Critical thinking."};
 var LESSONS = [
   {id: "W", name: "Changes Caused by the Weather", icon: "🌪️", boss: "Storm Spinner"},
   {id: "R", name: "Minerals and Rocks", icon: "🪨", boss: "Rock Golem"},
@@ -1705,10 +1714,53 @@ var SORTS = {
   F: {title:"Renewable or nonrenewable?",bins:["Renewable","Nonrenewable"],items:[{t:"sunlight",bin:0},{t:"wind",bin:0},{t:"flowing water",bin:0},{t:"ocean tides",bin:0},{t:"heat inside Earth",bin:0},{t:"coal",bin:1},{t:"oil",bin:1},{t:"natural gas",bin:1}]},
   A: {title:"Fresh water or salt water?",bins:["Fresh water","Salt water"],items:[{t:"most rivers",bin:0},{t:"lakes and ponds",bin:0},{t:"wells",bin:0},{t:"glaciers and ice caps",bin:0},{t:"oceans",bin:1},{t:"seas",bin:1}]}
 };
+/* ===== Harder, workbook-style items (Outline / Cloze Activity / Label / Critical thinking) — modeled on the midterm practice pages ===== */
+var SOIL_SVG = '<svg viewBox="0 0 320 200" width="100%" style="max-width:420px;display:block;margin:6px auto"><rect x="40" y="10" width="170" height="40" fill="#5b3a1e"/><rect x="40" y="50" width="170" height="45" fill="#a0703c"/><rect x="40" y="95" width="170" height="50" fill="#b9a27a"/><circle cx="70" cy="120" r="9" fill="#8b8172"/><circle cx="150" cy="125" r="12" fill="#8b8172"/><rect x="40" y="145" width="170" height="45" fill="#6b6b6b"/><g font-size="20" font-weight="700" fill="#fff"><text x="225" y="36">1</text><text x="225" y="78">2</text><text x="225" y="126">3</text><text x="225" y="173">4</text></g><path d="M60 10 v25 M90 10 v35 M120 10 v20" stroke="#2f6b1f" stroke-width="3"/></svg>';
+var RCYCLE_SVG = '<svg viewBox="0 0 340 230" width="100%" style="max-width:440px;display:block;margin:6px auto" font-size="13" font-weight="700"><rect x="120" y="8" width="100" height="34" rx="8" fill="#ef4444"/><text x="170" y="30" text-anchor="middle" fill="#fff">igneous</text><rect x="8" y="180" width="110" height="34" rx="8" fill="#d97706"/><text x="63" y="202" text-anchor="middle" fill="#fff">sedimentary</text><rect x="222" y="180" width="110" height="34" rx="8" fill="#7c3aed"/><text x="277" y="202" text-anchor="middle" fill="#fff">metamorphic</text><g stroke="#38bdf8" stroke-width="3" fill="none"><path d="M120 34 L60 176"/><path d="M118 197 L220 197"/><path d="M277 178 L220 40"/></g><g fill="#fde68a"><text x="40" y="100">A</text><text x="165" y="190">B</text><text x="262" y="100">C</text></g></svg>';
+var HARD = [
+  /* Outline-style (textbook sentences, two blanks) */
+  {L:"R",ty:"fill",t:"A mineral is a natural, ___ substance that makes up ___.",a:["nonliving","rock"],bank:["nonliving","rock","living","water","soil"]},
+  {L:"R",ty:"fill",t:"The harder a mineral is, the more it resists ___. ___ is the hardest mineral of all.",a:["scratching","Diamond"],bank:["scratching","Diamond","melting","Talc","Quartz"]},
+  {L:"R",ty:"fill",t:"Igneous rocks form from melted rock, either from ___ below Earth's crust or from ___ above it.",a:["magma","lava"],bank:["magma","lava","sediment","humus","bands"]},
+  {L:"R",ty:"fill",t:"In some metamorphic rocks, minerals are pressed into thin layers called ___. Marble does not have them; marble forms from ___.",a:["bands","limestone"],bank:["bands","limestone","horizons","granite","sandstone"]},
+  {L:"S",ty:"fill",t:"Soil forms in layers called ___. A soil ___ shows these layers.",a:["horizons","profile"],bank:["horizons","profile","bands","reservoir","fossils"]},
+  {L:"S",ty:"fill",t:"Materials with pore spaces are said to be ___. They hold ___ and water.",a:["porous","air"],bank:["porous","air","permeable","oil","salt"]},
+  {L:"F",ty:"fill",t:"Most fossils are found in ___ rocks. Sediments bury the ___ of a plant or animal.",a:["sedimentary","remains"],bank:["sedimentary","remains","igneous","bubbles","metamorphic"]},
+  {L:"F",ty:"fill",t:"A ___ resource can be replaced quickly in nature, but a ___ resource is gone forever once it is used up.",a:["renewable","nonrenewable"],bank:["renewable","nonrenewable","fossil","petrified","solar"]},
+  {L:"A",ty:"fill",t:"Most of Earth's fresh water is ___, held in glaciers and ___.",a:["solid","ice caps"],bank:["solid","ice caps","liquid","reservoirs","wells"]},
+  {L:"A",ty:"fill",t:"Water seeps down until it reaches a layer without cracks or ___. Then it collects as ___.",a:["pore spaces","groundwater"],bank:["pore spaces","groundwater","runoff","soil water","bands"]},
+  {L:"W",ty:"fill",t:"A hurricane is much ___ than a tornado. It can span hundreds of ___.",a:["bigger","kilometers"],bank:["bigger","kilometers","smaller","meters","seconds"]},
+  {L:"W",ty:"fill",t:"Floods ___ the soil quickly, but afterwards new soil is ___ on the land.",a:["erode","deposited"],bank:["erode","deposited","freeze","burned","melted"]},
+
+  /* Cloze Activity paragraphs (word box, 4 blanks) */
+  {L:"R",ty:"cloze",title:"Cloze Activity — Rocks",t:"Rocks are made of ___. When magma cools and hardens, ___ rock forms. Sediments that are pressed together form ___ rock. Extreme heat and pressure change rocks into ___ rock.",a:["minerals","igneous","sedimentary","metamorphic"],bank:["minerals","igneous","sedimentary","metamorphic","fossils","humus"]},
+  {L:"R",ty:"cloze",title:"Cloze Activity — Mineral properties",t:"Scientists identify minerals by their properties. ___ alone cannot identify a mineral. The Mohs scale measures ___. The way light bounces off a mineral is its ___. The color of its powder on a white tile is its ___.",a:["Color","hardness","luster","streak"],bank:["Color","hardness","luster","streak","texture","gravity"]},
+  {L:"S",ty:"cloze",title:"Cloze Activity — Soil",t:"Soil is made of bits of rock, minerals and ___. The top layer, or ___, is rich in humus. Below it is the ___. Sandy soil has high ___, so water moves through it quickly.",a:["humus","topsoil","subsoil","permeability"],bank:["humus","topsoil","subsoil","permeability","magma","amber"]},
+  {L:"F",ty:"cloze",title:"Cloze Activity — Fossils",t:"A shell can leave a hollow ___ in rock. If minerals fill it, a ___ forms. Insects can be trapped in ___. Wood and bones can become ___, or turned to stone.",a:["mold","cast","amber","petrified"],bank:["mold","cast","amber","petrified","imprint","lava"]},
+  {L:"F",ty:"cloze",title:"Cloze Activity — Energy",t:"Coal, oil and natural gas are ___ fuels. They are ___ resources. Burning them causes air ___. Sunlight and wind are ___ resources.",a:["fossil","nonrenewable","pollution","renewable"],bank:["fossil","nonrenewable","pollution","renewable","solar","fresh"]},
+  {L:"A",ty:"cloze",title:"Cloze Activity — Water",t:"Most cities get water from a ___. People dig a ___ to get groundwater. Water that flows over the land is called ___. A water ___ plant makes water clean and pure.",a:["reservoir","well","runoff","treatment"],bank:["reservoir","well","runoff","treatment","watershed","glacier"]},
+  {L:"W",ty:"cloze",title:"Cloze Activity — Fast changes",t:"Heavy rain can cause a ___. A column of spinning wind is a ___. A very large swirling storm over warm oceans is a ___. Gravity can pull rock and soil down a slope in a ___.",a:["flood","tornado","hurricane","landslide"],bank:["flood","tornado","hurricane","landslide","avalanche","fossil"]},
+
+  /* Label the diagram */
+  {L:"S",ty:"label",svg:SOIL_SVG,title:"Label the soil profile (1 = top).",t:"1 ___\n2 ___\n3 ___\n4 ___",a:["topsoil (A)","subsoil (B)","C horizon","bedrock"],bank:["topsoil (A)","subsoil (B)","C horizon","bedrock","humus","magma"]},
+  {L:"R",ty:"label",svg:RCYCLE_SVG,title:"Label the paths in the rock cycle.",t:"A (igneous → sedimentary): ___\nB (sedimentary → metamorphic): ___\nC (metamorphic → igneous): ___",a:["weathering and erosion","heat and pressure","melting and cooling"],bank:["weathering and erosion","heat and pressure","melting and cooling","pollination","irrigation"]},
+
+  /* Critical thinking (Quick Check questions) */
+  {L:"R",ty:"open",q:"Can you observe sedimentary rocks forming? Explain.",a:"No. It can take millions of years for sediment to become rock, so it happens too slowly to watch.",points:[["no","not","can't","cannot"],["millions of years","slow","slowly","long time"]],need:2},
+  {L:"R",ty:"open",q:"Compare slow and fast events in the rock cycle.",a:"Weathering, erosion and pressing sediments into rock are slow and take millions of years. Lava cooling quickly, like obsidian, is fast.",points:[["slow","slowly","millions"],["fast","quick","quickly"],["weathering","erosion","sediment","cool","cooling","lava"]],need:2},
+  {L:"S",ty:"open",q:"How does the size of the pore spaces affect the permeability of soil?",a:"Bigger pore spaces let water pass through faster, so permeability is higher. Small pore spaces make water move slowly.",points:[["big","bigger","large","larger"],["fast","faster","quickly","high","higher"],["small","slow","slowly"]],need:2},
+  {L:"S",ty:"open",q:"A farmer wants to grow a crop on flat land. The soil has lots of humus. Is this a good idea? Why?",a:"Yes. Flat land has thick soil that does not erode quickly, and humus has nutrients that help plants grow.",points:[["yes","good"],["humus","nutrients"],["flat","thick","erode"]],need:2},
+  {L:"F",ty:"open",q:"How could ferns have lived on Antarctica?",a:"Long ago Earth's climate was warmer, so Antarctica was warm enough for ferns to grow.",points:[["warm","warmer"],["long ago","past","climate","changed"]],need:2},
+  {L:"F",ty:"open",q:"Should scientists develop new ways to use renewable energy? Why?",a:"Yes. Fossil fuels are nonrenewable and cause pollution, but renewable resources like sun and wind are replaced quickly.",points:[["yes"],["nonrenewable","run out","gone","pollution"],["sun","sunlight","wind","water","renewable","replaced"]],need:2},
+  {L:"A",ty:"open",q:"Why shouldn't you drink water directly from streams or lakes?",a:"It may have bacteria or harmful chemicals carried in by runoff.",points:[["bacteria","germs","organisms"],["chemicals","runoff","dirty","pollution"]],need:1},
+  {L:"A",ty:"open",q:"How could we use salt water?",a:"Ships can travel on it, people can swim, boat and fish in it, and fish and other animals live in it.",points:[["ship","ships","boat","boats","transport"],["swim","swimming","fish","fishing"],["animals","fish live","live"]],need:1},
+  {L:"W",ty:"open",q:"Why might it be risky to build a town on a soft hillside?",a:"Heavy rain and gravity can cause a landslide that moves rock and soil quickly downhill onto the town.",points:[["landslide","slide","mudslide"],["rain","gravity","downhill"]],need:2}
+];
+BANK = BANK.concat(HARD);
 
 /* ===== App code ===== */
 AppCore.injectCSS(); KidKit.injectCSS();
-var KEY = "hw-science-1151-final", MAPKEY = KEY + "-map";
+var KEY = APP.key, MAPKEY = KEY + "-map";
 var root = document.getElementById("app");
 var esc = AppCore.esc, el = AppCore.el;
 function lessonById(id) { return LESSONS.filter(function (l) { return l.id === id; })[0]; }
@@ -1726,13 +1778,22 @@ function vocabItems(L) {
   });
   return out;
 }
-function pool(L) { return BANK.filter(function (q) { return q.L === L; }).concat(vocabItems(L)); }
+function matchItems(L) {
+  var out = [], v = AppCore.shuffle(VOCAB[L]);
+  for (var k = 0; k + 4 <= v.length && out.length < 2; k += 4) {
+    var set = v.slice(k, k + 4), extra = v[(k + 4) % v.length][0];
+    out.push({L: L, ty: "match", title: "Match each word with its meaning.", t: set.map(function (x, i) { return (i + 1) + ". ___ — " + x[1]; }).join("\n"),
+      a: set.map(function (x) { return x[0]; }), bank: set.map(function (x) { return x[0]; }).concat([extra])});
+  }
+  return out;
+}
+function pool(L) { return BANK.filter(function (q) { return q.L === L; }).concat(vocabItems(L), matchItems(L)); }
 
 /* ---------- Home ---------- */
 function home() {
   AppCore.stopSpeech(); window.scrollTo(0, 0);
   root.innerHTML = "";
-  root.appendChild(el("div", "hs-hero", "<h1>🔬 Howard's Science Final</h1><p>A Closer Look 4 · 5 lessons · defeat every boss, then beat the Final Boss!</p>"));
+  root.appendChild(el("div", "hs-hero", "<h1>" + APP.title + "</h1><p>" + APP.sub + "</p>"));
   var map = el("div"); root.appendChild(map);
   var lv = LESSONS.map(function (l) { return {id: l.id, name: l.name, icon: l.icon}; });
   lv.push({id: "MOCK", name: "Mock Exam — Final Boss", icon: "👑"});
@@ -1743,7 +1804,7 @@ function home() {
   g.appendChild(AppCore.btn("🧺 Sort It", "ac-primary", function () { pickLesson("🧺 Sort It — which lesson?", sortIt); }));
   root.appendChild(g);
   var n = 0; LESSONS.forEach(function (l) { n += pool(l.id).length; });
-  root.appendChild(el("p", "hs-note", "Question bank: " + n + " questions + " + LESSONS.length + " sort games. Scope: Changes Caused by the Weather; Minerals and Rocks; Soil; Resources from the Past; Water (from the lesson recordings)."));
+  root.appendChild(el("p", "hs-note", "Question bank: " + n + " questions + " + LESSONS.length + " sort games. Scope: " + APP.scope));
 }
 function pickLesson(title, fn, withAll) {
   root.innerHTML = "";
@@ -1772,13 +1833,16 @@ function drill(L) {
   run(AppCore.shuffle(pool(L)), {title: l.icon + " " + l.name, gameKey: KEY + "-" + L, boss: AppCore.bossFor(Math.min(20, pool(L).length), l.boss), mapId: L, limit: 20});
 }
 function mock() {
-  var all = [];
-  LESSONS.forEach(function (l) {
-    var p = AppCore.shuffle(pool(l.id).filter(function (q) { return q.ty !== "open"; })).slice(0, 5);
-    var o = AppCore.shuffle(pool(l.id).filter(function (q) { return q.ty === "open"; })).slice(0, 1);
-    all = all.concat(p, o);
-  });
-  run(AppCore.shuffle(all), {title: "👑 Mock Exam", gameKey: KEY + "-mock", boss: AppCore.bossFor(all.length, "Final Boss"), mapId: "MOCK", mock: true});
+  function pick(f, n) { var all = []; LESSONS.forEach(function (l) { all = all.concat(pool(l.id).filter(f)); }); return AppCore.shuffle(all).slice(0, n); }
+  var items = [].concat(
+    pick(function (q) { return q.ty === "match"; }, 2),
+    pick(function (q) { return q.ty === "cloze"; }, 3),
+    pick(function (q) { return q.ty === "label"; }, 1),
+    pick(function (q) { return q.ty === "fill"; }, 6),
+    pick(function (q) { return q.ty === "order"; }, 2),
+    pick(function (q) { return q.ty === "mc" || q.ty === "tf"; }, 12),
+    pick(function (q) { return q.ty === "open"; }, 3));
+  run(items, {title: "👑 Mock Exam", gameKey: KEY + "-mock", boss: AppCore.bossFor(items.length, "Final Boss"), mapId: "MOCK", mock: true});
 }
 function run(items, o) {
   if (o.limit) items = items.slice(0, o.limit);
@@ -1790,7 +1854,7 @@ function run(items, o) {
     root.innerHTML = "";
     root.appendChild(AppCore.drillBar({title: o.title + " · " + (i + 1) + " / " + items.length, onBack: home, onFinish: end, game: G}));
     var card = el("div", "hs-card"); root.appendChild(card);
-    var tag = q.vocab ? "Vocabulary" : {mc: "Multiple choice", tf: "True or False", fill: "Fill in the blank", order: "Put in order", open: "Short answer"}[q.ty];
+    var tag = q.vocab ? "Vocabulary" : {mc: "Multiple choice", tf: "True or False", fill: Array.isArray(q.a) ? "Outline" : "Fill in the blank", order: "Put in order", open: "Critical thinking", cloze: "Cloze Activity", match: "Vocabulary matching", label: "Label the diagram"}[q.ty];
     card.appendChild(el("div", "hs-tag", lessonById(q.L).icon + " " + esc(lessonById(q.L).name) + " · " + tag));
     var area = el("div"); card.appendChild(area);
     var next = el("div", "hs-next"); card.appendChild(next);
@@ -1819,6 +1883,11 @@ function run(items, o) {
         });
         opts.appendChild(b);
       });
+    } else if (q.ty === "cloze" || q.ty === "match" || q.ty === "label" || (q.ty === "fill" && Array.isArray(q.a))) {
+      if (q.title) area.appendChild(el("p", "hs-q", esc(q.title)));
+      if (q.svg) area.appendChild(el("div", "", q.svg));
+      var wb = el("div"); area.appendChild(wb);
+      AppCore.wordBank(wb, {text: q.t, bank: AppCore.shuffle(q.bank), answers: q.a, exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a.join(" / ")); }});
     } else if (q.ty === "fill") {
       var others = AppCore.shuffle(VOCAB[q.L].map(function (v) { return v[0]; }).filter(function (w) { return w.toLowerCase() !== q.a.toLowerCase(); })).slice(0, 3);
       AppCore.wordBank(area, {text: q.t, bank: AppCore.shuffle([q.a].concat(others)), answers: [q.a], exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a); }});

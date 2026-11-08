@@ -1,0 +1,2214 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Audrey · Science Final · A Closer Look</title><style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:1.05rem;line-height:1.5;background:#0b1730;color:#e2e8f0}
+#app{max-width:760px;margin:0 auto;padding:12px 14px 90px}
+.hs-hero{background:linear-gradient(135deg,#0c4a6e,#1e3a8a);border-radius:18px;padding:16px 18px;margin:6px 0 14px}
+.hs-hero h1{margin:0 0 4px;font-size:1.5rem}.hs-hero p{margin:0;opacity:.9}
+.hs-h2{font-size:1.15rem;margin:18px 0 8px}
+.hs-games{display:flex;flex-wrap:wrap;gap:8px}
+.hs-note{opacity:.7;font-size:.9rem;margin-top:18px}
+.hs-wide{display:block;width:100%;text-align:left}
+.hs-card{background:#13254a;border:1px solid #1e3a8a;border-radius:16px;padding:14px 16px;margin-top:6px}
+.hs-tag{font-size:.85rem;color:#7dd3fc;margin-bottom:6px}
+.hs-q{font-size:1.15rem;font-weight:600;margin:4px 0 10px}
+.hs-opts{display:flex;flex-direction:column;gap:8px}.hs-tf{flex-direction:row}.hs-tf .hs-opt{flex:1;text-align:center;font-weight:800}
+.hs-opt{font:inherit;text-align:left;min-height:54px;padding:10px 14px;border-radius:12px;border:2px solid #38bdf8;background:rgba(56,189,248,.08);color:inherit;cursor:pointer;touch-action:manipulation}
+.hs-opt.hs-ok{background:#16a34a;border-color:#16a34a;color:#fff}.hs-opt.hs-bad{background:#dc2626;border-color:#dc2626;color:#fff}
+.hs-next{margin-top:10px}
+.ac-bar{background:#0b1730!important}
+.ac-fb.ok{color:#bbf7d0}.ac-fb.bad{color:#fde68a}.ac-correct{color:#86efac}
+.ac-mc.open,.ac-mc.done{color:#e2e8f0}
+.kk-lv{color:inherit}
+
+
+.hs-card svg{background:#0f1f3d;border-radius:12px}
+
+.ac-sentence{white-space:pre-line}
+.hs-card svg{background:#0f1f3d;border-radius:12px}
+.ac-ans,.ac-fb b{white-space:pre-line}
+
+.ac-sentence{white-space:pre-line}
+.hs-card svg{background:#0f1f3d;border-radius:12px}
+.ac-ans,.ac-fb b{white-space:pre-line}
+</style></head><body><div id="app"></div>
+<script>
+/* =====================================================================
+   app-core.js — shared core for the kids' exam-practice apps
+   Canonical copy: github.com/iam5980/kids-practice/template/app-core.js
+   Version: 2026-11-08 (play layer: boss battle, word flip, sort game,
+            evidence hunt, sentence race; reports to SitePoints)
+
+   HOW TO USE (for the Reading / Science / Grammar skills)
+   - Paste this whole file INSIDE the app's single <script> block, before
+     the app's own code. Do NOT link it with <script src>. Each app stays
+     one self-contained HTML file (offline, Artifact preview, no shared
+     breakage).
+   - Call AppCore.injectCSS() once at start-up.
+   - Use these helpers instead of writing your own versions.
+   - Wire buttons with addEventListener or AppCore.btn(). Do NOT build
+     inline onclick="..." strings with escaped double quotes (iPad Safari
+     fails to parse them).
+
+   WHAT IS IN HERE (each part was fixed after a real bug on iPad)
+     shuffle(arr)              Fisher-Yates, returns a NEW array
+     speak(text, opts)         best English voice, rate .88, onDone callback
+     stopSpeech()              cancel TTS
+     dealer()                  MC answer positions evenly spread A/B/C/D,
+                               never 3 in a row
+     stars(pct) / result(log)  scoring + 1-5 stars
+     drillBar(opts)            sticky bar: Back + Finish & Score
+     resultView(log, opts)     score screen, wrong answers first, Try Again
+     recorder(opts)            iOS-safe recording + playback
+     oralCard(el, q, opts)     record-first, reveal-later oral flow
+     WEBVIEW_NOTICE            "open in Safari/Chrome" notice HTML
+
+   TAP-TO-ANSWER (iPad/phone friendly — avoid the keyboard)
+     wordBank(el, spec, o)     tap a word-bank chip → it fills the blank
+     tiles(el, spec, o)        tap word / letter / step tiles to build the
+                               answer (unscramble, spelling, ordering)
+     openAnswer(el, spec, o)   🎤 speak (speech → text) or type → scored
+                               automatically on key points (short answers)
+     Each draws its own ✔ Check button and calls o.onResult(ok, given).
+
+   GAME LAYER  (each answer and finished round is also reported to the
+               site-wide 集點卡 through SitePoints from site-home.js)
+     game(key)                 points, 🔥 streaks, cheers, confetti,
+                               best score per drill on this device
+     drillBar({game}) shows the HUD; resultView(log, {game, onRetryWrong})
+     shows points, best streak, new-best badge and "Practise my mistakes".
+   ===================================================================== */
+var AppCore = (function () {
+  "use strict";
+
+  /* ---------- small DOM helpers ---------- */
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function el(tag, cls, html) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (html != null) e.innerHTML = html;
+    return e;
+  }
+  function btn(label, cls, onClick) {
+    var b = el("button", "ac-btn " + (cls || ""), label);
+    b.type = "button";
+    if (onClick) b.addEventListener("click", onClick);
+    return b;
+  }
+
+  /* ---------- shuffle: always returns a new array ---------- */
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  /* ---------- TTS ----------
+     speak(text)                         default rate 0.88
+     speak(text, {rate: 0.7})
+     speak(text, {onDone: function(){}}) onDone fires on end OR error
+     The 2nd argument is ALWAYS an options object (a past bug passed a
+     callback where a number was expected and the button got stuck). */
+  var _voices = [];
+  function loadVoices() {
+    if (window.speechSynthesis) _voices = window.speechSynthesis.getVoices() || [];
+  }
+  if (window.speechSynthesis) {
+    loadVoices();
+    if (window.speechSynthesis.addEventListener) {
+      window.speechSynthesis.addEventListener("voiceschanged", loadVoices);
+    } else {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+  }
+  function getBestVoice() {
+    var v = _voices.length ? _voices : (window.speechSynthesis ? window.speechSynthesis.getVoices() : []);
+    var tests = [
+      function (x) { return x.name === "Samantha"; },
+      function (x) { return x.name === "Karen"; },
+      function (x) { return x.name === "Daniel"; },
+      function (x) { return x.name.indexOf("Google US English") >= 0; },
+      function (x) { return x.name.indexOf("Google UK English") >= 0; },
+      function (x) { return x.name.indexOf("Microsoft Aria") >= 0; },
+      function (x) { return x.lang === "en-US" && x.localService; },
+      function (x) { return x.lang === "en-GB" && x.localService; },
+      function (x) { return x.lang.indexOf("en") === 0; }
+    ];
+    for (var t = 0; t < tests.length; t++) {
+      for (var i = 0; i < v.length; i++) if (tests[t](v[i])) return v[i];
+    }
+    return null;
+  }
+  function speak(text, opts) {
+    opts = (opts && typeof opts === "object") ? opts : {};
+    var done = typeof opts.onDone === "function" ? opts.onDone : null;
+    if (!window.speechSynthesis) { if (done) done(); return; }
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(String(text));
+    u.lang = "en-US";
+    u.rate = typeof opts.rate === "number" ? opts.rate : 0.88;
+    u.pitch = 1.0;
+    var voice = getBestVoice();
+    if (voice) u.voice = voice;
+    var fired = false;
+    function fin() { if (fired) return; fired = true; if (done) done(); }
+    u.onend = fin; u.onerror = fin;
+    speak._last = u; // keep a reference so Safari does not drop it mid-sentence
+    window.speechSynthesis.speak(u);
+  }
+  function stopSpeech() {
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+  }
+
+  /* ---------- MC answer positions ----------
+     var D = AppCore.dealer();          // one per drill / mock exam
+     var r = D.place(correctText, [wrong1, wrong2]);
+     r.choices -> array to show as A, B, C ...   r.answer -> correct index
+     var m = D.placeMulti([c1, c2], [w1]);   // "choose two"
+     m.answers -> sorted indexes
+     Positions are dealt from a balanced deck, so A/B/C come up equally
+     often and the same letter never appears 3 times in a row.
+     Store choices in the bank as TEXT, never as a fixed letter. */
+  function dealer() {
+    var decks = {}, last = [], pairs = [];
+    function runOK(deck, prev) {
+      var s = prev.concat(deck);
+      for (var i = 2; i < s.length; i++) if (s[i] === s[i - 1] && s[i] === s[i - 2]) return false;
+      return true;
+    }
+    function build(n) {
+      var base = [], d, k = 0;
+      for (var r = 0; r < 3; r++) for (var i = 0; i < n; i++) base.push(i);
+      do { d = shuffle(base); k++; } while (!runOK(d, last.slice(-2)) && k < 300);
+      return d;
+    }
+    function nextPos(n) {
+      if (!decks[n] || !decks[n].length) decks[n] = build(n);
+      var p = decks[n].shift();
+      if (last.length >= 2 && last[last.length - 1] === p && last[last.length - 2] === p) {
+        // deck boundary produced a triple: swap with the next different one
+        for (var i = 0; i < decks[n].length; i++) if (decks[n][i] !== p) {
+          var q = decks[n][i]; decks[n][i] = p; p = q; break;
+        }
+      }
+      last.push(p); if (last.length > 4) last.shift();
+      return p;
+    }
+    function fill(out, wrong) {
+      var w = shuffle(wrong);
+      for (var i = 0; i < out.length; i++) if (out[i] === undefined) out[i] = w.shift();
+      return out;
+    }
+    return {
+      place: function (correct, wrong) {
+        var n = wrong.length + 1, pos = nextPos(n), out = new Array(n);
+        out[pos] = correct;
+        return { choices: fill(out, wrong), answer: pos };
+      },
+      placeMulti: function (correct, wrong) {
+        var n = correct.length + wrong.length, out = new Array(n), slots;
+        if (correct.length === 2 && n === 3) {
+          if (!pairs.length) pairs = shuffle([[0, 1], [0, 2], [1, 2], [0, 1], [0, 2], [1, 2]]);
+          slots = pairs.shift();
+        } else {
+          slots = shuffle(Array.apply(null, { length: n }).map(function (_, i) { return i; }))
+            .slice(0, correct.length);
+        }
+        var c = shuffle(correct);
+        slots.forEach(function (s, k) { out[s] = c[k]; });
+        return { choices: fill(out, wrong), answers: slots.slice().sort() };
+      }
+    };
+  }
+
+  /* ---------- scoring ----------
+     log = [{q:"question text", given:"student answer", correct:"answer", ok:true}] */
+  function stars(pct) {
+    return pct >= 90 ? 5 : pct >= 75 ? 4 : pct >= 55 ? 3 : pct >= 40 ? 2 : 1;
+  }
+  function result(log) {
+    var n = log.length, c = 0;
+    for (var i = 0; i < n; i++) if (log[i].ok) c++;
+    var pct = n ? Math.round(100 * c / n) : 0;
+    return { answered: n, correct: c, pct: pct, stars: n ? stars(pct) : 0,
+             wrong: log.filter(function (x) { return !x.ok; }) };
+  }
+
+  /* ---------- sticky Back + Finish & Score bar ----------
+     Put it at the top of EVERY drill (topic, story, mock exam, oral).
+     drillBar({title:"Vocab · 3 / 20", onBack: goHome, onFinish: showResult}) */
+  function drillBar(o) {
+    var bar = el("div", "ac-bar");
+    if (o.onBack) bar.appendChild(btn("⬅ Back", "ac-ghost", o.onBack));
+    bar.appendChild(el("span", "ac-bar-title", esc(o.title || "")));
+    if (o.game) bar.appendChild(o.game.hud());
+    bar.appendChild(btn("🏁 Finish &amp; Score", "ac-finish", function () {
+      stopSpeech(); if (o.onFinish) o.onFinish();
+    }));
+    return bar;
+  }
+
+  /* ---------- result screen ----------
+     resultView(log, {onAgain: restartSameDrill, onHome: goHome}) -> element */
+  var CHEERS = {5: "Perfect! You are a star! 🌟", 4: "Great work — almost perfect! 🎉", 3: "Good job! Keep practising 👍",
+                2: "Nice try! Practise your mistakes and try again 💪", 1: "Every try makes you stronger. Let's practise again! 🌱"};
+  function resultView(log, o) {
+    o = o || {};
+    var r = result(log), box = el("div", "ac-result");
+    if (!r.answered) {
+      box.appendChild(el("h2", null, "You have not answered any questions yet."));
+    } else {
+      box.appendChild(el("div", "ac-stars", new Array(r.stars + 1).join("⭐")));
+      box.appendChild(el("h2", null, "Answered " + r.answered + " question" + (r.answered > 1 ? "s" : "") +
+        " — " + r.correct + " correct (" + r.pct + "%)"));
+      box.appendChild(el("p", "ac-cheerline", CHEERS[r.stars]));
+      if (o.game) {
+        var g = o.game.summary();
+        box.appendChild(el("div", "ac-gamebox",
+          "<span>⭐ <b>" + g.points + "</b> points</span><span>🔥 Best streak <b>" + g.bestStreak + "</b></span>" +
+          "<span>" + (g.newBest ? "🏆 <b>New best score!</b>" : "🏅 Best <b>" + g.best + "</b>") + "</span>"));
+        if (o.game.boss) box.appendChild(el("p", "ac-cheerline", o.game.boss.defeated() ? "👾 Boss defeated! 🏆" : "👾 The boss escaped this time — try again to beat it!"));
+      }
+      if (r.pct === 100 && r.answered >= 3) setTimeout(function () { confetti(80); }, 200);
+      try { if (window.SitePoints && o.game) window.SitePoints.roundEnd(r.pct); } catch (e) {}
+      if (r.wrong.length) {
+        var ul = el("div", "ac-review");
+        ul.appendChild(el("h3", null, "Review these"));
+        r.wrong.forEach(function (w) {
+          ul.appendChild(el("div", "ac-review-item",
+            "<div>" + esc(w.q) + "</div>" +
+            (w.given != null && w.given !== "" ? "<div class='ac-given'>Your answer: " + esc(w.given) + "</div>" : "") +
+            "<div class='ac-correct'>Answer: " + esc(w.correct) + "</div>" +
+            (w.appeal ? "<div><span class='ac-flag'>🙋 Ask a parent to check</span></div>" : "")));
+        });
+        box.appendChild(ul);
+      } else {
+        box.appendChild(el("p", null, "Perfect — no mistakes! 🎉"));
+      }
+    }
+    var row = el("div", "ac-row ac-center");
+    if (o.onRetryWrong && r.wrong.length) row.appendChild(btn("🎯 Practise my " + r.wrong.length + " mistake" + (r.wrong.length > 1 ? "s" : ""), "ac-finish", o.onRetryWrong));
+    if (o.onAgain) row.appendChild(btn("🔄 Try Again", "ac-primary", o.onAgain));
+    if (o.onHome) row.appendChild(btn("🏠 Home", "ac-ghost", o.onHome));
+    box.appendChild(row);
+    return box;
+  }
+
+  /* ---------- recording (iOS Safari safe) ----------
+     var R = AppCore.recorder({maxSecs: 60, onTick, onState, onError});
+     recordBtn.addEventListener("click", function(){ R.toggle(); });  // direct
+     playBtn.addEventListener("click",   function(){ R.play();   });  // direct
+     Rules baked in:
+       - getUserMedia is called synchronously inside start() — so start()
+         / toggle() must be called DIRECTLY from a click handler
+       - MIME type is chosen after permission is granted
+       - play() calls audio.play() synchronously — call it from a click
+       - nothing plays from onstop
+     States: "idle" | "asking" | "recording" | "ready"  */
+  var WEBVIEW_NOTICE =
+    '<div class="ac-notice"><strong>🎙 Recording needs Safari or Chrome</strong><br>' +
+    'Open this page in Safari (iPad/iPhone) or Chrome — not inside another app.<br>' +
+    'iPad: tap ••• or the share button → <b>Open in Safari</b></div>';
+
+  function pickMime() {
+    if (!window.MediaRecorder || !MediaRecorder.isTypeSupported) return "";
+    var t = ["audio/mp4", "audio/aac", "audio/webm;codecs=opus", "audio/webm", "audio/ogg"];
+    for (var i = 0; i < t.length; i++) { try { if (MediaRecorder.isTypeSupported(t[i])) return t[i]; } catch (e) {} }
+    return "";
+  }
+  function recorder(o) {
+    o = o || {};
+    var max = o.maxSecs || 60, rec = null, stream = null, chunks = [], url = null,
+        timer = null, secs = 0, audio = null, state = "idle";
+    function set(s) { state = s; if (o.onState) o.onState(s); }
+    function fail(msg) {
+      cleanup(); set(url ? "ready" : "idle");
+      if (o.onError) o.onError(msg);
+    }
+    function cleanup() {
+      clearInterval(timer); timer = null;
+      if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
+    }
+    function supported() {
+      return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+    }
+    function start() {
+      if (state === "recording" || state === "asking") return;
+      if (!supported()) { fail("This browser cannot record here. Open the page in Safari or Chrome."); return; }
+      if (audio) { audio.pause(); audio = null; }
+      stopSpeech();
+      var gum = navigator.mediaDevices.getUserMedia({ audio: true, video: false }); // inside the tap
+      set("asking");
+      var to = setTimeout(function () { if (state === "asking") fail("No microphone permission. Open the page in Safari or Chrome and allow the microphone."); }, 8000);
+      gum.then(function (s) {
+        clearTimeout(to);
+        if (state !== "asking") { s.getTracks().forEach(function (t) { t.stop(); }); return; }
+        stream = s; chunks = [];
+        var mime = pickMime();
+        try { rec = mime ? new MediaRecorder(s, { mimeType: mime }) : new MediaRecorder(s); }
+        catch (e) { rec = new MediaRecorder(s); }
+        rec.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+        rec.onstop = function () {
+          var b = new Blob(chunks, { type: (rec && rec.mimeType) || mime || "audio/webm" });
+          if (url) URL.revokeObjectURL(url);
+          url = URL.createObjectURL(b);
+          cleanup(); set("ready");           // only store the clip — never auto-play
+        };
+        rec.start(200);
+        secs = 0; set("recording"); if (o.onTick) o.onTick(0, max);
+        timer = setInterval(function () {
+          secs++; if (o.onTick) o.onTick(secs, max);
+          if (secs >= max) stop();
+        }, 1000);
+      }).catch(function (err) {
+        clearTimeout(to);
+        var n = err && err.name;
+        fail(n === "NotAllowedError" ? "Microphone blocked. Allow the microphone in Safari settings, or open the page in Safari/Chrome."
+           : n === "NotFoundError" ? "No microphone found on this device."
+           : "Could not start recording. Open the page in Safari or Chrome.");
+      });
+    }
+    function stop() {
+      clearInterval(timer); timer = null;
+      if (rec && rec.state !== "inactive") { try { rec.stop(); } catch (e) { cleanup(); set(url ? "ready" : "idle"); } }
+    }
+    function play() {                       // call DIRECTLY from the Play button's click
+      if (!url) return;
+      if (audio) audio.pause();
+      audio = new Audio();
+      audio.src = url;
+      var p = audio.play();
+      if (p && p.catch) p.catch(function (e) { if (o.onError) o.onError("Playback failed: " + e.message); });
+    }
+    function reset() {
+      stop(); cleanup();
+      if (audio) { audio.pause(); audio = null; }
+      if (url) { URL.revokeObjectURL(url); url = null; }
+      set("idle");
+    }
+    return {
+      start: start, stop: stop, play: play, reset: reset, supported: supported,
+      toggle: function () { if (state === "recording") stop(); else start(); },
+      hasClip: function () { return !!url; },
+      state: function () { return state; }
+    };
+  }
+
+  /* ---------- oral question card: record first, reveal later ----------
+     AppCore.oralCard(container, {
+        q: "What is a fossil?", a: "A fossil is ...",
+        keywords: ["remains", "rock"],   // shown ONLY after Reveal
+        mustKnow: true                   // red "Exam Must-Know" badge
+     }, {onSelfScore: function(ok){ ... }, maxSecs: 60});
+     Flow: 🔊 Hear Q → 🎙 Record → ⏹ Stop → ▶ My Voice → 👁 Reveal Answer
+           → model answer + 🔊 Hear Model → ✓ Got it / ✗ Still learning.
+     The model answer and keywords are never in the page before Reveal.
+     If recording is impossible, the student taps "I said my answer" to
+     unlock Reveal, so practice can continue. Returns {destroy()}. */
+  function oralCard(container, q, o) {
+    o = o || {};
+    container.innerHTML = "";
+    var card = el("div", "ac-oral");
+    if (q.mustKnow) card.appendChild(el("span", "ac-badge", "⭐ Exam Must-Know"));
+    card.appendChild(el("div", "ac-oral-q", esc(q.q)));
+    var row = el("div", "ac-row"), status = el("div", "ac-status"), out = el("div", "ac-oral-out");
+
+    var hearQ = btn("🔊 Hear Question", "ac-ghost", function () { speak(q.q); });
+    var recB = btn("🎙 Record", "ac-rec");
+    var playB = btn("▶ My Voice", "ac-ghost"); playB.hidden = true;
+    var saidB = btn("I said my answer", "ac-ghost"); saidB.hidden = true;
+    var revealB = btn("👁 Reveal Answer", "ac-primary"); revealB.hidden = true;
+    var revealed = false;
+
+    var R = recorder({
+      maxSecs: o.maxSecs || 60,
+      onTick: function (s, m) { status.textContent = "● Recording " + s + "s / " + m + "s"; },
+      onState: function (s) {
+        card.classList.toggle("ac-recording", s === "recording");
+        if (s === "asking") { status.textContent = "⏳ Asking for the microphone…"; recB.disabled = true; }
+        if (s === "recording") { recB.disabled = false; recB.innerHTML = "⏹ Stop"; }
+        if (s === "ready") {
+          recB.disabled = false; recB.innerHTML = "🎙 Record Again";
+          status.textContent = "✓ Recorded. Listen to yourself, then reveal the answer.";
+          playB.hidden = false; revealB.hidden = revealed;
+        }
+        if (s === "idle") { recB.disabled = false; recB.innerHTML = "🎙 Record"; }
+      },
+      onError: function (msg) {
+        status.textContent = msg;
+        if (!R.hasClip()) saidB.hidden = revealed;
+      }
+    });
+    recB.addEventListener("click", function () { R.toggle(); });     // direct tap → getUserMedia
+    playB.addEventListener("click", function () { R.play(); });      // direct tap → audio.play()
+    saidB.addEventListener("click", function () { saidB.hidden = true; revealB.hidden = false; });
+    revealB.addEventListener("click", function () {
+      revealed = true; revealB.hidden = true; saidB.hidden = true;
+      var m = el("div", "ac-model", "<b>📖 Model Answer</b><div>" + esc(q.a) + "</div>" +
+        (q.keywords && q.keywords.length ? "<div class='ac-kw'>Key words: " + q.keywords.map(esc).join(" · ") + "</div>" : ""));
+      m.appendChild(btn("🔊 Hear Model Answer", "ac-ghost", function () { speak(q.a); }));
+      out.appendChild(m);
+      var self = el("div", "ac-row");
+      function pick(ok) {
+        self.innerHTML = "<div class='ac-fb " + (ok ? "ok" : "bad") + "'>" +
+          (ok ? "Great job! ✓" : "Keep practising — try it again later.") + "</div>";
+        if (o.onSelfScore) o.onSelfScore(ok);
+      }
+      self.appendChild(btn("✓ Got it", "ac-ok", function () { pick(true); }));
+      self.appendChild(btn("✗ Still learning", "ac-ghost", function () { pick(false); }));
+      out.appendChild(self);
+    });
+
+    [hearQ, recB, playB, saidB, revealB].forEach(function (b) { row.appendChild(b); });
+    card.appendChild(row); card.appendChild(status); card.appendChild(out);
+    container.appendChild(card);
+    return { destroy: function () { R.reset(); stopSpeech(); } };
+  }
+
+  /* ---------- answer normalising (for Check) ---------- */
+  function norm(s) {
+    return String(s == null ? "" : s).toLowerCase()
+      .replace(/[’‘`]/g, "'").replace(/[“”]/g, '"')
+      .replace(/[.,!?;:"]/g, " ").replace(/\s+/g, " ").trim();
+  }
+  function matches(given, answers) {
+    var list = Array.isArray(answers) ? answers : [answers];
+    for (var i = 0; i < list.length; i++) if (norm(given) === norm(list[i])) return true;
+    return false;
+  }
+
+  /* ---------- TAP-TO-ANSWER widgets (no keyboard needed on iPad/phone) ----
+     All three share the same contract:
+       AppCore.xxx(container, spec, {onResult: function(ok, given){...}})
+     They draw their own ✔ Check button (Enter also checks when typing),
+     lock after checking, and show green ✓ or the yellow correct-answer box.
+     Every widget has a small "⌨ Type instead" link for older kids.        */
+
+  function checkRow(onCheck) {
+    var row = el("div", "ac-row");
+    var b = btn("✔ Check", "ac-primary ac-check", onCheck);
+    b.disabled = true;
+    row.appendChild(b);
+    return { row: row, btn: b };
+  }
+  function feedback(box, ok, correctText, exp) {
+    var f = el("div", "ac-fb " + (ok ? "ok" : "bad"),
+      ok ? "✓ " + praise() :
+      "✗ Not quite. The answer is:<div class='ac-ans'>" + esc(correctText) + "</div>" +
+      (exp ? "<div class='ac-exp'>" + esc(exp) + "</div>" : ""));
+    box.appendChild(f);
+    return f;
+  }
+  function typeToggle(box, onType) {
+    var t = el("button", "ac-link", "⌨ Type instead");
+    t.type = "button";
+    t.addEventListener("click", function () { t.remove(); onType(); });
+    box.appendChild(t);
+  }
+  function typedInput(box, answers, done, exp, shown) {
+    var inp = el("input", "ac-input"); inp.setAttribute("autocapitalize", "off");
+    inp.setAttribute("autocomplete", "off"); inp.setAttribute("spellcheck", "false");
+    box.appendChild(inp);
+    var c = checkRow(function () { go(); });
+    box.appendChild(c.row);
+    inp.addEventListener("input", function () { c.btn.disabled = !inp.value.trim(); });
+    inp.addEventListener("keydown", function (e) { if (e.key === "Enter" && inp.value.trim()) go(); });
+    var used = false;
+    function go() {
+      if (used) return; used = true; inp.disabled = true; c.row.remove();
+      var ok = matches(inp.value, answers);
+      feedback(box, ok, shown, exp);
+      done(ok, inp.value);
+    }
+    inp.focus();
+  }
+
+  /* 1) Word bank → tap a word to fill the blank(s)
+     AppCore.wordBank(el, {
+        text: "The cat is ___ the box.",      // "___" marks each blank
+        bank: ["in", "on", "under"],          // chips shown under the sentence
+        answers: ["under"],                   // one per blank (string or array of accepted)
+        exp: "optional explanation"
+     }, {onResult})
+     Tap a chip → it goes into the first empty blank. Tap a filled blank → it
+     goes back. Words can be re-used if the bank has duplicates.            */
+  function wordBank(container, spec, o) {
+    o = o || {};
+    container.innerHTML = "";
+    var box = el("div", "ac-q"), parts = String(spec.text).split("___");
+    var n = parts.length - 1, filled = [], used = false;
+    for (var z = 0; z < n; z++) filled.push(null);
+    var line = el("div", "ac-sentence"), chips = el("div", "ac-chips");
+    var pool = spec.bank.map(function (w, i) { return { w: w, id: i, out: false }; });
+    var c = checkRow(check);
+    function render() {
+      line.innerHTML = "";
+      parts.forEach(function (p, i) {
+        line.appendChild(document.createTextNode(p));
+        if (i < n) {
+          var slot = el("button", "ac-slot" + (filled[i] ? " ac-filled" : ""), filled[i] ? esc(filled[i].w) : "&nbsp;");
+          slot.type = "button";
+          slot.addEventListener("click", function () {
+            if (used || !filled[i]) return;
+            filled[i].out = false; filled[i] = null; render();
+          });
+          line.appendChild(slot);
+        }
+      });
+      chips.innerHTML = "";
+      pool.forEach(function (it) {
+        var ch = el("button", "ac-chip" + (it.out ? " ac-used" : ""), esc(it.w));
+        ch.type = "button"; ch.disabled = used || it.out;
+        ch.addEventListener("click", function () {
+          var k = filled.indexOf(null);
+          if (k < 0) return;
+          filled[k] = it; it.out = true; render();
+        });
+        chips.appendChild(ch);
+      });
+      c.btn.disabled = used || filled.filter(Boolean).length < n;
+    }
+    function check() {
+      if (used) return; used = true; c.row.remove(); render();
+      var given = filled.map(function (f) { return f ? f.w : ""; });
+      var ok = given.every(function (g, i) { return matches(g, spec.answers[i]); });
+      var full = parts.map(function (p, i) {
+        var a = spec.answers[i]; return p + (i < n ? (Array.isArray(a) ? a[0] : a) : "");
+      }).join("");
+      feedback(box, ok, full, spec.exp);
+      if (o.onResult) o.onResult(ok, given.join(" / "));
+    }
+    box.appendChild(line); box.appendChild(chips); box.appendChild(c.row);
+    container.appendChild(box);
+    render();
+  }
+
+  /* 2) Build from tiles → unscramble a sentence, spell a word, order steps
+     AppCore.tiles(el, {
+        answer: "She always eats breakfast at seven.",   // or ["acceptable", ...]
+        unit: "word" | "letter" | "item",   // word: split on spaces, letter: per letter
+        items: [...],        // only for unit "item": the pieces in the CORRECT order
+        extra: ["never"],    // optional distractor tiles
+        hint: "optional instruction shown above",
+        exp: "optional explanation"
+     }, {onResult})
+     Tap a tile → it moves to the answer line; tap it there → it moves back.
+     Spelling (unit "letter") also offers "⌨ Type instead".                  */
+  function tiles(container, spec, o) {
+    o = o || {};
+    container.innerHTML = "";
+    var box = el("div", "ac-q"), unit = spec.unit || "word";
+    var first = Array.isArray(spec.answer) ? spec.answer[0] : spec.answer;
+    var pieces = unit === "item" ? spec.items.slice()
+      : unit === "letter" ? String(first).replace(/\s+/g, "").split("")
+      : String(first).replace(/[.!?]$/, "").split(/\s+/);
+    var tail = unit === "word" ? (String(first).match(/[.!?]$/) || [""])[0] : "";
+    var all = pieces.concat(spec.extra || []).map(function (t, i) { return { t: t, id: i }; });
+    var src;
+    do { src = shuffle(all); } while (all.length > 1 && src.map(function (x) { return x.t; }).join("|") === pieces.join("|"));
+    var ans = [], used = false;
+    if (spec.hint) box.appendChild(el("div", "ac-hint", esc(spec.hint)));
+    var line = el("div", "ac-tiles ac-answer-line"), pool = el("div", "ac-tiles");
+    var c = checkRow(check);
+    function joinUp(arr) {
+      var s = arr.map(function (x) { return x.t; });
+      return unit === "letter" ? s.join("") : unit === "item" ? s.join(" → ") : s.join(" ") + tail;
+    }
+    function render() {
+      line.innerHTML = ""; pool.innerHTML = "";
+      if (!ans.length) line.appendChild(el("span", "ac-placeholder", "Tap the tiles below in order"));
+      ans.forEach(function (x, i) {
+        var b = btn(esc(x.t), "ac-tile ac-in", function () { if (used) return; src.push(ans.splice(i, 1)[0]); render(); });
+        line.appendChild(b);
+      });
+      src.forEach(function (x, i) {
+        var b = btn(esc(x.t), "ac-tile", function () { if (used) return; ans.push(src.splice(i, 1)[0]); render(); });
+        pool.appendChild(b);
+      });
+      c.btn.disabled = used || !ans.length;
+    }
+    function check() {
+      if (used) return; used = true; c.row.remove(); render();
+      var given = joinUp(ans);
+      var target = unit === "item" ? [pieces.join(" → ")] : (Array.isArray(spec.answer) ? spec.answer : [spec.answer]);
+      var ok = unit === "letter" ? matches(given, target.map(function (a) { return String(a).replace(/\s+/g, ""); }))
+                                 : matches(given, target);
+      feedback(box, ok, unit === "item" ? pieces.join(" → ") : first, spec.exp);
+      if (o.onResult) o.onResult(ok, given);
+    }
+    box.appendChild(line); box.appendChild(pool); box.appendChild(c.row);
+    if (unit === "letter") typeToggle(box, function () {
+      line.remove(); pool.remove(); c.row.remove();
+      typedInput(box, spec.answer, function (ok, g) { used = true; if (o.onResult) o.onResult(ok, g); }, spec.exp, first);
+    });
+    container.appendChild(box);
+    render();
+  }
+
+  /* 3) Open answer (short answer, "write a sentence", "name 3 things")
+     Speak (🎤 → text) or type, then the answer is scored AUTOMATICALLY on
+     key points, the way a teacher marks a short answer.
+     AppCore.openAnswer(el, {
+        a: "Plants need water, sunlight and air.",          // model answer
+        points: [["water"], ["sunlight", "sun", "sunshine"], ["air"]],
+                     // each key point = accepted words/phrases (first = label)
+                     // or {label: "sunlight", any: ["sun", "sunshine"]}
+        need: 2,     // points needed to count as correct (default: all if
+                     // 1–2 points, otherwise ~70% rounded up)
+        exp: "optional explanation"
+     }, {onResult: function(ok, given, info){}})
+     info = {hits, total, appeal}. Matching ignores case, punctuation,
+     plurals (-s/-es/-ies), -ed/-ing and number words (three = 3).
+     "🙋 I think I'm right" marks the answer for a parent to check
+     (info.appeal = true); it does NOT change the score.               */
+  var NUMS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+              "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"];
+  function stem(w) {
+    var n = NUMS.indexOf(w); if (n >= 0) return String(n);
+    w = w.replace(/'s$/, "");
+    if (w.length > 4 && /ies$/.test(w)) return w.slice(0, -3) + "y";
+    if (w.length > 4 && /(ches|shes|sses|xes)$/.test(w)) return w.slice(0, -2);
+    if (w.length > 5 && /ing$/.test(w)) return w.slice(0, -3);
+    if (w.length > 4 && /ied$/.test(w)) return w.slice(0, -3) + "y";
+    if (w.length > 4 && /ed$/.test(w)) return w.slice(0, -2);
+    if (w.length > 3 && /s$/.test(w) && !/ss$/.test(w)) return w.slice(0, -1);
+    return w;
+  }
+  function stems(s) { return norm(s).split(" ").filter(Boolean).map(stem); }
+  function hasPhrase(words, phrase) {
+    var p = stems(phrase); if (!p.length) return false;
+    for (var i = 0; i + p.length <= words.length; i++) {
+      var ok = true;
+      for (var k = 0; k < p.length; k++) if (words[i + k] !== p[k]) { ok = false; break; }
+      if (ok) return true;
+    }
+    return false;
+  }
+  function keyPoints(spec) {
+    var src = spec.points && spec.points.length ? spec.points : (spec.keywords || []).map(function (k) { return [k]; });
+    return src.map(function (p) {
+      if (Array.isArray(p)) return { label: p[0], any: p };
+      return { label: p.label, any: [p.label].concat(p.any || []) };
+    });
+  }
+  function scorePoints(text, pts) {
+    var w = stems(text);
+    return pts.map(function (p) {
+      for (var i = 0; i < p.any.length; i++) if (hasPhrase(w, p.any[i])) return true;
+      return false;
+    });
+  }
+  function speechSupported() { return !!(window.SpeechRecognition || window.webkitSpeechRecognition); }
+
+  function openAnswer(container, spec, o) {
+    o = o || {};
+    container.innerHTML = "";
+    var pts = keyPoints(spec), total = pts.length;
+    var need = spec.need || (total <= 2 ? total : Math.ceil(total * 0.7));
+    var box = el("div", "ac-q"), done = false, rec = null, listening = false;
+    box.appendChild(el("div", "ac-hint", speechSupported()
+      ? "🎤 Tap the mic and say your answer, or type it. Then tap ✔ Check."
+      : "⌨ Type your answer (tip: the 🎤 key on the iPad keyboard lets you speak it). Then tap ✔ Check."));
+    var inp = el("textarea", "ac-input");
+    inp.setAttribute("autocapitalize", "sentences"); inp.setAttribute("spellcheck", "false");
+    inp.placeholder = "Your answer…";
+    var row = el("div", "ac-row"), status = el("div", "ac-status");
+    var mic = btn("🎤 Speak", "ac-rec");
+    var c = checkRow(check);
+    row.appendChild(mic); row.appendChild(c.btn);
+    if (!speechSupported()) mic.hidden = true;
+    inp.addEventListener("input", function () { c.btn.disabled = done || !inp.value.trim(); });
+    inp.addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey && inp.value.trim()) { e.preventDefault(); check(); } });
+
+    mic.addEventListener("click", function () {          // start inside the tap (iOS)
+      if (done) return;
+      if (listening && rec) { rec.stop(); return; }
+      var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      stopSpeech();
+      rec = new SR(); rec.lang = "en-US"; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
+      var base = inp.value.trim() ? inp.value.trim() + " " : "";
+      rec.onresult = function (e) {
+        var t = "";
+        for (var i = 0; i < e.results.length; i++) t += e.results[i][0].transcript;
+        inp.value = base + t; c.btn.disabled = !inp.value.trim();
+      };
+      rec.onerror = function (e) {
+        status.textContent = e.error === "not-allowed" || e.error === "service-not-allowed"
+          ? "Microphone or speech not allowed. Open in Safari/Chrome, allow the mic — or type your answer."
+          : e.error === "no-speech" ? "I didn't hear anything. Tap 🎤 and try again." : "Speech didn't work — please type your answer.";
+      };
+      rec.onend = function () { listening = false; mic.innerHTML = "🎤 Speak"; card(false); if (inp.value.trim()) status.textContent = "✓ Check the words, fix any mistakes, then tap ✔ Check."; };
+      try { rec.start(); listening = true; mic.innerHTML = "⏹ Stop"; card(true); status.textContent = "● Listening…"; }
+      catch (err) { status.textContent = "Speech didn't start — please type your answer."; }
+    });
+    function card(on) { box.classList.toggle("ac-recording", on); }
+
+    function check() {
+      if (done || !inp.value.trim()) return;
+      if (listening && rec) { try { rec.stop(); } catch (e) {} }
+      done = true; inp.disabled = true; row.remove();
+      var hits = scorePoints(inp.value, pts), n = hits.filter(Boolean).length, ok = n >= need;
+      var list = pts.map(function (p, i) {
+        return "<span class='ac-kp " + (hits[i] ? "hit" : "miss") + "'>" + (hits[i] ? "✓ " : "✗ ") + esc(p.label) + "</span>";
+      }).join(" ");
+      var f = el("div", "ac-fb " + (ok ? "ok" : "bad"),
+        (ok ? "✓ " + praise() : "Not quite — keep going! 💪") +
+        "<div class='ac-kps'>" + list + "</div><div class='ac-exp'>Key points: " + n + " / " + total +
+        (ok ? "" : " (need " + need + ")") + "</div>");
+      box.appendChild(f);
+      var m = el("div", "ac-model", "<b>Model answer</b><div>" + esc(spec.a) + "</div>" +
+        (spec.exp ? "<div class='ac-kw'>" + esc(spec.exp) + "</div>" : ""));
+      m.appendChild(btn("🔊 Hear it", "ac-ghost", function () { speak(spec.a); }));
+      box.appendChild(m);
+      var info = { hits: n, total: total, appeal: false };
+      if (!ok) {
+        var ap = btn("🙋 I think I'm right", "ac-ghost", function () {
+          info.appeal = true; ap.remove();
+          box.appendChild(el("div", "ac-exp", "Marked for a parent to check. 👍"));
+          if (o.onAppeal) o.onAppeal(inp.value, info);
+        });
+        box.appendChild(ap);
+      }
+      if (o.onResult) o.onResult(ok, inp.value, info);
+    }
+    box.appendChild(inp); box.appendChild(row); box.appendChild(status);
+    container.appendChild(box);
+  }
+
+  /* ---------- GAME LAYER: points, streaks, praise, confetti, best score ----
+     var G = AppCore.game("audrey-reading-1151-vocab");   // one per drill, key = unique
+     G.hud()                -> element: ⭐ points · 🔥 streak  (put it in the drill bar area)
+     G.record(ok)           -> call after EVERY judged answer (any mode)
+     G.summary()            -> {points, bestStreak, best, newBest}
+     resultView(log, {game: G, onRetryWrong: fn, ...}) shows it all.
+     Scoring: correct +10, streak bonus +2 per answer in a row (max +10).
+     Streak milestones (3, 5, 10, …) pop a cheer; 5+ and 100% fire confetti.
+     The best score per drill is kept on this device (localStorage, safe).  */
+  var PRAISE = ["Great job!", "Awesome!", "You got it!", "Super!", "Well done!", "Nice work!", "Brilliant!", "Fantastic!", "Way to go!", "Excellent!"];
+  function praise() { return PRAISE[Math.floor(Math.random() * PRAISE.length)]; }
+  function cheer(text) {
+    var t = el("div", "ac-cheer", esc(text));
+    document.body.appendChild(t);
+    setTimeout(function () { t.classList.add("ac-out"); }, 1100);
+    setTimeout(function () { t.remove(); }, 1600);
+  }
+  function confetti(n) {
+    var colors = ["#f59e0b", "#0284c7", "#16a34a", "#dc2626", "#a855f7", "#ec4899"];
+    var layer = el("div", "ac-confetti");
+    for (var i = 0; i < (n || 60); i++) {
+      var p = el("i");
+      p.style.left = Math.random() * 100 + "vw";
+      p.style.background = colors[i % colors.length];
+      p.style.animationDelay = (Math.random() * 0.4) + "s";
+      p.style.animationDuration = (1.2 + Math.random() * 1.2) + "s";
+      p.style.transform = "rotate(" + Math.floor(Math.random() * 360) + "deg)";
+      layer.appendChild(p);
+    }
+    document.body.appendChild(layer);
+    setTimeout(function () { layer.remove(); }, 3000);
+  }
+  function game(key, gopt) {
+    gopt = gopt || {};
+    var boss = gopt.boss ? bossWidget(gopt.boss) : null;
+    var pts = 0, streak = 0, bestStreak = 0, hudEl = null, best = 0, newBest = false;
+    try { best = parseInt(localStorage.getItem("ac-best-" + key) || "0", 10) || 0; } catch (e) { best = 0; }
+    function draw() {
+      if (hudEl) hudEl.innerHTML = "⭐ " + pts + (streak >= 2 ? " &nbsp; 🔥 " + streak + " in a row" : "");
+    }
+    return {
+      hud: function () { hudEl = el("span", "ac-hud"); draw(); if (!boss) return hudEl; var w = el("span", "ac-hudwrap"); w.appendChild(hudEl); w.appendChild(boss.el); return w; },
+      boss: boss,
+      record: function (ok) {
+        try { if (window.SitePoints) window.SitePoints.answer(!!ok); } catch (e) {}
+        if (ok) {
+          streak++; bestStreak = Math.max(bestStreak, streak);
+          pts += 10 + Math.min(10, (streak - 1) * 2);
+          if (streak === 3) cheer("🔥 3 in a row!");
+          else if (streak === 5) { cheer("🚀 5 in a row! Amazing!"); confetti(40); }
+          else if (streak > 5 && streak % 5 === 0) { cheer("🏆 " + streak + " in a row! Unstoppable!"); confetti(60); }
+        } else {
+          if (streak >= 3) cheer("Good try! Start a new streak 💪");
+          streak = 0;
+        }
+        if (boss) boss.hit(!!ok, streak);
+        draw();
+      },
+      summary: function () {
+        if (pts > best) {
+          newBest = best > 0 || pts > 0; best = pts;
+          try { localStorage.setItem("ac-best-" + key, String(pts)); } catch (e) {}
+        }
+        return { points: pts, bestStreak: bestStreak, best: best, newBest: newBest };
+      }
+    };
+  }
+
+  /* =================================================================
+     PLAY LAYER (2026-11-08) — more game-like practice for English apps
+     ----------------------------------------------------------------
+     1) Boss battle      game(key, {boss: {name, hp}})  — every correct
+                          answer hits the boss (streak = bigger hits);
+                          HP bar in the drill bar; defeat → confetti.
+                          bossFor(n, name) gives a fair HP for n questions.
+     2) Word flip        memory(container, {key, pairs:[[word, meaning]],
+                          size: 6|8, speak: true, onDone(pct)})
+     3) Sort game        sortGame(container, {key, bins:["Solid","Liquid"],
+                          items:[{t:"ice", bin:0, exp:"…"}], onDone(log)})
+                          tap an item card, then tap its bin (no dragging)
+     4) Evidence hunt    evidence(container, {passage:["sentence 1", …],
+                          q:"Why did …?", correct:[2], exp:"…", onResult(ok)})
+                          tap the sentence(s) that PROVE the answer
+     5) Sentence race    sentenceRace(container, {key, seconds: 90,
+                          items:[{answer:"She has eaten.", extra:["eat"], hint:"…"}],
+                          onDone(log)}) — build as many sentences as you can
+     All report to SitePoints (points, quests, 🎒 creatures) automatically.
+     ================================================================= */
+  var BOSS_C = ["#7c3aed", "#0891b2", "#be123c", "#15803d", "#c2410c", "#4338ca"];
+  function bossSvg(seed, hurt) {
+    var c = BOSS_C[seed % BOSS_C.length], k = "#111827";
+    return '<svg viewBox="0 0 100 100" width="100%" height="100%" aria-hidden="true">' +
+      '<path d="M22 34 L14 10 L34 26Z M78 34 L86 10 L66 26Z" fill="' + c + '"/>' +
+      '<path d="M16 60 Q16 22 50 22 Q84 22 84 60 Q84 92 50 92 Q16 92 16 60Z" fill="' + c + '"/>' +
+      '<path d="M16 66 Q6 58 8 72 M84 66 Q94 58 92 72" stroke="' + c + '" stroke-width="7" stroke-linecap="round" fill="none"/>' +
+      (hurt ? '<path d="M32 48 L42 56 M42 48 L32 56 M58 48 L68 56 M68 48 L58 56" stroke="#fff" stroke-width="4" stroke-linecap="round"/>'
+            : '<circle cx="37" cy="52" r="8" fill="#fff"/><circle cx="63" cy="52" r="8" fill="#fff"/><circle cx="38" cy="53" r="4" fill="' + k + '"/><circle cx="62" cy="53" r="4" fill="' + k + '"/>' +
+              '<path d="M28 40 L44 46 M72 40 L56 46" stroke="' + k + '" stroke-width="3.5" stroke-linecap="round"/>') +
+      '<path d="M36 72 Q50 ' + (hurt ? "64" : "80") + ' 64 72" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>' +
+      '<path d="M40 72 L43 77 L46 73 M54 73 L57 77 L60 72" fill="#fff"/></svg>';
+  }
+  function bossFor(n, name) { return { name: name || "Quiz Monster", hp: Math.max(30, Math.round(n * 10 * 0.75)) }; }
+  function bossWidget(b) {
+    var hp = b.hp, max = b.hp, seed = 0, done = false, w = el("span", "ac-boss");
+    for (var i = 0; i < (b.name || "").length; i++) seed += b.name.charCodeAt(i);
+    function draw(fx) {
+      w.innerHTML = '<span class="ac-boss-pic' + (fx ? " " + fx : "") + '">' + bossSvg(seed, hp <= 0) + '</span>' +
+        '<span class="ac-boss-info"><b>' + esc(b.name) + '</b><span class="ac-hp"><i style="width:' + Math.max(0, hp / max * 100) + '%"></i></span>' +
+        '<small>' + (hp > 0 ? "HP " + hp + " / " + max : "Defeated! 🏆") + '</small></span>';
+    }
+    draw();
+    return {
+      el: w,
+      hit: function (ok, streak) {
+        if (done) return;
+        if (ok) {
+          var dmg = 10 + Math.min(10, (streak - 1) * 2);
+          hp = Math.max(0, hp - dmg); draw("ac-hit");
+          if (hp <= 0) { done = true; setTimeout(function () { cheer("🏆 You defeated " + b.name + "!"); confetti(90); }, 300); }
+        } else draw("ac-laugh");
+      },
+      defeated: function () { return done; }
+    };
+  }
+
+  /* ---------- 2) word flip memory ---------- */
+  function memory(container, o) {
+    var size = o.size || 6, key = "ac-mem-" + (o.key || "x") + "-" + size;
+    var pool = shuffle(o.pairs).slice(0, size), cards = [];
+    pool.forEach(function (p, i) { cards.push({ id: i, side: 0, t: p[0] }, { id: i, side: 1, t: p[1] }); });
+    cards = shuffle(cards);
+    var open = [], matched = 0, moves = 0, combo = 0, lock = false, t0 = 0, timer = null;
+    container.innerHTML = "";
+    var hud = el("div", "ac-mem-hud"), grid = el("div", "ac-mem" + (size > 6 ? " ac-mem16" : ""));
+    container.appendChild(hud); container.appendChild(grid);
+    function drawHud() {
+      var s = t0 ? Math.floor((Date.now() - t0) / 1000) : 0;
+      hud.innerHTML = "⏱ " + Math.floor(s / 60) + ":" + ("0" + s % 60).slice(-2) + " &nbsp; 🔄 " + moves + " &nbsp; ✅ " + matched + " / " + size;
+    }
+    function draw() {
+      grid.innerHTML = "";
+      cards.forEach(function (c, i) {
+        var b = el("button", "ac-mc" + (c.open || c.done ? " open" : "") + (c.done ? " done" : "") + (c.side ? " back" : ""),
+          c.open || c.done ? esc(c.t) : "?");
+        b.type = "button";
+        b.addEventListener("click", function () { flip(i); });
+        grid.appendChild(b);
+      });
+      drawHud();
+    }
+    function flip(i) {
+      var c = cards[i];
+      if (lock || c.open || c.done) return;
+      if (!t0) { t0 = Date.now(); timer = setInterval(drawHud, 500); }
+      c.open = true; open.push(c);
+      if (o.speak !== false && c.side === 0) speak(c.t);
+      if (open.length === 2) {
+        moves++;
+        var a = open[0], z = open[1];
+        if (a.id === z.id) {
+          a.done = z.done = true; a.open = z.open = false; open = []; matched++; combo++;
+          try { if (window.SitePoints) window.SitePoints.answer(true); } catch (e) {}
+          if (combo >= 2) cheer("🔥 " + combo + " combo!");
+          draw();
+          if (matched === size) finish();
+        } else {
+          combo = 0; lock = true; draw();
+          setTimeout(function () { a.open = z.open = false; open = []; lock = false; draw(); }, 900);
+        }
+      } else draw();
+    }
+    function finish() {
+      clearInterval(timer);
+      var secs = Math.round((Date.now() - t0) / 1000), st = moves <= size + 2 ? 3 : moves <= Math.ceil(size * 1.7) ? 2 : 1;
+      var pct = Math.round(100 * size / moves), best = null;
+      try { best = JSON.parse(localStorage.getItem(key) || "null"); } catch (e) {}
+      var rec = !best || secs < best.s; if (rec) try { localStorage.setItem(key, JSON.stringify({ s: secs, m: moves })); } catch (e) {}
+      if (st === 3) confetti(70);
+      try { if (window.SitePoints) window.SitePoints.roundEnd(Math.min(100, pct)); } catch (e) {}
+      var box = el("div", "ac-result", '<div class="ac-stars">' + new Array(st + 1).join("⭐") + '</div><h2>All pairs found in ' + secs + ' s, ' + moves + ' flips</h2>' +
+        (rec ? '<p class="ac-cheerline">🏆 New record!</p>' : best ? '<p>Best: ' + best.s + ' s</p>' : ''));
+      var row = el("div", "ac-row ac-center");
+      row.appendChild(btn("🔄 Play again", "ac-primary", function () { memory(container, o); }));
+      if (o.onHome) row.appendChild(btn("🏠 Home", "ac-ghost", o.onHome));
+      box.appendChild(row); container.appendChild(box);
+      if (o.onDone) o.onDone(pct);
+    }
+    draw();
+  }
+
+  /* ---------- 3) sort game (tap item → tap bin) ---------- */
+  function sortGame(container, o) {
+    var items = shuffle(o.items), i = 0, log = [], G = game("sort-" + (o.key || "x"));
+    container.innerHTML = "";
+    var bar = drillBar({ title: o.title || "Sort it!", onBack: o.onHome, game: G, onFinish: done });
+    var card = el("div", "ac-sort-item"), bins = el("div", "ac-bins"), fb = el("div");
+    container.appendChild(bar); container.appendChild(el("p", "ac-hint", "Tap the box where this belongs.")); container.appendChild(card); container.appendChild(bins); container.appendChild(fb);
+    o.bins.forEach(function (name, k) {
+      var b = btn(esc(name), "ac-bin", function () { choose(k, b); });
+      bins.appendChild(b);
+    });
+    function show() {
+      if (i >= items.length) return done();
+      card.innerHTML = '<span class="ac-sort-n">' + (i + 1) + " / " + items.length + '</span><b>' + esc(items[i].t) + '</b>';
+      fb.innerHTML = ""; Array.prototype.forEach.call(bins.children, function (b) { b.disabled = false; b.className = "ac-btn ac-bin"; });
+    }
+    function choose(k, b) {
+      var it = items[i], ok = k === it.bin;
+      G.record(ok); log.push({ q: it.t, given: o.bins[k], correct: o.bins[it.bin], ok: ok, item: it });
+      Array.prototype.forEach.call(bins.children, function (x, j) { x.disabled = true; if (j === it.bin) x.className += " ac-bin-ok"; else if (x === b) x.className += " ac-bin-bad"; });
+      fb.innerHTML = '<div class="ac-fb ' + (ok ? "ok" : "bad") + '">' + (ok ? praise() : "It goes in <b>" + esc(o.bins[it.bin]) + "</b>.") +
+        (it.exp ? '<div class="ac-exp">' + esc(it.exp) + '</div>' : '') + '</div>';
+      var nx = btn(i + 1 < items.length ? "Next ➡" : "See my score", "ac-primary", function () { i++; show(); });
+      fb.appendChild(nx);
+    }
+    function done() {
+      container.innerHTML = "";
+      container.appendChild(resultView(log, { game: G, onAgain: function () { sortGame(container, o); }, onHome: o.onHome,
+        onRetryWrong: function () { sortGame(container, Object.assign({}, o, { items: log.filter(function (x) { return !x.ok; }).map(function (x) { return x.item; }) })); } }));
+      if (o.onDone) o.onDone(log);
+    }
+    show();
+  }
+
+  /* ---------- 4) evidence hunt ---------- */
+  function evidence(container, o) {
+    var picked = [], need = o.correct.length, done = false;
+    container.innerHTML = "";
+    container.appendChild(el("p", "ac-q", "<b>" + esc(o.q) + "</b>"));
+    if (o.answer) container.appendChild(el("p", "ac-hint", "Answer: " + esc(o.answer)));
+    container.appendChild(el("p", "ac-hint", "🔎 Find the evidence: tap the sentence" + (need > 1 ? "s (" + need + ")" : "") + " that prove" + (need > 1 ? "" : "s") + " it."));
+    var box = el("div", "ac-passage"), fb = el("div");
+    o.passage.forEach(function (s, k) {
+      var sp = el("span", "ac-sent", esc(s) + " ");
+      sp.setAttribute("role", "button"); sp.tabIndex = 0;
+      sp.addEventListener("click", function () {
+        if (done) return;
+        var at = picked.indexOf(k);
+        if (at >= 0) { picked.splice(at, 1); sp.classList.remove("ac-picked"); }
+        else if (picked.length < need) { picked.push(k); sp.classList.add("ac-picked"); }
+        chk.disabled = picked.length !== need;
+      });
+      box.appendChild(sp);
+    });
+    container.appendChild(box);
+    var chk = btn("✔ Check", "ac-primary", function () {
+      done = true; chk.disabled = true;
+      var ok = picked.length === need && picked.every(function (k) { return o.correct.indexOf(k) >= 0; });
+      Array.prototype.forEach.call(box.children, function (sp, k) {
+        if (o.correct.indexOf(k) >= 0) sp.classList.add("ac-evid");
+        else if (picked.indexOf(k) >= 0) sp.classList.add("ac-wrongpick");
+      });
+      fb.innerHTML = '<div class="ac-fb ' + (ok ? "ok" : "bad") + '">' + (ok ? "🔎 Great detective work! " + praise() : "The highlighted sentence is the evidence.") +
+        (o.exp ? '<div class="ac-exp">' + esc(o.exp) + '</div>' : '') + '</div>';
+      if (o.onResult) o.onResult(ok, picked);
+    });
+    chk.disabled = true;
+    container.appendChild(chk); container.appendChild(fb);
+  }
+
+  /* ---------- 5) sentence race ---------- */
+  function sentenceRace(container, o) {
+    var secs = o.seconds || 90, items = shuffle(o.items), i = 0, log = [], G = game("race-" + (o.key || "x")), t0 = Date.now(), timer, over = false;
+    container.innerHTML = "";
+    var bar = drillBar({ title: "⏱ Sentence Race", onBack: function () { clearInterval(timer); if (o.onHome) o.onHome(); }, game: G, onFinish: end });
+    var clock = el("div", "ac-race-clock"), area = el("div");
+    container.appendChild(bar); container.appendChild(clock); container.appendChild(area);
+    function tick() {
+      var left = Math.max(0, secs - Math.floor((Date.now() - t0) / 1000));
+      clock.innerHTML = '<span class="ac-hp ac-time"><i style="width:' + (left / secs * 100) + '%"></i></span> ' + left + " s";
+      if (left <= 0) end();
+    }
+    timer = setInterval(tick, 250); tick();
+    function next() {
+      if (over) return;
+      if (i >= items.length) { items = items.concat(shuffle(o.items)); }
+      var it = items[i];
+      tiles(area, { answer: it.answer, extra: it.extra || [], hint: it.hint || "Build the sentence:", exp: it.exp }, {
+        onResult: function (ok, given) {
+          G.record(ok); log.push({ q: it.hint || "Build the sentence", given: given, correct: Array.isArray(it.answer) ? it.answer[0] : it.answer, ok: ok, item: it });
+          i++; setTimeout(next, ok ? 450 : 1300);
+        }
+      });
+    }
+    function end() {
+      if (over) return; over = true; clearInterval(timer);
+      container.innerHTML = "";
+      container.appendChild(el("h2", "ac-center", "⏱ Time! You built " + log.filter(function (x) { return x.ok; }).length + " correct sentences."));
+      container.appendChild(resultView(log, { game: G, onAgain: function () { sentenceRace(container, o); }, onHome: o.onHome }));
+      if (o.onDone) o.onDone(log);
+    }
+    next();
+  }
+
+  /* ---------- styles (call once) ---------- */
+  var CSS =
+    ".ac-btn{font:inherit;font-size:1.05rem;min-height:50px;padding:10px 16px;border-radius:12px;border:2px solid transparent;cursor:pointer;margin:4px 6px 4px 0;touch-action:manipulation}" +
+    ".ac-btn[disabled]{opacity:.5}" +
+    ".ac-primary{background:#0284c7;color:#fff}.ac-ok{background:#16a34a;color:#fff}" +
+    ".ac-rec{background:#dc2626;color:#fff}.ac-finish{background:#f59e0b;color:#1f2937;font-weight:700}" +
+    ".ac-ghost{background:transparent;color:inherit;border-color:currentColor}" +
+    ".ac-bar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 10px;margin:0 -10px 12px;background:inherit;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-bottom:1px solid rgba(127,127,127,.3)}" +
+    ".ac-bar-title{flex:1;min-width:120px;opacity:.8}" +
+    ".ac-row{display:flex;flex-wrap:wrap;align-items:center}" +
+    ".ac-result{text-align:center}.ac-stars{font-size:2.2rem;margin:8px 0}" +
+    ".ac-review{text-align:left;margin:16px 0}.ac-review-item{padding:10px 12px;border-left:4px solid #dc2626;margin:8px 0;border-radius:8px;background:rgba(220,38,38,.08)}" +
+    ".ac-given{opacity:.8}.ac-correct{font-weight:700;color:#15803d}" +
+    ".ac-notice{background:#1a0a2a;border:2px solid #a855f7;color:#e9d5ff;border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:.92rem;line-height:1.7}" +
+    ".ac-notice strong{color:#c084fc}" +
+    ".ac-oral{padding:14px;border-radius:14px;border:1px solid rgba(127,127,127,.35);margin-bottom:14px}" +
+    ".ac-oral-q{font-size:1.25rem;font-weight:700;margin:8px 0 10px}" +
+    ".ac-badge{display:inline-block;background:#dc2626;color:#fff;border-radius:999px;padding:2px 10px;font-size:.85rem}" +
+    ".ac-recording{box-shadow:0 0 0 3px #dc2626}" +
+    ".ac-status{min-height:1.4em;margin:6px 0;opacity:.85}" +
+    ".ac-model{background:rgba(22,163,74,.12);border:2px solid #16a34a;border-radius:12px;padding:12px;margin:10px 0}" +
+    ".ac-kw{margin-top:6px;opacity:.85}" +
+    ".ac-fb{padding:10px 14px;border-radius:10px;font-weight:700;margin-top:8px}.ac-fb.ok{background:rgba(22,163,74,.15);color:#15803d}.ac-fb.bad{background:rgba(245,158,11,.18)}" +
+    ".ac-ans{font-size:1.25rem;margin-top:4px}.ac-exp{font-weight:400;margin-top:4px;opacity:.85}" +
+    ".ac-q{margin:6px 0}.ac-hint{opacity:.8;margin-bottom:8px}" +
+    ".ac-sentence{font-size:1.2rem;line-height:2.4;margin-bottom:10px}" +
+    ".ac-slot{font:inherit;min-width:90px;min-height:44px;margin:0 4px;padding:4px 12px;border:none;border-bottom:3px solid #0284c7;border-radius:6px;background:rgba(2,132,199,.08);color:inherit;cursor:pointer}" +
+    ".ac-slot.ac-filled{background:#0284c7;color:#fff;border-bottom-color:#075985}" +
+    ".ac-chips,.ac-tiles{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}" +
+    ".ac-chip,.ac-tile{font:inherit;font-size:1.1rem;min-height:48px;min-width:48px;padding:8px 14px;border-radius:12px;border:2px solid #0284c7;background:transparent;color:inherit;cursor:pointer;touch-action:manipulation}" +
+    ".ac-chip.ac-used{opacity:.3}.ac-tile.ac-in{background:#0284c7;color:#fff}" +
+    ".ac-answer-line{min-height:62px;padding:6px;border:2px dashed rgba(127,127,127,.5);border-radius:12px;align-items:center}" +
+    ".ac-placeholder{opacity:.55;padding:0 6px}" +
+    ".ac-input{font:inherit;font-size:1.15rem;width:100%;max-width:520px;min-height:50px;padding:8px 12px;border-radius:10px;border:2px solid rgba(127,127,127,.5);background:transparent;color:inherit;display:block;margin:8px 0}" +
+    "textarea.ac-input{min-height:90px}" +
+    ".ac-link{font:inherit;font-size:.9rem;background:none;border:none;color:#0284c7;text-decoration:underline;cursor:pointer;padding:6px 0;margin-top:4px}" +
+    ".ac-hud{font-weight:700;white-space:nowrap}" +
+    ".ac-cheer{position:fixed;left:50%;top:22%;transform:translate(-50%,0) scale(1);z-index:9999;background:#f59e0b;color:#1f2937;font-weight:800;font-size:1.4rem;padding:14px 24px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:ac-pop .35s ease-out;transition:opacity .5s,transform .5s;pointer-events:none}" +
+    ".ac-cheer.ac-out{opacity:0;transform:translate(-50%,-30px)}" +
+    "@keyframes ac-pop{from{transform:translate(-50%,0) scale(.4)}to{transform:translate(-50%,0) scale(1)}}" +
+    ".ac-confetti{position:fixed;inset:0;pointer-events:none;z-index:9998;overflow:hidden}" +
+    ".ac-confetti i{position:absolute;top:-12px;width:10px;height:14px;border-radius:2px;animation:ac-fall linear forwards}" +
+    "@keyframes ac-fall{to{top:105vh;transform:rotate(720deg)}}" +
+    ".ac-cheerline{font-size:1.15rem;font-weight:700}" +
+    ".ac-gamebox{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin:10px 0;padding:10px;border-radius:12px;background:rgba(245,158,11,.14)}" +
+    ".ac-center{justify-content:center}" +
+    ".ac-kps{margin:6px 0;display:flex;flex-wrap:wrap;gap:6px}.ac-kp{padding:3px 10px;border-radius:999px;font-weight:700}" +
+    ".ac-kp.hit{background:rgba(22,163,74,.18);color:#15803d}.ac-kp.miss{background:rgba(220,38,38,.12);color:#b91c1c}" +
+    ".ac-flag{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:#fde68a;color:#78350f;font-size:.85rem}" +
+    ".ac-hudwrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px;flex-basis:100%;order:3}" +
+    ".ac-boss{display:flex;align-items:center;gap:8px;flex:1;min-width:200px}.ac-boss-pic{width:52px;height:52px;flex:none;display:inline-block}.ac-boss-info{flex:1;display:flex;flex-direction:column;font-size:.85rem}" +
+    ".ac-hp{display:block;height:10px;border-radius:99px;background:rgba(127,127,127,.25);overflow:hidden;margin:3px 0}.ac-hp i{display:block;height:100%;background:linear-gradient(90deg,#dc2626,#f59e0b);transition:width .4s}.ac-time i{background:linear-gradient(90deg,#0284c7,#22c55e)}" +
+    ".ac-hit{animation:ac-hit .35s}.ac-laugh{animation:ac-laugh .5s}@keyframes ac-hit{30%{transform:translateX(-6px) rotate(-8deg);filter:brightness(1.8)}70%{transform:translateX(6px)}}@keyframes ac-laugh{50%{transform:scale(1.15) translateY(-4px)}}" +
+    ".ac-mem-hud{font-weight:700;margin:6px 0 10px}.ac-mem{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}" +
+    ".ac-mc{font:inherit;min-height:84px;border-radius:12px;border:2px solid #0284c7;background:#0284c7;color:#fff;font-size:1.6rem;cursor:pointer;padding:6px;touch-action:manipulation;word-break:break-word}" +
+    ".ac-mc.open{background:transparent;color:inherit;font-size:1rem;line-height:1.25}.ac-mc.open.back{font-size:.85rem}.ac-mc.done{border-color:#16a34a;background:rgba(22,163,74,.15);color:inherit;font-size:.9rem}" +
+    ".ac-sort-item{font-size:1.5rem;text-align:center;padding:18px;border-radius:16px;border:2px dashed #0284c7;margin:8px 0 12px}.ac-sort-n{display:block;font-size:.8rem;opacity:.7}" +
+    ".ac-bins{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}.ac-bin{background:rgba(2,132,199,.1);color:inherit;border-color:#0284c7;min-height:70px;font-weight:700}.ac-bin-ok{background:#16a34a!important;color:#fff!important}.ac-bin-bad{background:#dc2626!important;color:#fff!important}" +
+    ".ac-passage{line-height:2;font-size:1.1rem;margin:8px 0 12px}.ac-sent{cursor:pointer;border-radius:6px;padding:2px 0}.ac-picked{background:#fde68a;color:#1f2937}.ac-evid{background:rgba(22,163,74,.25);outline:2px solid #16a34a}.ac-wrongpick{background:rgba(220,38,38,.18);text-decoration:line-through}" +
+    ".ac-race-clock{font-weight:800;font-size:1.1rem;margin:4px 0 10px}" +
+    "@media (prefers-reduced-motion:reduce){.ac-confetti{display:none}.ac-cheer{animation:none}}";
+  function injectCSS() {
+    if (document.getElementById("ac-css")) return;
+    var s = document.createElement("style"); s.id = "ac-css"; s.textContent = CSS;
+    document.head.appendChild(s);
+  }
+
+  return {
+    VERSION: "2026-11-08",
+    esc: esc, el: el, btn: btn, shuffle: shuffle,
+    speak: speak, stopSpeech: stopSpeech, getBestVoice: getBestVoice,
+    dealer: dealer, stars: stars, result: result,
+    drillBar: drillBar, resultView: resultView,
+    recorder: recorder, oralCard: oralCard, pickMime: pickMime,
+    norm: norm, matches: matches, scorePoints: function (t, p) { return scorePoints(t, keyPoints({points: p})); },
+    wordBank: wordBank, tiles: tiles, openAnswer: openAnswer,
+    game: game, praise: praise, cheer: cheer, confetti: confetti,
+    bossFor: bossFor, memory: memory, sortGame: sortGame, evidence: evidence, sentenceRace: sentenceRace,
+    WEBVIEW_NOTICE: WEBVIEW_NOTICE, injectCSS: injectCSS
+  };
+})();
+
+/* =====================================================================
+   study-kit.js — read-aloud, level map and 素養題組 for any practice app
+   Canonical copy: github.com/iam5980/kids-practice/template/study-kit.js
+   Version: 2026-10-25
+
+   HOW TO USE: paste the whole file inside the page's main <script> (before
+   the app code). Works for 中文部 apps and English apps alike. Call
+   KidKit.injectCSS() once. Points/badges are reported to SitePoints
+   (from site-home.js) automatically when it is on the page.
+
+   1) READ-ALOUD
+      KidKit.say(text, {lang: "zh-TW" | "en-US", rate, math: true})
+      KidKit.sayBtn(text, label, opts)  -> HTML string for a 🔊 button
+        Clicks are handled by one delegated listener (no inline onclick).
+        math: true turns 6 1/2 → 6又2分之1, 13/2 → 2分之13, × → 乘 …
+        Put the definition's 🔊 INSIDE the element that "考自己" covers,
+        so it cannot be heard before the answer is revealed.
+
+   2) LEVEL MAP (闖關地圖) — one level per lesson/unit, 1–3 stars, never locked
+      var map = KidKit.levelMap(container, {
+          key: "au-zh-science-1151-mid",          // unique per app
+          levels: [{id: "L1", name: "第 1 課 …"}, …, {id: "LIT", name: "素養題組"}],
+          lang: "zh-TW",
+          onPlay: function (id) { … start that level … } });
+      KidKit.levelResult(key, id, pct)   -> stars earned (call when a level ends)
+      Stars: ≥90% ★★★, ≥70% ★★, ≥40% ★, else 0. Best result is kept.
+
+   3) 素養題組 (reading-heavy question sets)
+      KidKit.passageSet(container, {
+          title: "颱風來了",
+          source: "teacher" | "self",               // self → 「自編」 label
+          passage: "長文…（可含 <b>、<br>、<img>）",
+          figure: "data:image/…",                    // optional
+          lang: "zh-TW",
+          questions: [
+            {type: "mc",    q: "…", choices: ["對的", "錯1", "錯2"], exp: "…"},  // first choice = correct
+            {type: "tf",    q: "…", answer: true, exp: "…"},
+            {type: "multi", q: "…（選出兩個）", choices: [...], correct: [0, 2], exp: "…"},
+            {type: "order", q: "…", items: ["第1步", "第2步", "第3步"], exp: "…"},       // items in correct order
+            {type: "open",  q: "…", a: "參考答案", points: [["蒸發"], ["凝結", "變成水滴"]], need: 2}
+          ]}, {onDone: function (r) { … r = {correct, total, allOk} … }});
+      Passage stays one tap away (📖 看文章), can be read aloud, questions are
+      judged one by one, choices are shuffled, and the set reports to
+      SitePoints.literacy() when finished.
+   ===================================================================== */
+var KidKit = (function () {
+  "use strict";
+  function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+  function sp(name) { return window.SitePoints && window.SitePoints[name] ? window.SitePoints : null; }
+
+  /* ---------- read-aloud ---------- */
+  var voices = [];
+  function loadVoices() { try { voices = speechSynthesis.getVoices() || []; } catch (e) {} }
+  if (window.speechSynthesis) {
+    loadVoices();
+    try { speechSynthesis.addEventListener("voiceschanged", loadVoices); } catch (e) { speechSynthesis.onvoiceschanged = loadVoices; }
+  }
+  function pickVoice(lang) {
+    var v = voices.length ? voices : (window.speechSynthesis ? speechSynthesis.getVoices() : []);
+    var tests = lang.indexOf("zh") === 0
+      ? [/zh[-_]TW/i, /zh[-_](HK|Hant)/i, /^(zh|cmn)/i]
+      : [/^Samantha$/, /^Karen$/, /Google US English/, /en[-_]US/i, /^en/i];
+    for (var t = 0; t < tests.length; t++) for (var i = 0; i < v.length; i++) {
+      if (tests[t].test(lang.indexOf("zh") === 0 ? v[i].lang : (t < 3 ? v[i].name : v[i].lang))) return v[i];
+    }
+    return null;
+  }
+  function plain(html) { var d = document.createElement("div"); d.innerHTML = String(html); return (d.textContent || "").replace(/\s+/g, " ").trim(); }
+  function mathSpeech(s) {
+    return s
+      .replace(/(\d+)\s+(\d+)\s*\/\s*(\d+)/g, "$1又$3分之$2")
+      .replace(/(\d+)\s*\/\s*(\d+)/g, "$2分之$1")
+      .replace(/[×xX＊*](?=\s*\d)/g, "乘").replace(/[÷]/g, "除以")
+      .replace(/[＋+]/g, "加").replace(/(\d)\s*[－-]\s*(\d)/g, "$1減$2")
+      .replace(/[＝=]/g, "等於").replace(/[→⇒]/g, "，變成").replace(/＞|>/g, "大於").replace(/＜|</g, "小於")
+      .replace(/≒/g, "約等於").replace(/（例/g, "（例如");
+  }
+  function say(text, o) {
+    o = o || {};
+    var lang = o.lang || "zh-TW";
+    if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined") { hint("這個瀏覽器不支援朗讀，請改用 Safari 或 Chrome。"); return; }
+    var t = plain(text);
+    if (o.math) t = mathSpeech(t);
+    try {
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(t);
+      u.lang = lang; u.rate = o.rate || (lang.indexOf("zh") === 0 ? 0.85 : 0.88);
+      var v = pickVoice(lang); if (v) u.voice = v;
+      say._u = u;
+      speechSynthesis.speak(u);
+      if (!v && lang.indexOf("zh") === 0) hint("找不到中文語音，聲音可能不正確。可在 iPad 設定裡加裝「中文（台灣）」語音。");
+    } catch (e) { hint("朗讀失敗，請再按一次。"); }
+  }
+  function hint(msg) {
+    var t = document.getElementById("kk-hint");
+    if (!t) { t = el("div"); t.id = "kk-hint"; t.setAttribute("role", "status"); document.body.appendChild(t); }
+    t.textContent = msg; t.className = "kk-hint kk-show";
+    clearTimeout(hint._t); hint._t = setTimeout(function () { t.className = "kk-hint"; }, 3200);
+  }
+  function sayBtn(text, label, o) {
+    o = o || {};
+    return '<button type="button" class="kk-say" data-kk-say="' + esc(plain(text)) + '"' +
+      (o.lang ? ' data-kk-lang="' + esc(o.lang) + '"' : "") + (o.math ? ' data-kk-math="1"' : "") +
+      ' aria-label="' + esc((label || "朗讀") + "：" + plain(text).slice(0, 40)) + '">🔊' + (label ? " " + esc(label) : "") + "</button>";
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("[data-kk-say]");
+    if (!b) return;
+    e.stopPropagation(); e.preventDefault();
+    say(b.getAttribute("data-kk-say"), { lang: b.getAttribute("data-kk-lang") || "zh-TW", math: b.hasAttribute("data-kk-math") });
+  }, true);
+
+  /* ---------- level map ---------- */
+  function lvLoad(key) { try { return JSON.parse(localStorage.getItem("kk-lv-" + key) || "{}"); } catch (e) { return {}; } }
+  function starsFor(pct) { return pct >= 90 ? 3 : pct >= 70 ? 2 : pct >= 40 ? 1 : 0; }
+  function levelResult(key, id, pct) {
+    var d = lvLoad(key), s = starsFor(pct);
+    if (!d[id] || s > d[id]) { d[id] = s; try { localStorage.setItem("kk-lv-" + key, JSON.stringify(d)); } catch (e) {} }
+    var p = sp("roundEnd"); if (p) p.roundEnd(pct);
+    return s;
+  }
+  function levelMap(container, o) {
+    var zh = (o.lang || "zh-TW").indexOf("zh") === 0;
+    function draw() {
+      var d = lvLoad(o.key), total = 0;
+      var h = '<div class="kk-map">';
+      o.levels.forEach(function (lv, i) {
+        var s = d[lv.id] || 0; total += s;
+        h += '<button type="button" class="kk-lv' + (s === 3 ? " kk-full" : "") + '" data-lv="' + esc(lv.id) + '">' +
+          '<span class="kk-no">' + (lv.icon || (i + 1)) + '</span><span class="kk-name">' + esc(lv.name) + "</span>" +
+          '<span class="kk-stars" aria-label="' + s + ' stars">' + "★★★".slice(0, s) + '<i>' + "☆☆☆".slice(0, 3 - s) + "</i></span></button>";
+      });
+      h += "</div>";
+      var max = o.levels.length * 3;
+      h = '<div class="kk-maphead">' + (zh ? "🗺️ 闖關地圖" : "🗺️ Level map") + ' <span>⭐ ' + total + " / " + max + "</span></div>" +
+        '<p class="kk-maptip">' + (zh ? "每一關都可以直接玩。答對 90% 以上拿 3 顆星！" : "Play any level. Get 90%+ for 3 stars!") + "</p>" + h;
+      container.innerHTML = h;
+      Array.prototype.forEach.call(container.querySelectorAll(".kk-lv"), function (b) {
+        b.addEventListener("click", function () { if (o.onPlay) o.onPlay(b.getAttribute("data-lv")); });
+      });
+    }
+    draw();
+    return { refresh: draw };
+  }
+
+  /* ---------- 素養題組 ---------- */
+  function normZh(s) { return String(s || "").toLowerCase().replace(/[\s，。、！？；：「」『』（）()．.,!?;:"'—-]/g, ""); }
+  function passageSet(container, spec, o) {
+    o = o || {};
+    var lang = spec.lang || "zh-TW", zh = lang.indexOf("zh") === 0;
+    var T = zh ? { read: "📖 看文章", hide: "收起文章", listen: "🔊 朗讀文章", check: "✔ 對答案", next: "下一題 ▶", done: "完成題組 🏁",
+                   ok: "答對了！", no: "再想想，答案是：", q: "第 {n} 題 / 共 {t} 題", self: "自編", teacher: "老師的題目",
+                   res: "題組完成：{c} / {t} 題答對", all: "全部答對！素養題達人 🧩", again: "🔄 再做一次", tip: "先讀完文章再作答，作答時可以隨時點「📖 看文章」。",
+                   order: "依照順序點選", pick2: "（可以選多個）", say: "🎤 用說的", typ: "或在這裡打字…" }
+               : { read: "📖 Read the passage", hide: "Hide passage", listen: "🔊 Read aloud", check: "✔ Check", next: "Next ▶", done: "Finish set 🏁",
+                   ok: "Correct!", no: "Not quite. The answer is:", q: "Question {n} of {t}", self: "Practice set", teacher: "Teacher's question",
+                   res: "Set finished: {c} / {t} correct", all: "All correct! 🧩", again: "🔄 Try again", tip: "Read the passage first. Tap 📖 any time to look back.",
+                   order: "Tap in order", pick2: "(choose all that apply)", say: "🎤 Speak", typ: "or type here…" };
+    var qs = spec.questions, i = 0, correct = 0;
+    container.innerHTML = "";
+    var box = el("div", "kk-set");
+    box.appendChild(el("div", "kk-sethead", '<span class="kk-tag' + (spec.source === "self" ? " kk-self" : "") + '">' +
+      (spec.source === "self" ? T.self : T.teacher) + "</span> <b>" + esc(spec.title || "") + "</b>"));
+    var pas = el("div", "kk-passage");
+    pas.innerHTML = (spec.figure ? '<img src="' + esc(spec.figure) + '" alt="">' : "") + '<div class="kk-ptext">' + spec.passage + "</div>";
+    var bar = el("div", "kk-pbar");
+    var toggle = el("button", "kk-btn kk-ghost", T.hide); toggle.type = "button";
+    var listen = el("button", "kk-btn kk-ghost", T.listen); listen.type = "button";
+    listen.addEventListener("click", function () { say(spec.passage, { lang: lang, math: !!spec.math }); });
+    toggle.addEventListener("click", function () {
+      var open = pas.classList.toggle("kk-closed") === false;
+      toggle.textContent = open ? T.hide : T.read;
+      if (open) pas.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    bar.appendChild(toggle); bar.appendChild(listen);
+    box.appendChild(el("p", "kk-maptip", T.tip));
+    box.appendChild(pas); box.appendChild(bar);
+    var qbox = el("div", "kk-qbox"); box.appendChild(qbox);
+    container.appendChild(box);
+
+    function finishQ(ok, answerHtml, exp, showAlways) {
+      if (ok) correct++;
+      var p = sp("answer"); if (p) p.answer(ok);
+      var f = el("div", "kk-fb " + (ok ? "kk-ok" : "kk-bad"),
+        ok ? "✓ " + T.ok + (showAlways ? '<div class="kk-ans">' + answerHtml + "</div>" : "") : "✗ " + T.no + '<div class="kk-ans">' + answerHtml + "</div>");
+      if (exp) f.appendChild(el("div", "kk-exp", esc(exp)));
+      qbox.appendChild(f);
+      var last = i === qs.length - 1;
+      var nb = el("button", "kk-btn kk-primary", last ? T.done : T.next); nb.type = "button";
+      nb.addEventListener("click", function () { if (last) done(); else { i++; show(); } });
+      qbox.appendChild(nb);
+    }
+    function show() {
+      var q = qs[i]; qbox.innerHTML = "";
+      qbox.appendChild(el("div", "kk-qno", T.q.replace("{n}", i + 1).replace("{t}", qs.length)));
+      qbox.appendChild(el("div", "kk-q", esc(q.q) + " " + sayBtn(q.q, "", { lang: lang, math: !!spec.math }) +
+        (q.type === "multi" ? ' <small>' + T.pick2 + "</small>" : "")));
+      var area = el("div", "kk-area"); qbox.appendChild(area);
+      if (q.type === "mc" || q.type === "tf") {
+        var opts = q.type === "tf" ? [zh ? "⭕ 對" : "TRUE", zh ? "❌ 錯" : "FALSE"] : shuffle(q.choices);
+        var right = q.type === "tf" ? (q.answer ? 0 : 1) : opts.indexOf(q.choices[0]);
+        var used = false;
+        opts.forEach(function (c, k) {
+          var b = el("button", "kk-opt", (q.type === "tf" ? "" : "ABCD"[k] + ". ") + esc(c)); b.type = "button";
+          b.addEventListener("click", function () {
+            if (used) return; used = true;
+            b.classList.add(k === right ? "kk-right" : "kk-wrong");
+            area.children[right].classList.add("kk-right");
+            finishQ(k === right, esc(opts[right]), q.exp);
+          });
+          area.appendChild(b);
+        });
+      } else if (q.type === "multi") {
+        var ord = shuffle(q.choices.map(function (c, k) { return k; })), sel = [];
+        var chk = el("button", "kk-btn kk-primary", T.check); chk.type = "button"; chk.disabled = true;
+        ord.forEach(function (orig) {
+          var b = el("button", "kk-opt", esc(q.choices[orig])); b.type = "button";
+          b.addEventListener("click", function () {
+            if (chk.hidden) return;
+            var at = sel.indexOf(orig);
+            if (at < 0) sel.push(orig); else sel.splice(at, 1);
+            b.classList.toggle("kk-sel"); chk.disabled = !sel.length;
+          });
+          area.appendChild(b);
+        });
+        chk.addEventListener("click", function () {
+          chk.hidden = true;
+          var want = q.correct.slice().sort().join(), got = sel.slice().sort().join();
+          Array.prototype.forEach.call(area.children, function (b, k) {
+            if (q.correct.indexOf(ord[k]) >= 0) b.classList.add("kk-right"); else if (sel.indexOf(ord[k]) >= 0) b.classList.add("kk-wrong");
+          });
+          finishQ(want === got, q.correct.map(function (k) { return esc(q.choices[k]); }).join("、"), q.exp);
+        });
+        qbox.appendChild(chk);
+      } else if (q.type === "order") {
+        var src = shuffle(q.items), ans = [];
+        if (src.join("|") === q.items.join("|") && q.items.length > 1) src.push(src.shift());
+        var line = el("div", "kk-tiles kk-line"), pool = el("div", "kk-tiles");
+        var c2 = el("button", "kk-btn kk-primary", T.check); c2.type = "button";
+        function draw() {
+          line.innerHTML = ans.length ? "" : '<span class="kk-ph">' + T.order + "</span>"; pool.innerHTML = "";
+          ans.forEach(function (t, k) { var b = el("button", "kk-tile kk-in", (k + 1) + ". " + esc(t)); b.type = "button";
+            b.addEventListener("click", function () { if (c2.hidden) return; src.push(ans.splice(k, 1)[0]); draw(); }); line.appendChild(b); });
+          src.forEach(function (t, k) { var b = el("button", "kk-tile", esc(t)); b.type = "button";
+            b.addEventListener("click", function () { if (c2.hidden) return; ans.push(src.splice(k, 1)[0]); draw(); }); pool.appendChild(b); });
+          c2.disabled = src.length > 0;
+        }
+        c2.addEventListener("click", function () { c2.hidden = true; finishQ(ans.join("|") === q.items.join("|"), q.items.map(esc).join(" → "), q.exp); });
+        area.appendChild(line); area.appendChild(pool); qbox.appendChild(c2); draw();
+      } else if (q.type === "open") {
+        var ta = el("textarea", "kk-input"); ta.placeholder = T.typ;
+        var row = el("div", "kk-row");
+        var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        var mic = el("button", "kk-btn kk-ghost", T.say); mic.type = "button";
+        if (!SR) mic.hidden = true;
+        mic.addEventListener("click", function () {
+          try { var r = new SR(); r.lang = lang; r.interimResults = true;
+            var base = ta.value ? ta.value + " " : "";
+            r.onresult = function (e) { var s = ""; for (var k = 0; k < e.results.length; k++) s += e.results[k][0].transcript; ta.value = base + s; c3.disabled = !ta.value.trim(); };
+            r.start(); mic.textContent = "● …"; r.onend = function () { mic.textContent = T.say; };
+          } catch (e) { mic.hidden = true; }
+        });
+        var c3 = el("button", "kk-btn kk-primary", T.check); c3.type = "button"; c3.disabled = true;
+        ta.addEventListener("input", function () { c3.disabled = !ta.value.trim(); });
+        c3.addEventListener("click", function () {
+          c3.hidden = true; mic.hidden = true; ta.disabled = true;
+          var pts = q.points || [], txt = normZh(ta.value), hits = 0, list = [];
+          pts.forEach(function (alts) {
+            var hit = alts.some(function (a) { return txt.indexOf(normZh(a)) >= 0; });
+            if (hit) hits++; list.push((hit ? "✓ " : "✗ ") + esc(alts[0]));
+          });
+          var need = q.need || (pts.length <= 2 ? pts.length : Math.ceil(pts.length * 0.7));
+          finishQ(pts.length ? hits >= need : false, (zh ? "參考答案：" : "Model answer: ") + esc(q.a) + '<div class="kk-exp">' + list.join("　") + "</div>", q.exp, true);
+        });
+        area.appendChild(ta); row.appendChild(mic); row.appendChild(c3); qbox.appendChild(row);
+      }
+      qbox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+    function done() {
+      var allOk = correct === qs.length;
+      qbox.innerHTML = '<div class="kk-result"><div class="kk-big">' + T.res.replace("{c}", correct).replace("{t}", qs.length) + "</div>" +
+        (allOk ? "<div>" + T.all + "</div>" : "") + "</div>";
+      var again = el("button", "kk-btn kk-primary", T.again); again.type = "button";
+      again.addEventListener("click", function () { passageSet(container, spec, o); });
+      qbox.appendChild(again);
+      var p = sp("literacy"); if (p) p.literacy(allOk);
+      if (o.onDone) o.onDone({ correct: correct, total: qs.length, allOk: allOk });
+    }
+    show();
+  }
+
+  /* ---------- styles ---------- */
+  function injectCSS() {
+    if (document.getElementById("kk-css")) return;
+    var s = document.createElement("style"); s.id = "kk-css";
+    s.textContent =
+      ".kk-say{font:inherit;font-size:14px;line-height:1;min-height:34px;padding:6px 10px;margin:2px 4px;border-radius:999px;border:1.5px solid currentColor;background:transparent;color:inherit;cursor:pointer;opacity:.85;vertical-align:middle;touch-action:manipulation}" +
+      ".kk-hint{position:fixed;left:50%;bottom:calc(70px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1f2937;color:#fff;padding:10px 14px;border-radius:12px;font-size:14px;z-index:9003;opacity:0;pointer-events:none;transition:opacity .3s;max-width:90vw}" +
+      ".kk-hint.kk-show{opacity:.95}" +
+      ".kk-maphead{font-size:20px;font-weight:800;display:flex;justify-content:space-between;align-items:center}.kk-maphead span{font-size:16px}" +
+      ".kk-maptip{opacity:.75;font-size:14px;margin:4px 0 10px}" +
+      ".kk-map{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}" +
+      ".kk-lv{font:inherit;display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:12px;border-radius:14px;border:2px solid rgba(127,127,127,.35);background:transparent;color:inherit;cursor:pointer;text-align:left;min-height:96px;touch-action:manipulation}" +
+      ".kk-lv.kk-full{border-color:#f59e0b;background:rgba(245,158,11,.12)}" +
+      ".kk-no{display:inline-grid;place-items:center;min-width:30px;height:30px;border-radius:50%;background:#0284c7;color:#fff;font-weight:800;padding:0 6px}" +
+      ".kk-name{font-weight:700;font-size:15px}.kk-stars{color:#f59e0b;font-size:20px;letter-spacing:2px}.kk-stars i{font-style:normal;opacity:.35}" +
+      ".kk-set{border-radius:16px}.kk-sethead{font-size:18px;margin-bottom:6px}" +
+      ".kk-tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;background:#16a34a;color:#fff;vertical-align:2px}.kk-tag.kk-self{background:#7c3aed}" +
+      ".kk-passage{border:2px solid rgba(127,127,127,.3);border-radius:14px;padding:14px;line-height:1.9;font-size:17px;max-height:46vh;overflow:auto;background:rgba(127,127,127,.06)}" +
+      ".kk-passage.kk-closed{display:none}.kk-passage img{max-width:100%;border-radius:8px;display:block;margin:0 auto 8px}" +
+      ".kk-pbar{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 12px}" +
+      ".kk-btn{font:inherit;font-size:16px;min-height:48px;padding:10px 16px;border-radius:12px;border:2px solid transparent;cursor:pointer;margin:6px 6px 0 0;touch-action:manipulation}" +
+      ".kk-btn[disabled]{opacity:.45}.kk-primary{background:#0284c7;color:#fff}.kk-ghost{background:transparent;color:inherit;border-color:currentColor}" +
+      ".kk-qno{font-size:13px;opacity:.7}.kk-q{font-size:18px;font-weight:700;margin:4px 0 10px;line-height:1.6}" +
+      ".kk-opt{font:inherit;display:block;width:100%;text-align:left;min-height:50px;padding:10px 14px;margin:6px 0;border-radius:12px;border:2px solid rgba(127,127,127,.45);background:transparent;color:inherit;cursor:pointer;touch-action:manipulation}" +
+      ".kk-opt.kk-sel{border-color:#0284c7;background:rgba(2,132,199,.12)}.kk-opt.kk-right{border-color:#16a34a;background:rgba(22,163,74,.15)}.kk-opt.kk-wrong{border-color:#dc2626;background:rgba(220,38,38,.12)}" +
+      ".kk-tiles{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.kk-line{min-height:58px;padding:6px;border:2px dashed rgba(127,127,127,.5);border-radius:12px;align-items:center}" +
+      ".kk-ph{opacity:.55;padding:0 6px}.kk-tile{font:inherit;min-height:48px;padding:8px 12px;border-radius:12px;border:2px solid #0284c7;background:transparent;color:inherit;cursor:pointer}.kk-tile.kk-in{background:#0284c7;color:#fff}" +
+      ".kk-input{font:inherit;font-size:17px;width:100%;min-height:90px;padding:10px;border-radius:12px;border:2px solid rgba(127,127,127,.5);background:transparent;color:inherit}" +
+      ".kk-row{display:flex;flex-wrap:wrap;align-items:center}" +
+      ".kk-fb{margin-top:10px;padding:10px 14px;border-radius:12px;font-weight:700}.kk-ok{background:rgba(22,163,74,.15);color:#15803d}.kk-bad{background:rgba(245,158,11,.18)}" +
+      ".kk-ans{font-size:17px;margin-top:4px}.kk-exp{font-weight:400;margin-top:6px;opacity:.9}" +
+      ".kk-result{text-align:center;padding:14px}.kk-big{font-size:22px;font-weight:800;margin-bottom:6px}";
+    document.head.appendChild(s);
+  }
+  return { say: say, sayBtn: sayBtn, mathSpeech: mathSpeech, levelMap: levelMap, levelResult: levelResult,
+           starsFor: starsFor, passageSet: passageSet, injectCSS: injectCSS, esc: esc, VERSION: "2026-10-25" };
+})();
+
+/* ===== Audrey · Science Final · A Closer Look 2 — scope from the lesson recordings (Ch1 L4 still missing) ===== */
+var APP = {key: "au-science-1151-final", title: "🔬 Audrey's Science Final", sub: "A Closer Look · 4 lessons · defeat every boss, then beat the Final Boss!",
+  scope: "Ch1 L3 Animals and Their Parts; Ch2 L1 Plant Life Cycles; Ch2 L2 Animal Life Cycles; Ch2 L3 From Parents to Young (from the lesson recordings). Ch1 L4 Classifying Animals will be added when its recording arrives."};
+var LESSONS = [
+  {id: "AP", name: "Animals and Their Parts", icon: "🦁", boss: "Claw Critter"},
+  {id: "PL", name: "Plant Life Cycles", icon: "🌻", boss: "Seed Snatcher"},
+  {id: "AL", name: "Animal Life Cycles", icon: "🐸", boss: "Tadpole Titan"},
+  {id: "PY", name: "From Parents to Young", icon: "👪", boss: "Trait Troll"}
+];
+var VOCAB = {
+  AP: [
+    ["animal", "a living thing that can move and must eat other living things for food"],
+    ["structure", "a part of an animal that helps it get what it needs, like legs, fins or wings"],
+    ["lungs", "body parts that take in oxygen from the air"],
+    ["gills", "body parts that take in oxygen from the water"],
+    ["shelter", "a safe place where an animal can stay"],
+    ["oxygen", "a gas in air and water that animals need to breathe"],
+    ["quills", "sharp spines that keep other animals away from a porcupine"],
+    ["beak", "the hard mouth of a bird, used to pick up food and water"],
+    ["trunk", "the long nose an elephant uses to pick up water and plants"]
+  ],
+  PL: [
+    ["seed", "a structure that can grow into a new plant"],
+    ["embryo", "the young plant inside a seed"],
+    ["germinate", "to begin to grow"],
+    ["seedling", "a small new plant that grows out of a seed"],
+    ["flower", "a plant part that makes seeds"],
+    ["pollen", "a powder made by the male part of a flower"],
+    ["nectar", "a sweet liquid inside a flower that animals drink"],
+    ["pollination", "moving pollen from the male part of a flower to the female part"],
+    ["fruit", "a plant part that holds seeds"],
+    ["cone", "a plant part that makes seeds on trees like pines"],
+    ["conifer", "a plant that makes seeds in cones"],
+    ["spore", "a tiny part a fern makes that can grow into a new fern"],
+    ["bulb", "an underground stem, like an onion, that can grow a new plant"],
+    ["life cycle", "how a living thing is born, grows, reproduces and dies"]
+  ],
+  AL: [
+    ["life cycle", "the way an animal is born, grows, has young and dies"],
+    ["metamorphosis", "a big change in body shape as an animal grows"],
+    ["hatch", "to break out of an egg"],
+    ["egg", "it holds food for a young animal and has a shell to protect it"],
+    ["tadpole", "a young frog"],
+    ["caterpillar", "a young butterfly"],
+    ["mammal", "an animal whose young are born live and fed by the parents"],
+    ["reptile", "an animal that lays its eggs on dry land"],
+    ["amphibian", "an animal like a frog that goes through metamorphosis"]
+  ],
+  PY: [
+    ["trait", "a feature of a living thing, like eye color"],
+    ["heredity", "the passing on of traits from parents to young"],
+    ["inherited trait", "a trait that comes from the parents"],
+    ["learned trait", "a new skill you gain over time, like riding a bicycle"],
+    ["offspring", "an organism's young"],
+    ["environment", "the things around a living thing, like sunlight, water and food"],
+    ["organism", "any living thing"]
+  ]
+};
+var BANK = [
+  /* ---------- AP: Animals and Their Parts ---------- */
+  {L:"AP",ty:"mc",q:"How are animals different from plants?",a:"Animals cannot make their own food.",w:["Animals make food from sunlight.","Animals never move."]},
+  {L:"AP",ty:"mc",q:"Why do animals move?",a:"to find food and water and escape danger",w:["to make their own food","to grow new leaves"]},
+  {L:"AP",ty:"mc",q:"How does a snail move?",a:"It slides on a trail of slime.",w:["It runs on four legs.","It flies with wings."]},
+  {L:"AP",ty:"mc",q:"How does a snake move?",a:"It uses its whole body to slither.",w:["It hops on its tail.","It glides with wings."]},
+  {L:"AP",ty:"mc",q:"What does an elephant use to drink water?",a:"its trunk",w:["its tail","its ears"]},
+  {L:"AP",ty:"mc",q:"What do lions use to scrape meat from bones?",a:"their rough tongues",w:["their tails","their paws only"]},
+  {L:"AP",ty:"mc",q:"Long, sharp front teeth are good for…",a:"biting",w:["breathing","swimming"]},
+  {L:"AP",ty:"mc",q:"Flat back teeth are good for…",a:"chewing",w:["flying","digging"]},
+  {L:"AP",ty:"mc",q:"How do fish get oxygen?",a:"with gills",w:["with lungs","with fur"]},
+  {L:"AP",ty:"mc",q:"Which animals take in oxygen through their skin?",a:"worms and salamanders",w:["lions and wolves","birds and bats"]},
+  {L:"AP",ty:"mc",q:"How do groundhogs find shelter?",a:"They dig holes with their paws.",w:["They build nests in trees.","They hide in shells."]},
+  {L:"AP",ty:"mc",q:"What protects a snail?",a:"its hard shell",w:["its sharp quills","its thick fur"]},
+  {L:"AP",ty:"mc",q:"What can fur do for an animal?",a:"shield it from the cold",w:["help it breathe water","help it make food"]},
+  {L:"AP",ty:"mc",q:"A snake may lie in the sunlight when it feels…",a:"cold",w:["hungry","happy"]},
+  {L:"AP",ty:"tf",q:"Most animals can move.",a:true},
+  {L:"AP",ty:"tf",q:"Animals can make their own food like plants.",a:false,exp:"Animals must eat other living things to get energy."},
+  {L:"AP",ty:"tf",q:"Animals use their senses to get information.",a:true},
+  {L:"AP",ty:"tf",q:"Birds use their beaks and feet to build nests.",a:true},
+  {L:"AP",ty:"tf",q:"Lungs take in oxygen from the water.",a:false,exp:"Lungs take in oxygen from the air. Gills take it from the water."},
+  {L:"AP",ty:"tf",q:"Lizards flatten their bodies and crawl under rocks to stay safe.",a:true},
+  {L:"AP",ty:"fill",t:"Fish use ___ to get oxygen from the water.",a:"gills"},
+  {L:"AP",ty:"fill",t:"Many animals breathe with ___.",a:"lungs"},
+  {L:"AP",ty:"fill",t:"A porcupine's sharp ___ keep other animals away.",a:"quills"},
+  {L:"AP",ty:"fill",t:"Birds scoop up water with their ___.",a:"beak"},
+  {L:"AP",ty:"fill",t:"Animals need water, food and ___.",a:"oxygen"},
+  {L:"AP",ty:"open",q:"Name three things animals need.",a:"Animals need water, food and oxygen.",points:[["water"],["food"],["oxygen","air"]],need:3},
+  {L:"AP",ty:"open",q:"Name two ways animals stay safe.",a:"They find shelter, like holes or nests, or they have body parts that protect them, like shells, quills or fur.",points:[["shelter","hole","holes","nest","nests","rock","rocks"],["shell","shells","quills","fur"]],need:2},
+
+  /* ---------- PL: Plant Life Cycles ---------- */
+  {L:"PL",ty:"mc",q:"What is inside a seed?",a:"a young plant called an embryo",w:["a flower","a cone"]},
+  {L:"PL",ty:"mc",q:"What does a seed need to germinate?",a:"water, nutrients and the right temperature",w:["only darkness","only wind"]},
+  {L:"PL",ty:"mc",q:"What protects the embryo in a seed?",a:"a tough covering",w:["pollen","nectar"]},
+  {L:"PL",ty:"mc",q:"What does the female part of a flower make?",a:"tiny eggs",w:["pollen","cones"]},
+  {L:"PL",ty:"mc",q:"Which animals can carry pollen?",a:"hummingbirds, bees and bats",w:["fish and whales","worms and snails"]},
+  {L:"PL",ty:"mc",q:"Which seeds are made to blow in the breeze?",a:"fuzzy dandelion seeds",w:["acorns","lima beans"]},
+  {L:"PL",ty:"mc",q:"Which animal can bury acorns?",a:"a squirrel",w:["a bee","a fish"]},
+  {L:"PL",ty:"mc",q:"Which trees are conifers?",a:"pine, spruce and hemlock",w:["apple and orange","rose and tulip"]},
+  {L:"PL",ty:"mc",q:"What does a fern make instead of seeds?",a:"spores",w:["cones","fruit"]},
+  {L:"PL",ty:"mc",q:"A new potato plant can grow from…",a:"the eyes on a potato",w:["a pine cone","a spore"]},
+  {L:"PL",ty:"mc",q:"An onion is a kind of…",a:"bulb",w:["seed","cone"]},
+  {L:"PL",ty:"tf",q:"All seeds have the same job: to grow into a new plant.",a:true},
+  {L:"PL",ty:"tf",q:"A seed can wait months or even years until conditions are right.",a:true},
+  {L:"PL",ty:"tf",q:"A spore has stored food like a seed.",a:false,exp:"Unlike a seed, a spore does not have stored food."},
+  {L:"PL",ty:"tf",q:"Conifers make seeds inside flowers.",a:false,exp:"Conifers make seeds inside cones."},
+  {L:"PL",ty:"tf",q:"When plants die and decompose, they add nutrients to the soil.",a:true},
+  {L:"PL",ty:"tf",q:"Most plants are flowering plants.",a:true},
+  {L:"PL",ty:"fill",t:"The young plant inside a seed is called an ___.",a:"embryo"},
+  {L:"PL",ty:"fill",t:"When a seed begins to grow, we say it can ___.",a:"germinate"},
+  {L:"PL",ty:"fill",t:"The male part of a flower makes a powder called ___.",a:"pollen"},
+  {L:"PL",ty:"fill",t:"___ is a structure that holds seeds.",a:"fruit"},
+  {L:"PL",ty:"fill",t:"The small plant that grows out of a seed is a ___.",a:"seedling"},
+  {L:"PL",ty:"fill",t:"Animals drink a sweet liquid called ___ from flowers.",a:"nectar"},
+  {L:"PL",ty:"order",q:"Put a flowering plant's life cycle in order.",items:["seed","seedling","adult plant with flowers","new seeds"]},
+  {L:"PL",ty:"order",q:"Put the steps of germination in order.",items:["The seed soaks up water.","It swells and breaks its covering.","The embryo grows out of the seed.","It grows into a seedling."]},
+  {L:"PL",ty:"open",q:"Name two ways seeds travel.",a:"Wind blows them, ripe fruit falls and rots, squirrels bury them, they stick to animal fur, or animals eat fruit and leave the seeds.",points:[["wind","breeze","blow"],["animal","animals","squirrel","squirrels","fur","eat"],["fruit","fall","falls","rot"]],need:2},
+
+  /* ---------- AL: Animal Life Cycles ---------- */
+  {L:"AL",ty:"mc",q:"A caterpillar is a young…",a:"butterfly",w:["frog","bird"]},
+  {L:"AL",ty:"mc",q:"A tadpole is a young…",a:"frog",w:["fish","snake"]},
+  {L:"AL",ty:"mc",q:"Which animals go through metamorphosis?",a:"amphibians and most insects",w:["birds and fish","mammals and reptiles"]},
+  {L:"AL",ty:"mc",q:"Where do reptiles lay their eggs?",a:"on dry land",w:["in water","in trees only"]},
+  {L:"AL",ty:"mc",q:"Where do fish lay their eggs?",a:"in water",w:["on dry land","in nests in trees"]},
+  {L:"AL",ty:"mc",q:"Which animals often raise their young until they can fly?",a:"birds",w:["fish","reptiles"]},
+  {L:"AL",ty:"mc",q:"How are most young mammals born?",a:"born live",w:["they hatch from eggs","they come from spores"]},
+  {L:"AL",ty:"mc",q:"What happens when an animal dies?",a:"Its body breaks down and adds nutrients to the soil.",w:["It turns into a seed.","It becomes an egg."]},
+  {L:"AL",ty:"mc",q:"As young mammals grow, they…",a:"lose fat and grow stronger",w:["grow wings","go through metamorphosis"]},
+  {L:"AL",ty:"tf",q:"All animals change in the same ways.",a:false,exp:"Different types of animals change in different ways."},
+  {L:"AL",ty:"tf",q:"Eggs contain food that young animals need.",a:true},
+  {L:"AL",ty:"tf",q:"Young reptiles, fish and birds look similar to adults when they hatch.",a:true},
+  {L:"AL",ty:"tf",q:"Most amphibians and insects look after their young.",a:false,exp:"Most do not. The young get food on their own."},
+  {L:"AL",ty:"tf",q:"Adult mammals feed and care for their young.",a:true},
+  {L:"AL",ty:"fill",t:"Some animals change shape through ___.",a:"metamorphosis"},
+  {L:"AL",ty:"fill",t:"When a young animal breaks out of an egg, it ___.",a:"hatches"},
+  {L:"AL",ty:"fill",t:"A young frog is called a ___.",a:"tadpole"},
+  {L:"AL",ty:"fill",t:"Young ___ are born live and look like their parents.",a:"mammal"},
+  {L:"AL",ty:"order",q:"Put an animal's life cycle in order.",items:["is born","grows","reproduces as an adult","dies"]},
+  {L:"AL",ty:"order",q:"Put a frog's life cycle in order.",items:["egg","tadpole","young frog","adult frog"]},
+  {L:"AL",ty:"open",q:"How is a bird's life cycle different from a mammal's?",a:"A bird hatches from an egg. A mammal is born live and is fed by its parents.",points:[["egg","eggs","hatch","hatches"],["born live","live","born"]],need:2},
+
+  /* ---------- PY: From Parents to Young ---------- */
+  {L:"PY",ty:"mc",q:"Which is an inherited trait?",a:"eye color",w:["riding a bicycle","speaking a language"]},
+  {L:"PY",ty:"mc",q:"Which is a learned trait?",a:"riding a bicycle",w:["hair color","the number of legs"]},
+  {L:"PY",ty:"mc",q:"Why do organisms almost never look exactly like one parent?",a:"They inherit traits from both parents.",w:["They have no parents.","They learn all their traits."]},
+  {L:"PY",ty:"mc",q:"Hair may get lighter from…",a:"being in sunlight",w:["eating fruit","riding a bike"]},
+  {L:"PY",ty:"mc",q:"A plant's green leaves may turn yellow if it gets…",a:"too much water",w:["the right amount of sun","new seeds"]},
+  {L:"PY",ty:"mc",q:"If an animal gets a scar, its offspring will…",a:"not be born with scars",w:["be born with scars","have two scars"]},
+  {L:"PY",ty:"mc",q:"The offspring of a grey dog and a yellow dog may be…",a:"yellow",w:["blue","green"]},
+  {L:"PY",ty:"tf",q:"Learned traits are passed on from parents to offspring.",a:false,exp:"Learned traits are not passed on. You still have to learn them yourself."},
+  {L:"PY",ty:"tf",q:"The number of arms and legs an animal has is inherited.",a:true},
+  {L:"PY",ty:"tf",q:"Traits help you recognize and describe an organism.",a:true},
+  {L:"PY",ty:"tf",q:"A rabbit may grow fat when it finds a lot of food.",a:true},
+  {L:"PY",ty:"tf",q:"If a tree loses branches in a storm, its offspring will grow with missing branches.",a:false,exp:"Traits caused by the environment are not passed on."},
+  {L:"PY",ty:"fill",t:"A ___ is a feature of a living thing.",a:"trait"},
+  {L:"PY",ty:"fill",t:"___ is the passing on of traits from parents to young.",a:"heredity"},
+  {L:"PY",ty:"fill",t:"An organism's young are called its ___.",a:"offspring"},
+  {L:"PY",ty:"open",q:"Give one inherited trait and one learned trait.",a:"Eye color is inherited. Riding a bicycle is learned.",points:[["eye","hair","color","colour","legs","flower"],["bicycle","bike","language","speak","swim","read","write"]],need:2}
+];
+var SORTS = {
+  AP: {title:"Which body part helps it?",bins:["Moving","Breathing","Staying safe"],items:[{t:"a cheetah's strong legs",bin:0},{t:"a bird's wings",bin:0},{t:"a fish's fins",bin:0},{t:"a fish's gills",bin:1},{t:"a dog's lungs",bin:1},{t:"a worm's skin",bin:1,exp:"Worms take in oxygen through their skin."},{t:"a snail's shell",bin:2},{t:"a porcupine's quills",bin:2},{t:"thick fur in the cold",bin:2}]},
+  PL: {title:"How does it make new plants?",bins:["Seeds in flowers","Seeds in cones","No seeds"],items:[{t:"apple tree",bin:0},{t:"sunflower",bin:0},{t:"pine tree",bin:1},{t:"spruce",bin:1},{t:"hemlock",bin:1},{t:"fern (spores)",bin:2},{t:"potato (eyes)",bin:2},{t:"onion (bulb)",bin:2}]},
+  AL: {title:"Metamorphosis or not?",bins:["Metamorphosis","No metamorphosis"],items:[{t:"butterfly",bin:0},{t:"frog",bin:0},{t:"most insects",bin:0},{t:"bird",bin:1},{t:"fish",bin:1},{t:"snake (reptile)",bin:1},{t:"dog (mammal)",bin:1}]},
+  PY: {title:"Inherited or learned?",bins:["Inherited","Learned / environment"],items:[{t:"eye color",bin:0},{t:"hair color",bin:0},{t:"number of legs",bin:0},{t:"flower color",bin:0},{t:"riding a bicycle",bin:1},{t:"speaking a language",bin:1},{t:"a scar",bin:1},{t:"hair lighter from sunlight",bin:1}]}
+};
+/* ===== Workbook-style items: Cloze Activity, two-blank sentences, Label ===== */
+var HARD = [
+  {L:"AP",ty:"cloze",title:"Cloze Activity — Animals",t:"Animals cannot make their own ___. Fish use ___ to get oxygen. Birds build ___ for their young. A snail's hard ___ protects it.",a:["food","gills","nests","shell"],bank:["food","gills","nests","shell","lungs","pollen"]},
+  {L:"PL",ty:"cloze",title:"Cloze Activity — Plants",t:"A ___ holds a young plant called an embryo. When it begins to grow, it can ___. Bees carry ___ from flower to flower. Conifers make seeds in ___.",a:["seed","germinate","pollen","cones"],bank:["seed","germinate","pollen","cones","spores","gills"]},
+  {L:"AL",ty:"cloze",title:"Cloze Activity — Life cycles",t:"A frog changes shape through ___. A young frog is a ___. Birds ___ from eggs. Young ___ are born live.",a:["metamorphosis","tadpole","hatch","mammals"],bank:["metamorphosis","tadpole","hatch","mammals","conifers","seeds"]},
+  {L:"PY",ty:"cloze",title:"Cloze Activity — Traits",t:"A feature of a living thing is a ___. Eye color is an ___ trait. Riding a bicycle is a ___ trait. An organism's young are its ___.",a:["trait","inherited","learned","offspring"],bank:["trait","inherited","learned","offspring","embryo","nectar"]},
+  {L:"AP",ty:"fill",t:"Many animals breathe with ___, but fish use ___.",a:["lungs","gills"],bank:["lungs","gills","fins","beaks"]},
+  {L:"PL",ty:"fill",t:"The male part of a flower makes ___. The female part makes tiny ___.",a:["pollen","eggs"],bank:["pollen","eggs","seeds","cones"]},
+  {L:"AL",ty:"fill",t:"Reptiles lay eggs on dry ___. Fish lay eggs in ___.",a:["land","water"],bank:["land","water","trees","soil"]},
+  {L:"PY",ty:"fill",t:"Most organisms inherit traits from ___ parents, so they almost never look exactly like ___ parent.",a:["both","one"],bank:["both","one","no","three"]},
+  {L:"AL",ty:"label",title:"Label the frog life cycle (1 = first).",svg:'<svg viewBox="0 0 300 120" width="100%" style="max-width:420px;display:block;margin:6px auto" font-size="22" font-weight="700" fill="#fde68a"><circle cx="40" cy="60" r="16" fill="#cbd5e1"/><text x="34" y="105">1</text><ellipse cx="110" cy="60" rx="18" ry="11" fill="#475569"/><path d="M92 60 l-14 -6 v12z" fill="#475569"/><text x="104" y="105">2</text><ellipse cx="180" cy="60" rx="20" ry="14" fill="#4ade80"/><path d="M160 64 l-12 4" stroke="#4ade80" stroke-width="5"/><text x="174" y="105">3</text><ellipse cx="255" cy="58" rx="28" ry="20" fill="#16a34a"/><circle cx="244" cy="42" r="6" fill="#16a34a"/><circle cx="266" cy="42" r="6" fill="#16a34a"/><text x="249" y="105">4</text></svg>',t:"1 ___\n2 ___\n3 ___\n4 ___",a:["egg","tadpole","young frog","adult frog"],bank:["egg","tadpole","young frog","adult frog","seedling"]}
+];
+BANK = BANK.concat(HARD);
+
+/* ===== App code ===== */
+AppCore.injectCSS(); KidKit.injectCSS();
+var KEY = APP.key, MAPKEY = KEY + "-map";
+var root = document.getElementById("app");
+var esc = AppCore.esc, el = AppCore.el;
+function lessonById(id) { return LESSONS.filter(function (l) { return l.id === id; })[0]; }
+function saveStars(id, pct) {
+  var s = KidKit.starsFor(pct), d = {};
+  try { d = JSON.parse(localStorage.getItem("kk-lv-" + MAPKEY) || "{}"); } catch (e) {}
+  if (!d[id] || s > d[id]) { d[id] = s; try { localStorage.setItem("kk-lv-" + MAPKEY, JSON.stringify(d)); } catch (e) {} }
+}
+function vocabItems(L) {
+  var all = VOCAB[L], out = [];
+  all.forEach(function (v) {
+    var others = AppCore.shuffle(all.filter(function (x) { return x !== v; }));
+    out.push({L: L, ty: "mc", q: "Which word means: “" + v[1] + "”?", a: v[0], w: [others[0][0], others[1][0]], vocab: true});
+    out.push({L: L, ty: "mc", q: "What does “" + v[0] + "” mean?", a: v[1], w: [others[2][1], others[3][1]], vocab: true});
+  });
+  return out;
+}
+function matchItems(L) {
+  var out = [], v = AppCore.shuffle(VOCAB[L]);
+  for (var k = 0; k + 4 <= v.length && out.length < 2; k += 4) {
+    var set = v.slice(k, k + 4), extra = v[(k + 4) % v.length][0];
+    out.push({L: L, ty: "match", title: "Match each word with its meaning.", t: set.map(function (x, i) { return (i + 1) + ". ___ — " + x[1]; }).join("\n"),
+      a: set.map(function (x) { return x[0]; }), bank: set.map(function (x) { return x[0]; }).concat([extra])});
+  }
+  return out;
+}
+function pool(L) { return BANK.filter(function (q) { return q.L === L; }).concat(vocabItems(L), matchItems(L)); }
+
+/* ---------- Home ---------- */
+function home() {
+  AppCore.stopSpeech(); window.scrollTo(0, 0);
+  root.innerHTML = "";
+  root.appendChild(el("div", "hs-hero", "<h1>" + APP.title + "</h1><p>" + APP.sub + "</p>"));
+  var map = el("div"); root.appendChild(map);
+  var lv = LESSONS.map(function (l) { return {id: l.id, name: l.name, icon: l.icon}; });
+  lv.push({id: "MOCK", name: "Mock Exam — Final Boss", icon: "👑"});
+  KidKit.levelMap(map, {key: MAPKEY, lang: "en-US", levels: lv, onPlay: function (id) { id === "MOCK" ? mock() : drill(id); }});
+  root.appendChild(el("h2", "hs-h2", "🎮 Games"));
+  var g = el("div", "hs-games");
+  g.appendChild(AppCore.btn("🃏 Word Flip", "ac-primary", function () { pickLesson("🃏 Word Flip — which lesson?", flip, true); }));
+  g.appendChild(AppCore.btn("🧺 Sort It", "ac-primary", function () { pickLesson("🧺 Sort It — which lesson?", sortIt); }));
+  root.appendChild(g);
+  var n = 0; LESSONS.forEach(function (l) { n += pool(l.id).length; });
+  root.appendChild(el("p", "hs-note", "Question bank: " + n + " questions + " + LESSONS.length + " sort games. Scope: " + APP.scope));
+}
+function pickLesson(title, fn, withAll) {
+  root.innerHTML = "";
+  root.appendChild(AppCore.btn("⬅ Back", "ac-ghost", home));
+  root.appendChild(el("h2", "hs-h2", title));
+  LESSONS.forEach(function (l) { root.appendChild(AppCore.btn(l.icon + " " + l.name, "ac-primary hs-wide", function () { fn(l.id); })); });
+  if (withAll) root.appendChild(AppCore.btn("🌍 All lessons", "ac-finish hs-wide", function () { fn("ALL"); }));
+}
+function flip(L) {
+  var pairs = [];
+  (L === "ALL" ? LESSONS.map(function (l) { return l.id; }) : [L]).forEach(function (k) { pairs = pairs.concat(VOCAB[k]); });
+  root.innerHTML = "";
+  root.appendChild(AppCore.btn("⬅ Back", "ac-ghost", home));
+  root.appendChild(el("p", "ac-hint", "Match each science word with its meaning. Flip two cards at a time!"));
+  var box = el("div"); root.appendChild(box);
+  AppCore.memory(box, {key: KEY + "-flip-" + L, pairs: pairs, size: pairs.length >= 8 ? 8 : 6, onHome: home});
+}
+function sortIt(L) {
+  var s = SORTS[L];
+  AppCore.sortGame(root, {key: KEY + "-sort-" + L, title: s.title, bins: s.bins, items: s.items, onHome: home});
+}
+
+/* ---------- Drills ---------- */
+function drill(L) {
+  var l = lessonById(L);
+  run(AppCore.shuffle(pool(L)), {title: l.icon + " " + l.name, gameKey: KEY + "-" + L, boss: AppCore.bossFor(Math.min(20, pool(L).length), l.boss), mapId: L, limit: 20});
+}
+function mock() {
+  function pick(f, n) { var all = []; LESSONS.forEach(function (l) { all = all.concat(pool(l.id).filter(f)); }); return AppCore.shuffle(all).slice(0, n); }
+  var items = [].concat(
+    pick(function (q) { return q.ty === "match"; }, 2),
+    pick(function (q) { return q.ty === "cloze"; }, 3),
+    pick(function (q) { return q.ty === "label"; }, 1),
+    pick(function (q) { return q.ty === "fill"; }, 6),
+    pick(function (q) { return q.ty === "order"; }, 2),
+    pick(function (q) { return q.ty === "mc" || q.ty === "tf"; }, 12),
+    pick(function (q) { return q.ty === "open"; }, 3));
+  run(items, {title: "👑 Mock Exam", gameKey: KEY + "-mock", boss: AppCore.bossFor(items.length, "Final Boss"), mapId: "MOCK", mock: true});
+}
+function run(items, o) {
+  if (o.limit) items = items.slice(0, o.limit);
+  var D = AppCore.dealer(), G = AppCore.game(o.gameKey, {boss: o.boss}), log = [], i = 0;
+  function show() {
+    if (i >= items.length) return end();
+    window.scrollTo(0, 0);
+    var q = items[i];
+    root.innerHTML = "";
+    root.appendChild(AppCore.drillBar({title: o.title + " · " + (i + 1) + " / " + items.length, onBack: home, onFinish: end, game: G}));
+    var card = el("div", "hs-card"); root.appendChild(card);
+    var tag = q.vocab ? "Vocabulary" : {mc: "Multiple choice", tf: "True or False", fill: Array.isArray(q.a) ? "Outline" : "Fill in the blank", order: "Put in order", open: "Critical thinking", cloze: "Cloze Activity", match: "Vocabulary matching", label: "Label the diagram"}[q.ty];
+    card.appendChild(el("div", "hs-tag", lessonById(q.L).icon + " " + esc(lessonById(q.L).name) + " · " + tag));
+    var area = el("div"); card.appendChild(area);
+    var next = el("div", "hs-next"); card.appendChild(next);
+    function done(ok, given, correct, extra) {
+      G.record(ok);
+      var e = {q: q.q || q.t, given: given, correct: correct, ok: ok, item: q};
+      if (extra && extra.appeal) e.appeal = true;
+      log.push(e);
+      next.innerHTML = "";
+      next.appendChild(AppCore.btn(i + 1 < items.length ? "Next ▶" : "🏁 See my score", "ac-primary", function () { i++; show(); }));
+    }
+    if (q.ty === "mc" || q.ty === "tf") {
+      area.appendChild(el("p", "hs-q", esc(q.q) + " " + KidKit.sayBtn(q.q, "Hear", {lang: "en-US"})));
+      var r = q.ty === "tf" ? {choices: ["TRUE", "FALSE"], answer: q.a ? 0 : 1} : D.place(q.a, q.w);
+      var opts = el("div", "hs-opts" + (q.ty === "tf" ? " hs-tf" : "")); area.appendChild(opts);
+      var fb = el("div"); area.appendChild(fb);
+      var letters = "ABC";
+      r.choices.forEach(function (c, k) {
+        var b = AppCore.btn((q.ty === "tf" ? "" : "<b>" + letters[k] + "</b> ") + esc(c), "hs-opt", function () {
+          var ok = k === r.answer;
+          Array.prototype.forEach.call(opts.children, function (x, j) { x.disabled = true; if (j === r.answer) x.classList.add("hs-ok"); else if (x === b) x.classList.add("hs-bad"); });
+          var right = r.choices[r.answer];
+          fb.innerHTML = '<div class="ac-fb ' + (ok ? "ok" : "bad") + '">' + (ok ? "✓ " + AppCore.praise() : "Not quite — the answer is:<div class=\"ac-ans\"><b>" + esc(right) + "</b></div>") +
+            (q.exp ? '<div class="ac-exp">' + esc(q.exp) + "</div>" : "") + "</div>";
+          done(ok, c, right);
+        });
+        opts.appendChild(b);
+      });
+    } else if (q.ty === "cloze" || q.ty === "match" || q.ty === "label" || (q.ty === "fill" && Array.isArray(q.a))) {
+      if (q.title) area.appendChild(el("p", "hs-q", esc(q.title)));
+      if (q.svg) area.appendChild(el("div", "", q.svg));
+      var wb = el("div"); area.appendChild(wb);
+      AppCore.wordBank(wb, {text: q.t, bank: AppCore.shuffle(q.bank), answers: q.a, exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a.join(" / ")); }});
+    } else if (q.ty === "fill") {
+      var others = AppCore.shuffle(VOCAB[q.L].map(function (v) { return v[0]; }).filter(function (w) { return w.toLowerCase() !== q.a.toLowerCase(); })).slice(0, 3);
+      AppCore.wordBank(area, {text: q.t, bank: AppCore.shuffle([q.a].concat(others)), answers: [q.a], exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a); }});
+    } else if (q.ty === "order") {
+      AppCore.tiles(area, {unit: "item", items: q.items, hint: q.q, exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.items.join(" → ")); }});
+    } else if (q.ty === "open") {
+      area.appendChild(el("p", "hs-q", esc(q.q) + " " + KidKit.sayBtn(q.q, "Hear", {lang: "en-US"})));
+      var box = el("div"); area.appendChild(box);
+      var appealed = false;
+      AppCore.openAnswer(box, {a: q.a, points: q.points, need: q.need}, {onResult: function (ok, given) { done(ok, given, q.a, {appeal: appealed}); }, onAppeal: function () { appealed = true; var last = log[log.length - 1]; if (last) last.appeal = true; }});
+    }
+  }
+  function end() {
+    root.innerHTML = "";
+    var r = AppCore.result(log);
+    if (r.answered) saveStars(o.mapId, r.pct);
+    root.appendChild(AppCore.resultView(log, {game: G, onAgain: function () { o.mock ? mock() : drill(o.mapId); }, onHome: home,
+      onRetryWrong: function () { run(log.filter(function (x) { return !x.ok; }).map(function (x) { return x.item; }), {title: o.title + " · mistakes", gameKey: o.gameKey + "-retry", boss: AppCore.bossFor(r.wrong.length, (o.boss && o.boss.name) || "Boss"), mapId: o.mapId, mock: o.mock}); }}));
+  }
+  show();
+}
+home();
+
+</script>
+<script>
+/* =====================================================================
+   site-home.js — 📚 小站 button + 全站集點 (site-wide points & badges)
+   Canonical copy: github.com/iam5980/kids-practice/template/site-home.js
+   Version: 2026-11-08c（🔊 念解釋、🎒 抓寶＋進化／閃亮／巨大化、🎯 每日任務）
+
+   HOW TO USE: paste this whole file in its own <script> block just before
+   </body> of EVERY page published to kids-practice (English and 中文部,
+   apps, oral pages, listening players). Nothing else is required.
+
+   1) "📚 小站" pill, bottom-left → in-page confirm card → site home.
+   2) SitePoints — points and badges per kid, shared by every app on the
+      site (same origin), shown on the home page 集點卡. Kept only on
+      this device (localStorage).
+        SitePoints.answer(ok)       after every judged answer
+        SitePoints.roundEnd(pct)    when a round / drill ends (0–100)
+        SitePoints.literacy(allOk)  when a 素養題組 is finished
+      Points: correct +10, streak bonus +2 per answer in a row (max +10).
+      No speed bonus — accuracy only.
+   3) Auto-hooks, so older apps need no code changes:
+        中文部 engine:  rtAns(right) → answer;  celebrate() → perfect round
+        AppCore apps:   AppCore calls SitePoints itself (app-core ≥ 2026-10-25)
+   ===================================================================== */
+(function () {
+  "use strict";
+  if (window.__siteHome) return;
+  window.__siteHome = true;
+  var LIVE = "https://iam5980.github.io/kids-practice/";
+  function homeUrl() {
+    var p = location.pathname, i = p.indexOf("/kids-practice/");
+    if (location.protocol.indexOf("http") === 0 && i >= 0) return location.origin + p.slice(0, i) + "/kids-practice/";
+    return LIVE;
+  }
+
+  /* ---------------- SitePoints ---------------- */
+  var BADGES = [
+    { id: "first",   icon: "🌱", name: "第一次答對" },
+    { id: "perfect", icon: "💯", name: "第一次滿分" },
+    { id: "streak10",icon: "🔥", name: "連對 10 題" },
+    { id: "streak20",icon: "🚀", name: "連對 20 題" },
+    { id: "days3",   icon: "📅", name: "連續練習 3 天" },
+    { id: "days7",   icon: "🗓️", name: "連續練習 7 天" },
+    { id: "lit1",    icon: "🧩", name: "第一組素養題全對" },
+    { id: "lit10",   icon: "🎓", name: "素養題達人（10 組全對）" },
+    { id: "p500",    icon: "⭐", name: "累積 500 點" },
+    { id: "p2000",   icon: "🌟", name: "累積 2000 點" },
+    { id: "p5000",   icon: "🏆", name: "累積 5000 點" }
+  ];
+  function kidFromPath() {
+    var m = location.pathname.match(/\/kids-practice\/([a-z0-9]+)\//i);
+    return m && m[1] !== "template" && m[1] !== "shadowing" ? m[1] : null;
+  }
+  function today() { var d = new Date(); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+  function dayDiff(a, b) { return Math.round((new Date(b) - new Date(a)) / 864e5); }
+  function load(kid) {
+    var d = null;
+    try { d = JSON.parse(localStorage.getItem("kp-points-" + kid) || "null"); } catch (e) {}
+    return d || { points: 0, today: "", todayPts: 0, days: [], badges: {}, correct: 0, perfects: 0, lit: 0, bestStreak: 0 };
+  }
+  function save(kid, d) { try { localStorage.setItem("kp-points-" + kid, JSON.stringify(d)); } catch (e) {} }
+  function dayStreak(days) {
+    if (!days.length) return 0;
+    var s = days.slice().sort(), n = 1;
+    if (dayDiff(s[s.length - 1], today()) > 1) return 0;
+    for (var i = s.length - 1; i > 0; i--) { if (dayDiff(s[i - 1], s[i]) === 1) n++; else break; }
+    return n;
+  }
+  var kid = kidFromPath(), streak = 0;
+  function toast(html, big) {
+    var t = document.createElement("div");
+    t.className = "sp-toast" + (big ? " sp-big" : "");
+    t.innerHTML = html;
+    document.body.appendChild(t);
+    setTimeout(function () { t.classList.add("sp-out"); }, big ? 2200 : 900);
+    setTimeout(function () { t.remove(); }, big ? 2700 : 1300);
+  }
+  function grant(d, id) {
+    if (d.badges[id]) return;
+    d.badges[id] = today();
+    var b = BADGES.filter(function (x) { return x.id === id; })[0];
+    if (b) toast("🏅 獲得徽章<br><b>" + b.icon + " " + b.name + "</b>", true);
+  }
+  function update(fn) {
+    if (!kid) return;
+    var d = load(kid), t = today();
+    if (d.today !== t) { d.today = t; d.todayPts = 0; }
+    if (d.days.indexOf(t) < 0) { d.days.push(t); if (d.days.length > 60) d.days = d.days.slice(-60); }
+    fn(d);
+    var ds = dayStreak(d.days);
+    if (ds >= 3) grant(d, "days3");
+    if (ds >= 7) grant(d, "days7");
+    if (d.points >= 500) grant(d, "p500");
+    if (d.points >= 2000) grant(d, "p2000");
+    if (d.points >= 5000) grant(d, "p5000");
+    save(kid, d);
+  }
+  /* 🎯 每日任務 — reset every day; each one gives +50 once */
+  var QUESTS = [
+    { id: "c20", icon: "✅", name: "今天答對 20 題", goal: 20, f: "correct" },
+    { id: "r3",  icon: "🔁", name: "今天完成 3 輪練習", goal: 3, f: "rounds" },
+    { id: "s10", icon: "🔥", name: "今天連對 10 題", goal: 10, f: "streak" }
+  ];
+  function qDay(d) { var t = today(); if (!d.q || d.q.day !== t) d.q = { day: t, correct: 0, rounds: 0, streak: 0, done: {} }; }
+  function qCheck(d) {
+    QUESTS.forEach(function (q) {
+      if (!d.q.done[q.id] && d.q[q.f] >= q.goal) {
+        d.q.done[q.id] = 1; d.points += 50; d.todayPts += 50;
+        toast("🎯 每日任務完成<br><b>" + q.icon + " " + q.name + "</b><br>＋50 點", true);
+      }
+    });
+  }
+  var SitePoints = {
+    kid: kid,
+    badges: BADGES,
+    read: function (k) { var d = load(k || kid); d.dayStreak = dayStreak(d.days); return d; },
+    answer: function (ok) {
+      update(function (d) {
+        if (ok) {
+          streak++;
+          var pts = 10 + Math.min(10, (streak - 1) * 2);
+          d.points += pts; d.todayPts += pts; d.correct++;
+          qDay(d); d.q.correct++; d.q.streak = Math.max(d.q.streak, streak); qCheck(d);
+          d.bestStreak = Math.max(d.bestStreak, streak);
+          grant(d, "first");
+          if (streak >= 10) grant(d, "streak10");
+          if (streak >= 20) grant(d, "streak20");
+          toast("+" + pts);
+        } else { streak = 0; }
+      });
+    },
+    quests: QUESTS,
+    roundEnd: function (pct, noPerfect) {
+      update(function (d) { qDay(d); d.q.rounds++; qCheck(d); });
+      if (pct >= 100 && !noPerfect) update(function (d) { d.perfects++; grant(d, "perfect"); });
+    },
+    perfect: function () {
+      update(function (d) { d.perfects++; grant(d, "perfect"); });
+    },
+    literacy: function (allOk) {
+      if (allOk) update(function (d) { d.lit++; grant(d, "lit1"); if (d.lit >= 10) grant(d, "lit10"); });
+    }
+  };
+  window.SitePoints = SitePoints;
+
+  /* auto-hooks for the 中文部 engine (global rtAns / celebrate) */
+  if (typeof window.rtAns === "function" && !window.rtAns.__sp) {
+    var oAns = window.rtAns;
+    window.rtAns = function (right) { try { SitePoints.answer(!!right); } catch (e) {} return oAns.apply(this, arguments); };
+    window.rtAns.__sp = true;
+  }
+  if (typeof window.celebrate === "function" && !window.celebrate.__sp) {
+    var oCel = window.celebrate;
+    window.celebrate = function () { try { SitePoints.perfect(); } catch (e) {} return oCel.apply(this, arguments); };
+    window.celebrate.__sp = true;
+  }
+
+
+  /* ---------------- 🔊 念解釋（ReadAloud）----------------
+     Every explanation / definition box on every app gets a small 🔊 button:
+     .fb .ac-fb .ac-exp .ac-ans td.hint .qmean .why .explain .sp-read
+     Chinese text → zh-TW voice; otherwise en-US. */
+  var RA_SEL = ".fb,.ac-fb,.ac-exp,.ac-ans,td.hint,.qmean,.why,.explain,.sp-read";
+  function raText(el) {
+    var c = el.cloneNode(true);
+    Array.prototype.forEach.call(c.querySelectorAll("button,.sp-say,script,style"), function (x) { x.remove(); });
+    return (c.textContent || "").replace(/\s+/g, " ").trim();
+  }
+  function raSpeak(t) {
+    if (!window.speechSynthesis || !t) return;
+    try {
+      speechSynthesis.cancel();
+      var zh = /[一-鿿]/.test(t), u = new SpeechSynthesisUtterance(t);
+      u.lang = zh ? "zh-TW" : "en-US"; u.rate = zh ? 0.95 : 0.9;
+      var vs = speechSynthesis.getVoices() || [], pref = zh ? ["zh-TW", "zh_TW", "zh-HK", "zh"] : ["en-US", "en_US", "en-GB", "en"];
+      for (var i = 0; i < pref.length && !u.voice; i++) for (var j = 0; j < vs.length; j++) if (vs[j].lang && vs[j].lang.indexOf(pref[i]) === 0) { u.voice = vs[j]; break; }
+      speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+  function raScan() {
+    Array.prototype.forEach.call(document.querySelectorAll(RA_SEL), function (el) {
+      if (el.__ra || el.closest("#sh-card,.sd-card,.sp-toast") || (el.parentElement && el.parentElement.closest(RA_SEL))) return;
+      var t = raText(el); if (t.length < 2) return;
+      el.__ra = true;
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "sp-say"; b.textContent = "🔊";
+      b.title = b.ariaLabel = /[一-鿿]/.test(t) ? "念給我聽" : "Read aloud";
+      b.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); raSpeak(raText(el)); }, true);
+      el.appendChild(b);
+    });
+  }
+  var raPending = false;
+  function raQueue() { if (raPending) return; raPending = true; setTimeout(function () { raPending = false; raScan(); }, 120); }
+  if (window.MutationObserver && document.body) new MutationObserver(raQueue).observe(document.body, { childList: true, subtree: true });
+  raQueue();
+
+  /* ---------------- 🎒 抓寶（SiteDex）----------------
+     After a good round, an original creature may appear; tap 🫙 to catch it.
+     Collection per kid in localStorage "kp-dex-<kid>", shown on the home page 圖鑑.
+     SiteDex.maybe(pct, n)  — called from roundEnd and the 中文部 rtEnd hook.
+     All creatures are original designs (no existing characters). */
+  var DEX = [
+    ["ink","墨墨兔",0,"#94a3b8","bunny","drop"],["plane","紙飛鼠",0,"#cbd5e1","round","wing"],["eraser","橡皮熊",0,"#f9a8d4","round","none"],
+    ["chalk","粉筆鴨",0,"#fde68a","none","beak"],["mark","書籤狐",0,"#fb923c","cat","tail"],["pencil","鉛筆刺蝟",0,"#a16207","spike","pencil"],
+    ["ruler","尺子龜",0,"#86efac","none","shell"],["crayon","蠟筆貓",0,"#c4b5fd","cat","stripe"],["glue","膠水蝸牛",0,"#67e8f9","antenna","swirl"],
+    ["clip","迴紋小蛇",0,"#a3e635","none","clip"],["note","便利貼蛙",0,"#facc15","frog","note"],["compass","圓規鳥",0,"#7dd3fc","tuft","beak"],
+    ["zhuyin","注音龍寶",1,"#34d399","horn","wing"],["radical","部首獅",1,"#f59e0b","mane","none"],["idiom","成語鹿",1,"#d97706","antler","spots"],
+    ["rhet","修辭孔雀",1,"#2dd4bf","tuft","fan"],["spell","拼字海豚",1,"#38bdf8","none","fin"],["poem","詩詞鶴",1,"#e2e8f0","tuft","beak"],
+    ["abacus","算盤狸",1,"#b45309","round","stripe"],["globe","地球儀龜",1,"#60a5fa","none","globe"],
+    ["phoenix","金榜鳳凰",2,"#f97316","crest","fire"],["qilin","滿分麒麟",2,"#fbbf24","horn","star"],
+    ["dragon","智慧神龍",2,"#22d3ee","horn","wing"],["uni","星光獨角獸",2,"#f0abfc","uni","star"]
+  ];
+  var RARE = ["一般", "稀有", "傳說"], RARE_C = ["#64748b", "#2563eb", "#d97706"];
+  function dxStage(n) { return n >= 6 ? 3 : n >= 3 ? 2 : 1; }
+  function dxSvg(id, hidden, o) {
+    o = o || {};
+    var d = DEX.filter(function (x) { return x[0] === id; })[0]; if (!d) return "";
+    var c = hidden ? "#94a3b8" : d[3], k = hidden ? "#94a3b8" : "#1f2937", ear = d[4], f = d[5], s = "";
+    var lite = hidden ? "#cbd5e1" : "rgba(255,255,255,.55)";
+    if (ear === "bunny") s += '<ellipse cx="38" cy="22" rx="7" ry="18" fill="' + c + '"/><ellipse cx="62" cy="22" rx="7" ry="18" fill="' + c + '"/>';
+    if (ear === "cat" || ear === "mane") s += '<path d="M26 40 L32 16 L46 32Z M74 40 L68 16 L54 32Z" fill="' + c + '"/>';
+    if (ear === "round") s += '<circle cx="30" cy="30" r="10" fill="' + c + '"/><circle cx="70" cy="30" r="10" fill="' + c + '"/>';
+    if (ear === "horn" || ear === "uni") s += ear === "uni" ? '<path d="M50 4 L45 30 L55 30Z" fill="' + (hidden ? c : "#fde047") + '"/>' : '<path d="M36 30 L32 8 L44 26Z M64 30 L68 8 L56 26Z" fill="' + (hidden ? c : "#fde68a") + '"/>';
+    if (ear === "antler") s += '<path d="M36 30 L28 8 M30 16 L22 12 M64 30 L72 8 M70 16 L78 12" stroke="' + (hidden ? c : "#78350f") + '" stroke-width="4" stroke-linecap="round" fill="none"/>';
+    if (ear === "tuft" || ear === "crest") s += '<path d="M50 10 Q44 22 48 30 Q50 18 56 12 Q52 22 54 30" fill="' + c + '"/>';
+    if (ear === "antenna") s += '<path d="M42 30 L36 10 M58 30 L64 10" stroke="' + c + '" stroke-width="3"/><circle cx="36" cy="10" r="4" fill="' + c + '"/><circle cx="64" cy="10" r="4" fill="' + c + '"/>';
+    if (ear === "frog") s += '<circle cx="34" cy="30" r="11" fill="' + c + '"/><circle cx="66" cy="30" r="11" fill="' + c + '"/>';
+    if (ear === "spike") s += '<path d="M20 50 L14 34 L30 40 L28 22 L42 32 L50 16 L58 32 L72 22 L70 40 L86 34 L80 50Z" fill="' + (hidden ? c : "#78350f") + '"/>';
+    if (ear === "mane") s += '<circle cx="50" cy="56" r="38" fill="' + (hidden ? c : "#b45309") + '"/>';
+    if (f === "wing" || f === "fire") s += '<path d="M16 56 Q2 40 8 70 Q14 66 22 68Z M84 56 Q98 40 92 70 Q86 66 78 68Z" fill="' + (f === "fire" && !hidden ? "#ef4444" : c) + '" opacity=".85"/>';
+    if (f === "tail") s += '<path d="M78 74 Q100 60 92 40 Q86 62 70 70Z" fill="' + c + '"/><path d="M92 40 Q90 50 86 52" stroke="#fff" stroke-width="4"/>';
+    if (f === "fan") s += '<path d="M50 60 L10 30 L22 20 L40 14 L60 14 L78 20 L90 30Z" fill="' + (hidden ? c : "#0d9488") + '" opacity=".7"/>';
+    if (f === "shell" || f === "globe") s += '<ellipse cx="50" cy="70" rx="40" ry="20" fill="' + (hidden ? c : f === "globe" ? "#16a34a" : "#15803d") + '"/>';
+    if (f === "fin") s += '<path d="M50 30 L60 12 L64 34Z" fill="' + c + '"/>';
+    s += '<ellipse cx="50" cy="60" rx="30" ry="28" fill="' + c + '"/><ellipse cx="50" cy="70" rx="17" ry="13" fill="' + lite + '"/>';
+    if (!hidden) {
+      s += '<circle cx="40" cy="55" r="5" fill="' + k + '"/><circle cx="60" cy="55" r="5" fill="' + k + '"/><circle cx="41.5" cy="53.5" r="1.6" fill="#fff"/><circle cx="61.5" cy="53.5" r="1.6" fill="#fff"/>';
+      s += '<ellipse cx="33" cy="64" rx="4" ry="2.5" fill="#fb7185" opacity=".55"/><ellipse cx="67" cy="64" rx="4" ry="2.5" fill="#fb7185" opacity=".55"/>';
+      s += f === "beak" ? '<path d="M44 62 L56 62 L50 69Z" fill="#f59e0b"/>' : '<path d="M45 63 Q50 67 55 63" stroke="' + k + '" stroke-width="2" fill="none" stroke-linecap="round"/>';
+      if (f === "spots") s += '<circle cx="30" cy="70" r="3" fill="#fff"/><circle cx="70" cy="72" r="3" fill="#fff"/><circle cx="64" cy="80" r="2.5" fill="#fff"/>';
+      if (f === "stripe") s += '<path d="M24 52 L32 54 M22 60 L30 61 M76 52 L68 54 M78 60 L70 61" stroke="#1f2937" stroke-width="2" opacity=".5"/>';
+      if (f === "star") s += '<path d="M80 16 L83 24 L91 24 L85 29 L87 37 L80 32 L73 37 L75 29 L69 24 L77 24Z" fill="#fde047"/>';
+      if (f === "pencil") s += '<rect x="74" y="64" width="18" height="6" rx="1" fill="#facc15" transform="rotate(-30 83 67)"/>';
+      if (f === "note") s += '<rect x="70" y="66" width="16" height="16" fill="#fef08a" stroke="#ca8a04"/>';
+      if (f === "drop") s += '<path d="M80 60 Q86 70 80 74 Q74 70 80 60Z" fill="#1e293b"/>';
+      if (f === "swirl") s += '<path d="M74 78 a8 8 0 1 1 8 -8 a5 5 0 1 1 -5 5" stroke="#0e7490" stroke-width="3" fill="none"/>';
+      if (f === "clip") s += '<path d="M76 58 v18 a5 5 0 0 0 10 0 v-14 a3 3 0 0 0 -6 0 v12" stroke="#64748b" stroke-width="2.5" fill="none"/>';
+    }
+    var pre = "", post = "", st = hidden ? 1 : (o.stage || 1);
+    if (!hidden && o.giant) pre += '<circle cx="50" cy="56" r="47" fill="none" stroke="#ef4444" stroke-width="4" stroke-dasharray="6 4" opacity=".8"/><circle cx="50" cy="56" r="44" fill="#fecaca" opacity=".35"/>';
+    if (st >= 3) pre += '<circle cx="50" cy="56" r="45" fill="#fde68a" opacity=".45"/>';
+    if (st >= 2) post += '<path d="M24 74 Q50 86 76 74 L74 80 Q50 92 26 80Z" fill="#ef4444"/><path d="M66 80 L72 94 L62 88Z" fill="#dc2626"/>';
+    if (st >= 3) post += '<path d="M36 26 L40 14 L46 22 L50 10 L54 22 L60 14 L64 26Z" fill="#facc15" stroke="#ca8a04" stroke-width="1.5"/>';
+    if (!hidden && o.shiny) post += '<path d="M12 20 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3Z M88 70 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2Z" fill="#fde047"/>';
+    var g = !hidden && o.shiny ? '<g style="filter:hue-rotate(150deg) saturate(1.5) brightness(1.05)">' + s + "</g>" : s;
+    var tr = !hidden && o.giant ? ' transform="translate(50 56) scale(1.12) translate(-50 -56)"' : "";
+    return '<svg viewBox="0 0 100 100" width="100%" height="100%" aria-hidden="true">' + pre + "<g" + tr + ">" + g + post + "</g></svg>";
+  }
+  function dxLoad(k) { try { return JSON.parse(localStorage.getItem("kp-dex-" + k) || "{}") || {}; } catch (e) { return {}; } }
+  function dxSave(k, d) { try { localStorage.setItem("kp-dex-" + k, JSON.stringify(d)); } catch (e) {} }
+  var dxLast = 0;
+  function dxPick(pct) {
+    var r = Math.random(), tier = 0;
+    if (pct >= 100 && r < 0.12) tier = 2; else if (pct >= 90 && r < 0.4) tier = 1;
+    var pool = DEX.filter(function (x) { return x[2] === tier; });
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  function dxEncounter(pct) {
+    if (!kid || !document.body || document.querySelector(".sd-mask")) return;
+    var d = dxPick(pct), dx0 = dxLoad(kid), rec0 = dx0[d[0]], st0 = rec0 ? dxStage(rec0.n) : 1;
+    var shiny = Math.random() < 1 / 15, giant = pct >= 100 && st0 >= 2 && Math.random() < 0.3;
+    var tries = 3, rate = ([0.55, 0.35, 0.2][d[2]] + (pct >= 100 ? 0.1 : 0)) * (giant ? 0.6 : 1);
+    var label = (shiny ? "✨閃亮 " : "") + d[1];
+    var m = document.createElement("div"); m.className = "sd-mask";
+    m.innerHTML = '<div class="sd-card" role="dialog" aria-modal="true"><p class="sd-tag" style="color:' + RARE_C[d[2]] + '">✨ ' + RARE[d[2]] + (giant ? "・🌟 巨大化" : "") + (shiny ? "・閃亮" : "") + '</p>' +
+      '<h3>' + (giant ? "巨大化的" : "野生的") + "「" + label + '」出現了！</h3><div class="sd-pic sd-bob">' + dxSvg(d[0], false, { stage: st0, shiny: shiny, giant: giant }) + '</div><p class="sd-msg">' + (giant ? "巨大化的夥伴比較難抓！" : "答得好！") + '快丟星星瓶抓住牠（還有 <b>3</b> 次機會）</p>' +
+      '<button type="button" class="sd-throw">🫙 丟星星瓶</button><button type="button" class="sd-skip">先不要</button></div>';
+    document.body.appendChild(m);
+    var pic = m.querySelector(".sd-pic"), msg = m.querySelector(".sd-msg"), th = m.querySelector(".sd-throw"), sk = m.querySelector(".sd-skip");
+    function close() { m.remove(); }
+    sk.onclick = close;
+    th.onclick = function () {
+      th.disabled = true; pic.className = "sd-pic sd-shake";
+      setTimeout(function () {
+        tries--;
+        if (Math.random() < rate) {
+          var dx = dxLoad(kid), r = dx[d[0]] || { n: 0, d: today(), s: 0, g: 0 }, first = !dx[d[0]], before = dxStage(r.n);
+          r.n++; if (shiny) r.s = (r.s || 0) + 1; if (giant) r.g = (r.g || 0) + 1; dx[d[0]] = r; dxSave(kid, dx);
+          var after = dxStage(r.n), have = DEX.filter(function (x) { return dx[x[0]]; }).length;
+          var evo = after > before;
+          pic.innerHTML = dxSvg(d[0], false, { stage: after, shiny: shiny, giant: giant });
+          pic.className = "sd-pic sd-got";
+          msg.innerHTML = "🎉 抓到了！" + (first ? "新夥伴加入圖鑑" : "又抓到一隻（第 " + r.n + " 隻）") +
+            (evo ? "<br>✨ <b>" + d[1] + " 進化了！</b>現在是 " + "★★★".slice(0, after) + (after === 3 ? "（完全體）" : "") : (after < 3 ? "<br>再抓 " + ((after === 1 ? 3 : 6) - r.n) + " 隻就會進化" : "")) +
+            (shiny ? "<br>✨ 閃亮版收集 +1" : "") + (giant ? "<br>🌟 巨大化收集 +1" : "") +
+            "<br>圖鑑 <b>" + have + " / " + DEX.length + "</b>（回小站可以看）";
+          th.remove(); sk.textContent = "好耶，繼續練習";
+        } else if (tries > 0) {
+          pic.className = "sd-pic sd-bob"; th.disabled = false;
+          msg.innerHTML = "差一點！牠跳出來了，再試一次（還有 <b>" + tries + "</b> 次機會）";
+        } else {
+          pic.className = "sd-pic sd-run"; th.remove(); sk.textContent = "下次再來";
+          msg.innerHTML = "牠跑走了… 下一輪答得好，還有機會再遇到！";
+        }
+      }, 900);
+    };
+  }
+  var SiteDex = {
+    list: DEX, rarity: RARE, svg: dxSvg, stage: dxStage, read: function (k) { return dxLoad(k || kid); },
+    maybe: function (pct, n) {
+      if (!kid || n === 0 || pct < 70) return;
+      var now = Date.now(); if (now - dxLast < 5000) return; dxLast = now;
+      var p = pct >= 100 ? 1 : pct >= 90 ? 0.6 : 0.35;
+      if (Math.random() < p) setTimeout(function () { dxEncounter(pct); }, 1800);
+    }
+  };
+  window.SiteDex = SiteDex;
+  var oRE = SitePoints.roundEnd;
+  SitePoints.roundEnd = function (pct, noPerfect, n) { oRE(pct, noPerfect); try { SiteDex.maybe(pct, n); } catch (e) {} };
+  if (typeof window.rtEnd === "function" && !window.rtEnd.__sd) {
+    var oEnd = window.rtEnd;
+    window.rtEnd = function () {
+      try { var r = window.rt || (typeof rt !== "undefined" ? rt : null); if (r && !r.done && r.n >= 1) SitePoints.roundEnd(Math.round(r.ok / r.n * 100), true, r.n >= 5 ? r.n : 0); } catch (e) {}
+      return oEnd.apply(this, arguments);
+    };
+    window.rtEnd.__sd = true;
+  }
+
+  /* ---------------- styles ---------------- */
+  var css = document.createElement("style");
+  css.textContent =
+    "#sh-btn{position:fixed;left:max(12px,env(safe-area-inset-left));bottom:max(12px,env(safe-area-inset-bottom));z-index:9000;" +
+    "height:44px;padding:0 14px 0 10px;border-radius:999px;border:2px solid rgba(255,255,255,.9);background:#334155;color:#fff;font:700 16px/1 -apple-system,'PingFang TC','Noto Sans TC',sans-serif;" +
+    "box-shadow:0 4px 14px rgba(0,0,0,.28);cursor:pointer;opacity:.9;touch-action:manipulation;white-space:nowrap}" +
+    "#sh-btn:active{transform:scale(.94)}" +
+    "#sh-mask{position:fixed;inset:0;z-index:9001;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px}" +
+    "#sh-card{background:#fff;color:#0f172a;border-radius:18px;padding:20px 18px;max-width:340px;width:100%;text-align:center;" +
+    "font:17px/1.5 -apple-system,'PingFang TC','Noto Sans TC',sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.3)}" +
+    "#sh-card h3{margin:0 0 6px;font-size:20px}#sh-card p{margin:0 0 16px;color:#475569;font-size:15px}" +
+    "#sh-card button{font:inherit;min-height:48px;border-radius:12px;border:0;padding:10px 16px;margin:4px;cursor:pointer}" +
+    "#sh-go{background:#0284c7;color:#fff;font-weight:700}#sh-stay{background:#e2e8f0;color:#0f172a}" +
+    "@media (prefers-color-scheme:dark){#sh-card{background:#1e293b;color:#e2e8f0}#sh-card p{color:#94a3b8}#sh-stay{background:#334155;color:#e2e8f0}}" +
+    ".sp-say{font:14px/1 sans-serif;border:1px solid rgba(100,116,139,.45);background:transparent;border-radius:999px;padding:3px 7px;margin-left:6px;cursor:pointer;vertical-align:middle;color:inherit}" +
+    ".sd-mask{position:fixed;inset:0;z-index:9003;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px}" +
+    ".sd-card{background:#fff;color:#0f172a;border-radius:20px;padding:18px;max-width:340px;width:100%;text-align:center;font:16px/1.5 -apple-system,'PingFang TC','Noto Sans TC',sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.35)}" +
+    ".sd-card h3{margin:0 0 4px;font-size:20px}.sd-tag{margin:0;font-weight:800}.sd-msg{color:#475569;margin:6px 0 12px}" +
+    ".sd-pic{width:150px;height:150px;margin:6px auto}.sd-bob{animation:sdb 1.1s ease-in-out infinite}.sd-shake{animation:sds .3s linear 3}.sd-got{animation:sdg .6s ease-out}.sd-run{animation:sdr .8s ease-in forwards}" +
+    "@keyframes sdb{50%{transform:translateY(-10px)}}@keyframes sds{25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}@keyframes sdg{0%{transform:scale(.6)}70%{transform:scale(1.15)}}@keyframes sdr{to{transform:translateX(220px);opacity:0}}" +
+    ".sd-card button{font:inherit;min-height:48px;border-radius:12px;border:0;padding:10px 16px;margin:4px;cursor:pointer}.sd-throw{background:#7c3aed;color:#fff;font-weight:800}.sd-skip{background:#e2e8f0;color:#0f172a}" +
+    "@media (prefers-color-scheme:dark){.sd-card{background:#1e293b;color:#e2e8f0}.sd-msg{color:#94a3b8}.sd-skip{background:#334155;color:#e2e8f0}}" +
+    "body{padding-bottom:max(76px,calc(64px + env(safe-area-inset-bottom)))!important}" +
+    ".sp-toast{position:fixed;left:max(84px,calc(72px + env(safe-area-inset-left)));bottom:max(18px,calc(6px + env(safe-area-inset-bottom)));z-index:9002;" +
+    "background:#f59e0b;color:#1f2937;font:800 16px/1.3 -apple-system,'PingFang TC',sans-serif;padding:8px 12px;border-radius:999px;" +
+    "box-shadow:0 4px 12px rgba(0,0,0,.25);pointer-events:none;transition:opacity .4s,transform .4s}" +
+    ".sp-toast.sp-big{left:50%;bottom:auto;top:30%;transform:translateX(-50%);text-align:center;font-size:18px;padding:14px 22px;border-radius:18px}" +
+    ".sp-toast.sp-out{opacity:0;transform:translateY(-14px)}.sp-toast.sp-big.sp-out{transform:translate(-50%,-14px)}";
+  document.head.appendChild(css);
+
+  function qHtml() {
+    var d = load(kid); qDay(d);
+    return '<p style="text-align:left;font-size:14px;margin:-8px 0 14px">🎯 今天的任務：<br>' + QUESTS.map(function (q) {
+      var v = Math.min(q.goal, d.q[q.f] || 0); return (d.q.done[q.id] ? "✅ " : "⬜ ") + q.name + "（" + v + "/" + q.goal + "）";
+    }).join("<br>") + "</p>";
+  }
+  /* ---------------- 📚 小站 button ---------------- */
+  if (!document.body || window.__siteHomeNoBtn) return;
+  var b = document.createElement("button");
+  b.id = "sh-btn"; b.type = "button";
+  b.setAttribute("aria-label", "回到練習小站"); b.title = "回到練習小站";
+  b.textContent = "📚 小站";
+  b.addEventListener("click", function () {
+    if (document.getElementById("sh-mask")) return;
+    var m = document.createElement("div"); m.id = "sh-mask";
+    var pts = kid ? "<p>目前集點：⭐ " + load(kid).points + " 點・🎒 圖鑑 " + DEX.filter(function (x) { return dxLoad(kid)[x[0]]; }).length + " / " + DEX.length + "</p>" + qHtml() : "";
+    m.innerHTML = '<div id="sh-card" role="dialog" aria-modal="true"><h3>📚 回到練習小站？</h3>' +
+      '<p>這一輪的作答不會保留（點數和最高分紀錄會留著）。</p>' + pts +
+      '<button id="sh-go" type="button">回到練習小站</button><button id="sh-stay" type="button">繼續練習</button></div>';
+    document.body.appendChild(m);
+    function close() { m.remove(); }
+    m.addEventListener("click", function (e) { if (e.target === m) close(); });
+    document.getElementById("sh-stay").addEventListener("click", close);
+    document.getElementById("sh-go").addEventListener("click", function () {
+      try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
+      location.href = homeUrl();
+    });
+    document.getElementById("sh-go").focus();
+  });
+  document.body.appendChild(b);
+})();
+
+</script>
+</body></html>
