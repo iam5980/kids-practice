@@ -1215,7 +1215,7 @@ renderScope();renderCards();
 /* =====================================================================
    site-home.js — 📚 小站 button + 全站集點 (site-wide points & badges)
    Canonical copy: github.com/iam5980/kids-practice/template/site-home.js
-   Version: 2026-11-08b（新增 🔊 念解釋、🎒 抓寶、🎯 每日任務）
+   Version: 2026-11-08c（🔊 念解釋、🎒 抓寶＋進化／閃亮／巨大化、🎯 每日任務）
 
    HOW TO USE: paste this whole file in its own <script> block just before
    </body> of EVERY page published to kids-practice (English and 中文部,
@@ -1423,7 +1423,9 @@ renderScope();renderCards();
     ["dragon","智慧神龍",2,"#22d3ee","horn","wing"],["uni","星光獨角獸",2,"#f0abfc","uni","star"]
   ];
   var RARE = ["一般", "稀有", "傳說"], RARE_C = ["#64748b", "#2563eb", "#d97706"];
-  function dxSvg(id, hidden) {
+  function dxStage(n) { return n >= 6 ? 3 : n >= 3 ? 2 : 1; }
+  function dxSvg(id, hidden, o) {
+    o = o || {};
     var d = DEX.filter(function (x) { return x[0] === id; })[0]; if (!d) return "";
     var c = hidden ? "#94a3b8" : d[3], k = hidden ? "#94a3b8" : "#1f2937", ear = d[4], f = d[5], s = "";
     var lite = hidden ? "#cbd5e1" : "rgba(255,255,255,.55)";
@@ -1456,7 +1458,15 @@ renderScope();renderCards();
       if (f === "swirl") s += '<path d="M74 78 a8 8 0 1 1 8 -8 a5 5 0 1 1 -5 5" stroke="#0e7490" stroke-width="3" fill="none"/>';
       if (f === "clip") s += '<path d="M76 58 v18 a5 5 0 0 0 10 0 v-14 a3 3 0 0 0 -6 0 v12" stroke="#64748b" stroke-width="2.5" fill="none"/>';
     }
-    return '<svg viewBox="0 0 100 100" width="100%" height="100%" aria-hidden="true">' + s + "</svg>";
+    var pre = "", post = "", st = hidden ? 1 : (o.stage || 1);
+    if (!hidden && o.giant) pre += '<circle cx="50" cy="56" r="47" fill="none" stroke="#ef4444" stroke-width="4" stroke-dasharray="6 4" opacity=".8"/><circle cx="50" cy="56" r="44" fill="#fecaca" opacity=".35"/>';
+    if (st >= 3) pre += '<circle cx="50" cy="56" r="45" fill="#fde68a" opacity=".45"/>';
+    if (st >= 2) post += '<path d="M24 74 Q50 86 76 74 L74 80 Q50 92 26 80Z" fill="#ef4444"/><path d="M66 80 L72 94 L62 88Z" fill="#dc2626"/>';
+    if (st >= 3) post += '<path d="M36 26 L40 14 L46 22 L50 10 L54 22 L60 14 L64 26Z" fill="#facc15" stroke="#ca8a04" stroke-width="1.5"/>';
+    if (!hidden && o.shiny) post += '<path d="M12 20 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3Z M88 70 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2Z" fill="#fde047"/>';
+    var g = !hidden && o.shiny ? '<g style="filter:hue-rotate(150deg) saturate(1.5) brightness(1.05)">' + s + "</g>" : s;
+    var tr = !hidden && o.giant ? ' transform="translate(50 56) scale(1.12) translate(-50 -56)"' : "";
+    return '<svg viewBox="0 0 100 100" width="100%" height="100%" aria-hidden="true">' + pre + "<g" + tr + ">" + g + post + "</g></svg>";
   }
   function dxLoad(k) { try { return JSON.parse(localStorage.getItem("kp-dex-" + k) || "{}") || {}; } catch (e) { return {}; } }
   function dxSave(k, d) { try { localStorage.setItem("kp-dex-" + k, JSON.stringify(d)); } catch (e) {} }
@@ -1469,10 +1479,13 @@ renderScope();renderCards();
   }
   function dxEncounter(pct) {
     if (!kid || !document.body || document.querySelector(".sd-mask")) return;
-    var d = dxPick(pct), tries = 3, rate = [0.75, 0.5, 0.35][d[2]] + (pct >= 100 ? 0.1 : 0);
+    var d = dxPick(pct), dx0 = dxLoad(kid), rec0 = dx0[d[0]], st0 = rec0 ? dxStage(rec0.n) : 1;
+    var shiny = Math.random() < 1 / 15, giant = pct >= 100 && st0 >= 2 && Math.random() < 0.3;
+    var tries = 3, rate = ([0.55, 0.35, 0.2][d[2]] + (pct >= 100 ? 0.1 : 0)) * (giant ? 0.6 : 1);
+    var label = (shiny ? "✨閃亮 " : "") + d[1];
     var m = document.createElement("div"); m.className = "sd-mask";
-    m.innerHTML = '<div class="sd-card" role="dialog" aria-modal="true"><p class="sd-tag" style="color:' + RARE_C[d[2]] + '">✨ ' + RARE[d[2]] + '</p>' +
-      '<h3>野生的「' + d[1] + '」出現了！</h3><div class="sd-pic sd-bob">' + dxSvg(d[0]) + '</div><p class="sd-msg">答得好！快丟星星瓶抓住牠（還有 <b>3</b> 次機會）</p>' +
+    m.innerHTML = '<div class="sd-card" role="dialog" aria-modal="true"><p class="sd-tag" style="color:' + RARE_C[d[2]] + '">✨ ' + RARE[d[2]] + (giant ? "・🌟 巨大化" : "") + (shiny ? "・閃亮" : "") + '</p>' +
+      '<h3>' + (giant ? "巨大化的" : "野生的") + "「" + label + '」出現了！</h3><div class="sd-pic sd-bob">' + dxSvg(d[0], false, { stage: st0, shiny: shiny, giant: giant }) + '</div><p class="sd-msg">' + (giant ? "巨大化的夥伴比較難抓！" : "答得好！") + '快丟星星瓶抓住牠（還有 <b>3</b> 次機會）</p>' +
       '<button type="button" class="sd-throw">🫙 丟星星瓶</button><button type="button" class="sd-skip">先不要</button></div>';
     document.body.appendChild(m);
     var pic = m.querySelector(".sd-pic"), msg = m.querySelector(".sd-msg"), th = m.querySelector(".sd-throw"), sk = m.querySelector(".sd-skip");
@@ -1483,11 +1496,16 @@ renderScope();renderCards();
       setTimeout(function () {
         tries--;
         if (Math.random() < rate) {
-          var dx = dxLoad(kid), first = !dx[d[0]];
-          dx[d[0]] = { n: (dx[d[0]] ? dx[d[0]].n : 0) + 1, d: dx[d[0]] ? dx[d[0]].d : today() }; dxSave(kid, dx);
-          var have = DEX.filter(function (x) { return dx[x[0]]; }).length;
+          var dx = dxLoad(kid), r = dx[d[0]] || { n: 0, d: today(), s: 0, g: 0 }, first = !dx[d[0]], before = dxStage(r.n);
+          r.n++; if (shiny) r.s = (r.s || 0) + 1; if (giant) r.g = (r.g || 0) + 1; dx[d[0]] = r; dxSave(kid, dx);
+          var after = dxStage(r.n), have = DEX.filter(function (x) { return dx[x[0]]; }).length;
+          var evo = after > before;
+          pic.innerHTML = dxSvg(d[0], false, { stage: after, shiny: shiny, giant: giant });
           pic.className = "sd-pic sd-got";
-          msg.innerHTML = "🎉 抓到了！" + (first ? "新夥伴加入圖鑑" : "又抓到一隻") + "<br>圖鑑 <b>" + have + " / " + DEX.length + "</b>（回小站可以看）";
+          msg.innerHTML = "🎉 抓到了！" + (first ? "新夥伴加入圖鑑" : "又抓到一隻（第 " + r.n + " 隻）") +
+            (evo ? "<br>✨ <b>" + d[1] + " 進化了！</b>現在是 " + "★★★".slice(0, after) + (after === 3 ? "（完全體）" : "") : (after < 3 ? "<br>再抓 " + ((after === 1 ? 3 : 6) - r.n) + " 隻就會進化" : "")) +
+            (shiny ? "<br>✨ 閃亮版收集 +1" : "") + (giant ? "<br>🌟 巨大化收集 +1" : "") +
+            "<br>圖鑑 <b>" + have + " / " + DEX.length + "</b>（回小站可以看）";
           th.remove(); sk.textContent = "好耶，繼續練習";
         } else if (tries > 0) {
           pic.className = "sd-pic sd-bob"; th.disabled = false;
@@ -1500,7 +1518,7 @@ renderScope();renderCards();
     };
   }
   var SiteDex = {
-    list: DEX, rarity: RARE, svg: dxSvg, read: function (k) { return dxLoad(k || kid); },
+    list: DEX, rarity: RARE, svg: dxSvg, stage: dxStage, read: function (k) { return dxLoad(k || kid); },
     maybe: function (pct, n) {
       if (!kid || n === 0 || pct < 70) return;
       var now = Date.now(); if (now - dxLast < 5000) return; dxLast = now;
