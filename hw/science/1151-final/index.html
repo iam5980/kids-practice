@@ -1758,8 +1758,29 @@ var HARD = [
 ];
 BANK = BANK.concat(HARD);
 
+/* Oral practice — Estimated from the lessons (no teacher Oral sheet yet). */
+var ORAL_EST = true;
+var ORAL = [
+  {L: "W", q: "How can weather change the land quickly?", a: "Floods, tornadoes, hurricanes, landslides and avalanches can change the land in a very short time. They can wash away soil, knock down trees and move rocks.", keywords: ["flood", "hurricane / tornado", "landslide", "quickly"]},
+  {L: "W", q: "How are tornadoes and hurricanes different?", a: "A hurricane is much bigger than a tornado and lasts longer. Hurricanes form over warm oceans, but tornadoes form over land in a narrow path.", keywords: ["bigger", "lasts longer", "warm ocean", "narrow path"]},
+  {L: "W", q: "What causes a landslide?", a: "Gravity pulls loose rock and soil downhill. Heavy rain or an earthquake can make it happen suddenly.", keywords: ["gravity", "loose rock and soil", "heavy rain"]},
+  {L: "R", q: "What properties do scientists use to identify a mineral?", a: "They test color, hardness, luster and streak, because many minerals have the same color.", keywords: ["hardness", "luster", "streak", "color"]},
+  {L: "R", q: "Name the three kinds of rock and how each forms.", a: "Igneous rock forms when melted rock cools and hardens. Sedimentary rock forms when layers of sediment are pressed or cemented together. Metamorphic rock forms when heat and pressure change other rocks.", keywords: ["igneous", "sedimentary", "metamorphic", "heat and pressure"]},
+  {L: "R", q: "What is the rock cycle?", a: "The rock cycle is the way rocks change from one form to another over a very long time, through melting, weathering, erosion, heat and pressure.", keywords: ["change", "one form to another", "long time"]},
+  {L: "S", q: "What is soil made of?", a: "Soil is made of tiny pieces of rock and minerals, humus, water and air.", keywords: ["rock", "minerals", "humus", "water and air"]},
+  {L: "S", q: "Describe the layers of a soil profile.", a: "The top layer is topsoil, which is dark and rich in humus. Below it is subsoil, with clay and minerals. At the bottom is bedrock, which is solid rock.", keywords: ["topsoil", "subsoil", "bedrock", "humus"]},
+  {L: "S", q: "What is permeability, and how does pore size affect it?", a: "Permeability is how fast water passes through soil. Big pore spaces let water pass through faster, and small pore spaces slow it down.", keywords: ["how fast water passes", "pore spaces", "bigger = faster"]},
+  {L: "F", q: "What is a fossil? Name two kinds.", a: "A fossil is evidence of an organism that lived long ago. Molds, casts, imprints, petrified wood and insects in amber are fossils.", keywords: ["evidence", "long ago", "mold / cast / imprint / amber"]},
+  {L: "F", q: "Why are fossil fuels called nonrenewable resources?", a: "Fossil fuels took millions of years to form, so they cannot be replaced easily once we use them up.", keywords: ["millions of years", "cannot be replaced"]},
+  {L: "F", q: "Name two renewable energy sources and why they are helpful.", a: "Sunlight with solar cells and wind are renewable. They are replaced quickly in nature and make less pollution than fossil fuels.", keywords: ["solar", "wind", "replaced quickly", "less pollution"]},
+  {L: "A", q: "Where is Earth's fresh water found?", a: "Most fresh water is frozen in ice caps and glaciers. The rest is groundwater, soil water, and water in lakes and rivers.", keywords: ["ice caps", "groundwater", "lakes and rivers"]},
+  {L: "A", q: "How does a water treatment plant clean water?", a: "It removes dirt and germs from the water so that people can drink it safely.", keywords: ["removes dirt", "germs", "safe to drink"]},
+  {L: "A", q: "Describe three ways people use a river.", a: "People use rivers for drinking water, for irrigation on farms, to make electricity, to move goods by ship, and for fun like swimming and fishing.", keywords: ["drinking", "irrigation", "electricity", "transport"]}
+];
+
 /* ===== App code ===== */
 AppCore.injectCSS(); KidKit.injectCSS();
+(function () { var st = document.createElement("style"); st.textContent = ".hs-word{padding:12px 14px;margin:8px 0}.hs-wtop{font-size:1.15em}.hs-zh{color:#fbbf24;font-weight:700;margin-left:4px}.hs-word .explain{margin:6px 0;opacity:.95}.hs-sent{font-style:italic;opacity:.9}.hs-sent u{text-decoration-thickness:2px}"; document.head.appendChild(st); })();
 var KEY = APP.key, MAPKEY = KEY + "-map";
 var root = document.getElementById("app");
 var esc = AppCore.esc, el = AppCore.el;
@@ -1769,12 +1790,46 @@ function saveStars(id, pct) {
   try { d = JSON.parse(localStorage.getItem("kk-lv-" + MAPKEY) || "{}"); } catch (e) {}
   if (!d[id] || s > d[id]) { d[id] = s; try { localStorage.setItem("kk-lv-" + MAPKEY, JSON.stringify(d)); } catch (e) {} }
 }
+var ZH = {};
+var HAS_TV = typeof TVOCAB !== "undefined", HAS_ORAL = typeof ORAL !== "undefined";
+if (HAS_TV) Object.keys(TVOCAB).forEach(function (L) {
+  VOCAB[L] = VOCAB[L] || [];
+  TVOCAB[L].forEach(function (t) {
+    ZH[t[0].toLowerCase()] = t[1];
+    var hit = VOCAB[L].filter(function (v) { return v[0].toLowerCase() === t[0].toLowerCase(); })[0];
+    if (hit) hit[1] = t[3]; else VOCAB[L].push([t[0], t[3]]);
+  });
+});
+function zhOf(w) { var z = ZH[String(w).toLowerCase()]; return z ? " (" + z + ")" : ""; }
+function tvItems(L) {
+  if (!HAS_TV || !TVOCAB[L]) return [];
+  return TVOCAB[L].map(function (t) { return {L: L, ty: "fill", t: t[4], a: t[5], base: t[0], tv: true, exp: t[0] + " (" + t[1] + ", " + t[2] + "): " + t[3]}; });
+}
+function listenItems(L) {
+  var all = VOCAB[L], out = [];
+  all.forEach(function (v) {
+    var others = AppCore.shuffle(all.filter(function (x) { return x !== v; }));
+    out.push({L: L, ty: "listen", say: v[1], a: v[0], w: [others[0][0], others[1][0]], prompt: "🎧 Listen to the meaning. Which word is it?", exp: v[0] + zhOf(v[0]) + ": " + v[1]});
+  });
+  BANK.forEach(function (q) { if (q.L === L && q.ty === "tf") out.push({L: L, ty: "listen", tf: true, say: q.q, a: q.a, prompt: "🎧 Listen. Is it TRUE or FALSE?", exp: q.q + (q.exp ? "\n" + q.exp : "")}); });
+  return out;
+}
+function spellItems(L) {
+  return VOCAB[L].filter(function (v) { return /^[a-z]{3,12}$/i.test(v[0]); }).map(function (v) {
+    return {L: L, ty: "spell", a: v[0], def: v[1], exp: v[0] + zhOf(v[0]) + ": " + v[1]};
+  });
+}
+function oralItems(L) {
+  if (!HAS_ORAL) return [];
+  return ORAL.filter(function (o) { return L === "ALL" || o.L === L; }).map(function (o) { return {L: o.L, ty: "oral", q: o.q, a: o.a, keywords: o.keywords, mustKnow: o.mustKnow}; });
+}
 function vocabItems(L) {
   var all = VOCAB[L], out = [];
   all.forEach(function (v) {
     var others = AppCore.shuffle(all.filter(function (x) { return x !== v; }));
-    out.push({L: L, ty: "mc", q: "Which word means: “" + v[1] + "”?", a: v[0], w: [others[0][0], others[1][0]], vocab: true});
-    out.push({L: L, ty: "mc", q: "What does “" + v[0] + "” mean?", a: v[1], w: [others[2][1], others[3][1]], vocab: true});
+    var ex = v[0] + zhOf(v[0]) + ": " + v[1];
+    out.push({L: L, ty: "mc", q: "Which word means: “" + v[1] + "”?", a: v[0], w: [others[0][0], others[1][0]], vocab: true, exp: ex});
+    out.push({L: L, ty: "mc", q: "What does “" + v[0] + "” mean?", a: v[1], w: [others[2][1], others[3][1]], vocab: true, exp: ex});
   });
   return out;
 }
@@ -1787,7 +1842,8 @@ function matchItems(L) {
   }
   return out;
 }
-function pool(L) { return BANK.filter(function (q) { return q.L === L; }).concat(vocabItems(L), matchItems(L)); }
+function pool(L) { return BANK.filter(function (q) { return q.L === L; }).concat(vocabItems(L), matchItems(L), tvItems(L), listenItems(L), spellItems(L)); }
+function isWordy(q) { return q.vocab || q.tv || q.ty === "listen" || q.ty === "spell" || q.ty === "match"; }
 
 /* ---------- Home ---------- */
 function home() {
@@ -1803,14 +1859,21 @@ function home() {
   g.appendChild(AppCore.btn("🃏 Word Flip", "ac-primary", function () { pickLesson("🃏 Word Flip — which lesson?", flip, true); }));
   g.appendChild(AppCore.btn("🧺 Sort It", "ac-primary", function () { pickLesson("🧺 Sort It — which lesson?", sortIt); }));
   root.appendChild(g);
+  root.appendChild(el("h2", "hs-h2", "🎤 Speak · 🎧 Listen · 🔤 Spell"));
+  var g2 = el("div", "hs-games");
+  if (HAS_ORAL) g2.appendChild(AppCore.btn("🎤 Oral Practice", "ac-primary", function () { pickLesson("🎤 Oral Practice — which lesson?", oral, true); }));
+  g2.appendChild(AppCore.btn("🎧 Listening", "ac-primary", function () { pickLesson("🎧 Listening — which lesson?", listening, true); }));
+  g2.appendChild(AppCore.btn("🔤 Spelling", "ac-primary", function () { pickLesson("🔤 Spelling — which lesson?", spelling, true); }));
+  if (HAS_TV) g2.appendChild(AppCore.btn("📒 Teacher's Word List", "ac-primary", function () { pickLesson("📒 Teacher's Word List — which lesson?", wordList, false, true); }));
+  root.appendChild(g2);
   var n = 0; LESSONS.forEach(function (l) { n += pool(l.id).length; });
-  root.appendChild(el("p", "hs-note", "Question bank: " + n + " questions + " + LESSONS.length + " sort games. Scope: " + APP.scope));
+  root.appendChild(el("p", "hs-note", "Question bank: " + n + " questions" + (HAS_ORAL ? " + " + ORAL.length + " oral questions" : "") + " + " + LESSONS.length + " sort games. Scope: " + APP.scope));
 }
-function pickLesson(title, fn, withAll) {
+function pickLesson(title, fn, withAll, tvOnly) {
   root.innerHTML = "";
   root.appendChild(AppCore.btn("⬅ Back", "ac-ghost", home));
   root.appendChild(el("h2", "hs-h2", title));
-  LESSONS.forEach(function (l) { root.appendChild(AppCore.btn(l.icon + " " + l.name, "ac-primary hs-wide", function () { fn(l.id); })); });
+  LESSONS.forEach(function (l) { if (tvOnly && !TVOCAB[l.id]) return; root.appendChild(AppCore.btn(l.icon + " " + l.name, "ac-primary hs-wide", function () { fn(l.id); })); });
   if (withAll) root.appendChild(AppCore.btn("🌍 All lessons", "ac-finish hs-wide", function () { fn("ALL"); }));
 }
 function flip(L) {
@@ -1827,10 +1890,46 @@ function sortIt(L) {
   AppCore.sortGame(root, {key: KEY + "-sort-" + L, title: s.title, bins: s.bins, items: s.items, onHome: home});
 }
 
+function lessonsOf(L) { return L === "ALL" ? LESSONS.map(function (l) { return l.id; }) : [L]; }
+function labelOf(L) { return L === "ALL" ? "All lessons" : lessonById(L).name; }
+function listening(L) {
+  var it = []; lessonsOf(L).forEach(function (k) { it = it.concat(listenItems(k)); });
+  it = AppCore.shuffle(it).slice(0, 15);
+  run(it, {title: "🎧 " + labelOf(L), gameKey: KEY + "-listen-" + L, boss: AppCore.bossFor(it.length, "Echo Bat"), again: function () { listening(L); }});
+}
+function spelling(L) {
+  var it = []; lessonsOf(L).forEach(function (k) { it = it.concat(spellItems(k)); });
+  it = AppCore.shuffle(it).slice(0, 12);
+  run(it, {title: "🔤 " + labelOf(L), gameKey: KEY + "-spell-" + L, boss: AppCore.bossFor(it.length, "Letter Lizard"), again: function () { spelling(L); }});
+}
+function oral(L) {
+  var it = AppCore.shuffle(oralItems(L));
+  run(it, {title: "🎤 " + labelOf(L), gameKey: KEY + "-oral-" + L, again: function () { oral(L); }, oral: true});
+}
+function wordList(L) {
+  window.scrollTo(0, 0); root.innerHTML = "";
+  root.appendChild(AppCore.btn("⬅ Back", "ac-ghost", home));
+  root.appendChild(el("h2", "hs-h2", "📒 " + esc(lessonById(L).name) + " — Teacher's Word List"));
+  root.appendChild(el("p", "ac-hint", "Tap 🔊 to hear each word, meaning and sentence. Then try 🎧 Listening and 🔤 Spelling!"));
+  TVOCAB[L].forEach(function (t, i) {
+    var sent = t[4].replace("___", t[5]);
+    var c = el("div", "hs-card hs-word");
+    c.innerHTML = '<div class="hs-wtop"><b>' + (i + 1) + ". " + esc(t[0]) + "</b> " + KidKit.sayBtn(t[0], "Hear", {lang: "en-US"}) +
+      ' <span class="hs-zh">' + esc(t[1]) + " (" + esc(t[2]) + ")</span></div>" +
+      '<div class="explain">' + esc(t[3]) + "</div>" +
+      '<div class="sp-read hs-sent">' + esc(t[4]).replace("___", "<u>" + esc(t[5]) + "</u>") + "</div>";
+    root.appendChild(c);
+  });
+  root.appendChild(AppCore.btn("🎧 Listening practice", "ac-primary hs-wide", function () { listening(L); }));
+  root.appendChild(AppCore.btn("🔤 Spelling practice", "ac-primary hs-wide", function () { spelling(L); }));
+}
+
 /* ---------- Drills ---------- */
 function drill(L) {
-  var l = lessonById(L);
-  run(AppCore.shuffle(pool(L)), {title: l.icon + " " + l.name, gameKey: KEY + "-" + L, boss: AppCore.bossFor(Math.min(20, pool(L).length), l.boss), mapId: L, limit: 20});
+  var l = lessonById(L), P = pool(L);
+  var a = AppCore.shuffle(P.filter(function (q) { return !isWordy(q); })).slice(0, 12);
+  var b = AppCore.shuffle(P.filter(isWordy)).slice(0, 20 - a.length);
+  run(AppCore.shuffle(a.concat(b)), {title: l.icon + " " + l.name, gameKey: KEY + "-" + L, boss: AppCore.bossFor(Math.min(20, pool(L).length), l.boss), mapId: L, limit: 20});
 }
 function mock() {
   function pick(f, n) { var all = []; LESSONS.forEach(function (l) { all = all.concat(pool(l.id).filter(f)); }); return AppCore.shuffle(all).slice(0, n); }
@@ -1838,29 +1937,34 @@ function mock() {
     pick(function (q) { return q.ty === "match"; }, 2),
     pick(function (q) { return q.ty === "cloze"; }, 3),
     pick(function (q) { return q.ty === "label"; }, 1),
-    pick(function (q) { return q.ty === "fill"; }, 6),
+    pick(function (q) { return q.ty === "fill" && !q.tv; }, 5),
+    pick(function (q) { return q.tv; }, 3),
+    pick(function (q) { return q.ty === "listen"; }, 4),
+    pick(function (q) { return q.ty === "spell"; }, 2),
     pick(function (q) { return q.ty === "order"; }, 2),
-    pick(function (q) { return q.ty === "mc" || q.ty === "tf"; }, 12),
+    pick(function (q) { return (q.ty === "mc" || q.ty === "tf") && !q.vocab; }, 9),
+    pick(function (q) { return q.vocab; }, 3),
     pick(function (q) { return q.ty === "open"; }, 3));
   run(items, {title: "👑 Mock Exam", gameKey: KEY + "-mock", boss: AppCore.bossFor(items.length, "Final Boss"), mapId: "MOCK", mock: true});
 }
 function run(items, o) {
   if (o.limit) items = items.slice(0, o.limit);
-  var D = AppCore.dealer(), G = AppCore.game(o.gameKey, {boss: o.boss}), log = [], i = 0;
+  var D = AppCore.dealer(), G = AppCore.game(o.gameKey, {boss: o.boss}), log = [], i = 0, live = null;
   function show() {
+    if (live) { live.destroy(); live = null; }
     if (i >= items.length) return end();
     window.scrollTo(0, 0);
     var q = items[i];
     root.innerHTML = "";
     root.appendChild(AppCore.drillBar({title: o.title + " · " + (i + 1) + " / " + items.length, onBack: home, onFinish: end, game: G}));
     var card = el("div", "hs-card"); root.appendChild(card);
-    var tag = q.vocab ? "Vocabulary" : {mc: "Multiple choice", tf: "True or False", fill: Array.isArray(q.a) ? "Outline" : "Fill in the blank", order: "Put in order", open: "Critical thinking", cloze: "Cloze Activity", match: "Vocabulary matching", label: "Label the diagram"}[q.ty];
+    var tag = q.vocab ? "Vocabulary" : q.tv ? "Teacher's word list" : q.ty === "oral" ? "Oral" + (typeof ORAL_EST !== "undefined" && ORAL_EST ? " · Estimated — confirm with teacher" : "") : {listen: "Listening", spell: "Spelling", mc: "Multiple choice", tf: "True or False", fill: Array.isArray(q.a) ? "Outline" : "Fill in the blank", order: "Put in order", open: "Critical thinking", cloze: "Cloze Activity", match: "Vocabulary matching", label: "Label the diagram"}[q.ty];
     card.appendChild(el("div", "hs-tag", lessonById(q.L).icon + " " + esc(lessonById(q.L).name) + " · " + tag));
     var area = el("div"); card.appendChild(area);
     var next = el("div", "hs-next"); card.appendChild(next);
     function done(ok, given, correct, extra) {
       G.record(ok);
-      var e = {q: q.q || q.t, given: given, correct: correct, ok: ok, item: q};
+      var e = {q: q.q || q.t || (q.ty === "listen" ? "🎧 " + q.say : q.ty === "spell" ? "🔤 Spell the word that means: " + q.def : ""), given: given, correct: correct, ok: ok, item: q};
       if (extra && extra.appeal) e.appeal = true;
       log.push(e);
       next.innerHTML = "";
@@ -1883,13 +1987,48 @@ function run(items, o) {
         });
         opts.appendChild(b);
       });
+    } else if (q.ty === "listen") {
+      area.appendChild(el("p", "hs-q", esc(q.prompt)));
+      var pr = el("div", "ac-row"); area.appendChild(pr);
+      pr.appendChild(AppCore.btn("🔊 Play", "ac-primary", function () { AppCore.speak(q.say); }));
+      pr.appendChild(AppCore.btn("🐢 Slow", "ac-ghost", function () { AppCore.speak(q.say, {rate: 0.7}); }));
+      try { AppCore.speak(q.say); } catch (e) {}
+      var lr = q.tf ? {choices: ["TRUE", "FALSE"], answer: q.a ? 0 : 1} : D.place(q.a, q.w);
+      var lo = el("div", "hs-opts" + (q.tf ? " hs-tf" : "")); area.appendChild(lo);
+      var lfb = el("div"); area.appendChild(lfb);
+      lr.choices.forEach(function (c, k) {
+        var b = AppCore.btn((q.tf ? "" : "<b>" + "ABC"[k] + "</b> ") + esc(c), "hs-opt", function () {
+          var ok = k === lr.answer;
+          Array.prototype.forEach.call(lo.children, function (x, j) { x.disabled = true; if (j === lr.answer) x.classList.add("hs-ok"); else if (x === b) x.classList.add("hs-bad"); });
+          lfb.innerHTML = '<div class="ac-fb ' + (ok ? "ok" : "bad") + '">' + (ok ? "✓ " + AppCore.praise() : "Not quite — the answer is:<div class=\"ac-ans\"><b>" + esc(lr.choices[lr.answer]) + "</b></div>") +
+            '<div class="ac-exp">You heard: ' + esc(q.exp) + "</div></div>";
+          done(ok, c, lr.choices[lr.answer]);
+        });
+        lo.appendChild(b);
+      });
+    } else if (q.ty === "spell") {
+      area.appendChild(el("p", "hs-q", "🔤 Listen and spell the word."));
+      var sr = el("div", "ac-row"); area.appendChild(sr);
+      sr.appendChild(AppCore.btn("🔊 Hear the word", "ac-primary", function () { AppCore.speak(q.a); }));
+      sr.appendChild(AppCore.btn("🐢 Slow", "ac-ghost", function () { AppCore.speak(q.a, {rate: 0.6}); }));
+      try { AppCore.speak(q.a); } catch (e) {}
+      var sb = el("div"); area.appendChild(sb);
+      AppCore.tiles(sb, {answer: q.a, unit: "letter", hint: "Meaning: " + q.def, exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a); }});
+    } else if (q.ty === "oral") {
+      if (i === 0) area.appendChild(el("div", "", AppCore.WEBVIEW_NOTICE));
+      var ob = el("div"); area.appendChild(ob);
+      var scored = false;
+      live = AppCore.oralCard(ob, {q: q.q, a: q.a, keywords: q.keywords, mustKnow: q.mustKnow}, {maxSecs: 60, onSelfScore: function (ok) {
+        if (scored) { var last = log[log.length - 1]; last.ok = ok; last.given = ok ? "Got it" : "Still learning"; return; }
+        scored = true; done(ok, ok ? "Got it" : "Still learning", q.a);
+      }});
     } else if (q.ty === "cloze" || q.ty === "match" || q.ty === "label" || (q.ty === "fill" && Array.isArray(q.a))) {
       if (q.title) area.appendChild(el("p", "hs-q", esc(q.title)));
       if (q.svg) area.appendChild(el("div", "", q.svg));
       var wb = el("div"); area.appendChild(wb);
       AppCore.wordBank(wb, {text: q.t, bank: AppCore.shuffle(q.bank), answers: q.a, exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a.join(" / ")); }});
     } else if (q.ty === "fill") {
-      var others = AppCore.shuffle(VOCAB[q.L].map(function (v) { return v[0]; }).filter(function (w) { return w.toLowerCase() !== q.a.toLowerCase(); })).slice(0, 3);
+      var others = AppCore.shuffle(VOCAB[q.L].map(function (v) { return v[0]; }).filter(function (w) { return w.toLowerCase() !== q.a.toLowerCase() && w !== q.base; })).slice(0, 3);
       AppCore.wordBank(area, {text: q.t, bank: AppCore.shuffle([q.a].concat(others)), answers: [q.a], exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a); }});
     } else if (q.ty === "order") {
       AppCore.tiles(area, {unit: "item", items: q.items, hint: q.q, exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.items.join(" → ")); }});
@@ -1901,11 +2040,12 @@ function run(items, o) {
     }
   }
   function end() {
+    if (live) { live.destroy(); live = null; }
     root.innerHTML = "";
     var r = AppCore.result(log);
-    if (r.answered) saveStars(o.mapId, r.pct);
-    root.appendChild(AppCore.resultView(log, {game: G, onAgain: function () { o.mock ? mock() : drill(o.mapId); }, onHome: home,
-      onRetryWrong: function () { run(log.filter(function (x) { return !x.ok; }).map(function (x) { return x.item; }), {title: o.title + " · mistakes", gameKey: o.gameKey + "-retry", boss: AppCore.bossFor(r.wrong.length, (o.boss && o.boss.name) || "Boss"), mapId: o.mapId, mock: o.mock}); }}));
+    if (r.answered && o.mapId) saveStars(o.mapId, r.pct);
+    root.appendChild(AppCore.resultView(log, {game: G, onAgain: function () { o.again ? o.again() : o.mock ? mock() : drill(o.mapId); }, onHome: home,
+      onRetryWrong: function () { run(log.filter(function (x) { return !x.ok; }).map(function (x) { return x.item; }), {title: o.title + " · mistakes", gameKey: o.gameKey + "-retry", boss: AppCore.bossFor(r.wrong.length, (o.boss && o.boss.name) || "Boss"), mapId: o.mapId, mock: o.mock, again: o.again}); }}));
   }
   show();
 }
