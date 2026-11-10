@@ -1,0 +1,1910 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>四上社會期末練功房</title>
+</head>
+<body>
+<style>
+/* 社會課：土黃紙頁＋磚紅重點；單欄、手機優先 */
+:root{
+  --paper:#fbf8f0; --card:#ffffff; --ink:#2b2518; --muted:#6c6350;
+  --sage:#ead9b4; --sage-deep:#8a6b2b; --rose:#f6cba8; --rose-deep:#b3502a;
+  --line:#e2d6bb; --ok:#2f7a45; --bad:#b3362f; --okbg:#e3f2e6; --badbg:#fbe7e5;
+  --kai:"LXGW WenKai TC","BiauKai","DFKai-SB","標楷體",serif;
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#17140e; --card:#211c14; --ink:#f0e9db; --muted:#b2a68d;
+  --sage:#3a3121; --sage-deep:#e0bc6b; --rose:#4a2a1c; --rose-deep:#f0a877;
+  --line:#3a3222; --ok:#7fd29a; --bad:#ff958c; --okbg:#1d3324; --badbg:#3a1f1d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#17140e; --card:#211c14; --ink:#f0e9db; --muted:#b2a68d;
+  --sage:#3a3121; --sage-deep:#e0bc6b; --rose:#4a2a1c; --rose-deep:#f0a877;
+  --line:#3a3222; --ok:#7fd29a; --bad:#ff958c; --okbg:#1d3324; --badbg:#3a1f1d; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 40px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+header h1{font-family:var(--kai);font-size:clamp(24px,6.4vw,34px);margin:0;line-height:1.2;text-wrap:balance}
+header p{margin:2px 0 0;color:var(--muted);font-size:14px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,canvas:focus-visible{outline:3px solid var(--rose-deep);outline-offset:2px}
+.scope{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:4px 12px;font-size:14px}
+.chip[aria-pressed="true"]{background:var(--sage-deep);border-color:var(--sage-deep);color:var(--paper);font-weight:700}
+.chip.wrongchip[aria-pressed="true"]{background:var(--rose-deep);border-color:var(--rose-deep)}
+.count{font-size:13px;color:var(--muted);margin-left:auto}
+nav.tabs{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;background:var(--sage);padding:4px;border-radius:12px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+nav.tabs button{border:0;background:transparent;border-radius:9px;padding:8px 0;font-size:clamp(12px,3.4vw,15px);font-weight:500;white-space:nowrap}
+@media (max-width:760px){nav.tabs{grid-template-columns:repeat(5,1fr)}}
+nav.tabs button[aria-selected="true"]{background:var(--card);font-weight:700;color:var(--sage-deep);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+section{display:flex;flex-direction:column;gap:12px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{border:1.5px solid var(--sage-deep);background:var(--card);color:var(--sage-deep);border-radius:10px;padding:8px 16px;font-weight:700}
+.btn.primary{background:var(--sage-deep);color:var(--paper)}
+.btn.rose{border-color:var(--rose-deep);color:var(--rose-deep)}
+.btn.rose.primary{background:var(--rose-deep);color:var(--paper)}
+.btn:disabled{opacity:.45;cursor:default}
+.hint{color:var(--muted);font-size:14px;margin:0}
+select{font:inherit;padding:6px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--card);color:var(--ink)}
+.hdr{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+.hdr>div{min-width:0}
+.hdr #sfxBtn{flex:none;margin-top:6px}
+.modes{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.kai{font-family:var(--kai)}
+.zy{font-family:var(--sans);letter-spacing:1px}
+.say{display:inline-flex;align-items:center;gap:4px;border:1.5px solid var(--sage-deep);background:var(--card);color:var(--sage-deep);border-radius:999px;padding:2px 10px;font-size:14px;font-weight:700;vertical-align:middle;margin:2px 4px 2px 0;font-family:var(--sans)}
+.say svg{width:16px;height:16px;fill:currentColor}
+.say:active{background:var(--sage)}
+
+/* 重點卡 */
+.termlist{display:flex;flex-direction:column;gap:8px}
+.termcard{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px}
+.termcard .tt{font-family:var(--kai);font-size:22px;font-weight:700;color:var(--sage-deep);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.termcard .td{margin:4px 0 0;font-size:16px}
+.groupHead{font-family:var(--kai);font-size:18px;margin:8px 0 -2px;color:var(--sage-deep)}
+.cover{background:var(--sage);border-radius:6px;color:transparent;user-select:none;cursor:pointer;padding:0 6px;display:inline-block;min-width:120px}
+.cover::after{content:"點我看答案";color:var(--sage-deep);font-size:13px}
+.cover *{visibility:hidden}
+.lesson{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:0 6px;font-family:var(--sans);font-weight:400}
+
+/* 題卡、選項 */
+.qcard{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.qask{font-size:17px;margin:0;text-align:center}
+.qask.left{text-align:left;width:100%}
+.opts{display:grid;grid-template-columns:1fr;gap:8px;width:100%}
+.opt{border:2px solid var(--line);background:var(--paper);border-radius:12px;padding:10px 12px;display:flex;align-items:flex-start;gap:8px;text-align:left;line-height:1.5}
+.opt .o0{font-weight:700;color:var(--sage-deep);flex:none}
+.opt .o1{font-size:16px;min-width:0}
+.opt.ok{border-color:var(--ok);background:var(--okbg)}
+.opt.bad{border-color:var(--bad);background:var(--badbg)}
+.opt .mark{font-size:13px;font-weight:700;margin-left:auto;flex:none}
+.opt.ok .mark{color:var(--ok)}.opt.bad .mark{color:var(--bad)}
+.opt.tfbig{justify-content:center;font-size:30px;padding:16px;font-weight:700}
+.fb{border-radius:10px;padding:8px 12px;width:100%;font-size:15px}
+.fb.ok{background:var(--okbg);color:var(--ok)}.fb.bad{background:var(--badbg);color:var(--bad)}
+.fb b{color:var(--ink)}
+.prog{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* 計分列 */
+.rhud{width:100%;display:flex;flex-direction:column;gap:4px}
+.rrow{display:flex;flex-wrap:wrap;gap:4px 14px;justify-content:center;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.rrow b{color:var(--ink);font-size:17px}.rrow .cdw b{color:var(--bad)}
+.plus{text-align:center;font-size:14px;font-weight:700;color:var(--rose-deep);min-height:1.3em}
+.rsum{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%}
+.rsum div{background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:6px 2px;text-align:center;font-size:12px;color:var(--muted)}
+.rsum b{display:block;font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums}
+.hud{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:8px}
+.hud div{text-align:center;font-size:12px;color:var(--muted)}
+.hud b{display:block;font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums;font-family:var(--sans)}
+.hud .warn b{color:var(--bad)}
+.timebar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.timebar i{display:block;height:100%;background:var(--sage-deep);transition:width .25s linear}
+.timebar.warn i{background:var(--bad)}
+.combo{text-align:center;font-family:var(--kai);font-size:22px;color:var(--rose-deep);min-height:1.4em}
+.stars{font-size:34px;letter-spacing:4px;color:var(--rose-deep)}
+
+/* 配對題（連線式） */
+.pairwrap{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.pcol{display:flex;flex-direction:column;gap:8px}
+.pitem{border:2px solid var(--line);background:var(--paper);border-radius:10px;padding:8px 10px;text-align:left;font-size:15px;line-height:1.4;min-height:52px}
+.pitem.sel{border-color:var(--rose-deep);box-shadow:0 0 0 2px var(--rose-deep)}
+.pitem.done{border-color:var(--ok);background:var(--okbg);opacity:.7}
+.pitem.wrongflash{border-color:var(--bad);background:var(--badbg)}
+.pnum{font-size:12px;color:var(--muted);display:block}
+
+/* 分類題 */
+.sortq{font-size:17px;width:100%}
+.bins{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.bins.b3{grid-template-columns:repeat(3,1fr)}
+.bin{border:2px dashed var(--line);border-radius:12px;padding:8px;min-height:80px;background:var(--paper)}
+.bin h4{margin:0 0 6px;font-size:15px;color:var(--sage-deep);font-family:var(--kai)}
+.bin .tagi{display:block;background:var(--card);border:1.5px solid var(--line);border-radius:8px;padding:4px 8px;font-size:14px;margin-bottom:4px}
+.bin .tagi.ok{border-color:var(--ok);background:var(--okbg)}
+.bin .tagi.bad{border-color:var(--bad);background:var(--badbg)}
+.cur{background:var(--card);border:2px solid var(--rose-deep);border-radius:12px;padding:10px;text-align:center;font-size:19px;width:100%}
+
+/* 圖表 */
+.chartbox{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:10px;width:100%}
+.chartbox svg{display:block;width:100%;height:auto}
+.srcnote{font-size:12px;color:var(--muted);margin:4px 0 0;text-align:right}
+.tblwrap{overflow-x:auto;background:var(--card);border:1.5px solid var(--line);border-radius:12px}
+table.tbl{border-collapse:collapse;width:100%;font-size:15px}
+table.tbl caption{font-size:13px;color:var(--muted);padding:8px 10px 0;text-align:left}
+
+/* 寫國字 */
+.tian{position:relative;aspect-ratio:1;max-width:100%;border:2px solid var(--sage-deep);background:var(--card);display:grid;place-items:center}
+.tian::before,.tian::after{content:"";position:absolute;pointer-events:none}
+.tian::before{left:50%;top:0;bottom:0;border-left:1.5px dashed var(--line)}
+.tian::after{top:50%;left:0;right:0;border-top:1.5px dashed var(--line)}
+.tian .z{font-family:var(--kai);line-height:1;position:relative;z-index:1}
+.prompt{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;align-items:center;text-align:center}
+.prompt .word{font-family:var(--kai);font-size:34px;line-height:1.5}
+.prompt .box{display:inline-flex;align-items:center;justify-content:center;border:2px solid var(--rose-deep);border-radius:6px;padding:0 8px;margin:0 2px;font-family:var(--sans);font-size:20px;color:var(--rose-deep);vertical-align:middle;min-height:44px}
+.padwrap{width:min(100%,340px);margin:0 auto}
+.pad{touch-action:none}
+.pad canvas{position:absolute;inset:0;width:100%;height:100%;z-index:2}
+.pad .ghost{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--kai);color:var(--rose);z-index:1;line-height:1}
+.reveal{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.reveal .big{font-family:var(--kai);font-size:72px;line-height:1;color:var(--rose-deep)}
+.reveal .info{min-width:0;flex:1}
+.center{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.grade{display:flex;gap:14px;align-items:center;border-radius:14px;padding:12px 14px;border:2px solid var(--line);background:var(--card);margin-bottom:10px}
+.grade.g-ok{border-color:var(--ok);background:var(--okbg)}.grade.g-chk{border-color:var(--rose-deep);background:var(--badbg)}
+.gscore{text-align:center;flex:none}.gscore b{display:block;font-size:40px;line-height:1;font-variant-numeric:tabular-nums}.gscore span{font-size:13px;color:var(--muted)}
+.ginfo{min-width:0;font-size:15px}
+
+/* 翻牌 */
+.mem{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mem.m16{grid-template-columns:repeat(4,1fr)}
+.mc{aspect-ratio:3/4;border-radius:12px;border:2px solid var(--sage-deep);background:var(--sage);display:grid;place-items:center;font-size:0;padding:6px;transition:transform .2s;overflow:hidden}
+.mc.open,.mc.done{background:var(--card);font-size:13px}
+.mc.done{border-color:var(--ok);opacity:.65}
+.mc .k{font-family:var(--kai);font-size:clamp(14px,4.2vw,19px);line-height:1.3;text-align:center}
+.mc .k.sm{font-size:clamp(11px,3.2vw,14px);line-height:1.3}
+.mc:not(.open):not(.done)::after{content:"?";font-size:28px;font-family:var(--kai);color:var(--sage-deep)}
+.mc.pop{animation:pop .35s ease}
+.mc.shake{animation:shake .35s ease}
+@keyframes pop{50%{transform:scale(1.08)}}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@media (prefers-reduced-motion:reduce){.mc{transition:none}.mc.pop,.mc.shake{animation:none}}
+
+/* 慶祝 */
+#party{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:color-mix(in srgb,var(--paper) 70%,transparent);padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
+  --c1:#e8d9a8;--c2:#f0b48a;--c3:#ffd36e;--c4:#a9cdf2;animation:fadein .25s ease}
+#party.out{opacity:0;transition:opacity .3s}
+@keyframes fadein{from{opacity:0}}
+.party-card{position:relative;z-index:2;background:var(--card);border:2px solid var(--sage-deep);border-radius:20px;padding:18px 16px;text-align:center;max-width:380px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.dancers{display:flex;align-items:flex-end;justify-content:center;gap:4px}
+.dancer{width:110px;height:auto}
+.hundred{font-family:var(--kai);font-size:44px;font-weight:700;color:var(--rose-deep);align-self:center;animation:pulse .6s ease-in-out infinite alternate}
+.d1{animation:bounce .5s ease-in-out infinite alternate;transform-origin:50% 100%}
+.d2{animation:bounce .5s ease-in-out .25s infinite alternate;transform-origin:50% 100%}
+.arm{transform-box:fill-box}
+.d1 .al,.d2 .al{transform-origin:100% 100%;animation:wave .5s ease-in-out infinite alternate}
+.d1 .ar,.d2 .ar{transform-origin:0 100%;animation:wave2 .5s ease-in-out infinite alternate}
+.leg{transform-box:fill-box;transform-origin:50% 0}
+.ll{animation:kick .5s ease-in-out infinite alternate}.lr{animation:kick .5s ease-in-out .25s infinite alternate}
+@keyframes bounce{from{transform:translateY(0) rotate(-6deg)}to{transform:translateY(-14px) rotate(6deg)}}
+@keyframes wave{from{transform:rotate(18deg)}to{transform:rotate(-22deg)}}
+@keyframes wave2{from{transform:rotate(-18deg)}to{transform:rotate(22deg)}}
+@keyframes kick{from{transform:rotate(-12deg)}to{transform:rotate(12deg)}}
+@keyframes pulse{from{transform:scale(1)}to{transform:scale(1.15)}}
+.party-title{font-family:var(--kai);font-size:30px;font-weight:700;margin-top:6px}
+.party-sub{color:var(--muted);margin:4px 0 12px}
+.confetti{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.confetti i{position:absolute;top:-20px;width:10px;height:14px;border-radius:2px;animation:fall linear infinite}
+@keyframes fall{to{top:105%;transform:rotate(540deg)}}
+@media (prefers-reduced-motion:reduce){.d1,.d2,.arm,.leg,.hundred,.confetti i{animation:none!important}.confetti{display:none}}
+
+/* 結果、錯題 */
+.done-box{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:16px;text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center}
+.score{font-family:var(--kai);font-size:44px;line-height:1;color:var(--sage-deep);font-variant-numeric:tabular-nums}
+.wlist{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.wz{font-family:var(--kai);font-size:22px;border:1.5px solid var(--rose-deep);border-radius:8px;padding:0 8px;color:var(--rose-deep)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+.tbl{overflow-x:auto;background:var(--card);border:1.5px solid var(--line);border-radius:12px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+th{font-size:13px;color:var(--muted);font-weight:500}
+td.n{font-variant-numeric:tabular-nums;text-align:center;white-space:nowrap}
+.wtbl td{white-space:normal}
+.confirm{background:var(--badbg);border-radius:10px;padding:10px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.flag{display:inline-block;font-size:12px;background:var(--rose);color:var(--ink);border-radius:6px;padding:0 6px;margin-left:6px;vertical-align:middle}
+[hidden]{display:none!important}
+body{margin:0}
+img{max-width:100%}
+.olist{text-align:left;margin:4px 0;padding-left:1.6em;line-height:1.9;font-size:17px}
+</style>
+<div class="wrap">
+<header class="hdr">
+  <div>
+    <h1>四上社會期末練功房</h1>
+    <p>期末考範圍：第四單元 家鄉的多元文化、第五單元 家鄉的節慶與禮俗、第六單元 家鄉故事導覽員（4-1～6 共七課）</p>
+  </div>
+  <button class="btn" id="sfxBtn" aria-pressed="true">音效：開</button>
+</header>
+
+<div class="scope" id="scope"></div>
+
+<nav class="tabs" role="tablist" aria-label="練習模式">
+  <button role="tab" data-tab="cards" aria-selected="true">重點卡</button>
+  <button role="tab" data-tab="mc" aria-selected="false">選擇</button>
+  <button role="tab" data-tab="tf" aria-selected="false">是非</button>
+  <button role="tab" data-tab="pair" aria-selected="false">配對</button>
+  <button role="tab" data-tab="sort" aria-selected="false">分類</button>
+  <button role="tab" data-tab="order" aria-selected="false">排順序</button>
+  <button role="tab" data-tab="chart" aria-selected="false">圖表</button>
+  <button role="tab" data-tab="write" aria-selected="false">寫國字</button>
+  <button role="tab" data-tab="mem" aria-selected="false">翻牌</button>
+  <button role="tab" data-tab="exam" aria-selected="false">模擬考</button>
+  <button role="tab" data-tab="wrong" aria-selected="false">錯題</button>
+</nav>
+
+<section id="tab-cards"><div id="cardsArea"></div></section>
+<section id="tab-mc" hidden><div id="mcArea"></div></section>
+<section id="tab-tf" hidden><div id="tfArea"></div></section>
+<section id="tab-pair" hidden><div id="pairArea"></div></section>
+<section id="tab-sort" hidden><div id="sortArea"></div></section>
+<section id="tab-order" hidden><div id="orderArea"></div></section>
+<section id="tab-chart" hidden><div id="chartArea"></div></section>
+<section id="tab-write" hidden><div id="writeArea"></div></section>
+<section id="tab-mem" hidden><div id="memArea"></div></section>
+<section id="tab-exam" hidden><div id="examArea"></div></section>
+<section id="tab-wrong" hidden><div id="wrongArea"></div></section>
+
+<p class="hint">答對、答錯的紀錄只存在這台裝置的瀏覽器裡，換手機或清除瀏覽資料就會不見，也不會同步到別的裝置。題目與答案都來自老師的期末複習卷、第二、三次複習卷答案卷和課本、學習架構圖重點整理。</p>
+</div>
+<script>
+/* ===== KPDeal：選擇題正確答案位置平均分散（練習小站共用，版本 2026-11-10b）=====
+   規則：每個位置（A/B/C/D…）出現次數一樣多，且正確答案不會連續 3 題在同一位置。
+   用法（整段貼進 App 的 <script>，放在使用它的程式之前）：
+     KPDeal.place(options, correct)   → 回傳新陣列：錯誤選項打亂，正確選項放到平均分散的位置
+                                         correct 可以是「值」或「判斷函式 (item,index)=>boolean」
+     KPDeal.pos(n)                    → 只要位置編號（0..n-1）時使用
+     KPDeal.shuffle(arr)              → 一般打亂（回傳新陣列）
+   注意：凡是「一題 + 數個選項 + 一個正解」的地方都要用 place，不要再用 shuffle 決定選項順序。
+*/
+var KPDeal=(function(){
+  var decks={},last=[];
+  function sh(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+  function runOK(s){for(var i=2;i<s.length;i++)if(s[i]===s[i-1]&&s[i]===s[i-2])return false;return true}
+  function pos(n){
+    if(!(n>1))return 0;
+    var d=decks[n];
+    if(!d||!d.length){var base=[],k=0;for(var r=0;r<2;r++)for(var i=0;i<n;i++)base.push(i);
+      do{d=sh(base);k++}while(!runOK(last.slice(-2).concat(d))&&k<300);decks[n]=d}
+    var p=d.shift();
+    if(last.length>=2&&last[last.length-1]===p&&last[last.length-2]===p){
+      for(var i=0;i<d.length;i++)if(d[i]!==p){var q=d[i];d[i]=p;p=q;break}
+      if(last[last.length-1]===p&&last[last.length-2]===p){var alt=(p+1+Math.floor(Math.random()*(n-1)))%n;d.push(p);p=alt}}
+    last.push(p);if(last.length>4)last.shift();
+    return p;
+  }
+  function place(arr,correct){
+    var f=typeof correct==='function'?correct:function(x){return x===correct};
+    var ci=-1;for(var i=0;i<arr.length;i++)if(f(arr[i],i)){ci=i;break}
+    if(ci<0)return sh(arr);
+    var c=arr[ci],w=sh(arr.filter(function(_,i){return i!==ci}));
+    w.splice(pos(arr.length),0,c);
+    return w;
+  }
+  return {place:place,pos:pos,shuffle:sh};
+})();
+/* ===== 名詞解釋卡 TERM {g,t,d}（依課本、學習架構圖整理）===== */
+const TERM=[
+/* 4-1 家鄉的多元飲食文化 */
+{g:1,t:"飲食文化",d:"不同地區或族群有不同的飲食習慣，例如有些地區喜歡用味道強烈的辛香料做料理，有些地區偏愛醃漬食品。"},
+{g:1,t:"辛香料",d:"味道強烈的香料植物。東南亞國家常用來做料理，例如泰國的打拋豬肉。"},
+{g:1,t:"醃漬食品",d:"用鹽、醬料等醃過保存的食物，口味獨特，例如泡菜。"},
+{g:1,t:"桔醬",d:"客家族群常用來當沾醬的特色醬料。"},
+{g:1,t:"炒粄條",d:"客家族群的米製品料理。"},
+{g:1,t:"竹筒飯",d:"原住民族把米放進竹筒裡烤熟的米製品料理。"},
+{g:1,t:"碗粿",d:"閩南族群的米製品，主要食材是米。"},
+{g:1,t:"越南河粉",d:"越南新住民帶來的米製品料理，在臺灣也吃得到。"},
+{g:1,t:"米漢堡",d:"西方的漢堡傳到以米食為主的東方後，用米飯取代麵包做成的新食物，是飲食文化融合與創新的例子。"},
+{g:1,t:"臭豆腐披薩",d:"把臺灣傳統的臭豆腐和外國的披薩結合，創造出的新口味。"},
+{g:1,t:"飲食文化的融合與創新",d:"不同文化接觸時會互相影響，創造出新的文化，例如米漢堡、新住民用臺灣的紅豆、芋頭做東南亞糕點的餡料。"},
+/* 4-2 家鄉的多元服飾 */
+{g:2,t:"服飾特色",d:"各族群因居住環境、生活與節慶等需求，發展出不同的服飾特色。"},
+{g:2,t:"原住民族傳統服飾",d:"利用天然材料，織出有特殊圖案、色彩鮮豔、刺繡方法複雜的衣服；參與祭典時族人會穿戴傳統服飾與配件。"},
+{g:2,t:"百步蛇圖案",d:"排灣族傳統服飾上常見的圖案。"},
+{g:2,t:"藍衫",d:"客家族群傳統服飾，樸素、耐穿又方便勞動；現在重要節日或慶典時也會換上。"},
+{g:2,t:"奧黛",d:"越南的傳統服飾，越南新住民在春節時會穿著奧黛過年。"},
+{g:2,t:"頭巾",d:"信仰伊斯蘭教的新住民婦女外出時，必須穿戴覆蓋頭髮和肩頸的頭巾，這是宗教規範的服飾。"},
+{g:2,t:"服飾的創新與傳承",d:"近年發展出融合傳統與現代的服飾，例如加入排灣族圖騰元素的現代服裝、創意設計的藍衫禮服。"},
+/* 4-3 家鄉的多元語言與命名 */
+{g:3,t:"母語",d:"從小在家裡學會、習慣使用的語言。家鄉每個族群的語言都應受到相同的保障，讓大家都能有自信的使用自己的母語。"},
+{g:3,t:"臺灣常聽到的語言",d:"國語、閩南語、客家語、原住民族語等；也可能聽到英語、日語、越南語、韓語等其他國家的語言。"},
+{g:3,t:"學習不同語言的好處",d:"可以認識不同的文化，也能多認識一些朋友，和不同族群的人交談時更方便。"},
+{g:3,t:"在公共場所說話",d:"在學校或公共場所需要學習或溝通時，使用大家都聽得懂的語言。"},
+{g:3,t:"漢人的命名",d:"「姓」通常跟著父親或母親，名字有些是來自家人的期許或祝福。姓氏放在名字前面。"},
+{g:3,t:"原住民族的命名",d:"不一定都有姓，名字常參考自然界的事物；有些會在孩子的名字後面加上父親或母親的名字。"},
+/* 5-1 家鄉的傳統節慶 */
+{g:4,t:"除夕",d:"農曆 12 月 29 或 30 日，是農曆一年中的最後一天。家人團聚吃年夜飯，也有貼春聯、發壓歲錢的習俗。"},
+{g:4,t:"春節",d:"農曆 1 月 1 日，農曆新年的開始。人們到寺廟祈求平安順利，或拜訪親友、互道恭喜。"},
+{g:4,t:"元宵節",d:"農曆 1 月 15 日，被稱作「小過年」。吃元宵象徵幸福團圓，各地會舉辦燈會。"},
+{g:4,t:"清明節",d:"國曆 4 月 4、5 或 6 日。為了懷念與感恩祖先，許多人回故鄉掃墓、祭拜祖先，也會吃潤餅。"},
+{g:4,t:"端午節",d:"農曆 5 月 5 日。吃粽子、划龍舟，在門口插艾草、配戴香包，祈求身體健康；也有立蛋的遊戲。"},
+{g:4,t:"中秋節",d:"農曆 8 月 15 日，親友團聚的日子。大家賞月、吃月餅，現在也會團聚烤肉。"},
+{g:4,t:"小米播種祭",d:"許多原住民族把小米播種祭當作每年第一個歲時祭儀。"},
+{g:4,t:"邵族祖靈祭",d:"邵族的新年，在 9 月舉辦，是邵族最盛大的祭典，感謝祖靈庇佑，也祈求新的一年平安。"},
+{g:4,t:"阿美族豐年祭",d:"阿美族的新年，每年 7 到 9 月間在小米收穫後舉辦，感謝神靈、感恩五穀豐收，常見儀式有豐年舞。"},
+/* 5-2 家鄉的現代節日 */
+{g:5,t:"耶誕節",d:"國曆 12 月 25 日，慶祝耶穌誕生的西方節日。歐美家庭會耶誕布置、共進耶誕大餐，就像我們的春節一樣是家人團聚的日子。"},
+{g:5,t:"潑水節",d:"東南亞國家（例如泰國、緬甸）的傳統新年，在國曆 4 月中旬舉辦，人們潑水為彼此洗去壞運氣、祈求平安。"},
+{g:5,t:"開國紀念日",d:"國曆 1 月 1 日，總統府會舉行元旦升旗典禮。"},
+{g:5,t:"國慶日",d:"國曆 10 月 10 日，總統府前會舉行遊行、國軍儀隊表演等慶祝活動。"},
+{g:5,t:"不同角色的節日",d:"為不同身分或職業的人制訂的節日：母親節（國曆 5 月第二個星期日）、父親節（國曆 8 月 8 日）、教師節（國曆 9 月 28 日）。"},
+{g:5,t:"雲林國際偶戲節",d:"雲林有全臺最多的布袋戲團，結合在地偶戲文化發展出的地方特色節慶，會邀請國內外偶戲團體演出。"},
+{g:5,t:"布袋戲（掌中戲）",d:"融合操作戲偶、音樂、說故事的臺灣傳統藝術，因為用手掌指頭操作戲偶，又稱掌中戲。"},
+{g:5,t:"阿里山櫻花季",d:"嘉義縣阿里山氣候涼爽、適合櫻花生長，結合自然景觀發展出的地方特色節慶。"},
+/* 5-3 家鄉的生命禮俗 */
+{g:6,t:"生命禮俗",d:"人生的重要階段（出生、成年、結婚、死亡）會借助信仰或各種物品、儀式，祈求平安順利或給予祝福。"},
+{g:6,t:"滿月",d:"新生兒出生滿一個月時舉辦的禮俗，表達迎接新生命的喜悅。"},
+{g:6,t:"收涎",d:"新生兒出生滿四個月時的禮俗，意思是收起口水，希望孩子快快長大。"},
+{g:6,t:"抓週",d:"嬰兒滿週歲（一歲）時的禮俗，表現長輩對孩子長大後的期望與對新生命的重視。"},
+{g:6,t:"鑽七娘媽亭",d:"漢人青少年滿十六歲的成年禮儀式，取下護身符，表示長大成人。"},
+{g:6,t:"阿美族成年禮",d:"有賽跑、傳統歌舞教唱等訓練課程，培養青少年的責任感與敬老尊賢的美德。"},
+{g:6,t:"拜別父母",d:"漢人婚禮的儀式，表達感謝長輩的養育之恩。"},
+{g:6,t:"敬茶",d:"漢人婚禮中介紹新娘給男方親友認識，並向前來祝賀的親友表達感謝的儀式。"},
+{g:6,t:"盪秋千",d:"魯凱族婚禮的儀式，盪得愈高象徵夫妻愛情愈堅定。"},
+{g:6,t:"勇士禮讚",d:"魯凱族婚禮中新郎抱起新娘的行為，表示新郎有能力負擔重任。"},
+/* 6 家鄉故事導覽員 */
+{g:7,t:"地圖四要素",d:"圖名、方向標、比例尺、圖例。透過這些工具可以在地圖上找到家鄉的位置與景點、道路、河流的分布。"},
+{g:7,t:"蒐集資料的方法",d:"實地走訪、網路查詢、查閱書籍、訪問長輩。"},
+{g:7,t:"工作準備表",d:"進行工作之前的行前準備規畫表格，寫下人、事、時、地、物，讓活動能更順利。"},
+{g:7,t:"訪問的禮貌",d:"事先聯絡並說明目的、想好要問的問題；訪問時專心聆聽、依序提問、認真記錄；錄音錄影要先徵求同意，不問私事。"},
+{g:7,t:"整理分析",d:"依照主題和資料的重要程度，共同討論要呈現哪些資料、判斷是否保留。"},
+{g:7,t:"家鄉故事地圖",d:"決定地圖範圍和方位、標示主要道路、加入重要地點，再把蒐集到的故事繪製在地圖上；照片和資料都要標示出處。"},
+{g:7,t:"故事地圖導覽員",d:"把地圖張貼在公共場合、安排到各班輪流解說、錄製網路導覽影片、實際帶領導覽活動，讓更多人認識家鄉。"},
+];
+
+/* ===== 選擇題 MC {g,q,o,a,why}（a = 正解在 o 的位置；顯示時用 KPDeal 重新排列）===== */
+const MC=[
+/* 4-1 */
+{g:1,q:"下列哪一項食物的主要食材和其他三項不一樣？",o:["炒麵","炒粄條","越南河粉","碗粿"],a:0,why:"炒粄條、河粉、碗粿都是米製品，炒麵是用麵粉做的。"},
+{g:1,q:"炒粄條是哪一個族群的特色飲食？",o:["客家族群","越南新住民","閩南族群","原住民族"],a:0,why:"炒粄條是客家族群的米製品料理。"},
+{g:1,q:"竹筒飯是哪一個族群的特色飲食？",o:["原住民族","客家族群","閩南族群","越南新住民"],a:0,why:"原住民族把米放進竹筒做成竹筒飯。"},
+{g:1,q:"閩南族群的碗粿，主要是用什麼食材做成的？",o:["米","鴨肉","麵粉","生菜"],a:0,why:"碗粿和炒粄條、竹筒飯、河粉一樣都是米製品。"},
+{g:1,q:"下列哪一個是文化融合與創新的料理？",o:["米漢堡","壽司","竹筒飯","炒粄條"],a:0,why:"米漢堡是西方漢堡遇上東方米食後創造出的新食物。"},
+{g:1,q:"下列哪一項不是臺灣飲食文化的特色？",o:["在臺灣不可能找到不同地區或族群的飲食","勇於接受外來飲食，也保留原有特色","把臭豆腐和披薩結合成新口味","融合各種不同的文化特色"],a:0,why:"在臺灣可以吃到很多不同地區、族群的食物。"},
+{g:1,q:"關於不同族群的飲食文化，下列哪一項敘述是錯誤的？",o:["炒粄條是西方國家傳進臺灣的食物","竹筒飯是原住民族的特色食物","在臺灣可以吃到越南的河粉","有些地方會用味道強烈的辛香料入菜"],a:0,why:"炒粄條是客家族群的料理，不是西方傳入的。"},
+{g:1,q:"兩個在不同地區長大的人，一個喜歡香料多、口味辣的食物，一個喜歡醃漬、偏鹹的食物，最可能的原因是什麼？",o:["飲食文化不同","工作不同","年齡不同","食材不同"],a:0,why:"不同地區有不同的飲食文化，口味也不同。"},
+{g:1,q:"在夜市看到攤販賣炸昆蟲，覺得很不習慣，應該怎麼做比較好？",o:["用尊重的心態看待","請其他遊客不要買","向警察檢舉","大聲批評很噁心"],a:0,why:"無論喜不喜歡，都應該尊重不同地區的飲食文化。"},
+{g:1,q:"新住民媽媽做了「河粉包子」，下列哪一道料理和它的文化內涵最接近？",o:["臭豆腐披薩","碗粿","壽司","竹筒飯"],a:0,why:"河粉包子和臭豆腐披薩都是把不同文化的食物結合在一起的創新料理。"},
+{g:1,q:"客家族群常用哪一種醬料來當沾醬？",o:["桔醬","番茄醬","沙茶醬","芥末"],a:0,why:"桔醬是客家族群的特色沾醬。"},
+{g:1,q:"泰國的打拋豬肉最能代表哪一種飲食特色？",o:["使用辛香料植物做料理","以醃漬方式保存","用米飯取代麵包","用竹筒烤熟"],a:0,why:"東南亞國家常用辛香料植物做料理。"},
+{g:1,q:"新住民把東南亞糕點的餡料改成臺灣的紅豆、芋頭，這說明了什麼？",o:["飲食文化經過交流而融合","新住民不喜歡家鄉的食物","臺灣不能種東南亞的食材","糕點只能用紅豆做"],a:0,why:"透過交流與融合，改良成適合臺灣人的好滋味。"},
+/* 4-2 */
+{g:2,q:"客家族群常穿的藍衫有什麼特色？",o:["耐穿的布料，方便勞動","鮮豔亮麗的色彩","用天然材料織出特殊圖案","族長的衣服繡上特殊圖案"],a:0,why:"藍衫樸素耐穿，方便工作勞動。"},
+{g:2,q:"A 天然的材料、B 複雜的刺繡、C 鮮豔的色彩、D 樸素的裝飾。哪些是原住民族傳統服飾的特色？",o:["ABC","ACD","ABD","BCD"],a:0,why:"原住民族服飾用天然材料、色彩鮮豔、刺繡複雜；樸素是客家藍衫的特色。"},
+{g:2,q:"想研究客家族群的傳統服飾，應該研究哪一種服裝？",o:["藍衫","旗袍","洋裝","奧黛"],a:0,why:"藍衫是客家族群的傳統服飾。"},
+{g:2,q:"查原住民族服飾的資料時，不會看到下列哪一項特色？",o:["覆蓋頭髮和肩頸的頭巾","鮮豔的色彩","特殊的圖案","複雜的刺繡方法"],a:0,why:"覆蓋頭髮和肩頸的頭巾是信仰伊斯蘭教婦女的服飾。"},
+{g:2,q:"排灣族的傳統服飾上常見哪一種圖案？",o:["百步蛇","梅花","龍鳳","櫻花"],a:0,why:"百步蛇圖案是排灣族服飾的代表。"},
+{g:2,q:"越南新住民在春節時，常穿哪一種傳統服飾過年？",o:["奧黛","藍衫","和服","旗袍"],a:0,why:"奧黛是越南的傳統服飾。"},
+{g:2,q:"信仰伊斯蘭教的新住民婦女外出時戴頭巾，原因是什麼？",o:["信仰需要穿戴符合宗教規範的服飾","為了追求流行","因為天氣太冷","為了參加運動比賽"],a:0,why:"這是宗教規範，我們應以尊重的態度看待。"},
+{g:2,q:"A 原住民族成年禮穿傳統服飾、B 客家族群穿創意藍衫參與婚禮、C 新穎時裝融入原住民族圖騰。哪些是「現代服飾融合傳統文化元素」的例子？",o:["BC","AB","AC","ABC"],a:0,why:"A 是穿傳統服飾，沒有和現代服飾融合；B、C 都是傳統元素加入現代設計。"},
+{g:2,q:"不同族群發展出不同的服飾特色，主要和哪些需求有關？",o:["居住環境、生活和節慶","個人喜好","時尚潮流","全球審美標準"],a:0,why:"服飾特色因居住環境、生活與節慶等需求而不同。"},
+{g:2,q:"在路上看到穿著和我們不同服飾的人，應該怎麼做？",o:["以尊重的態度欣賞","趕快避開","一直盯著看並取笑","拍照上傳批評"],a:0,why:"那可能是不同族群的特色服飾，應該尊重欣賞。"},
+/* 4-3 */
+{g:3,q:"下列哪一種是我們在臺灣日常生活中比較不常聽到的語言？",o:["印度語","國語","閩南語","客家語"],a:0,why:"國語、閩南語、客家語、原住民族語都是臺灣常聽到的語言。"},
+{g:3,q:"下列哪一項比較不是學習不同語言的目的？",o:["可以跟別人炫耀","認識不同的文化","多認識一些朋友","和不同族群溝通更方便"],a:0,why:"學習語言是為了認識文化、交朋友、溝通，不是為了炫耀。"},
+{g:3,q:"關於母語的敘述，哪一項比較正確？",o:["客家人的母語通常是客家語","所有臺灣人的母語都是國語","所有原住民族的母語都是太魯閣語","我們不需要重視母語"],a:0,why:"各族群有自己的母語，每個族群的語言都應受到保障。"},
+{g:3,q:"轉學後發現同學常用客家語和閩南語交談，想儘快交到新朋友，怎麼做比較恰當？",o:["努力學習客家語及閩南語","要求同學只能說國語","不和說客家語的同學來往","只認識說國語的同學"],a:0,why:"學習不同語言可以多認識朋友。"},
+{g:3,q:"到花蓮部落旅遊，聽到當地居民用不熟悉的語言交談，最可能是哪一種？",o:["原住民族語","國語","閩南語","以上皆是"],a:0,why:"花蓮部落的居民可能使用原住民族語。"},
+{g:3,q:"同學名叫「娃郁．瓦歷斯」，名字是娃郁，後面加上爸爸的名字瓦歷斯。下列哪一項描述正確？",o:["原住民族命名時不一定有姓","原住民族名字的排列方式和漢人相同","原住民族的名字一定是兩個字","從原住民族的名字看不出是誰家的孩子"],a:0,why:"有些原住民族會在名字後面加上父親或母親的名字，不一定有姓。"},
+{g:3,q:"漢人的名字常常有什麼由來？",o:["來自家人的期許或祝福","一定和父親的名字相同","一定參考自然界的事物","一定放在姓的前面"],a:0,why:"漢人名字常帶有長輩的期許或祝福。"},
+{g:3,q:"在學校分組討論時，組員說不同的母語，最好怎麼做？",o:["使用大家都聽得懂的語言","每個人只說自己的母語","禁止任何人說母語","不要討論"],a:0,why:"在公共場所溝通時，使用大家都聽得懂的語言比較方便。"},
+/* 5-1 */
+{g:4,q:"下列哪一項不屬於漢人的傳統節慶？",o:["豐年祭","元宵節","中秋節","清明節"],a:0,why:"豐年祭是阿美族的祭典。"},
+{g:4,q:"端午節掛艾草、配戴香包的主要原因是什麼？",o:["祈求身體健康","嚇走年獸","祭拜祖先","招財"],a:0,why:"端午節的習俗是為了祈求身體健康。"},
+{g:4,q:"下列哪一項最不可能出現在除夕的年夜飯？",o:["月餅","紅燒魚","餃子","火鍋"],a:0,why:"月餅是中秋節的應景食物。"},
+{g:4,q:"下列哪一項節慶與代表食物的配對是錯誤的？",o:["端午節吃潤餅","中秋節吃月餅","元宵節吃元宵","除夕吃團圓飯"],a:0,why:"端午節吃粽子，潤餅是清明節吃的。"},
+{g:4,q:"下列哪一個漢人傳統節慶和月亮有關？",o:["中秋節","端午節","清明節","除夕"],a:0,why:"中秋節大家一同賞月、吃月餅。"},
+{g:4,q:"準備過清明節時，下列哪一項不會是家人進行的活動？",o:["中午時立蛋","回故鄉掃墓祭祖","一起緬懷祖先","準備食材包潤餅"],a:0,why:"立蛋是端午節的遊戲。"},
+{g:4,q:"漢人有許多傳統節慶會與親友團聚，但通常不包含哪一個？",o:["祖靈祭","除夕","清明節","中秋節"],a:0,why:"祖靈祭是邵族的祭典。"},
+{g:4,q:"關於新年的敘述，哪一項是錯誤的？",o:["每個族群的新年時間都差不多，習俗也相同","農曆 1 月 1 日許多人會到寺廟祈福","除夕時團聚圍爐、發壓歲錢","豐年祭是阿美族的新年"],a:0,why:"不同族群迎接新年的時間和活動都不一樣。"},
+{g:4,q:"漢人過年期間的活動，不包括下列哪一項？",o:["1 月 1 日吃月餅","拜訪親戚朋友","除夕吃年夜飯","發壓歲錢"],a:0,why:"吃月餅是中秋節的習俗。"},
+{g:4,q:"被稱作「小過年」、吃元宵象徵幸福團圓的節慶是哪一個？",o:["元宵節","春節","中秋節","端午節"],a:0,why:"元宵節（農曆 1 月 15 日）被稱作小過年。"},
+{g:4,q:"阿美族的豐年祭在什麼時候舉辦？",o:["小米收穫後，每年 7 到 9 月間","農曆 1 月 1 日","國曆 12 月 25 日","國曆 4 月中旬"],a:0,why:"豐年祭在小米收穫後舉辦，感恩五穀豐收。"},
+{g:4,q:"邵族最盛大的祭典、也是邵族的新年，是哪一個？",o:["祖靈祭","豐年祭","潑水節","小米播種祭"],a:0,why:"邵族祖靈祭在 9 月舉辦，感謝祖靈庇佑。"},
+{g:4,q:"許多原住民族把哪一個祭儀當作每年第一個歲時祭儀？",o:["小米播種祭","豐年祭","祖靈祭","收穫祭"],a:0,why:"許多原住民族以小米播種祭作為一年第一個歲時祭儀。"},
+{g:4,q:"除夕是哪一天？",o:["農曆 12 月 29 或 30 日","農曆 1 月 1 日","農曆 1 月 15 日","國曆 12 月 31 日"],a:0,why:"除夕是農曆一年中的最後一天。"},
+/* 5-2 */
+{g:5,q:"關於現代節日的敘述，哪一項是錯誤的？",o:["現代的節日不會因不同身分而制訂","有與國家相關的重要節日","有為不同職業制訂的節日","有從不同國家文化傳入的節日"],a:0,why:"教師節、母親節、父親節都是為不同身分或職業制訂的節日。"},
+{g:5,q:"新住民朋友邀大家參加她故鄉的潑水節，她最可能來自哪裡？",o:["泰國","西班牙","德國","義大利"],a:0,why:"潑水節是東南亞國家的傳統新年。"},
+{g:5,q:"潑水節大約在什麼時候舉辦？",o:["國曆 4 月中旬","農曆 8 月中旬","國曆 12 月 25 日","農曆 1 月 1 日"],a:0,why:"潑水節在國曆 4 月中旬舉辦。"},
+{g:5,q:"一家人信奉基督教，在國曆 12 月 25 日到教會參加慶祝活動，這是什麼節日？",o:["耶誕節","國慶日","開國紀念日","教師節"],a:0,why:"耶誕節是慶祝耶穌誕生的節日。"},
+{g:5,q:"為了感謝老師的辛勞，政府把每年 9 月 28 日訂為什麼節日？",o:["教師節","父親節","兒童節","耶誕節"],a:0,why:"教師節在國曆 9 月 28 日。"},
+{g:5,q:"每年國曆 1 月 1 日到總統府前參加升旗典禮，這天是什麼節日？",o:["開國紀念日","國慶日","春節","潑水節"],a:0,why:"開國紀念日總統府會舉行元旦升旗典禮。"},
+{g:5,q:"國慶日是哪一天？",o:["國曆 10 月 10 日","國曆 1 月 1 日","國曆 9 月 28 日","國曆 8 月 8 日"],a:0,why:"國慶日總統府前會有遊行、國軍儀隊表演。"},
+{g:5,q:"父親節是哪一天？",o:["國曆 8 月 8 日","國曆 5 月第二個星期日","國曆 9 月 28 日","國曆 10 月 10 日"],a:0,why:"父親節在國曆 8 月 8 日；母親節是 5 月第二個星期日。"},
+{g:5,q:"清明連假到嘉義阿里山參加櫻花季，吸引人的主要是什麼？",o:["自然景觀","國際文化","創新藝術","潮流科技"],a:0,why:"阿里山櫻花季結合了當地的自然景觀。"},
+{g:5,q:"雲林國際偶戲節是結合什麼發展出來的地方特色節慶？",o:["在地的布袋戲文化","當地的櫻花美景","東南亞的新年習俗","西方的宗教節日"],a:0,why:"雲林有全臺最多的布袋戲團，偶戲文化深厚。"},
+{g:5,q:"布袋戲為什麼又被稱為「掌中戲」？",o:["用手掌指頭操作戲偶","在手掌上畫圖","只在掌形舞臺演出","戲偶只有手掌大"],a:0,why:"因為運用手掌指頭操作戲偶。"},
+{g:5,q:"國家的特殊節日（例如開國紀念日、國慶日）可以讓我們了解什麼？",o:["國家的歷史與發展","外國的飲食文化","各族群的服飾","生命禮俗的意義"],a:0,why:"這些節日和國家的歷史與發展有關。"},
+/* 5-3 */
+{g:6,q:"漢人婚禮中的拜別父母儀式，目的是什麼？",o:["感謝父母養育之恩","象徵愛情堅定","介紹新娘給親友","能夠吉利平安"],a:0,why:"拜別父母是表達感謝長輩的養育之恩。"},
+{g:6,q:"弟弟滿一歲，媽媽為他報名「抓週」活動，這和人生哪個階段有關？",o:["出生","成年","結婚","死亡"],a:0,why:"抓週是新生階段、滿週歲時的禮俗。"},
+{g:6,q:"人們常在嬰兒滿一歲時舉辦什麼儀式，表達對新生命的重視？",o:["抓週","滿月","收涎","敬茶"],a:0,why:"抓週在出生滿週歲時舉行。"},
+{g:6,q:"什麼生命禮俗有傳承家庭責任的意義，因此有拜別父母的儀式？",o:["婚嫁","新生","成年","死亡"],a:0,why:"結婚通常具有傳承家庭責任的意義。"},
+{g:6,q:"下列哪一項是阿美族的成年禮活動？",o:["賽跑訓練","鑽七娘媽亭","收涎","盪秋千"],a:0,why:"阿美族成年禮有賽跑、傳統歌舞教唱等訓練課程。"},
+{g:6,q:"依照漢人傳統習俗舉辦的婚禮中，不會進行哪一項儀式？",o:["盪秋千","拜別父母","敬茶","祭拜祖先"],a:0,why:"盪秋千是魯凱族的婚禮儀式。"},
+{g:6,q:"收涎是在新生兒出生多久時舉行？",o:["滿四個月","滿一個月","滿週歲","滿十六歲"],a:0,why:"收涎在出生滿四個月時，意思是收起口水、希望快快長大。"},
+{g:6,q:"魯凱族婚禮中盪秋千盪得愈高，象徵什麼？",o:["夫妻愛情愈堅定","新郎愈有錢","賓客愈多","天氣愈好"],a:0,why:"盪得愈高象徵夫妻愛情愈堅定，也受到族人愈多祝福。"},
+{g:6,q:"漢人婚禮中「敬茶」的意思是什麼？",o:["介紹新娘給男方親友，並感謝前來祝賀的親友","感謝父母養育之恩","祈求生出男孩","表示新郎有能力負擔重任"],a:0,why:"敬茶是介紹新娘給親友認識並表達感謝。"},
+{g:6,q:"人們在生命各階段為什麼要借助信仰或舉行儀式？",o:["祈求平安順利、給予祝福","為了收很多紅包","因為法律規定","為了比賽誰辦得最大"],a:0,why:"生命禮俗是為了祈求平安順利或給予祝福。"},
+/* 6 */
+{g:7,q:"訪問長輩時，不應該做出哪一種行為？",o:["詢問長輩的私事","專心聆聽長輩談話","依序提問","認真記錄長輩說的話"],a:0,why:"訪問要有禮貌，不問與主題無關的私事。"},
+{g:7,q:"訪問長輩時，選擇下列哪一個場所最適當？",o:["教室","電影院","行進中的公車上","圖書館"],a:0,why:"教室安靜又可以好好對話；圖書館要保持安靜、電影院和公車都不適合。"},
+{g:7,q:"想了解家鄉早期的歷史故事而訪問里長，哪一個題目和主題沒有直接關係？",o:["家鄉現在共有多少居民","家鄉地名的由來","家鄉曾發生過什麼重大事件","家鄉有什麼知名的人物故事"],a:0,why:"現在的居民人數和「早期的歷史故事」沒有直接關係。"},
+{g:7,q:"「工作準備表」是在什麼時候使用？",o:["進行工作之前的行前規畫","工作完成後的檢討","只在考試時使用","只有老師才能用"],a:0,why:"工作準備表是行前準備規畫，讓活動更順利。"},
+{g:7,q:"想用手機錄下訪問里長的過程，應該怎麼做？",o:["先徵求里長的同意","偷偷錄才不會影響訪談","錄完再告訴里長","不用告訴里長"],a:0,why:"錄音錄影一定要先徵求受訪者同意。"},
+{g:7,q:"下列哪一項不是蒐集家鄉故事資料的方法？",o:["把地圖收進抽屜","實地走訪","網路查詢","訪問長輩"],a:0,why:"蒐集資料的方法有實地走訪、網路查詢、查閱書籍、訪問長輩。"},
+{g:7,q:"製作家鄉故事地圖時，放進地圖的照片和資料要注意什麼？",o:["都要標示出處","越多越好不必整理","只能用自己畫的圖","不需要寫說明"],a:0,why:"無論照片或資料都要標示出處。"},
+{g:7,q:"地圖上用來辨識方位的是哪一項？",o:["方向標","圖名","比例尺","圖例"],a:0,why:"方向標用來辨識方位。"},
+];
+
+/* ===== 是非題 TF {g,q,a,why}  a:true=○ false=╳ ===== */
+const TF=[
+{g:1,q:"不同地區的人們喜歡的飲食口味也會有所不同。",a:true,why:"不同地區或族群有不同的飲食文化。"},
+{g:1,q:"稻米在每個地方的料理方式都一樣。",a:false,why:"同一種食材在不同族群常有不同的料理方式，例如炒粄條、竹筒飯、碗粿、河粉。"},
+{g:1,q:"每個地區的飲食文化都一樣，所以到歐洲旅遊一定不會吃不習慣。",a:false,why:"每個地區有不同的飲食文化。"},
+{g:1,q:"即使是自己吃不習慣的料理，也要尊重不同地區的飲食文化，不可以大肆批評。",a:true,why:"無論喜不喜歡，都應該學習尊重。"},
+{g:1,q:"客家族群會把米做成炒粄條，原住民族會把米做成竹筒飯，各有不同風味。",a:true,why:"同樣是米製品，不同族群有不同的料理方式。"},
+{g:1,q:"不同的文化之間不可能接觸，也不可能創造出新的文化。",a:false,why:"不同文化接觸時會互相影響，創造出新的文化，例如米漢堡。"},
+{g:1,q:"米漢堡是用米飯取代麵包，是飲食文化融合與創新的例子。",a:true,why:"西方漢堡傳到東方後，演變成米漢堡。"},
+{g:1,q:"有些地區的人們喜歡用味道強烈的辛香料來做料理。",a:true,why:"例如東南亞的打拋豬肉。"},
+{g:1,q:"所有人都不喜歡有特殊味道的食物，例如皮蛋。",a:false,why:"皮蛋味道特殊，但有的人很喜歡吃。"},
+{g:2,q:"每個族群的服裝會因為居住環境或生活需求，而有不同的特色。",a:true,why:"服飾特色和居住環境、生活、節慶需求有關。"},
+{g:2,q:"用天然材料做成、有大量鮮豔色彩和華麗花紋的衣服，是客家傳統服飾。",a:false,why:"那是原住民族服飾的特色；客家族群以樸素實用的藍衫為主。"},
+{g:2,q:"在外面看到穿著和我們不同服飾的人，應該趕快避開。",a:false,why:"那可能是不同族群的特色服飾，應以尊重的心態面對。"},
+{g:2,q:"信仰伊斯蘭教的新住民婦女外出時戴頭巾，這是她們的服飾特色，我們應該友善對待。",a:true,why:"這是宗教規範的服飾，要尊重。"},
+{g:2,q:"客家族群的藍衫不僅耐穿，也方便勞動。",a:true,why:"藍衫樸素實用。"},
+{g:2,q:"現在有些服裝會加入排灣族的圖騰元素，展現族群文化的創新與傳承。",a:true,why:"融合傳統與現代的服飾愈來愈多。"},
+{g:2,q:"越南新住民在春節時，有些人會穿著奧黛過年。",a:true,why:"奧黛是越南的傳統服飾。"},
+{g:3,q:"習慣說英語和習慣說國語的兩個人，語言不同，完全無法成為好朋友。",a:false,why:"學會尊重彼此的差異，就能相處融洽。"},
+{g:3,q:"在學校或公共場所和人說話時，一定只能使用國語。",a:false,why:"也可以使用其他語言；需要溝通時使用大家都聽得懂的語言。"},
+{g:3,q:"學國語以外的語言很麻煩，反正不會認識使用其他語言的朋友。",a:false,why:"生活周遭有許多不同族群，學習不同語言可以多認識朋友。"},
+{g:3,q:"和不同族群的朋友在一起時，最好使用彼此都聽得懂的語言交談。",a:true,why:"這樣溝通比較方便。"},
+{g:3,q:"名字通常沒有什麼特別的意義。",a:false,why:"名字常代表家人對我們的期許或祝福。"},
+{g:3,q:"漢人的姓氏一定和父親相同。",a:false,why:"有些漢人的姓和母親相同。"},
+{g:3,q:"漢人的姓名中，姓氏一定在名字的後面。",a:false,why:"漢人的姓氏放在名字的前面。"},
+{g:3,q:"有些原住民族會把父親或母親的名字放在自己名字後面。",a:true,why:"例如「娃郁．瓦歷斯」，瓦歷斯是爸爸的名字。"},
+{g:3,q:"生活在臺灣的每一個人，名字裡都有「姓」。",a:false,why:"有些原住民族不是用漢人的方式命名，名字中不一定有姓。"},
+{g:3,q:"原住民族和漢人的命名方式不同，雙方應該互相學習、尊重彼此的姓名。",a:true,why:"尊重不同族群的命名文化。"},
+{g:4,q:"許多人會在端午節賞月、吃月餅。",a:false,why:"賞月、吃月餅是中秋節的習俗。"},
+{g:4,q:"臺灣有不同族群的居民，並不是所有族群都在農曆新年吃年夜飯。",a:true,why:"不同族群迎接新年的時間和方式不同。"},
+{g:4,q:"元宵節被稱作小過年，人們會吃元宵過節。",a:true,why:"元宵象徵幸福團圓。"},
+{g:4,q:"除夕是農曆年的第一天，大家會圍爐吃年夜飯。",a:false,why:"除夕是農曆一年中的最後一天，農曆 1 月 1 日才是春節。"},
+{g:4,q:"清明節時會掃墓、祭拜祖先。",a:true,why:"為了懷念與感恩祖先。"},
+{g:4,q:"中秋節時大家習慣吃年糕過節。",a:false,why:"中秋節吃月餅、賞月，現在也會烤肉。"},
+{g:4,q:"端午節會吃粽子，也有立蛋的遊戲。",a:true,why:"端午節還會划龍舟、插艾草、配戴香包。"},
+{g:4,q:"漢人年夜飯的應景食物，每一種都有不同的意涵與祝福。",a:true,why:"例如魚代表年年有餘。"},
+{g:4,q:"有些原住民族為了慶祝豐收而舉辦祭典，例如阿美族的豐年祭。",a:true,why:"豐年祭有感恩五穀豐收的意義。"},
+{g:4,q:"祭典是原住民族很重要的文化，不同族群的祭典也有不同的意義。",a:true,why:"例如邵族祖靈祭、阿美族豐年祭。"},
+{g:4,q:"臺灣的傳統節慶大多有各種活動，可以讓許多人一同參與。",a:true,why:"例如燈會、划龍舟。"},
+{g:5,q:"臺灣民眾現在過的耶誕節，是受到西方文化影響的節日。",a:true,why:"耶誕節是慶祝耶穌誕生的西方節日。"},
+{g:5,q:"每到農曆 8 月中旬，東南亞新住民會舉辦潑水節。",a:false,why:"潑水節在國曆 4 月中旬。"},
+{g:5,q:"潑水節來自東北亞，可以透過潑水把壞運氣趕走。",a:false,why:"潑水節是東南亞國家的傳統新年。"},
+{g:5,q:"從國家的重要節日，可以了解國家的歷史與發展。",a:true,why:"例如開國紀念日、國慶日。"},
+{g:5,q:"國慶日是受到外來文化影響才有的節日。",a:false,why:"國慶日和國家的歷史與發展有關，不是外來文化。"},
+{g:5,q:"教師節在國曆 9 月 28 日。",a:true,why:"許多學校會舉辦敬師活動。"},
+{g:5,q:"母親節是國曆 8 月 8 日。",a:false,why:"8 月 8 日是父親節；母親節是國曆 5 月第二個星期日。"},
+{g:5,q:"有些地方會結合在地文化或自然景觀，發展出特色節慶，例如雲林國際偶戲節。",a:true,why:"阿里山櫻花季也是一例。"},
+{g:5,q:"耶誕節對歐美家庭來說，就像我們的春節一樣，是家人團聚的日子。",a:true,why:"會進行耶誕布置、共進耶誕大餐。"},
+{g:6,q:"家庭迎接新生兒時，會透過滿月、收涎、抓週等禮俗，表達喜悅與對新生命的重視。",a:true,why:"這些都是新生階段的禮俗。"},
+{g:6,q:"漢人小孩的成年禮會有賽跑、傳統歌舞教唱等訓練課程。",a:false,why:"這是阿美族的成年禮；漢人有鑽七娘媽亭等儀式。"},
+{g:6,q:"同樣生活在臺灣，漢人和原住民族的婚禮各有不同的方式與特色。",a:true,why:"例如漢人敬茶、魯凱族盪秋千。"},
+{g:6,q:"漢人青少年滿十六歲時，有些地方會舉行成年禮，例如鑽七娘媽亭。",a:true,why:"成年表示從青少年轉變為大人。"},
+{g:6,q:"收涎是在新生兒滿週歲時舉行的禮俗。",a:false,why:"收涎在滿四個月；滿週歲是抓週。"},
+{g:6,q:"魯凱族婚禮中新郎抱起新娘，表示新郎有能力負擔重任。",a:true,why:"這被稱為勇士禮讚。"},
+{g:7,q:"呈現資料的方式有很多種，可以依內容的文字多寡、影音資料等，用不同方式呈現。",a:true,why:"討論資料呈現方式是製作地圖的步驟之一。"},
+{g:7,q:"訪問里長前不必事先聯絡，這樣可以讓訪問更順利。",a:false,why:"要提前告知並說明訪問目的。"},
+{g:7,q:"「工作準備表」是在完成工作之後，用來檢討過程的表格。",a:false,why:"工作準備表是工作前的行前準備規畫。"},
+{g:7,q:"進行訪問活動之前，應該事先想好要向受訪者請教哪些問題。",a:true,why:"這樣訪問才會順利。"},
+{g:7,q:"訪問居住家鄉多年的長輩，可以讓我們更了解家鄉的歷史。",a:true,why:"長輩知道很多家鄉的故事。"},
+{g:7,q:"做好家鄉故事地圖後，應該把它放在抽屜裡好好收藏。",a:false,why:"要張貼在公共場合、安排解說，讓更多人認識家鄉。"},
+{g:7,q:"錄下解說地圖的影片放到網頁上，可以讓更多人看到家鄉故事地圖。",a:true,why:"這是推廣故事地圖的方法之一。"},
+];
+
+/* ===== 配對題 PAIR {g,cat,items:[[左,右],...]} ===== */
+const PAIR=[
+{g:1,cat:"米製品與族群",items:[["炒粄條","客家族群"],["竹筒飯","原住民族"],["碗粿","閩南族群"],["河粉","越南新住民"]]},
+{g:1,cat:"飲食特色與例子",items:[["醃漬食品","泡菜"],["辛香料料理","泰國打拋豬肉"],["特殊沾醬","客家桔醬"],["融合創新","米漢堡"]]},
+{g:2,cat:"服飾與族群",items:[["藍衫","客家族群"],["百步蛇圖案","排灣族"],["奧黛","越南新住民"],["覆蓋頭髮和肩頸的頭巾","信仰伊斯蘭教的婦女"]]},
+{g:3,cat:"命名方式",items:[["漢人的姓","通常跟著父親或母親"],["漢人的名字","常來自家人的期許或祝福"],["原住民族的名字","常參考自然界的事物"],["娃郁．瓦歷斯","名字後面加上父親的名字"]]},
+{g:4,cat:"節慶與日期",items:[["除夕","農曆 12 月 29 或 30 日"],["元宵節","農曆 1 月 15 日"],["端午節","農曆 5 月 5 日"],["中秋節","農曆 8 月 15 日"]]},
+{g:4,cat:"節慶與習俗",items:[["元宵節","吃元宵、看燈會"],["清明節","掃墓、吃潤餅"],["端午節","吃粽子、划龍舟"],["中秋節","賞月、吃月餅"]]},
+{g:4,cat:"原住民族祭典",items:[["阿美族豐年祭","小米收穫後，感恩五穀豐收"],["邵族祖靈祭","9 月舉辦，感謝祖靈庇佑"],["小米播種祭","每年第一個歲時祭儀"],["豐年舞","豐年祭常見的儀式"]]},
+{g:5,cat:"現代節日與日期",items:[["開國紀念日","國曆 1 月 1 日"],["父親節","國曆 8 月 8 日"],["教師節","國曆 9 月 28 日"],["國慶日","國曆 10 月 10 日"]]},
+{g:5,cat:"節日與由來",items:[["耶誕節","慶祝耶穌誕生（西方）"],["潑水節","東南亞的傳統新年"],["雲林國際偶戲節","在地的布袋戲文化"],["阿里山櫻花季","當地的自然景觀"]]},
+{g:6,cat:"新生禮俗",items:[["滿月","出生滿一個月"],["收涎","出生滿四個月，收起口水"],["抓週","滿週歲，長輩的期望"],["鑽七娘媽亭","滿十六歲的成年禮"]]},
+{g:6,cat:"婚禮儀式",items:[["拜別父母","感謝養育之恩"],["敬茶","介紹新娘給男方親友"],["盪秋千","魯凱族，象徵愛情堅定"],["抱新娘","魯凱族，勇士禮讚"]]},
+{g:7,cat:"地圖四要素",items:[["圖名","地圖的名稱或主題"],["方向標","用來辨識方位"],["比例尺","代表地圖縮小的比例"],["圖例","用簡單符號表示地面的實際景物"]]},
+];
+
+/* ===== 分類題 SORT {g,q,cats,items:[[項目,類別index],...]} ===== */
+const SORT=[
+{g:1,q:"這些食物是哪一個族群的米製品？",cats:["客家族群","原住民族","閩南族群"],items:[["炒粄條",0],["竹筒飯",1],["碗粿",2],["客家桔醬（沾醬）",0]]},
+{g:2,q:"這是哪一種服飾的特色？",cats:["原住民族傳統服飾","客家藍衫"],items:[["用天然材料織成",0],["色彩鮮豔",0],["刺繡方法複雜",0],["樸素",1],["耐穿",1],["方便勞動",1]]},
+{g:3,q:"這是漢人還是原住民族的命名方式？",cats:["漢人","原住民族"],items:[["姓氏放在名字前面",0],["名字常來自家人的期許或祝福",0],["名字常參考自然界的事物",1],["名字後面加上父親或母親的名字",1],["不一定都有姓",1]]},
+{g:4,q:"這些是哪一個族群的傳統節慶或祭典？",cats:["漢人","原住民族"],items:[["元宵節",0],["清明節",0],["端午節",0],["中秋節",0],["豐年祭",1],["祖靈祭",1],["小米播種祭",1]]},
+{g:4,q:"這些活動屬於哪一個節慶？",cats:["除夕／春節","端午節","中秋節"],items:[["貼春聯",0],["發壓歲錢",0],["吃年夜飯",0],["配戴香包",1],["划龍舟",1],["立蛋",1],["賞月",2],["吃月餅",2]]},
+{g:5,q:"這些現代節日屬於哪一類？",cats:["國家的特殊節日","不同角色的節日","從國外傳入的節日"],items:[["開國紀念日",0],["國慶日",0],["母親節",1],["父親節",1],["教師節",1],["耶誕節",2],["潑水節",2]]},
+{g:5,q:"這些地方特色節慶是結合什麼發展出來的？",cats:["在地文化","自然景觀"],items:[["雲林國際偶戲節",0],["布袋戲踩街活動",0],["阿里山櫻花季",1],["欣賞日出雲海",1]]},
+{g:6,q:"這些生命禮俗屬於人生哪一個階段？",cats:["新生","成年","婚嫁"],items:[["滿月",0],["收涎",0],["抓週",0],["鑽七娘媽亭",1],["阿美族賽跑訓練",1],["拜別父母",2],["敬茶",2],["盪秋千",2]]},
+{g:7,q:"訪問長輩時，哪些行為恰當？",cats:["恰當","不恰當"],items:[["事先聯絡、說明目的",0],["專心聆聽",0],["依序提問",0],["認真記錄",0],["詢問長輩的私事",1],["沒經同意偷偷錄影",1],["在電影院進行訪問",1]]},
+{g:7,q:"想讓更多人認識家鄉故事地圖，哪些做法正確？",cats:["正確","不正確"],items:[["把地圖張貼在公共場合",0],["安排到各班輪流解說",0],["錄製網路導覽影片",0],["實際帶領導覽活動",0],["把地圖收在抽屜裡",1]]},
+];
+
+/* ===== 排序題 ORDER {g,q,items:[依正確順序]} ===== */
+const ORDER=[
+{g:7,q:"製作家鄉故事地圖的步驟，請依序排好。",items:["蒐集資料","決定適合呈現的資料","討論資料呈現方式","將資料繪製在地圖上","將地圖張貼在公共場合"]},
+{g:7,q:"把故事種在地圖上的步驟，請依序排好。",items:["決定地圖範圍和方位","標示主要道路","加入重要地點","把蒐集到的故事繪製在地圖中","檢查我們的故事地圖"]},
+{g:7,q:"進行一次訪問活動，請依序排好。",items:["填寫工作準備表、想好問題","事先聯絡受訪者、說明目的","訪問時專心聆聽、依序提問","認真記錄受訪者說的話","整理訪問資料"]},
+{g:4,q:"依照一年中的時間先後，排出這些漢人傳統節慶。",items:["春節（農曆 1 月 1 日）","元宵節（農曆 1 月 15 日）","清明節（國曆 4 月初）","端午節（農曆 5 月 5 日）","中秋節（農曆 8 月 15 日）"]},
+{g:5,q:"依照國曆日期先後，排出這些節日。",items:["開國紀念日","父親節","教師節","國慶日","耶誕節"]},
+{g:6,q:"依照孩子長大的先後，排出這些生命禮俗。",items:["滿月","收涎","抓週","鑽七娘媽亭（成年禮）","拜別父母（婚嫁）"]},
+];
+
+/* ===== 圖表判讀 CHART：原創示意圖，資料取自課本 ===== */
+function festSVG(){
+  const W=680,H=230,L=40,R=30,top=70;const pw=W-L-R;
+  const ev=[["A",1,"#c4622d"],["B",4,"#5b7f96"],["C",8,"#7a6a2e"],["D",9,"#8b3f6b"],["E",10,"#2f6b4f"],["F",12,"#a0522d"]];
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="國曆節日時間軸示意圖"><text x="${L}" y="20" font-size="14" fill="currentColor">國曆節日時間軸（課本資料）</text>`;
+  s+=`<line x1="${L}" y1="${top+60}" x2="${L+pw}" y2="${top+60}" stroke="currentColor" stroke-width="2"/>`;
+  for(let m=1;m<=12;m++){const x=L+pw*(m-0.5)/12;s+=`<line x1="${x}" y1="${top+54}" x2="${x}" y2="${top+66}" stroke="currentColor"/><text x="${x}" y="${top+84}" font-size="12" text-anchor="middle" fill="currentColor">${m}月</text>`}
+  ev.forEach(([k,m,c],i)=>{const x=L+pw*(m-0.5)/12;const y=top+(i%2?20:0);s+=`<line x1="${x}" y1="${y+16}" x2="${x}" y2="${top+56}" stroke="${c}" stroke-width="2"/><circle cx="${x}" cy="${y}" r="15" fill="${c}"/><text x="${x}" y="${y+5}" font-size="15" font-weight="700" text-anchor="middle" fill="#fff">${k}</text>`});
+  s+=`<text x="${L}" y="${H-12}" font-size="12" fill="currentColor" opacity=".75">A 1/1　B 4 月中旬　C 8/8　D 9/28　E 10/10　F 12/25</text></svg>`;return s;
+}
+function lifeSVG(){
+  const W=680,H=210,L=30;const st=[["出生","",0],["滿一個月","甲",1],["滿四個月","乙",2],["滿週歲","丙",3],["十六歲","丁",4],["結婚","戊",5]];
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="人生階段與生命禮俗示意圖"><text x="${L}" y="20" font-size="14" fill="currentColor">人生階段與禮俗（課本資料）</text>`;
+  s+=`<line x1="${L+20}" y1="110" x2="${W-40}" y2="110" stroke="currentColor" stroke-width="2"/><polygon points="${W-40},104 ${W-28},110 ${W-40},116" fill="currentColor"/>`;
+  st.forEach(([t,k,i])=>{const x=L+40+i*115;s+=`<circle cx="${x}" cy="110" r="8" fill="currentColor"/><text x="${x}" y="145" font-size="13" text-anchor="middle" fill="currentColor">${t}</text>`;if(k)s+=`<rect x="${x-20}" y="52" width="40" height="34" rx="8" fill="#c4622d"/><text x="${x}" y="75" font-size="17" font-weight="700" text-anchor="middle" fill="#fff">${k}</text>`});
+  return s+`</svg>`;
+}
+const CHART=[
+{g:5,title:"國曆節日時間軸",note:"原創示意圖；日期取自課本第五單元。",svg:festSVG,qs:[
+ {q:"標示 E 的節日，總統府前會舉行遊行、國軍儀隊表演，是哪一個節日？",o:["國慶日","開國紀念日","教師節","耶誕節"],a:0,why:"E 在 10 月 10 日，是國慶日。"},
+ {q:"標示 B 的節日是東南亞國家的傳統新年，是哪一個？",o:["潑水節","耶誕節","父親節","春節"],a:0,why:"B 在國曆 4 月中旬，是潑水節。"},
+ {q:"標示 D 的節日，許多學校會舉辦敬師活動，是哪一個？",o:["教師節","父親節","國慶日","母親節"],a:0,why:"D 在 9 月 28 日，是教師節。"},
+ {q:"標示 F 的節日是從西方傳入、慶祝耶穌誕生的節日，是哪一個？",o:["耶誕節","開國紀念日","國慶日","潑水節"],a:0,why:"F 在 12 月 25 日，是耶誕節。"},
+ {q:"圖中哪兩個節日屬於「國家的特殊節日」？",o:["A 和 E","B 和 F","C 和 D","A 和 B"],a:0,why:"A 開國紀念日、E 國慶日都和國家的歷史發展有關。"},
+ {q:"圖中哪兩個節日是「從國外傳入」的？",o:["B 和 F","A 和 E","C 和 D","D 和 E"],a:0,why:"B 潑水節來自東南亞，F 耶誕節來自西方。"},
+ {q:"標示 C 的節日是為了哪一種角色制訂的？",o:["父親","老師","母親","兒童"],a:0,why:"C 在 8 月 8 日，是父親節。"},
+]},
+{g:6,title:"人生階段與生命禮俗",note:"原創示意圖；內容取自課本第五單元第三課。",svg:lifeSVG,qs:[
+ {q:"「甲」的位置是出生滿一個月，應該舉行哪一個禮俗？",o:["滿月","收涎","抓週","鑽七娘媽亭"],a:0,why:"出生滿一個月是滿月。"},
+ {q:"「乙」的禮俗意思是收起口水、希望快快長大，是哪一個？",o:["收涎","滿月","抓週","敬茶"],a:0,why:"收涎在滿四個月。"},
+ {q:"「丙」滿週歲時，長輩想知道孩子長大後的志向，會舉辦什麼？",o:["抓週","收涎","滿月","盪秋千"],a:0,why:"抓週在滿週歲時舉行。"},
+ {q:"「丁」十六歲時，漢人有些地方會舉行什麼儀式？",o:["鑽七娘媽亭","抓週","敬茶","豐年舞"],a:0,why:"鑽七娘媽亭是漢人的成年禮。"},
+ {q:"「戊」結婚時，漢人用哪一個儀式感謝父母養育之恩？",o:["拜別父母","盪秋千","收涎","抓週"],a:0,why:"盪秋千是魯凱族的婚禮儀式。"},
+ {q:"甲、乙、丙三個禮俗都屬於人生哪一個階段？",o:["新生","成年","婚嫁","死亡"],a:0,why:"滿月、收涎、抓週都是新生階段的禮俗。"},
+]},
+];
+
+/* ===== 寫國字 WRITE {g,w,z,hint} ===== */
+const WRITE=[
+{g:1,w:"粄條",z:"ㄅㄢˇ ㄊㄧㄠˊ",hint:"客家族群的米製品，常炒來吃。"},
+{g:1,w:"碗粿",z:"ㄨㄢˇ ㄍㄨㄟˇ",hint:"閩南族群的米製品。"},
+{g:1,w:"醃漬",z:"ㄧㄢ ㄗˋ",hint:"泡菜就是這一類的食品。"},
+{g:1,w:"辛香料",z:"ㄒㄧㄣ ㄒㄧㄤ ㄌㄧㄠˋ",hint:"味道強烈，東南亞料理常用。"},
+{g:2,w:"藍衫",z:"ㄌㄢˊ ㄕㄢ",hint:"客家族群的傳統服飾。"},
+{g:2,w:"刺繡",z:"ㄘˋ ㄒㄧㄡˋ",hint:"原住民族服飾的方法很複雜。"},
+{g:2,w:"服飾",z:"ㄈㄨˊ ㄕˋ",hint:"衣服和配件。"},
+{g:3,w:"母語",z:"ㄇㄨˇ ㄩˇ",hint:"從小在家學會的語言。"},
+{g:3,w:"命名",z:"ㄇㄧㄥˋ ㄇㄧㄥˊ",hint:"取名字。"},
+{g:3,w:"期許",z:"ㄑㄧˊ ㄒㄩˇ",hint:"名字裡常有家人的＿＿或祝福。"},
+{g:4,w:"除夕",z:"ㄔㄨˊ ㄒㄧ",hint:"農曆一年中的最後一天。"},
+{g:4,w:"元宵",z:"ㄩㄢˊ ㄒㄧㄠ",hint:"小過年吃的食物。"},
+{g:4,w:"清明節",z:"ㄑㄧㄥ ㄇㄧㄥˊ ㄐㄧㄝˊ",hint:"掃墓、祭拜祖先的節慶。"},
+{g:4,w:"端午節",z:"ㄉㄨㄢ ㄨˇ ㄐㄧㄝˊ",hint:"吃粽子、划龍舟。"},
+{g:4,w:"祭典",z:"ㄐㄧˋ ㄉㄧㄢˇ",hint:"原住民族很重要的文化。"},
+{g:4,w:"豐年祭",z:"ㄈㄥ ㄋㄧㄢˊ ㄐㄧˋ",hint:"阿美族的新年。"},
+{g:5,w:"耶誕節",z:"ㄧㄝ ㄉㄢˋ ㄐㄧㄝˊ",hint:"國曆 12 月 25 日。"},
+{g:5,w:"潑水節",z:"ㄆㄛ ㄕㄨㄟˇ ㄐㄧㄝˊ",hint:"東南亞的傳統新年。"},
+{g:5,w:"國慶日",z:"ㄍㄨㄛˊ ㄑㄧㄥˋ ㄖˋ",hint:"國曆 10 月 10 日。"},
+{g:5,w:"偶戲",z:"ㄡˇ ㄒㄧˋ",hint:"雲林國際＿＿節。"},
+{g:6,w:"禮俗",z:"ㄌㄧˇ ㄙㄨˊ",hint:"生命＿＿：滿月、成年、婚嫁。"},
+{g:6,w:"收涎",z:"ㄕㄡ ㄒㄧㄢˊ",hint:"出生滿四個月的禮俗。"},
+{g:6,w:"抓週",z:"ㄓㄨㄚ ㄓㄡ",hint:"滿週歲的禮俗。"},
+{g:6,w:"婚嫁",z:"ㄏㄨㄣ ㄐㄧㄚˋ",hint:"結婚。"},
+{g:7,w:"導覽",z:"ㄉㄠˇ ㄌㄢˇ",hint:"家鄉故事＿＿員。"},
+{g:7,w:"訪問",z:"ㄈㄤˇ ㄨㄣˋ",hint:"向長輩請教家鄉故事。"},
+{g:7,w:"比例尺",z:"ㄅㄧˇ ㄌㄧˋ ㄔˇ",hint:"代表地圖縮小的比例。"},
+];
+
+/* ===== 課次名稱 ===== */
+const GN=["4-1 多元飲食文化","4-2 多元服飾","4-3 多元語言與命名","5-1 傳統節慶","5-2 現代節日","5-3 生命禮俗","6 家鄉故事導覽員"];
+
+
+/* ===== 小工具 ===== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+function load(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+const OL=['（1）','（2）','（3）','（4）','（5）'];
+
+/* ===== 發音（瀏覽器內建語音，優先用臺灣國語）===== */
+const SPK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
+const sayBtn=(t,label)=>`<button type="button" class="say" data-say="${esc(t)}" aria-label="${label}：${esc(t)}">${SPK}${label}</button>`;
+let zhVoice=null;
+const canSpeak=()=>{try{return 'speechSynthesis' in window && typeof SpeechSynthesisUtterance!=='undefined'}catch(e){return false}};
+function pickVoice(){try{const vs=speechSynthesis.getVoices();zhVoice=vs.find(v=>/zh[-_]TW/i.test(v.lang))||vs.find(v=>/zh[-_](HK|Hant)/i.test(v.lang))||vs.find(v=>/^(zh|cmn)/i.test(v.lang))||null}catch(e){}}
+if(canSpeak()){pickVoice();try{speechSynthesis.onvoiceschanged=pickVoice}catch(e){}}
+function say(t){
+  if(!canSpeak()){alertSay('這個瀏覽器不支援發音，請改用 Chrome、Safari 或 Edge。');return}
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='zh-TW';if(zhVoice)u.voice=zhVoice;u.rate=0.8;speechSynthesis.speak(u)}catch(e){alertSay('發音失敗，請再按一次。')}
+  if(canSpeak()&&!zhVoice){pickVoice();if(!zhVoice)alertSay('找不到中文語音，聲音可能不正確。可在裝置設定裡加裝「中文（台灣）」語音。')}
+}
+function alertSay(m){let t=document.getElementById('sayToast');if(!t){t=document.createElement('div');t.id='sayToast';t.setAttribute('role','status');t.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);padding:8px 14px;border-radius:10px;font-size:14px;z-index:20;max-width:90vw';document.body.appendChild(t)}t.textContent=m;t.hidden=false;clearTimeout(t._h);t._h=setTimeout(()=>t.hidden=true,3500)}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-say]');if(b){e.stopPropagation();say(b.dataset.say)}},true);
+
+/* ===== 音效（Web Audio 合成，不需下載音檔）===== */
+let sfxOn=load('au4sf-sfx',true),actx=null;
+function tone(seq){
+  if(!sfxOn)return;
+  try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();
+    let t=actx.currentTime+0.01;
+    seq.forEach(([f,d,type,v])=>{const o=actx.createOscillator(),g=actx.createGain();o.type=type||'sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(v||0.16,t+0.015);g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+      o.connect(g);g.connect(actx.destination);o.start(t);o.stop(t+d+0.03);t+=d*0.8});
+  }catch(e){}
+}
+const SFX={
+  ok:()=>tone([[659,.12],[880,.12],[1175,.25]]),
+  bad:()=>tone([[311,.18,'triangle',.14],[233,.32,'triangle',.14]]),
+  flip:()=>tone([[540,.05,'triangle',.07]]),
+  match:()=>tone([[784,.09],[1047,.2]]),
+  combo:()=>tone([[784,.08],[988,.08],[1319,.22]]),
+  tick:()=>tone([[1250,.04,'square',.035]]),
+  win:()=>tone([[523,.13],[659,.13],[784,.13],[1047,.13],[784,.1],[1047,.4]]),
+  lose:()=>tone([[392,.2,'triangle'],[330,.2,'triangle'],[262,.45,'triangle']])
+};
+function renderSfx(){const b=$('#sfxBtn');b.setAttribute('aria-pressed',sfxOn);b.textContent='音效：'+(sfxOn?'開':'關')}
+$('#sfxBtn').onclick=()=>{sfxOn=!sfxOn;save('au4sf-sfx',sfxOn);renderSfx();if(sfxOn)SFX.ok()};
+renderSfx();
+
+/* ===== 每一關的計時與計分 ===== */
+let tmode=load('au4sf-tmode','up'),rt=null;const QLIM=15;
+const rmt=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
+const timeChips=()=>`<div class="modes"><button class="chip" data-tm="up" aria-pressed="${tmode==='up'}">計時計分</button><button class="chip" data-tm="cd" aria-pressed="${tmode==='cd'}">每題 ${QLIM} 秒倒數</button></div>`;
+document.addEventListener('click',e=>{const b=e.target.closest('[data-tm]');if(!b)return;tmode=b.dataset.tm;save('au4sf-tmode',tmode);document.querySelectorAll('[data-tm]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.tm===tmode))});
+function rtStart(key){rt={key,t0:Date.now(),score:0,streak:0,best:0,ok:0,n:0,qT:Date.now(),onTimeout:null,last:'',lastTick:-1,done:false}}
+function rtQ(onTimeout){if(!rt)return;rt.qT=Date.now();rt.onTimeout=(tmode==='cd'&&onTimeout)?onTimeout:null;rt.lastTick=-1;rtTick()}
+function rtAns(right){
+  if(!rt)return 0;rt.n++;rt.onTimeout=null;let pts=0;
+  if(right){rt.ok++;rt.streak++;rt.best=Math.max(rt.best,rt.streak);const sec=(Date.now()-rt.qT)/1000;
+    const sp=Math.round(50*Math.max(0,Math.min(1,1-(sec-3)/12))),cb=Math.min(5,rt.streak-1)*10;pts=100+sp+cb;rt.score+=pts;
+    rt.last=`＋${pts}${sp?`（快答 ＋${sp}）`:''}${rt.streak>1?`・${rt.streak} 連對`:''}`}
+  else{rt.streak=0;rt.last='連對中斷'}
+  rtTick();return pts;
+}
+function rtTick(){
+  if(!rt||rt.done)return;
+  const now=Date.now(),el=(now-rt.t0)/1000;
+  let cd='';
+  if(rt.onTimeout){const left=QLIM-(now-rt.qT)/1000,c=Math.ceil(left);
+    if(c<=3&&c>0&&c!==rt.lastTick){rt.lastTick=c;SFX.tick()}
+    cd=`<div class="timebar${left<=5?' warn':''}"><i style="width:${Math.max(0,left/QLIM*100)}%"></i></div>`;
+    if(left<=0){const f=rt.onTimeout;rt.onTimeout=null;f();return}}
+  document.querySelectorAll('.rhud').forEach(h=>{const sec=h.closest('section');if(sec&&sec.hidden)return;
+    h.innerHTML=`<div class="rrow"><span>時間 <b>${rmt(el)}</b></span><span>分數 <b>${rt.score}</b></span><span>連對 <b>${rt.streak}</b></span>${rt.onTimeout?`<span class="cdw">剩 <b>${Math.max(0,Math.ceil(QLIM-(now-rt.qT)/1000))}</b> 秒</span>`:''}</div>${cd}<div class="plus">${rt.last}</div>`})
+}
+setInterval(rtTick,250);
+function rtEnd(label){
+  if(!rt)return '';
+  rt.done=true;rt.onTimeout=null;const el=(Date.now()-rt.t0)/1000,acc=rt.n?Math.round(rt.ok/rt.n*100):0;
+  const key='au4sf-rbest-'+rt.key+(label||''),best=load(key,null),rec=!best||rt.score>best.sc;
+  if(rec&&rt.n)save(key,{sc:rt.score,t:el});
+  return `<div class="rsum"><div><b>${rt.score}</b>分數</div><div><b>${rmt(el)}</b>用時</div><div><b>${acc}%</b>正確率</div><div><b>${rt.best}</b>最高連對</div></div>
+   <p class="qask">${rec&&rt.n?'<b style="color:var(--rose-deep)">新紀錄！</b>':`這一關最佳紀錄：${best?best.sc:0} 分`}</p>`;
+}
+
+/* ===== 範圍與錯題 ===== */
+let WR=load('au4sf-wrong',{});
+const KINDN={mc:'選擇題',tf:'是非題',pair:'配對題',sort:'分類題',order:'排順序',chart:'圖表判讀',write:'寫國字'};
+function addWrong(kind,idx,label){const k=kind+':'+idx;const o=WR[k]||{n:0,kind,t:label};o.n++;o.t=label;o.kind=kind;WR[k]=o;save('au4sf-wrong',WR);renderScope()}
+const isWrong=(kind,idx)=>!!WR[kind+':'+idx];
+const st={groups:new Set(GN.map((_,i)=>i+1)),onlyWrong:false,selfTest:false};
+function pool(arr,kind){
+  let p=arr.map((x,i)=>Object.assign({},x,{_i:i})).filter(x=>st.groups.has(x.g));
+  if(st.onlyWrong&&kind)p=p.filter(x=>isWrong(kind,x._i));
+  return p;
+}
+function renderScope(){
+  const n=Object.keys(WR).length;if(!n)st.onlyWrong=false;
+  const el=$('#scope');
+  el.innerHTML=GN.map((g,i)=>`<button class="chip" data-g="${i+1}" aria-pressed="${st.groups.has(i+1)}">${g}</button>`).join('')+
+   `<button class="chip" data-g="all" aria-pressed="false">全選</button>`+
+   (n?`<button class="chip wrongchip" data-g="wrong" aria-pressed="${st.onlyWrong}">只練錯題（${n}）</button>`:'')+
+   `<span class="count">範圍內 ${pool(MC,'mc').length+pool(TF,'tf').length} 題</span>`;
+}
+$('#scope').addEventListener('click',e=>{
+  const b=e.target.closest('.chip');if(!b)return;const g=b.dataset.g;
+  if(g==='all')st.groups=new Set(GN.map((_,i)=>i+1));
+  else if(g==='wrong')st.onlyWrong=!st.onlyWrong;
+  else{const i=+g;if(st.groups.has(i)){if(st.groups.size>1)st.groups.delete(i)}else st.groups.add(i)}
+  renderScope();refreshTab();
+});
+
+/* ===== 分頁 ===== */
+let tab='cards';
+document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  tab=b.dataset.tab;rt=null;if(mm&&mm.timer){clearInterval(mm.timer);mm.timer=null}clearWTimer();if(ex&&ex.timer){clearInterval(ex.timer);ex.timer=null}
+  document.querySelectorAll('nav.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  document.querySelectorAll('section').forEach(s=>s.hidden=s.id!=='tab-'+tab);
+  refreshTab(true);
+}));
+function refreshTab(){
+  if(tab==='cards')renderCards();
+  if(tab==='mc')mcIntro();
+  if(tab==='tf')tfIntro();
+  if(tab==='pair')pairIntro();
+  if(tab==='sort')sortIntro();
+  if(tab==='order')orderIntro();
+  if(tab==='chart')chartIntro();
+  if(tab==='write')writeIntro();
+  if(tab==='mem')memIntro();
+  if(tab==='exam')examIntro();
+  if(tab==='wrong')renderWrong();
+}
+const sizeSel=(id,n)=>`<label class="hint" for="${id}">題數</label> <select id="${id}"><option value="10">10 題</option><option value="20">20 題</option><option value="999">全部${n?`（${n} 題）`:''}</option></select>`;
+const emptyMsg=`<p class="hint">這個範圍裡沒有題目，請在上方多選幾課，或關掉「只練錯題」。</p>`;
+/* ===== 重點卡（名詞解釋）===== */
+function renderCards(){
+  const p=pool(TERM);
+  const cv=h=>st.selfTest?`<span class="cover" tabindex="0" role="button">${h}</span>`:h;
+  let html=`<div class="bar"><button class="chip" id="stBtn" aria-pressed="${st.selfTest}">考自己（先遮住說明）</button><span class="count">共 ${p.length} 張卡</span></div>`;
+  if(!p.length)html+=emptyMsg;
+  for(let g=1;g<=6;g++){
+    const xs=p.filter(x=>x.g===g);if(!xs.length)continue;
+    html+=`<h3 class="groupHead">${GN[g-1]}</h3><div class="termlist">`+
+      xs.map(x=>`<div class="termcard"><div class="tt">${esc(x.t)} ${sayBtn(x.t,'聽')}</div><p class="td">${cv(esc(x.d)+' '+sayBtn(x.d,'聽說明'))}</p></div>`).join('')+`</div>`;
+  }
+  $('#cardsArea').innerHTML=html;
+  $('#stBtn').onclick=()=>{st.selfTest=!st.selfTest;renderCards()};
+  document.querySelectorAll('#cardsArea .cover').forEach(c=>{
+    const open=()=>{c.classList.remove('cover');c.removeAttribute('role');c.removeAttribute('tabindex')};
+    c.onclick=open;c.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}};
+  });
+}
+
+/* ===== 選擇題 ===== */
+let mcs=null;
+function mcIntro(){
+  const p=pool(MC,'mc');
+  $('#mcArea').innerHTML=`<div class="qcard"><p class="qask">四個選項選一個。答完會立刻告訴你對不對，還會說明理由。</p>
+    ${timeChips()}
+    ${p.length?`<div class="bar">${sizeSel('mcN',p.length)}<button class="btn primary" id="mcGo">開始作答</button></div>`:emptyMsg}
+    <p class="hint">題目來自老師的期末複習卷、第二、三次複習卷與課本重點整理。</p></div>`;
+  const g=$('#mcGo');if(g)g.onclick=()=>{const n=+$('#mcN').value;rtStart('mc');mcs={q:shuffle(p).slice(0,n),i:0,ok:0,bad:[]};mcQ()};
+}
+function mcQ(){
+  if(mcs.i>=mcs.q.length)return mcDone();
+  const x=mcs.q[mcs.i],order=KPDeal.place(x.o.map((t,i)=>({t,i})),o=>o.i===x.a);
+  $('#mcArea').innerHTML=`<div class="qcard"><div class="rhud"></div>
+    <span class="prog">第 ${mcs.i+1} / ${mcs.q.length} 題　<span class="lesson">${GN[x.g-1]}</span></span>
+    <p class="qask left">${esc(x.q)}</p>
+    <div class="opts" id="mcOpts">${order.map((o,k)=>`<button class="opt" data-k="${k}"><span class="o0">${OL[k]}</span><span class="o1">${esc(o.t)}</span></button>`).join('')}</div>
+    <div id="mcFb"></div></div>`;
+  rtQ(()=>pick(-1));
+  let locked=false;
+  function pick(k){
+    if(locked)return;locked=true;
+    const right=k>=0&&order[k].i===x.a,ci=order.findIndex(o=>o.i===x.a);
+    document.querySelectorAll('#mcOpts .opt').forEach((b,j)=>{b.disabled=true;
+      if(j===ci)b.className='opt ok',b.insertAdjacentHTML('beforeend','<span class="mark">✓ 正確</span>');
+      else if(j===k)b.className='opt bad',b.insertAdjacentHTML('beforeend','<span class="mark">✗ 你選的</span>')});
+    rtAns(right);
+    if(right){mcs.ok++;SFX.ok()}else{SFX.bad();mcs.bad.push(x);addWrong('mc',x._i,x.q)}
+    $('#mcFb').innerHTML=`<div class="fb ${right?'ok':'bad'}">${right?'✓ 答對了！':k<0?'✗ 時間到':'✗ 答錯了'}　<b>${esc(x.why)}</b></div>
+      <div class="center" style="margin-top:10px"><button class="btn primary" id="mcNext">${mcs.i+1>=mcs.q.length?'看成績':'下一題'}</button></div>`;
+    $('#mcNext').onclick=()=>{mcs.i++;mcQ()};
+  }
+  document.querySelectorAll('#mcOpts .opt').forEach(b=>b.onclick=()=>pick(+b.dataset.k));
+}
+function mcDone(){
+  if(mcs.q.length&&mcs.ok===mcs.q.length)celebrate('選擇題全對！');
+  $('#mcArea').innerHTML=`<div class="done-box"><div class="score">${mcs.ok} / ${mcs.q.length}</div>${rtEnd()}
+   <p class="qask">${mcs.bad.length?'這幾題再看一次：':'全部答對，太厲害了！'}</p>
+   <div class="termlist" style="text-align:left">${mcs.bad.map(x=>`<div class="termcard"><div class="tt" style="font-size:16px">${esc(x.q)}</div><p class="td"><b>正解：</b>${esc(x.o[x.a])}<br>${esc(x.why)}</p></div>`).join('')}</div>
+   <div class="center">${mcs.bad.length?'<button class="btn rose primary" id="mcRe">只重做錯的</button>':''}<button class="btn" id="mcAgain">再來一輪</button></div></div>`;
+  $('#mcAgain').onclick=mcIntro;
+  const r=$('#mcRe');if(r)r.onclick=()=>{rtStart('mc');mcs={q:shuffle(mcs.bad),i:0,ok:0,bad:[]};mcQ()};
+}
+
+/* ===== 是非題 ===== */
+let tfs=null;
+function tfIntro(){
+  const p=pool(TF,'tf');
+  $('#tfArea').innerHTML=`<div class="qcard"><p class="qask">對的按 <b>○</b>，錯的按 <b>✗</b>。答完會說明理由。</p>
+    ${timeChips()}
+    ${p.length?`<div class="bar">${sizeSel('tfN',p.length)}<button class="btn primary" id="tfGo">開始作答</button></div>`:emptyMsg}
+    <p class="hint">題目來自老師的期末複習卷與第二、三次複習卷。</p></div>`;
+  const g=$('#tfGo');if(g)g.onclick=()=>{const n=+$('#tfN').value;rtStart('tf');tfs={q:shuffle(p).slice(0,n),i:0,ok:0,bad:[]};tfQ()};
+}
+function tfQ(){
+  if(tfs.i>=tfs.q.length)return tfDone();
+  const x=tfs.q[tfs.i];
+  $('#tfArea').innerHTML=`<div class="qcard"><div class="rhud"></div>
+    <span class="prog">第 ${tfs.i+1} / ${tfs.q.length} 題　<span class="lesson">${GN[x.g-1]}</span></span>
+    <p class="qask left">${esc(x.q)}</p>
+    <div class="opts" style="grid-template-columns:1fr 1fr" id="tfOpts">
+      <button class="opt tfbig" data-v="1">○</button><button class="opt tfbig" data-v="0">✗</button></div>
+    <div id="tfFb"></div></div>`;
+  rtQ(()=>pick(null));
+  let locked=false;
+  function pick(v){
+    if(locked)return;locked=true;
+    const right=v!==null&&(!!v)===(!!x.a);
+    document.querySelectorAll('#tfOpts .opt').forEach(b=>{b.disabled=true;const bv=b.dataset.v==='1';
+      if(bv===(!!x.a))b.className='opt tfbig ok';else if(v!==null&&bv===(!!v))b.className='opt tfbig bad'});
+    rtAns(right);
+    if(right){tfs.ok++;SFX.ok()}else{SFX.bad();tfs.bad.push(x);addWrong('tf',x._i,x.q)}
+    $('#tfFb').innerHTML=`<div class="fb ${right?'ok':'bad'}">${right?'✓ 答對了！':v===null?'✗ 時間到':'✗ 答錯了'}　正確答案是 <b>${x.a?'○':'✗'}</b>。<b>${esc(x.why)}</b></div>
+      <div class="center" style="margin-top:10px"><button class="btn primary" id="tfNext">${tfs.i+1>=tfs.q.length?'看成績':'下一題'}</button></div>`;
+    $('#tfNext').onclick=()=>{tfs.i++;tfQ()};
+  }
+  document.querySelectorAll('#tfOpts .opt').forEach(b=>b.onclick=()=>pick(+b.dataset.v));
+}
+function tfDone(){
+  if(tfs.q.length&&tfs.ok===tfs.q.length)celebrate('是非題全對！');
+  $('#tfArea').innerHTML=`<div class="done-box"><div class="score">${tfs.ok} / ${tfs.q.length}</div>${rtEnd()}
+   <p class="qask">${tfs.bad.length?'這幾題再看一次：':'全部答對，太厲害了！'}</p>
+   <div class="termlist" style="text-align:left">${tfs.bad.map(x=>`<div class="termcard"><div class="tt" style="font-size:16px">${x.a?'○':'✗'}　${esc(x.q)}</div><p class="td">${esc(x.why)}</p></div>`).join('')}</div>
+   <div class="center">${tfs.bad.length?'<button class="btn rose primary" id="tfRe">只重做錯的</button>':''}<button class="btn" id="tfAgain">再來一輪</button></div></div>`;
+  $('#tfAgain').onclick=tfIntro;
+  const r=$('#tfRe');if(r)r.onclick=()=>{rtStart('tf');tfs={q:shuffle(tfs.bad),i:0,ok:0,bad:[]};tfQ()};
+}
+/* ===== 配對題 ===== */
+let ps=null;
+function pairIntro(){
+  const p=pool(PAIR,'pair');
+  $('#pairArea').innerHTML=`<div class="qcard"><p class="qask">左邊點一下，再點右邊和它相配的那一個。配對成功會變綠色 ✓。</p>
+    ${p.length?`<div class="bar" style="justify-content:center">${p.map(x=>`<button class="btn" data-p="${x._i}">${esc(x.cat)}<span class="lesson" style="margin-left:6px">${GN[x.g-1].slice(0,3)}</span></button>`).join('')}</div>
+      <button class="btn primary" id="pRand">隨機抽一組</button>`:emptyMsg}
+    <p class="hint">共 ${p.length} 組可以練。</p></div>`;
+  document.querySelectorAll('#pairArea [data-p]').forEach(b=>b.onclick=()=>pairStart(+b.dataset.p));
+  const r=$('#pRand');if(r)r.onclick=()=>pairStart(p[Math.random()*p.length|0]._i);
+}
+function pairStart(idx){
+  const g=PAIR[idx];
+  rtStart('pair');
+  /* 右邊可能有「多對一」（例如好幾個聚落都是因為交通方便），所以右欄先去掉重複，
+     並記住每一張右卡還要被配幾次，全部配完才算完成。 */
+  const rights=[];g.items.forEach(it=>{if(rights.indexOf(it[1])<0)rights.push(it[1])});
+  const need={},tot={};
+  rights.forEach((r,k)=>{need[k]=tot[k]=g.items.filter(it=>it[1]===r).length});
+  ps={idx,cat:g.cat,g:g.g,
+     L:shuffle(g.items.map((it,i)=>({t:it[0],i,r:rights.indexOf(it[1])}))),
+     R:shuffle(rights.map((t,k)=>({t,i:k}))),
+     need,tot,doneL:{},doneR:{},sel:null,n:g.items.length,ok:0,tries:0,fx:null};
+  pairRender();rtQ(null);
+}
+function pairRender(){
+  const cell=(side,o)=>{
+    const done=side==='L'?ps.doneL[o.i]:ps.doneR[o.i];
+    const sel=ps.sel&&ps.sel.side===side&&ps.sel.i===o.i;
+    const fx=ps.fx&&ps.fx.side===side&&ps.fx.i===o.i;
+    const more=side==='R'&&ps.tot[o.i]>1&&!done?`<span class="lesson" style="margin-left:6px">還要 ${ps.need[o.i]} 個</span>`:'';
+    return `<button class="pitem${done?' done':''}${sel?' sel':''}${fx?' wrongflash':''}" data-s="${side}" data-i="${o.i}"${done?' disabled':''}>${esc(o.t)}${more}${done?' ✓':''}</button>`};
+  $('#pairArea').innerHTML=`<div class="qcard"><div class="rhud"></div>
+    <span class="prog">${esc(ps.cat)}　<span class="lesson">${GN[ps.g-1]}</span>　已配對 ${ps.ok} / ${ps.n}</span>
+    <div class="pairwrap">
+      <div class="pcol">${ps.L.map(o=>cell('L',o)).join('')}</div>
+      <div class="pcol">${ps.R.map(o=>cell('R',o)).join('')}</div>
+    </div>
+    <div class="center"><button class="btn" id="pBack">換一組</button></div>
+    <div id="pMsg"></div></div>`;
+  $('#pBack').onclick=pairIntro;
+  document.querySelectorAll('#pairArea .pitem').forEach(b=>b.onclick=()=>pairTap(b.dataset.s,+b.dataset.i));
+}
+function pairTap(side,i){
+  if(side==='L'?ps.doneL[i]:ps.doneR[i])return;
+  if(!ps.sel||ps.sel.side===side){ps.sel={side,i};ps.fx=null;SFX.flip();pairRender();return}
+  const li=side==='L'?i:ps.sel.i,ri=side==='L'?ps.sel.i:i;
+  ps.tries++;
+  const lo=ps.L.filter(o=>o.i===li)[0];
+  if(lo&&lo.r===ri){
+    ps.doneL[li]=true;ps.need[ri]--;if(ps.need[ri]<=0)ps.doneR[ri]=true;
+    ps.ok++;ps.sel=null;ps.fx=null;rtAns(true);SFX.match();
+    pairRender();
+    if(ps.ok===ps.n)return pairDone();
+    rtQ(null);
+  }else{
+    rtAns(false);SFX.bad();addWrong('pair',ps.idx,ps.cat);
+    ps.fx={side,i};const keep=ps.sel;ps.sel=null;pairRender();
+    $('#pMsg').innerHTML=`<div class="fb bad">✗ 這兩個不是一對，再想一想。</div>`;
+    setTimeout(()=>{if(ps&&ps.fx){ps.fx=null;pairRender();rtQ(null)}},700);
+  }
+}
+function pairDone(){
+  const perfect=ps.tries===ps.n;
+  if(perfect)celebrate('配對全對！');else SFX.win();
+  $('#pMsg').innerHTML=`<div class="done-box"><div class="score">${ps.ok} / ${ps.n}</div>${rtEnd('-'+ps.idx)}
+    <p class="qask">${perfect?'一次都沒配錯，超強！':`配了 ${ps.tries} 次才全部完成，再練一次會更快。`}</p>
+    <div class="center"><button class="btn primary" id="pAgain">再配一次</button><button class="btn" id="pBack2">換一組</button></div></div>`;
+  $('#pAgain').onclick=()=>pairStart(ps.idx);$('#pBack2').onclick=pairIntro;
+}
+
+/* ===== 分類題 ===== */
+let ss=null;
+function sortIntro(){
+  const p=pool(SORT,'sort');
+  $('#sortArea').innerHTML=`<div class="qcard"><p class="qask">看題目，把每一個項目放進正確的籃子裡。</p>
+    ${p.length?`<div class="bar" style="justify-content:center">${p.map(x=>`<button class="btn" data-s="${x._i}" style="text-align:left">${esc(x.q)}<span class="lesson" style="margin-left:6px">${GN[x.g-1].slice(0,3)}</span></button>`).join('')}</div>
+      <button class="btn primary" id="sRand">隨機抽一題</button>`:emptyMsg}
+    <p class="hint">共 ${p.length} 題可以練。</p></div>`;
+  document.querySelectorAll('#sortArea [data-s]').forEach(b=>b.onclick=()=>sortStart(+b.dataset.s));
+  const r=$('#sRand');if(r)r.onclick=()=>sortStart(p[Math.random()*p.length|0]._i);
+}
+function sortStart(idx){
+  const q=SORT[idx];
+  rtStart('sort');
+  ss={idx,q,items:shuffle(q.items.map(it=>({t:it[0],c:it[1]}))),i:0,ok:0,placed:q.cats.map(()=>[])};
+  sortQ();
+}
+function binsHTML(){
+  return ss.q.cats.map((c,k)=>`<div class="bin"><h4>${esc(c)}</h4>${ss.placed[k].map(p=>`<span class="tagi ${p.ok?'ok':'bad'}">${esc(p.t)} ${p.ok?'✓':'✗'}</span>`).join('')}</div>`).join('');
+}
+function sortQ(){
+  if(ss.i>=ss.items.length)return sortDone();
+  const q=ss.q,cur=ss.items[ss.i];
+  $('#sortArea').innerHTML=`<div class="qcard"><div class="rhud"></div>
+    <p class="qask left">${esc(q.q)}　<span class="lesson">${GN[q.g-1]}</span></p>
+    <span class="prog">第 ${ss.i+1} / ${ss.items.length} 個</span>
+    <div class="cur">${esc(cur.t)}</div>
+    <p class="hint">它應該放進哪一個？</p>
+    <div class="opts" style="grid-template-columns:repeat(${q.cats.length},1fr)" id="sBtns">
+      ${q.cats.map((c,k)=>`<button class="opt" data-k="${k}" style="justify-content:center;text-align:center"><span class="o1">${esc(c)}</span></button>`).join('')}</div>
+    <div class="bins${q.cats.length===3?' b3':''}" id="sBins">${binsHTML()}</div>
+    <div class="center"><button class="btn" id="sBack">換一題</button></div>
+    <div id="sFb"></div></div>`;
+  $('#sBack').onclick=sortIntro;
+  rtQ(()=>pick(-1));
+  let locked=false;
+  function pick(k){
+    if(locked)return;locked=true;
+    const right=k===cur.c;
+    rtAns(right);
+    ss.placed[cur.c].push({t:cur.t,ok:right});
+    $('#sBins').innerHTML=binsHTML();            /* 讓孩子馬上看到它掉進籃子裡 */
+    document.querySelectorAll('#sBtns .opt').forEach(b=>{b.disabled=true;
+      if(+b.dataset.k===cur.c)b.className='opt ok';else if(+b.dataset.k===k)b.className='opt bad'});
+    if(right){ss.ok++;SFX.ok()}else{SFX.bad();addWrong('sort',ss.idx,ss.q.q)}
+    $('#sFb').innerHTML=`<div class="fb ${right?'ok':'bad'}">${right?'✓ 放對了！':k<0?'✗ 時間到':'✗ 放錯了'}　「${esc(cur.t)}」要放進 <b>${esc(ss.q.cats[cur.c])}</b>。</div>
+      <div class="center" style="margin-top:10px"><button class="btn primary" id="sNext">${ss.i+1>=ss.items.length?'看成績':'下一個'}</button></div>`;
+    $('#sNext').onclick=()=>{ss.i++;sortQ()};
+  }
+  document.querySelectorAll('#sBtns .opt').forEach(b=>b.onclick=()=>pick(+b.dataset.k));
+}
+function sortDone(){
+  const q=ss.q;
+  if(ss.ok===ss.items.length)celebrate('分類全對！');
+  $('#sortArea').innerHTML=`<div class="done-box"><div class="score">${ss.ok} / ${ss.items.length}</div>${rtEnd('-'+ss.idx)}
+    <p class="qask left">${esc(q.q)}</p>
+    <div class="bins${q.cats.length===3?' b3':''}" style="width:100%">${q.cats.map((c,k)=>`<div class="bin"><h4>${esc(c)}</h4>${q.items.filter(it=>it[1]===k).map(it=>`<span class="tagi">${esc(it[0])}</span>`).join('')}</div>`).join('')}</div>
+    <p class="hint">上面是正確答案。</p>
+    <div class="center"><button class="btn primary" id="sAgain">再做一次</button><button class="btn" id="sBack2">換一題</button></div></div>`;
+  $('#sAgain').onclick=()=>sortStart(ss.idx);$('#sBack2').onclick=sortIntro;
+}
+
+/* ===== 排順序（點選排出正確順序）===== */
+let os=null;
+function orderIntro(){
+  const p=pool(ORDER,'order');
+  $('#orderArea').innerHTML=`<div class="qcard"><p class="qask">依照正確的先後順序，一個一個點下去。</p>
+    ${p.length?`<div class="bar" style="justify-content:center">${p.map(x=>`<button class="btn" data-o="${x._i}" style="text-align:left">${esc(x.q)}<span class="lesson" style="margin-left:6px">${GN[x.g-1].slice(0,3)}</span></button>`).join('')}</div>`:emptyMsg}
+    <p class="hint">共 ${p.length} 題可以練。</p></div>`;
+  document.querySelectorAll('#orderArea [data-o]').forEach(b=>b.onclick=()=>orderStart(+b.dataset.o));
+}
+function orderStart(idx){
+  const q=ORDER[idx];rtStart('order');
+  let sh=shuffle(q.items.map((t,i)=>({t,i})));let k=0;while(sh.every((o,j)=>o.i===j)&&k++<20)sh=shuffle(sh);
+  os={idx,q,cards:sh,got:[],miss:0};orderQ();
+}
+function orderQ(){
+  const q=os.q,n=q.items.length;
+  $('#orderArea').innerHTML=`<div class="qcard"><div class="rhud"></div>
+    <p class="qask left">${esc(q.q)}　<span class="lesson">${GN[q.g-1]}</span></p>
+    <ol class="olist">${q.items.map((t,i)=>`<li>${i<os.got.length?`<b>${esc(t)}</b> ✓`:'＿＿＿＿'}</li>`).join('')}</ol>
+    <p class="hint">${os.got.length<n?`請點第 ${os.got.length+1} 步：`:''}</p>
+    <div class="opts" id="oBtns">${os.cards.map((c,j)=>`<button class="opt" data-j="${j}" ${os.got.includes(c.i)?'disabled style="opacity:.35"':''}><span class="o1">${esc(c.t)}</span></button>`).join('')}</div>
+    <div id="oFb"></div><div class="center"><button class="btn" id="oBack">換一題</button></div></div>`;
+  $('#oBack').onclick=orderIntro;
+  rtQ(null);
+  document.querySelectorAll('#oBtns .opt').forEach(b=>b.onclick=()=>{
+    const c=os.cards[+b.dataset.j],need=os.got.length;
+    if(c.i===need){os.got.push(c.i);SFX.flip();
+      if(os.got.length===n){const ok=os.miss===0;rtAns(ok);if(ok)SFX.ok();else addWrong('order',os.idx,q.q);return orderDone()}
+      orderQ()}
+    else{os.miss++;SFX.bad();b.classList.add('bad');
+      $('#oFb').innerHTML=`<div class="fb bad">✗ 不是這一個，想一想第 ${need+1} 步應該是什麼？</div>`;
+      setTimeout(()=>{b.classList.remove('bad')},700)}
+  });
+}
+function orderDone(){
+  const q=os.q;if(!os.miss)celebrate('排序全對！');
+  $('#orderArea').innerHTML=`<div class="done-box"><div class="score">${os.miss?`點錯 ${os.miss} 次`:'一次全對！'}</div>${rtEnd('-'+os.idx)}
+    <p class="qask left">${esc(q.q)}</p><ol class="olist" style="text-align:left">${q.items.map(t=>`<li class="explain">${esc(t)}</li>`).join('')}</ol>
+    <div class="center"><button class="btn primary" id="oAgain">再排一次</button><button class="btn" id="oBack2">換一題</button></div></div>`;
+  $('#oAgain').onclick=()=>orderStart(os.idx);$('#oBack2').onclick=orderIntro;
+}
+
+/* ===== 圖表判讀 ===== */
+let cs=null;
+function chartIntro(){
+  const p=pool(CHART,'chart');
+  $('#chartArea').innerHTML=`<div class="qcard"><p class="qask">看圖、看表回答問題。圖表都是自己畫的練習圖，資料來源寫在圖的下面。</p>
+    ${p.length?`<div class="bar" style="justify-content:center">${p.map(x=>`<button class="btn" data-c="${x._i}" style="text-align:left">${esc(x.title)}<span class="lesson" style="margin-left:6px">${GN[x.g-1].slice(0,3)}</span></button>`).join('')}</div>`:emptyMsg}
+    <p class="hint">共 ${p.length} 組圖表。</p></div>`;
+  document.querySelectorAll('#chartArea [data-c]').forEach(b=>b.onclick=()=>chartStart(+b.dataset.c));
+}
+function chartStart(idx){
+  const c=CHART[idx];
+  rtStart('chart');
+  cs={idx,c,q:shuffle(c.qs.map((q,i)=>Object.assign({},q,{_q:i}))),i:0,ok:0,bad:[]};
+  chartQ();
+}
+function chartQ(){
+  if(cs.i>=cs.q.length)return chartDone();
+  const c=cs.c,x=cs.q[cs.i],order=KPDeal.place(x.o.map((t,i)=>({t,i})),o=>o.i===x.a);
+  $('#chartArea').innerHTML=`<div class="qcard"><div class="rhud"></div>
+    <span class="prog">${esc(c.title)}　<span class="lesson">${GN[c.g-1]}</span>　第 ${cs.i+1} / ${cs.q.length} 題</span>
+    <div class="chartbox">${c.svg()}</div><p class="srcnote">${esc(c.note)}</p>
+    <p class="qask left">${esc(x.q)}</p>
+    <div class="opts" id="cOpts">${order.map((o,k)=>`<button class="opt" data-k="${k}"><span class="o0">${OL[k]}</span><span class="o1">${esc(o.t)}</span></button>`).join('')}</div>
+    <div id="cFb"></div>
+    <div class="center"><button class="btn" id="cBack">換一組圖表</button></div></div>`;
+  $('#cBack').onclick=chartIntro;
+  rtQ(()=>pick(-1));
+  let locked=false;
+  function pick(k){
+    if(locked)return;locked=true;
+    const right=k>=0&&order[k].i===x.a,ci=order.findIndex(o=>o.i===x.a);
+    document.querySelectorAll('#cOpts .opt').forEach((b,j)=>{b.disabled=true;
+      if(j===ci)b.className='opt ok',b.insertAdjacentHTML('beforeend','<span class="mark">✓ 正確</span>');
+      else if(j===k)b.className='opt bad',b.insertAdjacentHTML('beforeend','<span class="mark">✗ 你選的</span>')});
+    rtAns(right);
+    if(right){cs.ok++;SFX.ok()}else{SFX.bad();cs.bad.push(x);addWrong('chart',cs.idx,c.title+'：'+x.q)}
+    $('#cFb').innerHTML=`<div class="fb ${right?'ok':'bad'}">${right?'✓ 答對了！':k<0?'✗ 時間到':'✗ 答錯了'}　<b>${esc(x.why)}</b></div>
+      <div class="center" style="margin-top:10px"><button class="btn primary" id="cNext">${cs.i+1>=cs.q.length?'看成績':'下一題'}</button></div>`;
+    $('#cNext').onclick=()=>{cs.i++;chartQ()};
+  }
+  document.querySelectorAll('#cOpts .opt').forEach(b=>b.onclick=()=>pick(+b.dataset.k));
+}
+function chartDone(){
+  if(cs.q.length&&cs.ok===cs.q.length)celebrate('圖表判讀全對！');
+  $('#chartArea').innerHTML=`<div class="done-box"><div class="score">${cs.ok} / ${cs.q.length}</div>${rtEnd('-'+cs.idx)}
+   <p class="qask">${cs.bad.length?'這幾題再看一次：':'全部答對，判讀能力滿分！'}</p>
+   <div class="termlist" style="text-align:left">${cs.bad.map(x=>`<div class="termcard"><div class="tt" style="font-size:16px">${esc(x.q)}</div><p class="td"><b>正解：</b>${esc(x.o[x.a])}<br>${esc(x.why)}</p></div>`).join('')}</div>
+   <div class="center"><button class="btn primary" id="cAgain">同一組再做</button><button class="btn" id="cBack3">換一組</button></div></div>`;
+  $('#cAgain').onclick=()=>chartStart(cs.idx);$('#cBack3').onclick=chartIntro;
+}
+
+/* ===== 寫國字（重要地名、名詞；自動評分只看字形，筆畫數僅供參考）===== */
+let ws=null,wTime=load('au4sf-wtime',0);
+function wParts(x){
+  const zs=String(x.z).trim().split(/\s+/);
+  return zs.length===x.w.length?zs:null;
+}
+function writeIntro(){
+  clearWTimer();
+  const p=pool(WRITE,'write');
+  const tchip=v=>`<button class="chip" data-wt="${v}" aria-pressed="${wTime===v}">${v?`每字 ${v} 秒`:'不限時'}</button>`;
+  $('#writeArea').innerHTML=`<div class="qcard">
+    <p class="qask">看注音寫國字：語詞裡會空一個字，把那個字寫在格子裡，寫好按「寫好了」。App 會先<b>自動評分</b>（只比對字形），再請你自己對照答案確認。</p>
+    <div class="modes">${tchip(0)}${tchip(30)}${tchip(20)}</div>
+    ${p.length?`<div class="bar">${sizeSel('wN',p.length)}<button class="btn primary" id="wGo">開始寫</button></div>`:emptyMsg}
+    <p class="hint">注音是編者標註的，請以課本為準。自動評分只能抓出明顯寫錯的字，細節要自己對照。</p></div>`;
+  document.querySelectorAll('#writeArea [data-wt]').forEach(b=>b.onclick=()=>{wTime=+b.dataset.wt;save('au4sf-wtime',wTime);writeIntro()});
+  const g=$('#wGo');if(g)g.onclick=()=>{const n=+$('#wN').value;rtStart('write');
+    ws={q:shuffle(p).slice(0,n).map(x=>{const zs=wParts(x);const k=Math.random()*x.w.length|0;return Object.assign({},x,{k,c:x.w[k],zc:zs?zs[k]:x.z})}),i:0,ok:0,bad:[],scores:[]};writeQ()};
+}
+function promptWord(x){return x.w.split('').map((ch,i)=>i===x.k?`<span class="box">${esc(x.zc)}</span>`:esc(ch)).join('')}
+function clearWTimer(){if(ws&&ws.timer){clearInterval(ws.timer);ws.timer=null}}
+function writeQ(){
+  clearWTimer();
+  if(ws.i>=ws.q.length)return writeDone();
+  const x=ws.q[ws.i];
+  $('#writeArea').innerHTML=`<div class="prompt"><div class="rhud"></div><span class="prog">第 ${ws.i+1} / ${ws.q.length} 字　<span class="lesson">${GN[x.g-1]}</span></span>
+      <div class="word">${promptWord(x)}</div><span class="hint">${esc(x.hint)}</span><span class="hint">把框框裡的注音寫成國字　${sayBtn(x.w,'聽語詞')}</span></div>
+    ${wTime?`<div class="timebar" id="wBar"><i style="width:100%"></i></div><div class="prog" id="wLeft" style="text-align:center">剩下 ${wTime} 秒</div>`:''}
+    ${padHTML(x.c)}
+    <div class="center"><button class="btn" id="wClear">擦掉重寫</button><button class="btn primary" id="wShow">寫好了，評分</button></div>
+    <div id="wRev"></div>`;
+  setupPad($('#writeArea'));rtQ(null);
+  $('#wClear').onclick=clearPad;
+  let done=false;
+  const reveal=async(timeout)=>{
+    if(done)return;done=true;clearWTimer();padLocked=true;
+    $('#wShow').disabled=true;$('#wClear').disabled=true;
+    const sc=await gradeWriting(x.c);ws.scores.push(sc.score);
+    const shapeTxt=sc.n===0?'沒有寫':sc.f>=0.80?'很接近 ✓':sc.f>=0.65?'有部分相似，請仔細對照':'差很多，可能寫錯字了';
+    const verdict=sc.good?'很可能寫對了！再看一眼確認吧。':sc.n===0?'沒有寫到字，記下來再練一次。':'可能有地方寫錯，請和答案仔細比對。';
+    if(sc.good)SFX.ok();
+    $('#wRev').innerHTML=`<div class="grade ${sc.good?'g-ok':'g-chk'}">
+        <div class="gscore"><b>${sc.score}</b><span>分</span></div>
+        <div class="ginfo">${timeout?'<div><b>時間到！</b></div>':''}<div><b>字形</b>：${shapeTxt}</div><div><b>筆畫</b>：你寫了 ${sc.n} 畫（僅供參考）</div><div><b>初評</b>：${verdict}</div></div></div>
+      <div class="reveal"><div class="big">${esc(x.c)}</div>
+      <div class="info"><div><b>語詞</b>：<span class="kai" style="font-size:22px">${esc(x.w)}</span></div>
+      <div class="zy hint">${esc(x.z)}</div><div class="hint">${esc(x.hint)}</div></div></div>
+      <div class="center" style="margin-top:10px"><button class="btn" id="wGhost" aria-pressed="false">把答案疊在格子上比對</button></div>
+      <div class="center" style="margin-top:10px"><button class="btn ${sc.good?'primary':''}" id="wOk">我寫對了</button><button class="btn rose ${sc.good?'':'primary'}" id="wBad">寫錯了，記下來</button></div>
+      <p class="hint" style="text-align:center">自動評分是參考：只比對字形，細節請自己對照課本。</p>`;
+    $('#wGhost').onclick=e=>{const g=$('#writeArea .ghost');g.hidden=!g.hidden;e.currentTarget.setAttribute('aria-pressed',!g.hidden)};
+    $('#wOk').onclick=()=>{rtAns(true);if(!sc.good)SFX.ok();ws.ok++;ws.i++;writeQ()};
+    $('#wBad').onclick=()=>{rtAns(false);SFX.bad();ws.bad.push(x);addWrong('write',x._i,x.w);ws.i++;writeQ()};
+  };
+  $('#wShow').onclick=()=>reveal(false);
+  if(wTime){const t0=Date.now();let lastTick=-1;
+    ws.timer=setInterval(()=>{const left=wTime-(Date.now()-t0)/1000;const bar=$('#wBar'),lt=$('#wLeft');
+      if(!bar){clearWTimer();return}
+      bar.firstElementChild.style.width=Math.max(0,left/wTime*100)+'%';bar.classList.toggle('warn',left<=5);
+      lt.textContent=`剩下 ${Math.max(0,Math.ceil(left))} 秒`;
+      const c=Math.ceil(left);if(c<=5&&c>0&&c!==lastTick){lastTick=c;SFX.tick()}
+      if(left<=0)reveal(true)},200)}
+}
+function writeDone(){
+  clearWTimer();
+  const avg=ws.scores.length?Math.round(ws.scores.reduce((a,b)=>a+b,0)/ws.scores.length):0;
+  if(ws.q.length&&ws.ok===ws.q.length)celebrate('全部寫對！');
+  $('#writeArea').innerHTML=`<div class="done-box"><div class="score">${ws.ok} / ${ws.q.length}</div>${rtEnd(wTime?'-'+wTime:'')}
+   <p class="qask">自動評分平均 ${avg} 分</p>
+   <p class="qask">${ws.bad.length?'這幾個語詞再多寫幾次：':'全部寫對，太棒了！'}</p>
+   <div class="wlist">${ws.bad.map(x=>`<span class="wz">${esc(x.w)}</span>`).join('')}</div>
+   <div class="center">${ws.bad.length?'<button class="btn rose primary" id="wRe">只重寫錯的</button>':''}<button class="btn" id="wAgain">再來一輪</button></div></div>`;
+  $('#wAgain').onclick=writeIntro;
+  const r=$('#wRe');if(r)r.onclick=()=>{const b=ws.bad.slice();rtStart('write');ws={q:shuffle(b),i:0,ok:0,bad:[],scores:[]};writeQ()};
+}
+let cv,ctx,drawing=false,last=null,padStrokes=0,padLocked=false;
+const padHTML=ch=>`<div class="padwrap"><div class="tian pad"><div class="ghost" hidden>${esc(ch)}</div><canvas aria-label="寫字格"></canvas></div></div>`;
+function setupPad(root){
+  cv=root.querySelector('canvas');ctx=cv.getContext('2d');padStrokes=0;padLocked=false;
+  const r=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+  cv.width=Math.max(1,r.width*dpr);cv.height=Math.max(1,r.height*dpr);ctx.scale(dpr,dpr);
+  ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=Math.max(5,r.width/30);
+  ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--ink').trim()||'#2b2518';
+  root.querySelector('.ghost').style.fontSize=(r.width*0.82)+'px';
+  const pt=e=>{const b=cv.getBoundingClientRect();return [e.clientX-b.left,e.clientY-b.top]};
+  cv.onpointerdown=e=>{if(padLocked)return;drawing=true;padStrokes++;last=pt(e);try{cv.setPointerCapture(e.pointerId)}catch(_){}ctx.beginPath();ctx.arc(last[0],last[1],ctx.lineWidth/2,0,7);ctx.fillStyle=ctx.strokeStyle;ctx.fill()};
+  cv.onpointermove=e=>{if(!drawing||padLocked)return;const p=pt(e);ctx.beginPath();ctx.moveTo(...last);ctx.lineTo(...p);ctx.stroke();last=p};
+  cv.onpointerup=cv.onpointercancel=()=>{drawing=false};
+}
+function clearPad(){if(padLocked)return;ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);ctx.restore();padStrokes=0}
+
+/* 字形相似度：把手寫和標準楷書都縮放到 64×64、細化成骨架，再算互相覆蓋的比例 */
+const GZ=64;
+function toGrid(src){
+  const w=src.width,h=src.height,d=src.getContext('2d').getImageData(0,0,w,h).data;
+  let x0=w,y0=h,x1=-1,y1=-1;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(d[(y*w+x)*4+3]>60){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+  if(x1<0)return null;
+  const off=document.createElement('canvas');off.width=off.height=GZ;const o=off.getContext('2d');
+  const bw=x1-x0+1,bh=y1-y0+1,s=(GZ-4)/Math.max(bw,bh),dw=bw*s,dh=bh*s;
+  o.drawImage(src,x0,y0,bw,bh,(GZ-dw)/2,(GZ-dh)/2,dw,dh);
+  const od=o.getImageData(0,0,GZ,GZ).data,g=new Uint8Array(GZ*GZ);
+  for(let i=0;i<g.length;i++)g[i]=od[i*4+3]>60?1:0;
+  return g;
+}
+function thin(g){
+  const N=GZ,a=Uint8Array.from(g);let ch=true;
+  const P=(x,y)=>(x<0||y<0||x>=N||y>=N)?0:a[y*N+x];
+  while(ch){ch=false;
+    for(const step of [0,1]){const del=[];
+      for(let y=0;y<N;y++)for(let x=0;x<N;x++){if(!a[y*N+x])continue;
+        const p=[P(x,y-1),P(x+1,y-1),P(x+1,y),P(x+1,y+1),P(x,y+1),P(x-1,y+1),P(x-1,y),P(x-1,y-1)];
+        const B=p.reduce((s,v)=>s+v,0);if(B<2||B>6)continue;
+        let A=0;for(let k=0;k<8;k++)if(!p[k]&&p[(k+1)%8])A++;if(A!==1)continue;
+        if(step===0){if(p[0]*p[2]*p[4]||p[2]*p[4]*p[6])continue}else{if(p[0]*p[2]*p[6]||p[0]*p[4]*p[6])continue}
+        del.push(y*N+x)}
+      if(del.length){ch=true;del.forEach(i=>a[i]=0)}}}
+  return a;
+}
+function dilate(g,r){const N=GZ,o=new Uint8Array(N*N);
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(g[y*N+x])for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){
+    if(dx*dx+dy*dy>r*r)continue;const X=x+dx,Y=y+dy;if(X>=0&&Y>=0&&X<N&&Y<N)o[Y*N+X]=1}
+  return o}
+async function gradeWriting(ch){
+  const n=padStrokes;
+  let f=0;
+  try{
+    if(n>0){
+      try{await document.fonts.load(`100px "LXGW WenKai TC"`,ch)}catch(_){}
+      const ref=document.createElement('canvas');ref.width=cv.width;ref.height=cv.height;
+      const r=ref.getContext('2d');r.fillStyle='#000';r.textAlign='center';r.textBaseline='middle';
+      r.font=`${Math.round(cv.width*0.82)}px "LXGW WenKai TC","BiauKai","DFKai-SB",serif`;r.fillText(ch,cv.width/2,cv.height/2);
+      const U0=toGrid(cv),R0=toGrid(ref);
+      if(U0&&R0){const U=thin(U0),R=thin(R0),dU=dilate(U,3),dR=dilate(R,3);
+        let su=0,sr=0,pu=0,pr=0;for(let i=0;i<U.length;i++){if(U[i]){su++;if(dR[i])pu++}if(R[i]){sr++;if(dU[i])pr++}}
+        const p=su?pu/su:0,q=sr?pr/sr:0;f=p+q?2*p*q/(p+q):0}
+    }
+  }catch(e){f=0}
+  const score=n===0?0:Math.round(100*Math.min(1,Math.max(0,(f-0.55)/(0.88-0.55))));
+  return {n,f,score,good:n>0&&f>=0.80};
+}
+/* ===== 翻牌配對（計時賽／限時賽、連擊加分、星等、最佳紀錄）===== */
+let mm=null,memMode='up',memSize=6;
+const mmt=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
+const memKey=()=>`au4sf-best-${memMode}-${memSize}`;
+function memCards(){
+  const seenL=new Set(),seenR=new Set(),out=[];
+  for(const g of shuffle(pool(PAIR)))for(const it of shuffle(g.items)){
+    if(seenL.has(it[0])||seenR.has(it[1])||seenL.has(it[1])||seenR.has(it[0]))continue;
+    seenL.add(it[0]);seenR.add(it[1]);out.push({a:it[0],b:it[1],cat:g.cat});
+  }
+  return shuffle(out);
+}
+function memIntro(){
+  if(mm&&mm.timer){clearInterval(mm.timer);mm.timer=null}
+  const best=load(memKey(),null),avail=memCards().length;
+  const chip=(k,v,label)=>`<button class="chip" data-${k}="${v}" aria-pressed="${({mode:memMode,size:String(memSize)})[k]===String(v)}">${label}</button>`;
+  $('#memArea').innerHTML=`<div class="qcard"><p class="qask">翻開兩張牌，把<b>名詞或地點</b>和它的<b>說明</b>配成一對。連續配對成功有連擊加分！</p>
+   <div class="modes">${chip('mode','up','計時賽：越快越好')}${chip('mode','down','限時賽：倒數讀秒')}</div>
+   <div class="modes">${chip('size',6,'6 對（12 張）')}${chip('size',8,'8 對（16 張）')}</div>
+   <p class="hint">${best?`這一關的最佳紀錄：${memMode==='up'?`${mmt(best.t)}・翻 ${best.mv} 次`:`${best.sc} 分`}`:'這一關還沒有紀錄，來創第一個吧！'}${memMode==='down'?`　限時 ${memSize===6?90:120} 秒`:''}</p>
+   ${avail>=memSize?'<button class="btn primary" id="mGo">發牌開始</button>':`<p class="hint">範圍內的配對不夠 ${memSize} 對，請多選幾課。</p>`}</div>`;
+  document.querySelectorAll('#memArea [data-mode]').forEach(b=>b.onclick=()=>{memMode=b.dataset.mode;memIntro()});
+  document.querySelectorAll('#memArea [data-size]').forEach(b=>b.onclick=()=>{memSize=+b.dataset.size;memIntro()});
+  const g=$('#mGo');if(g)g.onclick=memDeal;
+}
+function memDeal(){
+  if(mm&&mm.timer)clearInterval(mm.timer);
+  const pick=memCards().slice(0,memSize);
+  const cards=shuffle(pick.flatMap((x,i)=>[{id:i,t:'a',x},{id:i,t:'b',x}]));
+  const limit=memMode==='down'?(memSize===6?90:120):0;
+  mm={cards,open:[],done:0,moves:0,n:pick.length,lock:false,score:0,combo:0,maxCombo:0,start:0,el:0,limit,over:false,timer:null,lastTick:-1,msg:''};
+  memRender();
+}
+function memStartClock(){
+  if(mm.start)return;mm.start=Date.now();
+  mm.timer=setInterval(()=>{mm.el=(Date.now()-mm.start)/1000;
+    if(mm.limit){const left=Math.ceil(mm.limit-mm.el);if(left<=10&&left>0&&left!==mm.lastTick){mm.lastTick=left;SFX.tick()}
+      if(mm.el>=mm.limit){mm.el=mm.limit;memEnd(false);return}}
+    memHud()},250);
+}
+function memHud(){
+  const h=$('#mHud');if(!h)return;
+  const left=mm.limit?Math.max(0,mm.limit-mm.el):0,warn=mm.limit&&left<=10;
+  h.innerHTML=`<div class="${warn?'warn':''}">${mm.limit?'剩下':'時間'}<b>${mmt(mm.limit?Math.ceil(left):mm.el)}</b></div><div>翻牌<b>${mm.moves}</b></div><div>配對<b>${mm.done}/${mm.n}</b></div><div>分數<b>${mm.score}</b></div>`;
+  const tb=$('#mBar');if(tb){tb.classList.toggle('warn',!!warn);tb.firstElementChild.style.width=(mm.limit?left/mm.limit*100:mm.done/mm.n*100)+'%'}
+}
+function memFace(c){const t=c.t==='a'?c.x.a:c.x.b;return `<span class="k${t.length>8?' sm':''}">${esc(t)}</span>`}
+function memRender(fx){
+  $('#memArea').innerHTML=`<div class="hud" id="mHud"></div><div class="timebar" id="mBar"><i></i></div>
+   <div class="combo" id="mCombo">${mm.msg}</div>
+   <div class="mem${mm.n===8?' m16':''}">${mm.cards.map((c,i)=>`<button class="mc${c.open?' open':''}${c.done?' done':''}${fx&&fx.idx.includes(i)?' '+fx.cls:''}" data-i="${i}" aria-label="${c.open||c.done?'已翻開':'蓋著的牌'}">${c.open||c.done?memFace(c):''}</button>`).join('')}</div>
+   <div class="center"><button class="btn" id="mNew">重新發牌</button><button class="btn" id="mBack">換關卡</button></div>
+   <div id="mMsg"></div>`;
+  memHud();
+  $('#mNew').onclick=memDeal;$('#mBack').onclick=memIntro;
+  document.querySelectorAll('.mc').forEach(b=>b.onclick=()=>memFlip(+b.dataset.i));
+}
+function memFlip(i){
+  const c=mm.cards[i];if(mm.over||mm.lock||c.open||c.done)return;
+  memStartClock();SFX.flip();
+  c.open=true;mm.open.push(c);
+  if(mm.open.length===2){mm.moves++;const [a,b]=mm.open,ia=mm.cards.indexOf(a),ib=mm.cards.indexOf(b);
+    if(a.id===b.id&&a.t!==b.t){
+      a.done=b.done=true;a.open=b.open=false;mm.done++;mm.open=[];mm.combo++;mm.maxCombo=Math.max(mm.maxCombo,mm.combo);
+      const add=100+(mm.combo-1)*50;mm.score+=add;
+      mm.msg=mm.combo>1?`${mm.combo} 連擊！＋${add}`:`配對成功 ＋${add}`;
+      mm.combo>1?SFX.combo():SFX.match();
+      memRender({idx:[ia,ib],cls:'pop'});
+      if(mm.done===mm.n)memEnd(true);
+    }else{
+      mm.combo=0;mm.msg='';mm.lock=true;memRender({idx:[ia,ib],cls:'shake'});
+      setTimeout(()=>{if(mm.over)return;a.open=b.open=false;mm.open=[];mm.lock=false;memRender()},900);
+    }
+  }else memRender();
+}
+function memEnd(win){
+  mm.over=true;clearInterval(mm.timer);mm.timer=null;
+  if(mm.start)mm.el=Math.min(mm.limit||1e9,(Date.now()-mm.start)/1000);
+  let bonus=0;if(win&&mm.limit)bonus=Math.ceil(mm.limit-mm.el)*10;mm.score+=bonus;
+  memHud();
+  if(!win){SFX.lose();
+    const left=mm.cards.filter(c=>!c.done&&c.t==='a').map(c=>c.x);
+    mm.cards.forEach(c=>{if(!c.done)c.open=true});memRender();
+    $('#mMsg').innerHTML=`<div class="done-box"><div class="score">時間到！</div><p class="qask">配了 ${mm.done} / ${mm.n} 對，得 ${mm.score} 分。還沒配到的：</p>
+      <div class="termlist" style="text-align:left">${left.map(x=>`<div class="termcard"><div class="tt" style="font-size:16px">${esc(x.a)}</div><p class="td">${esc(x.b)}</p></div>`).join('')}</div>
+      <button class="btn primary" id="mAgain">再挑戰一次</button></div>`;
+    $('#mAgain').onclick=memDeal;return;
+  }
+  const stars=mm.moves<=mm.n+2?3:mm.moves<=Math.ceil(mm.n*1.7)?2:1;
+  const key=memKey(),best=load(key,null);let rec=false;
+  if(mm.limit){if(!best||mm.score>best.sc){save(key,{sc:mm.score});rec=true}}
+  else{if(!best||mm.el<best.t){save(key,{t:mm.el,mv:mm.moves});rec=true}}
+  setTimeout(()=>stars===3?celebrate('三顆星過關！'):SFX.win(),250);
+  $('#mMsg').innerHTML=`<div class="done-box"><div class="stars" aria-label="${stars} 顆星">${'★'.repeat(stars)}${'☆'.repeat(3-stars)}</div>
+    <div class="score">${mm.score} 分</div>
+    <p class="qask">用了 ${mmt(mm.el)}、翻 ${mm.moves} 次、最高 ${mm.maxCombo} 連擊${bonus?`，剩餘時間加分 ＋${bonus}`:''}。</p>
+    ${rec?'<p class="qask" style="color:var(--rose-deep)"><b>🏆 新紀錄！</b></p>':''}
+    <div class="center"><button class="btn primary" id="mAgain">再玩一局</button><button class="btn" id="mBack2">換關卡</button></div></div>`;
+  $('#mAgain').onclick=memDeal;$('#mBack2').onclick=memIntro;
+}
+
+/* ===== 模擬考（交卷後才公布答案與分數）===== */
+let ex=null;
+const EXPLAN=[['tf',12,2,'一、是非題'],['mc',17,2,'二、選擇題'],['pair',5,2,'三、配對題'],['sort',5,2,'四、分類題'],['order',5,2,'五、排順序'],['chart',6,2,'六、圖表判讀']];
+function examIntro(){
+  if(ex&&ex.timer){clearInterval(ex.timer);ex.timer=null}
+  const best=load('au4sf-exambest',null);
+  $('#examArea').innerHTML=`<div class="qcard"><p class="qask">模擬考要<b>全部作答完、按「交卷」之後</b>才會看到答案和分數，和真的考試一樣。</p>
+    <div class="tblwrap"><table class="tbl"><tr><th>大題</th><th>題數</th><th>每題</th><th>小計</th></tr>
+      ${EXPLAN.map(([k,n,p,t])=>`<tr><td>${t}</td><td class="n">${n}</td><td class="n">${p} 分</td><td class="n">${n*p} 分</td></tr>`).join('')}
+      <tr><th>合計</th><th class="n">${EXPLAN.reduce((a,b)=>a+b[1],0)}</th><th></th><th class="n">${EXPLAN.reduce((a,b)=>a+b[1]*b[2],0)} 分</th></tr></table></div>
+    <p class="hint">${best?`上次最好成績：${best.sc} 分（${best.d}）`:'還沒有考過，加油！'}</p>
+    <p class="hint">題目會從範圍內隨機抽，所以每次考都不一樣。若上方只選了部分課次，題數可能會變少，總分也會跟著調整。</p>
+    <button class="btn primary" id="exGo">開始模擬考</button></div>`;
+  $('#exGo').onclick=examStart;
+}
+function examBuild(){
+  const items=[];
+  const addTF=n=>shuffle(pool(TF)).slice(0,n).forEach(x=>items.push({sec:0,kind:'tf',q:x.q,o:['○ 對','✗ 錯'],a:x.a?0:1,why:x.why,pt:2}));
+  const addMC=n=>shuffle(pool(MC)).slice(0,n).forEach(x=>{const od=shuffle(x.o.map((t,i)=>({t,i})));
+    items.push({sec:1,kind:'mc',q:x.q,o:od.map(o=>o.t),a:od.findIndex(o=>o.i===x.a),why:x.why,pt:2})});
+  const addPair=n=>{
+    const gs=pool(PAIR);if(!gs.length)return;
+    const flat=[];gs.forEach(g=>g.items.forEach(it=>flat.push({l:it[0],r:it[1],cat:g.cat,gi:g._i})));
+    shuffle(flat).slice(0,n).forEach(p=>{
+      const same=PAIR[p.gi].items.map(it=>it[1]).filter(r=>r!==p.r);
+      const other=flat.map(f=>f.r).filter(r=>r!==p.r&&!same.includes(r));
+      const dis=shuffle(same).slice(0,3);while(dis.length<3&&other.length)dis.push(shuffle(other).shift());
+      const od=shuffle([p.r].concat(dis.slice(0,3)));
+      items.push({sec:2,kind:'pair',q:`${p.l}（${p.cat}）`,o:od,a:od.indexOf(p.r),why:`「${p.l}」要配「${p.r}」。`,pt:2})})};
+  const addSort=n=>{
+    const gs=pool(SORT);if(!gs.length)return;
+    const flat=[];gs.forEach(g=>g.items.forEach(it=>flat.push({t:it[0],c:it[1],cats:g.cats,q:g.q})));
+    shuffle(flat).slice(0,n).forEach(f=>items.push({sec:3,kind:'sort',q:`${f.q}　→　「${f.t}」`,o:f.cats.slice(),a:f.c,why:`「${f.t}」屬於「${f.cats[f.c]}」。`,pt:2}))};
+  const addChart=n=>{
+    const cs2=shuffle(pool(CHART));let left=n;
+    for(const c of cs2){
+      if(left<=0)break;
+      const qs=shuffle(c.qs).slice(0,Math.min(5,left));left-=qs.length;
+      qs.forEach((x,j)=>{const od=shuffle(x.o.map((t,i)=>({t,i})));
+        items.push({sec:5,kind:'chart',q:x.q,o:od.map(o=>o.t),a:od.findIndex(o=>o.i===x.a),why:x.why,pt:2,
+          chart:j===0?{svg:c.svg,note:c.note,title:c.title}:null})})}};
+  const addOrder=n=>{
+    const gs=pool(ORDER);if(!gs.length)return;const flat=[];
+    gs.forEach(g=>g.items.forEach((t,k)=>flat.push({g,k})));
+    shuffle(flat).slice(0,n).forEach(f=>{const ch=['第 1 步','第 2 步','第 3 步','第 4 步','第 5 步'].slice(0,f.g.items.length);
+      const opts=[ch[f.k]].concat(shuffle(ch.filter((_,i)=>i!==f.k)).slice(0,3));
+      items.push({sec:4,kind:'order',q:`${f.g.q}　→　「${f.g.items[f.k]}」是第幾步？`,o:opts,a:0,why:`正確順序：${f.g.items.join(' → ')}`,pt:2})})};
+  addTF(12);addMC(17);addPair(5);addSort(5);addOrder(5);addChart(6);
+  items.forEach(it=>{if(it.kind==='tf')return;const od=KPDeal.place(it.o.map((t,i)=>({t,i})),o=>o.i===it.a);it.o=od.map(o=>o.t);it.a=od.findIndex(o=>o.i===it.a)});
+  return items;
+}
+function examStart(){
+  const items=examBuild();
+  if(!items.length){$('#examArea').innerHTML=`<div class="qcard">${emptyMsg}<button class="btn" id="exB">回去</button></div>`;$('#exB').onclick=examIntro;return}
+  ex={items,ans:{},t0:Date.now(),timer:null,over:false};
+  examRender();
+  ex.timer=setInterval(()=>{const e=$('#exClock');if(e)e.textContent=mmt((Date.now()-ex.t0)/1000)},500);
+}
+function examRender(){
+  let html=`<div class="hud"><div>作答時間<b id="exClock">0:00</b></div><div>已答<b id="exDone">0</b></div><div>題數<b>${ex.items.length}</b></div><div>總分<b>${ex.items.reduce((a,b)=>a+b.pt,0)}</b></div></div>`;
+  let sec=-1;
+  ex.items.forEach((it,i)=>{
+    if(it.sec!==sec){sec=it.sec;const p=EXPLAN[sec];html+=`<h3 class="groupHead">${p[3]}（每題 ${p[2]} 分）</h3>`}
+    html+=`<div class="qcard" style="align-items:stretch">
+      ${it.chart?`<div class="chartbox">${it.chart.svg()}</div><p class="srcnote">${esc(it.chart.note)}</p>`:''}
+      <p class="qask left"><b>${i+1}.</b> ${esc(it.q)}</p>
+      <div class="opts" data-q="${i}">${it.o.map((o,k)=>`<button class="opt" data-k="${k}"><span class="o0">${OL[k]}</span><span class="o1">${esc(o)}</span></button>`).join('')}</div></div>`;
+  });
+  html+=`<div class="qcard"><p class="hint" id="exWarn"></p><button class="btn primary" id="exSubmit">交卷，看分數</button>
+    <button class="btn" id="exQuit">放棄這次模擬考</button></div>`;
+  $('#examArea').innerHTML=html;
+  document.querySelectorAll('#examArea .opts').forEach(g=>{
+    const qi=+g.dataset.q;
+    g.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+      ex.ans[qi]=+b.dataset.k;SFX.flip();
+      g.querySelectorAll('.opt').forEach(x=>x.classList.toggle('sel2',x===b));
+      g.querySelectorAll('.opt').forEach(x=>x.style.borderColor=x===b?'var(--rose-deep)':'');
+      $('#exDone').textContent=Object.keys(ex.ans).length;
+    });
+  });
+  $('#exQuit').onclick=()=>{if(ex.timer)clearInterval(ex.timer);examIntro()};
+  $('#exSubmit').onclick=()=>{
+    const un=ex.items.map((_,i)=>i).filter(i=>!(i in ex.ans));
+    if(un.length&&!ex.warned){ex.warned=true;$('#exWarn').innerHTML=`還有 ${un.length} 題沒作答（第 ${un.slice(0,8).map(i=>i+1).join('、')}${un.length>8?'…':''} 題）。要直接交卷就再按一次「交卷」。`;return}
+    examGrade();
+  };
+}
+function examGrade(){
+  if(ex.timer){clearInterval(ex.timer);ex.timer=null}
+  ex.over=true;
+  const el=(Date.now()-ex.t0)/1000;
+  let got=0,total=0;const secS=EXPLAN.map(()=>0),secT=EXPLAN.map(()=>0);
+  ex.items.forEach((it,i)=>{total+=it.pt;secT[it.sec]+=it.pt;
+    if(ex.ans[i]===it.a){got+=it.pt;secS[it.sec]+=it.pt}});
+  const pct=total?Math.round(got/total*100):0;
+  const best=load('au4sf-exambest',null),rec=!best||got>best.sc;
+  const d=new Date();const ds=`${d.getMonth()+1}/${d.getDate()}`;
+  if(rec)save('au4sf-exambest',{sc:got,d:ds});
+  if(pct===100)celebrate('模擬考滿分！');else if(pct>=80)SFX.win();else SFX.lose();
+  let html=`<div class="done-box"><div class="score">${got} / ${total} 分</div>
+    <p class="qask">用了 ${mmt(el)}，正確率 ${pct}%${rec?'　<b style="color:var(--rose-deep)">新紀錄！</b>':`　最佳 ${best?best.sc:0} 分`}</p>
+    <div class="tblwrap" style="width:100%"><table class="tbl"><tr><th>大題</th><th>得分</th><th>滿分</th></tr>
+      ${EXPLAN.map((p,s)=>secT[s]?`<tr><td>${p[3]}</td><td class="n">${secS[s]}</td><td class="n">${secT[s]}</td></tr>`:'').join('')}</table></div>
+    <div class="center"><button class="btn primary" id="exAgain">再考一次</button><button class="btn" id="exBack">回說明</button></div></div>
+    <h3 class="groupHead">檢討：每一題的答案</h3>`;
+  ex.items.forEach((it,i)=>{
+    const my=ex.ans[i],right=my===it.a;
+    html+=`<div class="qcard" style="align-items:stretch">
+      <p class="qask left"><b>${i+1}.</b> ${esc(it.q)}</p>
+      <div class="opts">${it.o.map((o,k)=>`<div class="opt${k===it.a?' ok':(k===my?' bad':'')}"><span class="o0">${OL[k]}</span><span class="o1">${esc(o)}</span>${k===it.a?'<span class="mark">✓ 正確</span>':(k===my?'<span class="mark">✗ 你選的</span>':'')}</div>`).join('')}</div>
+      <div class="fb ${right?'ok':'bad'}">${right?'✓ 答對':my===undefined?'✗ 沒作答':'✗ 答錯'}　<b>${esc(it.why)}</b></div></div>`;
+  });
+  $('#examArea').innerHTML=html;
+  $('#exAgain').onclick=examStart;$('#exBack').onclick=examIntro;
+  window.scrollTo(0,0);
+}
+
+/* ===== 慶祝角色（全部原創，每次隨機兩位出場）===== */
+const FACE=(y,c='var(--ink)')=>`<circle cx="48" cy="${y}" r="5" fill="${c}"/><circle cx="72" cy="${y}" r="5" fill="${c}"/><circle cx="49.5" cy="${y-1.5}" r="1.6" fill="#fff"/><circle cx="73.5" cy="${y-1.5}" r="1.6" fill="#fff"/>
+ <ellipse cx="40" cy="${y+11}" rx="6" ry="4" fill="var(--c2)" opacity=".75"/><ellipse cx="80" cy="${y+11}" rx="6" ry="4" fill="var(--c2)" opacity=".75"/><path d="M51 ${y+14} Q60 ${y+23} 69 ${y+14}" stroke="${c}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+const CHARS=[
+ {name:'小墨',body:`<path d="M60 18 C30 46 24 70 24 88 a36 36 0 0 0 72 0 C96 70 90 46 60 18Z" fill="#8fb8e8" stroke="var(--ink)" stroke-width="3"/>`+FACE(80)},
+ {name:'小筆',body:`<rect x="36" y="40" width="48" height="82" rx="10" fill="var(--c4)" stroke="var(--ink)" stroke-width="3"/><path d="M36 50 L60 12 L84 50Z" fill="var(--c3)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><path d="M54 22 L60 12 L66 22Z" fill="var(--ink)"/>`+FACE(74)},
+ {name:'飯糰君',body:`<path d="M60 22 C70 22 104 92 98 110 C94 122 26 122 22 110 C16 92 50 22 60 22Z" fill="#fffaf0" stroke="var(--ink)" stroke-width="3"/><rect x="40" y="100" width="40" height="22" rx="4" fill="#2f3b33"/>`+FACE(76)},
+ {name:'星星妹',body:`<path d="M60 14 L74 52 L114 54 L82 78 L94 118 L60 95 L26 118 L38 78 L6 54 L46 52Z" fill="var(--c3)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/>`+FACE(70)},
+ {name:'雲朵朵',body:`<path d="M30 112 C10 112 8 84 26 80 C22 58 46 46 58 58 C66 38 96 42 94 66 C114 66 116 112 92 112Z" fill="#f4f7fb" stroke="var(--ink)" stroke-width="3"/>`+FACE(84)},
+ {name:'小龍寶',body:`<path d="M40 40 L46 26 L54 38 L60 22 L66 38 L74 26 L80 40" fill="var(--c3)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><ellipse cx="60" cy="82" rx="38" ry="44" fill="#9ed49a" stroke="var(--ink)" stroke-width="3"/><ellipse cx="60" cy="98" rx="20" ry="18" fill="#e9f6d8"/>`+FACE(70)},
+ {name:'包子弟',body:`<path d="M20 112 C18 70 40 40 60 40 C80 40 102 70 100 112Z" fill="#fff3e2" stroke="var(--ink)" stroke-width="3"/><path d="M60 40 L54 30 M60 40 L60 28 M60 40 L66 30" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>`+FACE(80)},
+ {name:'貓頭鷹博士',body:`<path d="M30 40 L38 24 L48 38 M90 40 L82 24 L72 38" fill="none" stroke="var(--ink)" stroke-width="3"/><ellipse cx="60" cy="80" rx="38" ry="44" fill="#c8a27a" stroke="var(--ink)" stroke-width="3"/><circle cx="46" cy="70" r="13" fill="#fff" stroke="var(--ink)" stroke-width="2"/><circle cx="74" cy="70" r="13" fill="#fff" stroke="var(--ink)" stroke-width="2"/><circle cx="46" cy="70" r="5" fill="var(--ink)"/><circle cx="74" cy="70" r="5" fill="var(--ink)"/><path d="M55 84 L60 92 L65 84Z" fill="var(--c3)" stroke="var(--ink)" stroke-width="2"/><ellipse cx="60" cy="104" rx="18" ry="12" fill="#ead6bd"/>`},
+ {name:'小地球',body:`<circle cx="60" cy="80" r="42" fill="#8ec8e8" stroke="var(--ink)" stroke-width="3"/><path d="M28 62 q14 8 26 2 t22 6 q8 6 18 2 M30 98 q16 -6 24 2 t20 -2" stroke="#4f9a5f" stroke-width="7" fill="none" stroke-linecap="round"/>`+FACE(74)},
+ {name:'指北針妹',body:`<circle cx="60" cy="80" r="40" fill="#fdf3dc" stroke="var(--ink)" stroke-width="3"/><path d="M60 46 L70 80 L60 114 L50 80Z" fill="var(--c2)" stroke="var(--ink)" stroke-width="2"/><text x="60" y="40" text-anchor="middle" font-size="16" fill="var(--ink)">N</text>`+FACE(72)},
+];
+function dancerSVG(c,cls){
+  const hand=['var(--c2)','var(--c3)','var(--c4)','var(--c1)'][Math.floor(Math.random()*4)];
+  return `<svg class="dancer ${cls}" viewBox="0 0 120 150" aria-hidden="true">
+   <g class="arm al"><path d="M28 80 Q12 64 8 46" stroke="var(--ink)" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="8" cy="44" r="6" fill="${hand}"/></g>
+   <g class="arm ar"><path d="M92 80 Q108 64 112 46" stroke="var(--ink)" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="112" cy="44" r="6" fill="${hand}"/></g>
+   <g class="leg ll"><path d="M48 118 L42 144" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/></g>
+   <g class="leg lr"><path d="M72 118 L78 144" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/></g>
+   ${c.body}</svg>`;
+}
+/* ===== 滿分慶祝：隨機兩位原創角色跳舞＋彩紙 ===== */
+function celebrate(msg){
+  SFX.win();
+  let ov=document.getElementById('party');if(ov)ov.remove();
+  ov=document.createElement('div');ov.id='party';ov.setAttribute('role','dialog');ov.setAttribute('aria-label','滿分慶祝');
+  const conf=Array.from({length:40},(_,i)=>`<i style="left:${Math.random()*100}%;animation-delay:${(Math.random()*1.2).toFixed(2)}s;animation-duration:${(2.2+Math.random()*1.8).toFixed(2)}s;background:var(--c${i%4+1});transform:rotate(${Math.random()*360}deg)"></i>`).join('');
+  const pair=shuffle(CHARS).slice(0,2);
+  ov.innerHTML=`<div class="confetti">${conf}</div>
+   <div class="party-card">
+    <div class="dancers">
+     ${dancerSVG(pair[0],'d1')}
+     <div class="hundred">100</div>
+     ${dancerSVG(pair[1],'d2')}
+    </div>
+    <div class="party-title">${esc(msg||'100 分！')}</div>
+    <p class="party-sub">${pair[0].name}和${pair[1].name}在幫你跳舞慶祝！</p>
+    <button class="btn primary" id="partyClose">好耶，繼續加油</button>
+   </div>`;
+  document.body.appendChild(ov);
+  const close=()=>{ov.classList.add('out');setTimeout(()=>ov.remove(),300)};
+  ov.querySelector('#partyClose').onclick=close;ov.addEventListener('click',e=>{if(e.target===ov)close()});
+  ov.querySelector('#partyClose').focus();
+  setTimeout(()=>{if(document.body.contains(ov))close()},7000);
+}
+
+/* ===== 錯題本 ===== */
+function renderWrong(confirm){
+  const ks=Object.keys(WR).sort((a,b)=>WR[b].n-WR[a].n);
+  $('#wrongArea').innerHTML=ks.length?`<p class="hint">答錯的題目都會記在這裡（只存在這台裝置的瀏覽器裡，換裝置或清掉瀏覽資料就會不見）。上方點「只練錯題」，各關就只出這些題。</p>
+   <div class="tblwrap"><table class="tbl wtbl"><tr><th>關卡</th><th>題目</th><th>錯幾次</th></tr>
+   ${ks.map(k=>`<tr><td>${KINDN[WR[k].kind]||WR[k].kind}</td><td>${esc(WR[k].t||'')}</td><td class="n">${WR[k].n}</td></tr>`).join('')}</table></div>
+   <div class="bar"><button class="btn rose primary" id="goWrong">只練錯題</button><button class="btn" id="clrW">清空錯題本</button></div>
+   ${confirm?`<div class="confirm">確定清空全部錯題紀錄？<button class="btn rose primary" id="clrYes">清空</button><button class="btn" id="clrNo">取消</button></div>`:''}`
+   :`<div class="done-box"><p class="qask">錯題本是空的。</p><p class="hint">在「選擇」「是非」「配對」「分類」「排順序」「圖表」「寫國字」答錯的題目都會自動記到這裡。模擬考不會記，請看交卷後的檢討。</p></div>`;
+  const g=$('#goWrong');if(g)g.onclick=()=>{st.onlyWrong=true;renderScope();document.querySelector('[data-tab="mc"]').click()};
+  const c=$('#clrW');if(c)c.onclick=()=>renderWrong(true);
+  const y=$('#clrYes');if(y)y.onclick=()=>{WR={};save('au4sf-wrong',WR);renderScope();renderWrong()};
+  const n=$('#clrNo');if(n)n.onclick=()=>renderWrong();
+}
+
+renderScope();renderCards();
+</script>
+
+<script>
+/* =====================================================================
+   site-home.js — 📚 小站 button + 全站集點 (site-wide points & badges)
+   Canonical copy: github.com/iam5980/kids-practice/template/site-home.js
+   Version: 2026-11-10（跟讀小教練可選擇孩子集點；🔊 念解釋、🎒 抓寶、🎯 每日任務）
+
+   HOW TO USE: paste this whole file in its own <script> block just before
+   </body> of EVERY page published to kids-practice (English and 中文部,
+   apps, oral pages, listening players). Nothing else is required.
+
+   1) "📚 小站" pill, bottom-left → in-page confirm card → site home.
+   2) SitePoints — points and badges per kid, shared by every app on the
+      site (same origin), shown on the home page 集點卡. Kept only on
+      this device (localStorage).
+        SitePoints.answer(ok)       after every judged answer
+        SitePoints.roundEnd(pct)    when a round / drill ends (0–100)
+        SitePoints.literacy(allOk)  when a 素養題組 is finished
+      Points: correct +10, streak bonus +2 per answer in a row (max +10).
+      No speed bonus — accuracy only.
+   3) Auto-hooks, so older apps need no code changes:
+        中文部 engine:  rtAns(right) → answer;  celebrate() → perfect round
+        AppCore apps:   AppCore calls SitePoints itself (app-core ≥ 2026-10-25)
+   ===================================================================== */
+(function () {
+  "use strict";
+  if (window.__siteHome) return;
+  window.__siteHome = true;
+  var LIVE = "https://iam5980.github.io/kids-practice/";
+  function homeUrl() {
+    var p = location.pathname, i = p.indexOf("/kids-practice/");
+    if (location.protocol.indexOf("http") === 0 && i >= 0) return location.origin + p.slice(0, i) + "/kids-practice/";
+    return LIVE;
+  }
+
+  /* ---------------- SitePoints ---------------- */
+  var BADGES = [
+    { id: "first",   icon: "🌱", name: "第一次答對" },
+    { id: "perfect", icon: "💯", name: "第一次滿分" },
+    { id: "streak10",icon: "🔥", name: "連對 10 題" },
+    { id: "streak20",icon: "🚀", name: "連對 20 題" },
+    { id: "days3",   icon: "📅", name: "連續練習 3 天" },
+    { id: "days7",   icon: "🗓️", name: "連續練習 7 天" },
+    { id: "lit1",    icon: "🧩", name: "第一組素養題全對" },
+    { id: "lit10",   icon: "🎓", name: "素養題達人（10 組全對）" },
+    { id: "p500",    icon: "⭐", name: "累積 500 點" },
+    { id: "p2000",   icon: "🌟", name: "累積 2000 點" },
+    { id: "p5000",   icon: "🏆", name: "累積 5000 點" }
+  ];
+  function kidFromPath() {
+    var m = location.pathname.match(/\/kids-practice\/([a-z0-9]+)\//i);
+    if (m && m[1] === "shadowing") { try { return localStorage.getItem("kp-shadow-kid") || null; } catch (e) { return null; } }
+    return m && m[1] !== "template" ? m[1] : null;
+  }
+  function today() { var d = new Date(); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+  function dayDiff(a, b) { return Math.round((new Date(b) - new Date(a)) / 864e5); }
+  function load(kid) {
+    var d = null;
+    try { d = JSON.parse(localStorage.getItem("kp-points-" + kid) || "null"); } catch (e) {}
+    return d || { points: 0, today: "", todayPts: 0, days: [], badges: {}, correct: 0, perfects: 0, lit: 0, bestStreak: 0 };
+  }
+  function save(kid, d) { try { localStorage.setItem("kp-points-" + kid, JSON.stringify(d)); } catch (e) {} }
+  function dayStreak(days) {
+    if (!days.length) return 0;
+    var s = days.slice().sort(), n = 1;
+    if (dayDiff(s[s.length - 1], today()) > 1) return 0;
+    for (var i = s.length - 1; i > 0; i--) { if (dayDiff(s[i - 1], s[i]) === 1) n++; else break; }
+    return n;
+  }
+  var kid = kidFromPath(), streak = 0;
+  function toast(html, big) {
+    var t = document.createElement("div");
+    t.className = "sp-toast" + (big ? " sp-big" : "");
+    t.innerHTML = html;
+    document.body.appendChild(t);
+    setTimeout(function () { t.classList.add("sp-out"); }, big ? 2200 : 900);
+    setTimeout(function () { t.remove(); }, big ? 2700 : 1300);
+  }
+  function grant(d, id) {
+    if (d.badges[id]) return;
+    d.badges[id] = today();
+    var b = BADGES.filter(function (x) { return x.id === id; })[0];
+    if (b) toast("🏅 獲得徽章<br><b>" + b.icon + " " + b.name + "</b>", true);
+  }
+  function update(fn) {
+    if (!kid) return;
+    var d = load(kid), t = today();
+    if (d.today !== t) { d.today = t; d.todayPts = 0; }
+    if (d.days.indexOf(t) < 0) { d.days.push(t); if (d.days.length > 60) d.days = d.days.slice(-60); }
+    fn(d);
+    var ds = dayStreak(d.days);
+    if (ds >= 3) grant(d, "days3");
+    if (ds >= 7) grant(d, "days7");
+    if (d.points >= 500) grant(d, "p500");
+    if (d.points >= 2000) grant(d, "p2000");
+    if (d.points >= 5000) grant(d, "p5000");
+    save(kid, d);
+  }
+  /* 🎯 每日任務 — reset every day; each one gives +50 once */
+  var QUESTS = [
+    { id: "c20", icon: "✅", name: "今天答對 20 題", goal: 20, f: "correct" },
+    { id: "r3",  icon: "🔁", name: "今天完成 3 輪練習", goal: 3, f: "rounds" },
+    { id: "s10", icon: "🔥", name: "今天連對 10 題", goal: 10, f: "streak" }
+  ];
+  function qDay(d) { var t = today(); if (!d.q || d.q.day !== t) d.q = { day: t, correct: 0, rounds: 0, streak: 0, done: {} }; }
+  function qCheck(d) {
+    QUESTS.forEach(function (q) {
+      if (!d.q.done[q.id] && d.q[q.f] >= q.goal) {
+        d.q.done[q.id] = 1; d.points += 50; d.todayPts += 50;
+        toast("🎯 每日任務完成<br><b>" + q.icon + " " + q.name + "</b><br>＋50 點", true);
+      }
+    });
+  }
+  var SitePoints = {
+    kid: kid,
+    badges: BADGES,
+    read: function (k) { var d = load(k || kid); d.dayStreak = dayStreak(d.days); return d; },
+    answer: function (ok) {
+      update(function (d) {
+        if (ok) {
+          streak++;
+          var pts = 10 + Math.min(10, (streak - 1) * 2);
+          d.points += pts; d.todayPts += pts; d.correct++;
+          qDay(d); d.q.correct++; d.q.streak = Math.max(d.q.streak, streak); qCheck(d);
+          d.bestStreak = Math.max(d.bestStreak, streak);
+          grant(d, "first");
+          if (streak >= 10) grant(d, "streak10");
+          if (streak >= 20) grant(d, "streak20");
+          toast("+" + pts);
+        } else { streak = 0; }
+      });
+    },
+    quests: QUESTS,
+    roundEnd: function (pct, noPerfect) {
+      update(function (d) { qDay(d); d.q.rounds++; qCheck(d); });
+      if (pct >= 100 && !noPerfect) update(function (d) { d.perfects++; grant(d, "perfect"); });
+    },
+    perfect: function () {
+      update(function (d) { d.perfects++; grant(d, "perfect"); });
+    },
+    literacy: function (allOk) {
+      if (allOk) update(function (d) { d.lit++; grant(d, "lit1"); if (d.lit >= 10) grant(d, "lit10"); });
+    }
+  };
+  window.SitePoints = SitePoints;
+
+  /* auto-hooks for the 中文部 engine (global rtAns / celebrate) */
+  if (typeof window.rtAns === "function" && !window.rtAns.__sp) {
+    var oAns = window.rtAns;
+    window.rtAns = function (right) { try { SitePoints.answer(!!right); } catch (e) {} return oAns.apply(this, arguments); };
+    window.rtAns.__sp = true;
+  }
+  if (typeof window.celebrate === "function" && !window.celebrate.__sp) {
+    var oCel = window.celebrate;
+    window.celebrate = function () { try { SitePoints.perfect(); } catch (e) {} return oCel.apply(this, arguments); };
+    window.celebrate.__sp = true;
+  }
+
+
+  /* ---------------- 🔊 念解釋（ReadAloud）----------------
+     Every explanation / definition box on every app gets a small 🔊 button:
+     .fb .ac-fb .ac-exp .ac-ans td.hint .qmean .why .explain .sp-read
+     Chinese text → zh-TW voice; otherwise en-US. */
+  var RA_SEL = ".fb,.ac-fb,.ac-exp,.ac-ans,td.hint,.qmean,.why,.explain,.sp-read";
+  function raText(el) {
+    var c = el.cloneNode(true);
+    Array.prototype.forEach.call(c.querySelectorAll("button,.sp-say,script,style"), function (x) { x.remove(); });
+    return (c.textContent || "").replace(/\s+/g, " ").trim();
+  }
+  function raSpeak(t) {
+    if (!window.speechSynthesis || !t) return;
+    try {
+      speechSynthesis.cancel();
+      var zh = /[一-鿿]/.test(t), u = new SpeechSynthesisUtterance(t);
+      u.lang = zh ? "zh-TW" : "en-US"; u.rate = zh ? 0.95 : 0.9;
+      var vs = speechSynthesis.getVoices() || [], pref = zh ? ["zh-TW", "zh_TW", "zh-HK", "zh"] : ["en-US", "en_US", "en-GB", "en"];
+      for (var i = 0; i < pref.length && !u.voice; i++) for (var j = 0; j < vs.length; j++) if (vs[j].lang && vs[j].lang.indexOf(pref[i]) === 0) { u.voice = vs[j]; break; }
+      speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+  function raScan() {
+    Array.prototype.forEach.call(document.querySelectorAll(RA_SEL), function (el) {
+      if (el.__ra || el.closest("#sh-card,.sd-card,.sp-toast") || (el.parentElement && el.parentElement.closest(RA_SEL))) return;
+      var t = raText(el); if (t.length < 2) return;
+      el.__ra = true;
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "sp-say"; b.textContent = "🔊";
+      b.title = b.ariaLabel = /[一-鿿]/.test(t) ? "念給我聽" : "Read aloud";
+      b.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); raSpeak(raText(el)); }, true);
+      el.appendChild(b);
+    });
+  }
+  var raPending = false;
+  function raQueue() { if (raPending) return; raPending = true; setTimeout(function () { raPending = false; raScan(); }, 120); }
+  if (window.MutationObserver && document.body) new MutationObserver(raQueue).observe(document.body, { childList: true, subtree: true });
+  raQueue();
+
+  /* ---------------- 🎒 抓寶（SiteDex）----------------
+     After a good round, an original creature may appear; tap 🫙 to catch it.
+     Collection per kid in localStorage "kp-dex-<kid>", shown on the home page 圖鑑.
+     SiteDex.maybe(pct, n)  — called from roundEnd and the 中文部 rtEnd hook.
+     All creatures are original designs (no existing characters). */
+  var DEX = [
+    ["ink","墨墨兔",0,"#94a3b8","bunny","drop"],["plane","紙飛鼠",0,"#cbd5e1","round","wing"],["eraser","橡皮熊",0,"#f9a8d4","round","none"],
+    ["chalk","粉筆鴨",0,"#fde68a","none","beak"],["mark","書籤狐",0,"#fb923c","cat","tail"],["pencil","鉛筆刺蝟",0,"#a16207","spike","pencil"],
+    ["ruler","尺子龜",0,"#86efac","none","shell"],["crayon","蠟筆貓",0,"#c4b5fd","cat","stripe"],["glue","膠水蝸牛",0,"#67e8f9","antenna","swirl"],
+    ["clip","迴紋小蛇",0,"#a3e635","none","clip"],["note","便利貼蛙",0,"#facc15","frog","note"],["compass","圓規鳥",0,"#7dd3fc","tuft","beak"],
+    ["zhuyin","注音龍寶",1,"#34d399","horn","wing"],["radical","部首獅",1,"#f59e0b","mane","none"],["idiom","成語鹿",1,"#d97706","antler","spots"],
+    ["rhet","修辭孔雀",1,"#2dd4bf","tuft","fan"],["spell","拼字海豚",1,"#38bdf8","none","fin"],["poem","詩詞鶴",1,"#e2e8f0","tuft","beak"],
+    ["abacus","算盤狸",1,"#b45309","round","stripe"],["globe","地球儀龜",1,"#60a5fa","none","globe"],
+    ["phoenix","金榜鳳凰",2,"#f97316","crest","fire"],["qilin","滿分麒麟",2,"#fbbf24","horn","star"],
+    ["dragon","智慧神龍",2,"#22d3ee","horn","wing"],["uni","星光獨角獸",2,"#f0abfc","uni","star"]
+  ];
+  var RARE = ["一般", "稀有", "傳說"], RARE_C = ["#64748b", "#2563eb", "#d97706"];
+  function dxStage(n) { return n >= 6 ? 3 : n >= 3 ? 2 : 1; }
+  function dxSvg(id, hidden, o) {
+    o = o || {};
+    var d = DEX.filter(function (x) { return x[0] === id; })[0]; if (!d) return "";
+    var c = hidden ? "#94a3b8" : d[3], k = hidden ? "#94a3b8" : "#1f2937", ear = d[4], f = d[5], s = "";
+    var lite = hidden ? "#cbd5e1" : "rgba(255,255,255,.55)";
+    if (ear === "bunny") s += '<ellipse cx="38" cy="22" rx="7" ry="18" fill="' + c + '"/><ellipse cx="62" cy="22" rx="7" ry="18" fill="' + c + '"/>';
+    if (ear === "cat" || ear === "mane") s += '<path d="M26 40 L32 16 L46 32Z M74 40 L68 16 L54 32Z" fill="' + c + '"/>';
+    if (ear === "round") s += '<circle cx="30" cy="30" r="10" fill="' + c + '"/><circle cx="70" cy="30" r="10" fill="' + c + '"/>';
+    if (ear === "horn" || ear === "uni") s += ear === "uni" ? '<path d="M50 4 L45 30 L55 30Z" fill="' + (hidden ? c : "#fde047") + '"/>' : '<path d="M36 30 L32 8 L44 26Z M64 30 L68 8 L56 26Z" fill="' + (hidden ? c : "#fde68a") + '"/>';
+    if (ear === "antler") s += '<path d="M36 30 L28 8 M30 16 L22 12 M64 30 L72 8 M70 16 L78 12" stroke="' + (hidden ? c : "#78350f") + '" stroke-width="4" stroke-linecap="round" fill="none"/>';
+    if (ear === "tuft" || ear === "crest") s += '<path d="M50 10 Q44 22 48 30 Q50 18 56 12 Q52 22 54 30" fill="' + c + '"/>';
+    if (ear === "antenna") s += '<path d="M42 30 L36 10 M58 30 L64 10" stroke="' + c + '" stroke-width="3"/><circle cx="36" cy="10" r="4" fill="' + c + '"/><circle cx="64" cy="10" r="4" fill="' + c + '"/>';
+    if (ear === "frog") s += '<circle cx="34" cy="30" r="11" fill="' + c + '"/><circle cx="66" cy="30" r="11" fill="' + c + '"/>';
+    if (ear === "spike") s += '<path d="M20 50 L14 34 L30 40 L28 22 L42 32 L50 16 L58 32 L72 22 L70 40 L86 34 L80 50Z" fill="' + (hidden ? c : "#78350f") + '"/>';
+    if (ear === "mane") s += '<circle cx="50" cy="56" r="38" fill="' + (hidden ? c : "#b45309") + '"/>';
+    if (f === "wing" || f === "fire") s += '<path d="M16 56 Q2 40 8 70 Q14 66 22 68Z M84 56 Q98 40 92 70 Q86 66 78 68Z" fill="' + (f === "fire" && !hidden ? "#ef4444" : c) + '" opacity=".85"/>';
+    if (f === "tail") s += '<path d="M78 74 Q100 60 92 40 Q86 62 70 70Z" fill="' + c + '"/><path d="M92 40 Q90 50 86 52" stroke="#fff" stroke-width="4"/>';
+    if (f === "fan") s += '<path d="M50 60 L10 30 L22 20 L40 14 L60 14 L78 20 L90 30Z" fill="' + (hidden ? c : "#0d9488") + '" opacity=".7"/>';
+    if (f === "shell" || f === "globe") s += '<ellipse cx="50" cy="70" rx="40" ry="20" fill="' + (hidden ? c : f === "globe" ? "#16a34a" : "#15803d") + '"/>';
+    if (f === "fin") s += '<path d="M50 30 L60 12 L64 34Z" fill="' + c + '"/>';
+    s += '<ellipse cx="50" cy="60" rx="30" ry="28" fill="' + c + '"/><ellipse cx="50" cy="70" rx="17" ry="13" fill="' + lite + '"/>';
+    if (!hidden) {
+      s += '<circle cx="40" cy="55" r="5" fill="' + k + '"/><circle cx="60" cy="55" r="5" fill="' + k + '"/><circle cx="41.5" cy="53.5" r="1.6" fill="#fff"/><circle cx="61.5" cy="53.5" r="1.6" fill="#fff"/>';
+      s += '<ellipse cx="33" cy="64" rx="4" ry="2.5" fill="#fb7185" opacity=".55"/><ellipse cx="67" cy="64" rx="4" ry="2.5" fill="#fb7185" opacity=".55"/>';
+      s += f === "beak" ? '<path d="M44 62 L56 62 L50 69Z" fill="#f59e0b"/>' : '<path d="M45 63 Q50 67 55 63" stroke="' + k + '" stroke-width="2" fill="none" stroke-linecap="round"/>';
+      if (f === "spots") s += '<circle cx="30" cy="70" r="3" fill="#fff"/><circle cx="70" cy="72" r="3" fill="#fff"/><circle cx="64" cy="80" r="2.5" fill="#fff"/>';
+      if (f === "stripe") s += '<path d="M24 52 L32 54 M22 60 L30 61 M76 52 L68 54 M78 60 L70 61" stroke="#1f2937" stroke-width="2" opacity=".5"/>';
+      if (f === "star") s += '<path d="M80 16 L83 24 L91 24 L85 29 L87 37 L80 32 L73 37 L75 29 L69 24 L77 24Z" fill="#fde047"/>';
+      if (f === "pencil") s += '<rect x="74" y="64" width="18" height="6" rx="1" fill="#facc15" transform="rotate(-30 83 67)"/>';
+      if (f === "note") s += '<rect x="70" y="66" width="16" height="16" fill="#fef08a" stroke="#ca8a04"/>';
+      if (f === "drop") s += '<path d="M80 60 Q86 70 80 74 Q74 70 80 60Z" fill="#1e293b"/>';
+      if (f === "swirl") s += '<path d="M74 78 a8 8 0 1 1 8 -8 a5 5 0 1 1 -5 5" stroke="#0e7490" stroke-width="3" fill="none"/>';
+      if (f === "clip") s += '<path d="M76 58 v18 a5 5 0 0 0 10 0 v-14 a3 3 0 0 0 -6 0 v12" stroke="#64748b" stroke-width="2.5" fill="none"/>';
+    }
+    var pre = "", post = "", st = hidden ? 1 : (o.stage || 1);
+    if (!hidden && o.giant) pre += '<circle cx="50" cy="56" r="47" fill="none" stroke="#ef4444" stroke-width="4" stroke-dasharray="6 4" opacity=".8"/><circle cx="50" cy="56" r="44" fill="#fecaca" opacity=".35"/>';
+    if (st >= 3) pre += '<circle cx="50" cy="56" r="45" fill="#fde68a" opacity=".45"/>';
+    if (st >= 2) post += '<path d="M24 74 Q50 86 76 74 L74 80 Q50 92 26 80Z" fill="#ef4444"/><path d="M66 80 L72 94 L62 88Z" fill="#dc2626"/>';
+    if (st >= 3) post += '<path d="M36 26 L40 14 L46 22 L50 10 L54 22 L60 14 L64 26Z" fill="#facc15" stroke="#ca8a04" stroke-width="1.5"/>';
+    if (!hidden && o.shiny) post += '<path d="M12 20 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3Z M88 70 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2Z" fill="#fde047"/>';
+    var g = !hidden && o.shiny ? '<g style="filter:hue-rotate(150deg) saturate(1.5) brightness(1.05)">' + s + "</g>" : s;
+    var tr = !hidden && o.giant ? ' transform="translate(50 56) scale(1.12) translate(-50 -56)"' : "";
+    return '<svg viewBox="0 0 100 100" width="100%" height="100%" aria-hidden="true">' + pre + "<g" + tr + ">" + g + post + "</g></svg>";
+  }
+  function dxLoad(k) { try { return JSON.parse(localStorage.getItem("kp-dex-" + k) || "{}") || {}; } catch (e) { return {}; } }
+  function dxSave(k, d) { try { localStorage.setItem("kp-dex-" + k, JSON.stringify(d)); } catch (e) {} }
+  var dxLast = 0;
+  function dxPick(pct) {
+    var r = Math.random(), tier = 0;
+    if (pct >= 100 && r < 0.12) tier = 2; else if (pct >= 90 && r < 0.4) tier = 1;
+    var pool = DEX.filter(function (x) { return x[2] === tier; });
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  function dxEncounter(pct) {
+    if (!kid || !document.body || document.querySelector(".sd-mask")) return;
+    var d = dxPick(pct), dx0 = dxLoad(kid), rec0 = dx0[d[0]], st0 = rec0 ? dxStage(rec0.n) : 1;
+    var shiny = Math.random() < 1 / 15, giant = pct >= 100 && st0 >= 2 && Math.random() < 0.3;
+    var tries = 3, rate = ([0.55, 0.35, 0.2][d[2]] + (pct >= 100 ? 0.1 : 0)) * (giant ? 0.6 : 1);
+    var label = (shiny ? "✨閃亮 " : "") + d[1];
+    var m = document.createElement("div"); m.className = "sd-mask";
+    m.innerHTML = '<div class="sd-card" role="dialog" aria-modal="true"><p class="sd-tag" style="color:' + RARE_C[d[2]] + '">✨ ' + RARE[d[2]] + (giant ? "・🌟 巨大化" : "") + (shiny ? "・閃亮" : "") + '</p>' +
+      '<h3>' + (giant ? "巨大化的" : "野生的") + "「" + label + '」出現了！</h3><div class="sd-pic sd-bob">' + dxSvg(d[0], false, { stage: st0, shiny: shiny, giant: giant }) + '</div><p class="sd-msg">' + (giant ? "巨大化的夥伴比較難抓！" : "答得好！") + '快丟星星瓶抓住牠（還有 <b>3</b> 次機會）</p>' +
+      '<button type="button" class="sd-throw">🫙 丟星星瓶</button><button type="button" class="sd-skip">先不要</button></div>';
+    document.body.appendChild(m);
+    var pic = m.querySelector(".sd-pic"), msg = m.querySelector(".sd-msg"), th = m.querySelector(".sd-throw"), sk = m.querySelector(".sd-skip");
+    function close() { m.remove(); }
+    sk.onclick = close;
+    th.onclick = function () {
+      th.disabled = true; pic.className = "sd-pic sd-shake";
+      setTimeout(function () {
+        tries--;
+        if (Math.random() < rate) {
+          var dx = dxLoad(kid), r = dx[d[0]] || { n: 0, d: today(), s: 0, g: 0 }, first = !dx[d[0]], before = dxStage(r.n);
+          r.n++; if (shiny) r.s = (r.s || 0) + 1; if (giant) r.g = (r.g || 0) + 1; dx[d[0]] = r; dxSave(kid, dx);
+          var after = dxStage(r.n), have = DEX.filter(function (x) { return dx[x[0]]; }).length;
+          var evo = after > before;
+          pic.innerHTML = dxSvg(d[0], false, { stage: after, shiny: shiny, giant: giant });
+          pic.className = "sd-pic sd-got";
+          msg.innerHTML = "🎉 抓到了！" + (first ? "新夥伴加入圖鑑" : "又抓到一隻（第 " + r.n + " 隻）") +
+            (evo ? "<br>✨ <b>" + d[1] + " 進化了！</b>現在是 " + "★★★".slice(0, after) + (after === 3 ? "（完全體）" : "") : (after < 3 ? "<br>再抓 " + ((after === 1 ? 3 : 6) - r.n) + " 隻就會進化" : "")) +
+            (shiny ? "<br>✨ 閃亮版收集 +1" : "") + (giant ? "<br>🌟 巨大化收集 +1" : "") +
+            "<br>圖鑑 <b>" + have + " / " + DEX.length + "</b>（回小站可以看）";
+          th.remove(); sk.textContent = "好耶，繼續練習";
+        } else if (tries > 0) {
+          pic.className = "sd-pic sd-bob"; th.disabled = false;
+          msg.innerHTML = "差一點！牠跳出來了，再試一次（還有 <b>" + tries + "</b> 次機會）";
+        } else {
+          pic.className = "sd-pic sd-run"; th.remove(); sk.textContent = "下次再來";
+          msg.innerHTML = "牠跑走了… 下一輪答得好，還有機會再遇到！";
+        }
+      }, 900);
+    };
+  }
+  var SiteDex = {
+    list: DEX, rarity: RARE, svg: dxSvg, stage: dxStage, read: function (k) { return dxLoad(k || kid); },
+    maybe: function (pct, n) {
+      if (!kid || n === 0 || pct < 70) return;
+      var now = Date.now(); if (now - dxLast < 5000) return; dxLast = now;
+      var p = pct >= 100 ? 1 : pct >= 90 ? 0.6 : 0.35;
+      if (Math.random() < p) setTimeout(function () { dxEncounter(pct); }, 1800);
+    }
+  };
+  window.SiteDex = SiteDex;
+  var oRE = SitePoints.roundEnd;
+  SitePoints.roundEnd = function (pct, noPerfect, n) { oRE(pct, noPerfect); try { SiteDex.maybe(pct, n); } catch (e) {} };
+  if (typeof window.rtEnd === "function" && !window.rtEnd.__sd) {
+    var oEnd = window.rtEnd;
+    window.rtEnd = function () {
+      try { var r = window.rt || (typeof rt !== "undefined" ? rt : null); if (r && !r.done && r.n >= 1) SitePoints.roundEnd(Math.round(r.ok / r.n * 100), true, r.n >= 5 ? r.n : 0); } catch (e) {}
+      return oEnd.apply(this, arguments);
+    };
+    window.rtEnd.__sd = true;
+  }
+
+  /* ---------------- styles ---------------- */
+  var css = document.createElement("style");
+  css.textContent =
+    "#sh-btn{position:fixed;left:max(12px,env(safe-area-inset-left));bottom:max(12px,env(safe-area-inset-bottom));z-index:9000;" +
+    "height:44px;padding:0 14px 0 10px;border-radius:999px;border:2px solid rgba(255,255,255,.9);background:#334155;color:#fff;font:700 16px/1 -apple-system,'PingFang TC','Noto Sans TC',sans-serif;" +
+    "box-shadow:0 4px 14px rgba(0,0,0,.28);cursor:pointer;opacity:.9;touch-action:manipulation;white-space:nowrap}" +
+    "#sh-btn:active{transform:scale(.94)}" +
+    "#sh-mask{position:fixed;inset:0;z-index:9001;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px}" +
+    "#sh-card{background:#fff;color:#0f172a;border-radius:18px;padding:20px 18px;max-width:340px;width:100%;text-align:center;" +
+    "font:17px/1.5 -apple-system,'PingFang TC','Noto Sans TC',sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.3)}" +
+    "#sh-card h3{margin:0 0 6px;font-size:20px}#sh-card p{margin:0 0 16px;color:#475569;font-size:15px}" +
+    "#sh-card button{font:inherit;min-height:48px;border-radius:12px;border:0;padding:10px 16px;margin:4px;cursor:pointer}" +
+    "#sh-go{background:#0284c7;color:#fff;font-weight:700}#sh-stay{background:#e2e8f0;color:#0f172a}" +
+    "@media (prefers-color-scheme:dark){#sh-card{background:#1e293b;color:#e2e8f0}#sh-card p{color:#94a3b8}#sh-stay{background:#334155;color:#e2e8f0}}" +
+    ".sp-say{font:14px/1 sans-serif;border:1px solid rgba(100,116,139,.45);background:transparent;border-radius:999px;padding:3px 7px;margin-left:6px;cursor:pointer;vertical-align:middle;color:inherit}" +
+    ".sd-mask{position:fixed;inset:0;z-index:9003;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px}" +
+    ".sd-card{background:#fff;color:#0f172a;border-radius:20px;padding:18px;max-width:340px;width:100%;text-align:center;font:16px/1.5 -apple-system,'PingFang TC','Noto Sans TC',sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.35)}" +
+    ".sd-card h3{margin:0 0 4px;font-size:20px}.sd-tag{margin:0;font-weight:800}.sd-msg{color:#475569;margin:6px 0 12px}" +
+    ".sd-pic{width:150px;height:150px;margin:6px auto}.sd-bob{animation:sdb 1.1s ease-in-out infinite}.sd-shake{animation:sds .3s linear 3}.sd-got{animation:sdg .6s ease-out}.sd-run{animation:sdr .8s ease-in forwards}" +
+    "@keyframes sdb{50%{transform:translateY(-10px)}}@keyframes sds{25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}@keyframes sdg{0%{transform:scale(.6)}70%{transform:scale(1.15)}}@keyframes sdr{to{transform:translateX(220px);opacity:0}}" +
+    ".sd-card button{font:inherit;min-height:48px;border-radius:12px;border:0;padding:10px 16px;margin:4px;cursor:pointer}.sd-throw{background:#7c3aed;color:#fff;font-weight:800}.sd-skip{background:#e2e8f0;color:#0f172a}" +
+    "@media (prefers-color-scheme:dark){.sd-card{background:#1e293b;color:#e2e8f0}.sd-msg{color:#94a3b8}.sd-skip{background:#334155;color:#e2e8f0}}" +
+    "body{padding-bottom:max(76px,calc(64px + env(safe-area-inset-bottom)))!important}" +
+    ".sp-toast{position:fixed;left:max(84px,calc(72px + env(safe-area-inset-left)));bottom:max(18px,calc(6px + env(safe-area-inset-bottom)));z-index:9002;" +
+    "background:#f59e0b;color:#1f2937;font:800 16px/1.3 -apple-system,'PingFang TC',sans-serif;padding:8px 12px;border-radius:999px;" +
+    "box-shadow:0 4px 12px rgba(0,0,0,.25);pointer-events:none;transition:opacity .4s,transform .4s}" +
+    ".sp-toast.sp-big{left:50%;bottom:auto;top:30%;transform:translateX(-50%);text-align:center;font-size:18px;padding:14px 22px;border-radius:18px}" +
+    ".sp-toast.sp-out{opacity:0;transform:translateY(-14px)}.sp-toast.sp-big.sp-out{transform:translate(-50%,-14px)}";
+  document.head.appendChild(css);
+
+  function qHtml() {
+    var d = load(kid); qDay(d);
+    return '<p style="text-align:left;font-size:14px;margin:-8px 0 14px">🎯 今天的任務：<br>' + QUESTS.map(function (q) {
+      var v = Math.min(q.goal, d.q[q.f] || 0); return (d.q.done[q.id] ? "✅ " : "⬜ ") + q.name + "（" + v + "/" + q.goal + "）";
+    }).join("<br>") + "</p>";
+  }
+  /* ---------------- 📚 小站 button ---------------- */
+  if (!document.body || window.__siteHomeNoBtn) return;
+  var b = document.createElement("button");
+  b.id = "sh-btn"; b.type = "button";
+  b.setAttribute("aria-label", "回到練習小站"); b.title = "回到練習小站";
+  b.textContent = "📚 小站";
+  b.addEventListener("click", function () {
+    if (document.getElementById("sh-mask")) return;
+    var m = document.createElement("div"); m.id = "sh-mask";
+    var pts = kid ? "<p>目前集點：⭐ " + load(kid).points + " 點・🎒 圖鑑 " + DEX.filter(function (x) { return dxLoad(kid)[x[0]]; }).length + " / " + DEX.length + "</p>" + qHtml() : "";
+    m.innerHTML = '<div id="sh-card" role="dialog" aria-modal="true"><h3>📚 回到練習小站？</h3>' +
+      '<p>這一輪的作答不會保留（點數和最高分紀錄會留著）。</p>' + pts +
+      '<button id="sh-go" type="button">回到練習小站</button><button id="sh-stay" type="button">繼續練習</button></div>';
+    document.body.appendChild(m);
+    function close() { m.remove(); }
+    m.addEventListener("click", function (e) { if (e.target === m) close(); });
+    document.getElementById("sh-stay").addEventListener("click", close);
+    document.getElementById("sh-go").addEventListener("click", function () {
+      try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
+      location.href = homeUrl();
+    });
+    document.getElementById("sh-go").focus();
+  });
+  document.body.appendChild(b);
+})();
+
+</script>
+</body>
+</html>
