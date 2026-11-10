@@ -1,7 +1,7 @@
 /* =====================================================================
    site-home.js — 📚 小站 button + 全站集點 (site-wide points & badges)
    Canonical copy: github.com/iam5980/kids-practice/template/site-home.js
-   Version: 2026-11-08c（🔊 念解釋、🎒 抓寶＋進化／閃亮／巨大化、🎯 每日任務）
+   Version: 2026-11-10（跟讀小教練可選擇孩子集點；🔊 念解釋、🎒 抓寶、🎯 每日任務）
 
    HOW TO USE: paste this whole file in its own <script> block just before
    </body> of EVERY page published to kids-practice (English and 中文部,
@@ -47,7 +47,8 @@
   ];
   function kidFromPath() {
     var m = location.pathname.match(/\/kids-practice\/([a-z0-9]+)\//i);
-    return m && m[1] !== "template" && m[1] !== "shadowing" ? m[1] : null;
+    if (m && m[1] === "shadowing") { try { return localStorage.getItem("kp-shadow-kid") || null; } catch (e) { return null; } }
+    return m && m[1] !== "template" ? m[1] : null;
   }
   function today() { var d = new Date(); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
   function dayDiff(a, b) { return Math.round((new Date(b) - new Date(a)) / 864e5); }
