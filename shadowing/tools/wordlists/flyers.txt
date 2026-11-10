@@ -1,0 +1,511 @@
+a.m. (for time)
+across
+act
+actor
+actually
+adventure
+after
+ago
+agree
+air
+airport
+alone
+already
+also
+amazing
+ambulance
+anyone
+anything
+anywhere
+appear
+April
+arrive
+art
+artist
+as
+as ... as
+astronaut
+at the moment
+August
+autumn (US fall)
+away
+backpack (UK rucksack)
+bandage
+bank
+beetle
+before
+begin
+believe
+belt
+Betty
+bicycle
+bin
+biscuit (US cookie)
+bit
+bored
+borrow
+bracelet
+break
+bridge
+broken
+brush
+burn
+business
+businessman/woman
+butter
+butterfly
+by myself
+by yourself
+calendar
+camel
+camp
+card
+cartoon
+castle
+cave
+century
+cereal
+channel
+chat
+cheap
+chemist(’s)
+chess
+chopsticks
+club
+collect
+college
+comb
+competition
+concert
+conversation
+cooker
+cookie (UK biscuit)
+corner
+costume
+could (for possibility)
+creature
+crown
+cushion
+cut
+cycle
+dark
+date (as in time)
+David
+dear (as in Dear Harry)
+December
+decide
+deep
+delicious
+desert
+design
+designer
+diary
+dictionary
+dinosaur
+disappear
+drum
+during
+each
+eagle
+early
+Earth
+east
+elbow
+else
+Emma
+empty
+end
+engine
+engineer
+enormous
+enough
+enter (a competition)
+entrance
+envelope
+environment
+ever
+everywhere
+excellent
+excited
+exit
+expensive
+explain
+explore
+extinct
+factory
+fall (UK autumn)
+fall over
+far
+fast
+February
+feel
+festival
+fetch
+a few
+file (as in open and close a file)
+find out
+finger
+finish
+fire
+fire engine (US fire truck)
+fire fighter
+fire station
+flag
+flashlight (UK torch)
+flour
+fog
+foggy
+follow
+for
+forget
+fork
+Frank
+fridge
+friendly
+frightening
+front
+full
+fur
+furry
+future
+gate
+geography
+George
+get to
+glass
+glove
+glue
+go away
+go out
+gold
+golf
+group
+guess
+gym
+half
+happen
+hard
+Harry
+hate
+hear
+heavy
+Helen
+high
+hill
+history
+hole
+Holly
+honey
+hope
+horrible
+hotel
+hour
+how long
+hurry
+husband
+if
+if you want
+important
+improve
+in a minute
+information
+insect
+instead
+instrument
+interested
+interesting
+invent
+invitation
+jam
+January
+job
+join (a club)
+journalist
+journey
+July
+June
+just
+Katy
+keep
+key
+kilometre (US kilometer)
+kind
+king
+knee
+knife
+land
+language
+large
+late
+later
+lazy
+leave
+left (as in direction)
+let
+letter (as in mail)
+lie (as in lie down)
+lift (ride)
+lift
+light
+a little
+London
+look after
+look like
+lovely
+low
+lucky
+magazine
+make sure
+manager
+March
+married
+match (football)
+maths (US math)
+May
+may
+meal
+mechanic
+medicine
+meet
+meeting
+member
+metal
+Michael
+midday
+middle
+midnight
+might
+million
+mind
+minute
+missing
+mix
+money
+month
+motorway
+much
+museum
+necklace
+nest
+news
+newspaper
+next
+no problem
+noisy
+no-one
+north
+November
+nowhere
+ocean
+October
+octopus
+of course
+office
+Oliver
+olives
+once
+online
+other
+oven
+over
+p.m. (for time)
+pajamas (UK pyjamas)
+passenger
+past
+path
+pepper
+perhaps
+photographer
+piece
+pilot
+pizza
+planet
+plastic
+platform
+pleased
+pocket
+police officer
+police station
+pond
+poor
+pop music
+popular
+post
+post office
+postcard
+prefer
+prepare
+prize
+problem
+programme (US program)
+project
+pull
+push
+puzzle
+pyjamas (US pajamas)
+pyramid
+quarter
+queen
+quite
+quiz
+race
+racing (car; bike)
+railway
+ready
+remember
+repair
+repeat
+restaurant
+rich
+Richard
+right
+right (as in direction)
+ring
+Robert
+rock music
+rocket
+rucksack (US backpack)
+salt
+same
+Sarah
+save
+science
+scissors
+score
+screen
+search
+secret
+sell
+September
+several
+shampoo
+shelf
+should
+silver
+since
+singer
+ski
+skyscraper
+sledge
+smell
+snack
+snowball
+snowboard
+snowboarding
+snowman
+so
+soap
+soft
+Sophia
+sore
+sound
+south
+space
+spaceship
+speak
+special
+spend
+spoon
+spot
+spotted
+spring
+stadium
+stage (theatre)
+stamp
+stay
+step
+still
+stone
+storm
+straight on
+strange
+strawberry
+stream
+stripe
+striped
+student
+study
+subject
+such
+suddenly
+sugar
+suitcase
+summer
+sunglasses
+sure
+surname
+surprise
+swan
+swing
+take (as in time e.g. it takes 20 minutes)
+taste
+taxi
+team
+telephone
+tent
+thank
+theatre (US theater)
+thousand
+through
+tidy
+time
+timetable
+toe
+together
+tomorrow
+tonight
+torch (US flashlight)
+tortoise
+touch
+tour
+traffic
+trainers
+tune
+turn
+turn off
+turn on
+twice
+tyre (US tire)
+umbrella
+unfriendly
+unhappy
+uniform
+university
+unkind
+untidy
+until
+unusual
+use
+usually
+view
+violin
+visit
+volleyball
+waiter
+warm
+way
+west
+wheel
+while
+whisper
+whistle
+wife
+wifi
+wild
+will
+William
+win
+wing
+winner
+winter
+wish
+without
+wonderful
+wood
+wool
+worried
+x-ray
+yet
+yoghurt
+you're welcome
+zero
