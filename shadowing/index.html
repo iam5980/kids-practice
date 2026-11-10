@@ -64,8 +64,8 @@ textarea{font-family:inherit;margin:6px 0 14px}
 .cefr button{flex:0 0 auto;padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:.9rem}
 .cefr button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .cefr button small{opacity:.75;margin-left:4px;font-size:.75rem}
-.modes{display:flex;gap:6px;margin-top:10px}
-.modes button{flex:1;padding:9px 4px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:.95rem}
+.modes{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.modes button{flex:1 1 30%;padding:9px 4px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:.95rem}
 .modes button.on{border-color:var(--accent);outline:2px solid var(--accent);font-weight:700}
 .zh{text-align:center;color:var(--muted);font-size:1.05rem;margin:-8px 0 12px;min-height:1.2em}
 .word.zhq{font-family:inherit;font-size:1.6rem;line-height:1.5}
@@ -74,6 +74,16 @@ textarea{font-family:inherit;margin:6px 0 14px}
 .opts button{padding:14px 8px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:1.05rem;min-height:3.4em}
 .opts button.good{background:var(--goodbg);border-color:var(--good);color:var(--good);font-weight:700}
 .opts button.bad{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
+.opts.en button{font-size:1.25rem;font-weight:600;letter-spacing:.3px}
+.spell{grid-column:1/-1;display:flex;flex-direction:column;gap:12px;align-items:center}
+.slots{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;min-height:52px}
+.slots span{min-width:38px;height:48px;border-bottom:3px solid var(--line);display:grid;place-items:center;font-size:1.6rem;font-weight:700;color:var(--ink)}
+.slots span.fix{border-bottom-color:transparent;color:var(--muted)}
+.slots.good span{border-bottom-color:var(--good);color:var(--good)}.slots.bad span{border-bottom-color:var(--bad);color:var(--bad)}
+.tiles{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.tiles button{min-width:48px;min-height:52px;padding:0 10px;font-size:1.5rem;font-weight:700;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.tiles button:disabled{opacity:.25}
+.spell .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .tally{text-align:center;color:var(--muted);font-size:.9rem;margin-top:8px;min-height:1.1em}
 .lvlnote{color:var(--muted);font-size:.85rem;margin-top:6px;min-height:1em}
 .notice{background:var(--warnbg);color:var(--warn);padding:12px;border-radius:12px;margin-top:8px}
@@ -150,7 +160,7 @@ label{font-weight:600}
     <div id="lvlChips" class="lvlchips"></div><select id="lvlSel" class="hidden" aria-hidden="true"></select>
     <div class="sels" style="margin-top:10px"><select id="packSel" aria-label="分包"></select></div>
     <div id="lvlNote" class="lvlnote"></div>
-    <div class="modes" id="modeBar"><button data-mode="say">🗣 跟讀發音</button><button data-mode="e2c">英翻中</button><button data-mode="c2e">中翻英（用說的）</button></div>
+    <div class="modes" id="modeBar"><button data-mode="say">🗣 跟讀發音</button><button data-mode="e2c">英翻中</button><button data-mode="c2e">中翻英（用說的）</button><button data-mode="lis">🎧 聽音選字</button><button data-mode="c2p">中翻英（點選）</button><button data-mode="spell">🔤 拼字方塊</button></div>
     <div class="card">
       <div class="meta"><span id="wPos"></span>
         <span><label class="toggle" id="zhToggle"><input type="checkbox" id="wShowZh" checked> 顯示中文</label>
@@ -200,6 +210,42 @@ label{font-weight:600}
 
 <script src="words.js"></script>
 <script>
+/* ===== KPDeal：選擇題正確答案位置平均分散（練習小站共用，版本 2026-11-10b）=====
+   規則：每個位置（A/B/C/D…）出現次數一樣多，且正確答案不會連續 3 題在同一位置。
+   用法（整段貼進 App 的 <script>，放在使用它的程式之前）：
+     KPDeal.place(options, correct)   → 回傳新陣列：錯誤選項打亂，正確選項放到平均分散的位置
+                                         correct 可以是「值」或「判斷函式 (item,index)=>boolean」
+     KPDeal.pos(n)                    → 只要位置編號（0..n-1）時使用
+     KPDeal.shuffle(arr)              → 一般打亂（回傳新陣列）
+   注意：凡是「一題 + 數個選項 + 一個正解」的地方都要用 place，不要再用 shuffle 決定選項順序。
+*/
+var KPDeal=(function(){
+  var decks={},last=[];
+  function sh(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+  function runOK(s){for(var i=2;i<s.length;i++)if(s[i]===s[i-1]&&s[i]===s[i-2])return false;return true}
+  function pos(n){
+    if(!(n>1))return 0;
+    var d=decks[n];
+    if(!d||!d.length){var base=[],k=0;for(var r=0;r<2;r++)for(var i=0;i<n;i++)base.push(i);
+      do{d=sh(base);k++}while(!runOK(last.slice(-2).concat(d))&&k<300);decks[n]=d}
+    var p=d.shift();
+    if(last.length>=2&&last[last.length-1]===p&&last[last.length-2]===p){
+      for(var i=0;i<d.length;i++)if(d[i]!==p){var q=d[i];d[i]=p;p=q;break}
+      if(last[last.length-1]===p&&last[last.length-2]===p){var alt=(p+1+Math.floor(Math.random()*(n-1)))%n;d.push(p);p=alt}}
+    last.push(p);if(last.length>4)last.shift();
+    return p;
+  }
+  function place(arr,correct){
+    var f=typeof correct==='function'?correct:function(x){return x===correct};
+    var ci=-1;for(var i=0;i<arr.length;i++)if(f(arr[i],i)){ci=i;break}
+    if(ci<0)return sh(arr);
+    var c=arr[ci],w=sh(arr.filter(function(_,i){return i!==ci}));
+    w.splice(pos(arr.length),0,c);
+    return w;
+  }
+  return {place:place,pos:pos,shuffle:sh};
+})();
+
 /* ===== 內建題庫：依全民英檢／劍橋英檢程度與主題挑選常考字，例句為自編。新增一組照格式加入即可（level 決定選單分類） ===== */
 const BANK = [
   {"level": "劍橋 Pre A1 Starters", "title": "劍橋 Pre A1 Starters｜Animals & Colours", "sentences": ["The cat is sleeping on the chair.", "I can see a big blue bird.", "My dog likes to play in the garden.", "The frog is small and green.", "How many ducks are there?"], "words": ["cat", "dog", "fish", "bird", "horse", "cow", "duck", "sheep", "frog", "monkey", "elephant", "giraffe", "tiger", "snake", "lizard", "red", "blue", "green", "yellow", "purple", "orange", "brown"]},
@@ -474,8 +520,24 @@ $("sResult").addEventListener("click",async e=>{
 
 /* ===== 單字練習：跟讀發音／英翻中／中翻英 ===== */
 let wAudioURL=null,wMode="say";try{wMode=localStorage.getItem("ha_wmode")||"say";}catch(e){}
-if(!["say","e2c","c2e"].includes(wMode))wMode="say";
-const optCache={};
+if(!["say","e2c","c2e","lis","c2p","spell"].includes(wMode))wMode="say";
+const optCache={},spellCache={};
+const CHOICE=new Set(["e2c","lis","c2p","spell"]);
+const isCh=m=>CHOICE.has(m||wMode);
+const MODE_NAME={say:"跟讀發音",e2c:"英翻中",c2e:"中翻英",lis:"聽音選字",c2p:"中翻英（點選）",spell:"拼字方塊"};
+function enPool(){if(wSrc.k==="L"&&WB[wSrc.i])return WB[wSrc.i].words;return curWords();}
+function lev(a,b){const m=a.length,n=b.length,d=Array.from({length:m+1},(_,i)=>[i]);for(let j=1;j<=n;j++)d[0][j]=j;
+  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[m][n];}
+function enDistractors(w,k){
+  const lw=w.toLowerCase();
+  const pool=[...new Set(enPool().filter(x=>x&&x.toLowerCase()!==lw))];
+  const near=pool.map(x=>({x,d:lev(lw,x.toLowerCase())+(x[0].toLowerCase()===lw[0]?0:1.5)+Math.abs(x.length-w.length)*0.3}))
+    .sort((a,b)=>a.d-b.d).slice(0,8).map(o=>o.x);
+  const picks=KPDeal.shuffle(near).slice(0,2);
+  const rest=KPDeal.shuffle(pool.filter(x=>!picks.includes(x)));
+  while(picks.length<k&&rest.length)picks.push(rest.shift());
+  return picks;}
+let lastAuto="";
 function curZh(){if(wSrc.k==="L"&&WB[wSrc.i]&&WB[wSrc.i].zh)return WB[wSrc.i].zh.slice(wSrc.p*PACK,(wSrc.p+1)*PACK);return curWords().map(()=>"");}
 function zhPool(){if(wSrc.k==="L"&&WB[wSrc.i]&&WB[wSrc.i].zh)return WB[wSrc.i].zh;return curZh();}
 const noLatin=z=>z.replace(/（[^）]*[A-Za-z][^）]*）/g,"").replace(/\([^)]*[A-Za-z][^)]*\)/g,"").replace(/\s{2,}/g," ").trim();
@@ -492,51 +554,93 @@ function setMode(m){wMode=m;try{localStorage.setItem("ha_wmode",m);}catch(e){}
   document.querySelectorAll("#modeBar button").forEach(b=>b.classList.toggle("on",b.dataset.mode===m));if(activeRec)activeRec.stop();renderWord();}
 $("modeBar").onclick=e=>{const b=e.target.closest("button");if(b)setMode(b.dataset.mode);};
 $("wShowZh").onchange=()=>renderWord();
-function tally(st){const v=Object.values(st).filter(r=>wMode==="e2c"?r.first!=null:r.tries.length);if(!v.length)return "";
-  if(wMode==="e2c"){const ok=v.filter(r=>r.first===100).length;return `這一包：答了 ${v.length} 題，一次就答對 ${ok} 題`;}
+function tally(st){const v=Object.values(st).filter(r=>isCh()?r.first!=null:r.tries.length);if(!v.length)return "";
+  if(isCh()){const ok=v.filter(r=>r.first===100).length;return `這一包：答了 ${v.length} 題，一次就答對 ${ok} 題`;}
   const ok=v.filter(r=>r.best>=100).length;return `這一包：練了 ${v.length} 個，${ok} 個拿到 100 分`;}
 function renderWord(ev){
   const W=curWords(),Z=curZh();const k=mKey();const st=wStat[k]||(wStat[k]={});
-  const done=r=>r&&(wMode==="e2c"?r.first!=null:r.tries.length>0);
-  const say_=wMode==="say",e2c=wMode==="e2c",c2e=wMode==="c2e";
+  const done=r=>r&&(isCh()?r.first!=null:r.tries.length>0);
+  const say_=wMode==="say",e2c=isCh(),c2e=wMode==="c2e",lis=wMode==="lis",c2p=wMode==="c2p",spl=wMode==="spell";
   document.querySelectorAll("#modeBar button").forEach(b=>b.classList.toggle("on",b.dataset.mode===wMode));
   if(!W.length){$("wPos").textContent="這組沒有單字";$("wText").textContent="";$("wList").innerHTML="";$("wOpts").innerHTML="";return;}
   if(wIdx>=W.length)wIdx=0;const w=W[wIdx],z=Z[wIdx]||"";const rec=st[w];
   $("wPos").textContent=(wSrc.k==="L"?`第 ${wSrc.p+1}/${packCount()} 包・`:"")+`第 ${wIdx+1} / ${W.length} 個`;
-  $("wText").textContent=c2e?(noLatin(z)||"（這個字暫無中文，請念："+w+"）"):w;
-  $("wText").classList.toggle("zhq",c2e);
+  const answered=rec&&rec.pick!=null;
+  $("wText").textContent=c2e?(noLatin(z)||"（這個字暫無中文，請念："+w+"）"):c2p||spl?(noLatin(z)||"（這個字暫無中文）"):lis?(answered?w:"🎧 聽一聽，選出聽到的字"):w;
+  $("wText").classList.toggle("zhq",c2e||c2p||spl||(lis&&!answered));
   $("zhToggle").classList.toggle("hidden",!say_);
   $("wZh").textContent=say_&&$("wShowZh").checked?z:"";
   $("wMic").classList.toggle("hidden",e2c);$("wOpts").classList.toggle("hidden",!e2c);
-  $("wSlow").classList.toggle("hidden",c2e&&!(rec&&rec.tries.length));
-  $("wSay").textContent=c2e?(rec&&rec.tries.length?"🔊 聽答案":"👀 看答案"):"🔊 示範";
+  $("wSlow").classList.toggle("hidden",(c2e&&!(rec&&rec.tries.length))||(c2p&&!answered));
+  $("wSay").classList.toggle("hidden",c2p&&!answered);
+  $("wSay").textContent=c2e?(rec&&rec.tries.length?"🔊 聽答案":"👀 看答案"):lis||spl?"🔊 再聽一次":"🔊 示範";
   $("wMic").textContent=say_?(rec&&rec.tries.length?(rec.best>=100?"▶ 再挑戰一次":"🔁 再念一次"):"▶ 先聽再念"):(rec&&rec.tries.length?"🔁 再說一次":"🎤 說出英文");
   $("wAns").innerHTML=c2e&&rec&&(rec.tries.length||rec.peek)?`答案：<b>${esc(w)}</b>`:"";
   if(ev){$("wResult").innerHTML=`<div class="big ${lvl(ev.score)}">${ev.score}<small> 分</small></div><div>${wCheer(ev.score)}</div>`;$("wStatus").textContent="我聽到：「"+ev.heard+"」";}
   else if(!e2c){$("wResult").innerHTML="";$("wStatus").textContent="";}
-  if(e2c)buildOpts(w,z,st,ev);
+  $("wOpts").classList.toggle("en",lis||c2p);
+  if(spl)buildSpell(w,z,st);else if(e2c)buildOpts(w,z,st,ev);
+  const ak=mKey()+"#"+w+"#"+wIdx;if((lis||spl)&&!answered&&lastAuto!==ak){lastAuto=ak;setTimeout(()=>{if(mKey()+"#"+curWords()[wIdx]+"#"+wIdx===ak)say(w);},250);}
   $("wHist").textContent=!e2c&&rec&&rec.tries.length?`練習紀錄：${rec.tries.slice(-8).join(" → ")}　最高 ${rec.best} 分`:"";
   $("wPlay").classList.toggle("hidden",!(ev&&wAudioURL));
   $("wTally").textContent=tally(st);
   $("wPrev").disabled=wIdx===0&&wSrc.p===0;$("wNext").disabled=wIdx>=W.length-1&&wSrc.p>=packCount()-1;
-  $("wList").innerHTML=W.map((x,i)=>{const r=done(st[x])?st[x]:null;const lab=c2e?(shortZh(Z[i])||x):x;
+  $("wList").innerHTML=W.map((x,i)=>{const r=done(st[x])?st[x]:null;const lab=(c2e||c2p||spl)?(shortZh(Z[i])||x):(lis&&!r)?"🎧 "+(i+1):x;
     const sc=r?(e2c?(r.first===100?"ok":"bad"):lvl(r.best)):"";const bd=r?(e2c?(r.first===100?"✓":"✗"):r.best):"";
     return `<div class="chip ${sc} ${i===wIdx?"cur":""}" data-i="${i}"><span>${esc(lab)}</span>${r?`<span class="badge">${bd}</span>`:""}</div>`;}).join("");
 }
+function rightOf(w,z){return wMode==="e2c"?(shortZh(z)||"（暫無中文）"):w;}
 function buildOpts(w,z,st,ev){
-  const k=mKey()+"#"+w;const right=shortZh(z)||"（暫無中文）";
-  if(!optCache[k]){const pool=[...new Set(zhPool().map(shortZh).filter(x=>x&&x!==right))];const ds=[];
-    while(ds.length<3&&pool.length){ds.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0]);}
-    const all=[right,...ds];for(let i=all.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[all[i],all[j]]=[all[j],all[i]];}optCache[k]=all;}
+  const k=mKey()+"#"+w;const right=rightOf(w,z);
+  if(!optCache[k]){let ds;
+    if(wMode==="e2c"){const pool=[...new Set(zhPool().map(shortZh).filter(x=>x&&x!==right))];ds=KPDeal.shuffle(pool).slice(0,3);}
+    else ds=enDistractors(w,3);
+    optCache[k]=KPDeal.place([right,...ds],right);}
   const rec=st[w];const picked=rec&&rec.pick;
   $("wOpts").innerHTML=optCache[k].map((o,i)=>{let c="";if(picked!=null){if(o===right)c="good";else if(o===picked)c="bad";}
     return `<button data-o="${i}" class="${c}">${esc(o)}</button>`;}).join("");
-  if(picked==null){$("wResult").innerHTML="";$("wStatus").textContent="選出正確的中文意思（可以先按 🔊 聽發音）";}
-  else{$("wResult").innerHTML=picked===right?`<div class="big ok">✅</div><div>答對了！</div>`:`<div class="big bad">❌</div><div>正確答案：${esc(right)}</div>`;$("wStatus").textContent=z;}
+  const tip={e2c:"選出正確的中文意思（可以先按 🔊 聽發音）",lis:"聽發音，選出正確的英文單字（可以按 🔊 再聽一次）",c2p:"看中文，選出正確的英文單字"}[wMode];
+  if(picked==null){$("wResult").innerHTML="";$("wStatus").textContent=tip;}
+  else{$("wResult").innerHTML=picked===right?`<div class="big ok">✅</div><div>答對了！</div>`:`<div class="big bad">❌</div><div>正確答案：${esc(right)}</div>`;$("wStatus").textContent=wMode==="e2c"?z:w+"："+shortZh(z);}
 }
-$("wOpts").onclick=e=>{const b=e.target.closest("button");if(!b)return;
+function spellState(w){const k=mKey()+"#"+w;
+  if(!spellCache[k]){const letters=[...w.toLowerCase()].filter(c=>/[a-z]/.test(c));
+    const abc="abcdefghijklmnopqrstuvwxyz".split("").filter(c=>!letters.includes(c));
+    const decoy=letters.length<=10?KPDeal.shuffle(abc).slice(0,2):[];
+    spellCache[k]={tiles:KPDeal.shuffle([...letters,...decoy]).map(c=>({c,used:false})),typed:[]};}
+  return spellCache[k];}
+function buildSpell(w,z,st){
+  const S=spellState(w),rec=st[w],picked=rec&&rec.pick;const target=[...w.toLowerCase()];
+  let ti=0;const slots=target.map(ch=>{if(!/[a-z]/.test(ch))return `<span class="fix">${ch===" "?"&nbsp;":esc(ch)}</span>`;const t=S.typed[ti++];return `<span>${t!=null?esc(S.tiles[t].c):""}</span>`;}).join("");
+  const res=picked==null?"":(picked===w.toLowerCase()?" good":" bad");
+  $("wOpts").innerHTML=`<div class="spell"><div class="slots${res}">${slots}</div>
+    ${picked==null?`<div class="tiles">${S.tiles.map((t,i)=>`<button data-t="${i}" ${t.used?"disabled":""}>${esc(t.c)}</button>`).join("")}</div>
+    <div class="row"><button data-act="back">⌫ 退一格</button><button data-act="clear">清除</button><button data-act="hint">💡 提示一個字母</button></div>`:""}</div>`;
+  if(picked==null){$("wResult").innerHTML="";$("wStatus").textContent=S.hinted?"用了提示，這題不算一次答對，但還是拼完它吧！":"聽發音、看中文，點字母拼出英文單字";}
+  else{$("wResult").innerHTML=picked===w.toLowerCase()?`<div class="big ok">✅</div><div>拼對了！</div>`:`<div class="big bad">❌</div><div>正確拼法：<b>${esc(w)}</b></div>`;$("wStatus").textContent=w+"："+shortZh(z);}
+}
+function spellTap(e){const b=e.target.closest("button");if(!b)return;
+  const W=curWords(),Z=curZh(),w=W[wIdx],z=Z[wIdx]||"",k=mKey();const st=wStat[k]||(wStat[k]={});const S=spellState(w);
+  if(st[w]&&st[w].pick!=null)return;
+  const letters=[...w.toLowerCase()].filter(c=>/[a-z]/.test(c));
+  if(b.dataset.act==="back"){const t=S.typed.pop();if(t!=null)S.tiles[t].used=false;renderWord();return;}
+  if(b.dataset.act==="clear"){S.typed.forEach(t=>S.tiles[t].used=false);S.typed=[];renderWord();return;}
+  if(b.dataset.act==="hint"){S.hinted=true;
+    while(S.typed.length&&S.typed.some((t,i)=>S.tiles[t].c!==letters[i])){const t=S.typed.pop();S.tiles[t].used=false;}
+    const i=S.tiles.findIndex(t=>!t.used&&t.c===letters[S.typed.length]);if(i>=0){S.tiles[i].used=true;S.typed.push(i);}}
+  else if(b.dataset.t!=null){const i=+b.dataset.t;if(S.tiles[i].used)return;S.tiles[i].used=true;S.typed.push(i);}
+  else return;
+  if(S.typed.length<letters.length){renderWord();return;}
+  const got=S.typed.map(t=>S.tiles[t].c).join(""),spelled=got===letters.join(""),ok=spelled&&!S.hinted;
+  const rec=st[w]||(st[w]={best:0,tries:[]});const firstTime=rec.first==null;if(firstTime)rec.first=ok?100:0;
+  rec.pick=spelled?w.toLowerCase():got;rec.tries.push(ok?100:0);rec.best=Math.max(rec.best,ok?100:0);
+  renderWord();say(w);if(firstTime){award(ok);packCheck();}
+  if(spelled&&$("wAuto").checked){const idx=wIdx,at=k;setTimeout(()=>{if(idx===wIdx&&at===mKey())wStep(1);},1500);}
+  else if(!spelled){setTimeout(()=>{if(st[w]&&st[w].pick!==w.toLowerCase()){delete st[w].pick;S.typed.forEach(t=>S.tiles[t].used=false);S.typed=[];renderWord();$("wStatus").textContent="再拼一次看看（第一次的成績已經記下）";}},2200);}
+}
+$("wOpts").onclick=e=>{if(wMode==="spell"){spellTap(e);return;}const b=e.target.closest("button");if(!b)return;
   const W=curWords(),Z=curZh(),w=W[wIdx],z=Z[wIdx]||"",k=mKey();const st=wStat[k]||(wStat[k]={});
-  const o=optCache[k+"#"+w][+b.dataset.o];const right=shortZh(z)||"（暫無中文）";const ok=o===right;
+  const o=optCache[k+"#"+w][+b.dataset.o];const right=rightOf(w,z);const ok=o===right;
   const rec=st[w]||(st[w]={best:0,tries:[]});const firstTime=rec.first==null;if(firstTime)rec.first=ok?100:0;rec.pick=o;rec.tries.push(ok?100:0);rec.best=Math.max(rec.best,ok?100:0);
   renderWord();say(w);if(firstTime){award(ok);packCheck();}
   if(ok&&$("wAuto").checked){const idx=wIdx,at=k;setTimeout(()=>{if(idx===wIdx&&at===mKey())wStep(1);},1500);}
@@ -618,16 +722,16 @@ function roundEnd(pct,n){try{if(window.SitePoints&&SitePoints.kid)SitePoints.rou
 const packDone={};
 function packCheck(){
   const W=curWords(),k=mKey(),st=wStat[k]||{};if(!W.length||packDone[k])return;
-  const e2c=wMode==="e2c";const done=W.every(w=>st[w]&&(e2c?st[w].first!=null:st[w].tries.length));if(!done)return;
+  const e2c=isCh();const done=W.every(w=>st[w]&&(e2c?st[w].first!=null:st[w].tries.length));if(!done)return;
   packDone[k]=1;
   const good=W.filter(w=>e2c?st[w].first===100:st[w].best>=90).length;const pct=Math.round(good/W.length*100);const s=starsOf(pct);
   if(wSrc.k==="L")progSet(WB[wSrc.i].id+"|"+wMode,wSrc.p,s),progSet(WB[wSrc.i].id,wSrc.p,s);
   fillPack();roundEnd(pct,W.length);if(s>=2)confetti(24);
   const hasNext=wSrc.k==="L"&&wSrc.p<packCount()-1;
-  const modeName={say:"跟讀發音",e2c:"英翻中",c2e:"中翻英"}[wMode];
+  const modeName=MODE_NAME[wMode];
   setTimeout(()=>showCard(`🎉 這一包完成了！`,`<div class="pk-stars">${"★".repeat(s)}${"☆".repeat(3-s)}</div><p>${modeName}：${W.length} 個字裡，${e2c?"一次答對":"拿到 90 分以上"} <b>${good}</b> 個（${pct}%）</p>
     <p style="color:var(--muted);font-size:.9rem">${s===3?"太厲害了！可以挑戰下一包。":s===2?"很棒！沒拿滿的字再練一次就能三顆星。":"多練幾次，星星就會變多！"}</p>`,
-    [hasNext?["下一包 ▶",()=>setW("L",wSrc.i,wSrc.p+1)]:null,["再練這一包",()=>{delete wStat[k];delete packDone[k];wIdx=0;renderWord();}],["關閉",null]].filter(Boolean)),900);
+    [hasNext?["下一包 ▶",()=>setW("L",wSrc.i,wSrc.p+1)]:null,["再練這一包",()=>{delete wStat[k];delete packDone[k];Object.keys(optCache).forEach(x=>{if(x.startsWith(k+"#"))delete optCache[x]});Object.keys(spellCache).forEach(x=>{if(x.startsWith(k+"#"))delete spellCache[x]});lastAuto="";wIdx=0;renderWord();}],["關閉",null]].filter(Boolean)),900);
 }
 function showCard(title,html,btns){
   const m=document.createElement("div");m.className="pk-mask";
@@ -675,7 +779,7 @@ function gListen(){
   try{best=+localStorage.getItem(bk)||0;}catch(e){}
   $("gPlay").innerHTML=`<div class="ghead"><span>⏱️ 60 秒聽力挑戰</span><span>答對 <b id="lOk">0</b>・最佳 ${best}</span>${backBtn}</div>
     <div class="timer"><i id="lBar" style="width:100%"></i></div><div style="text-align:center"><button id="lPlay" class="mic" style="max-width:320px">🔊 再聽一次</button></div><div class="lopts" id="lOpts"></div><div class="combo" id="lZh"></div>`;gWire();
-  function next(){lock=false;const qs=shuffle(pool.slice()).slice(0,4);cur=qs[0];const opts=shuffle(qs.slice());
+  function next(){lock=false;const qs=shuffle(pool.slice()).slice(0,4);cur=qs[0];const opts=KPDeal.place(qs.slice(),cur);
     $("lOpts").innerHTML=opts.map(o=>`<button data-w="${esc(o.w)}">${esc(o.w)}</button>`).join("");$("lZh").textContent="";say(cur.w);}
   $("lPlay").onclick=()=>cur&&say(cur.w);
   $("lOpts").onclick=e=>{const b=e.target.closest("button");if(!b||lock||left<=0)return;lock=true;n++;

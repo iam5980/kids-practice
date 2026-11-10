@@ -255,6 +255,41 @@ img{max-width:100%}
 <p class="hint">答對、答錯的紀錄只存在這台裝置的瀏覽器裡，換手機或清除瀏覽資料就會不見，也不會同步到別的裝置。題目與答案都來自老師的課堂筆記、重點整理小試身手、課文預習單和課本素養題組；圖表判讀的圖是自己畫的，標「自製練習圖」的數值為練習用。</p>
 </div>
 <script>
+/* ===== KPDeal：選擇題正確答案位置平均分散（練習小站共用，版本 2026-11-10b）=====
+   規則：每個位置（A/B/C/D…）出現次數一樣多，且正確答案不會連續 3 題在同一位置。
+   用法（整段貼進 App 的 <script>，放在使用它的程式之前）：
+     KPDeal.place(options, correct)   → 回傳新陣列：錯誤選項打亂，正確選項放到平均分散的位置
+                                         correct 可以是「值」或「判斷函式 (item,index)=>boolean」
+     KPDeal.pos(n)                    → 只要位置編號（0..n-1）時使用
+     KPDeal.shuffle(arr)              → 一般打亂（回傳新陣列）
+   注意：凡是「一題 + 數個選項 + 一個正解」的地方都要用 place，不要再用 shuffle 決定選項順序。
+*/
+var KPDeal=(function(){
+  var decks={},last=[];
+  function sh(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+  function runOK(s){for(var i=2;i<s.length;i++)if(s[i]===s[i-1]&&s[i]===s[i-2])return false;return true}
+  function pos(n){
+    if(!(n>1))return 0;
+    var d=decks[n];
+    if(!d||!d.length){var base=[],k=0;for(var r=0;r<2;r++)for(var i=0;i<n;i++)base.push(i);
+      do{d=sh(base);k++}while(!runOK(last.slice(-2).concat(d))&&k<300);decks[n]=d}
+    var p=d.shift();
+    if(last.length>=2&&last[last.length-1]===p&&last[last.length-2]===p){
+      for(var i=0;i<d.length;i++)if(d[i]!==p){var q=d[i];d[i]=p;p=q;break}
+      if(last[last.length-1]===p&&last[last.length-2]===p){var alt=(p+1+Math.floor(Math.random()*(n-1)))%n;d.push(p);p=alt}}
+    last.push(p);if(last.length>4)last.shift();
+    return p;
+  }
+  function place(arr,correct){
+    var f=typeof correct==='function'?correct:function(x){return x===correct};
+    var ci=-1;for(var i=0;i<arr.length;i++)if(f(arr[i],i)){ci=i;break}
+    if(ci<0)return sh(arr);
+    var c=arr[ci],w=sh(arr.filter(function(_,i){return i!==ci}));
+    w.splice(pos(arr.length),0,c);
+    return w;
+  }
+  return {place:place,pos:pos,shuffle:sh};
+})();
 /* ===== 名詞解釋卡 TERM {g,t,d} ===== */
 const TERM=[
 /* 1-1 智慧科技新生活 */
@@ -1056,7 +1091,7 @@ function mcIntro(){
 }
 function mcQ(){
   if(mcs.i>=mcs.q.length)return mcDone();
-  const x=mcs.q[mcs.i],order=shuffle(x.o.map((t,i)=>({t,i})));
+  const x=mcs.q[mcs.i],order=KPDeal.place(x.o.map((t,i)=>({t,i})),o=>o.i===x.a);
   $('#mcArea').innerHTML=`<div class="qcard"><div class="rhud"></div>
     <span class="prog">第 ${mcs.i+1} / ${mcs.q.length} 題　<span class="lesson">${GN[x.g-1]}</span></span>
     <p class="qask left">${esc(x.q)}</p>
@@ -1280,7 +1315,7 @@ function chartStart(idx){
 }
 function chartQ(){
   if(cs.i>=cs.q.length)return chartDone();
-  const c=cs.c,x=cs.q[cs.i],order=shuffle(x.o.map((t,i)=>({t,i})));
+  const c=cs.c,x=cs.q[cs.i],order=KPDeal.place(x.o.map((t,i)=>({t,i})),o=>o.i===x.a);
   $('#chartArea').innerHTML=`<div class="qcard"><div class="rhud"></div>
     <span class="prog">${esc(c.title)}　<span class="lesson">${GN[c.g-1]}</span>　第 ${cs.i+1} / ${cs.q.length} 題</span>
     <div class="chartbox">${c.svg()}</div><p class="srcnote">${esc(c.note)}</p>
@@ -1598,6 +1633,7 @@ function examBuild(){
         items.push({sec:4,kind:'chart',q:x.q,o:od.map(o=>o.t),a:od.findIndex(o=>o.i===x.a),why:x.why,pt:3,
           chart:j===0?{svg:c.svg,note:c.note,title:c.title}:null})})}};
   addTF(10);addMC(15);addPair(5);addSort(5);addChart(10);
+  items.forEach(it=>{if(it.kind==='tf')return;const od=KPDeal.place(it.o.map((t,i)=>({t,i})),o=>o.i===it.a);it.o=od.map(o=>o.t);it.a=od.findIndex(o=>o.i===it.a)});
   return items;
 }
 function examStart(){
