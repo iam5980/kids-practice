@@ -291,6 +291,58 @@ details.passage summary{cursor:pointer;font-weight:700;padding:4px 0}
 </div>
 
 <script>
+/* ===== KPDeal：選擇題正確答案位置平均分散（練習小站共用，版本 2026-11-10b）=====
+   規則：每個位置（A/B/C/D…）出現次數一樣多，且正確答案不會連續 3 題在同一位置。
+   用法（整段貼進 App 的 <script>，放在使用它的程式之前）：
+     KPDeal.place(options, correct)   → 回傳新陣列：錯誤選項打亂，正確選項放到平均分散的位置
+                                         correct 可以是「值」或「判斷函式 (item,index)=>boolean」
+     KPDeal.pos(n)                    → 只要位置編號（0..n-1）時使用
+     KPDeal.shuffle(arr)              → 一般打亂（回傳新陣列）
+   注意：凡是「一題 + 數個選項 + 一個正解」的地方都要用 place，不要再用 shuffle 決定選項順序。
+*/
+var KPDeal=(function(){
+  var decks={},last=[];
+  function sh(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+  function runOK(s){for(var i=2;i<s.length;i++)if(s[i]===s[i-1]&&s[i]===s[i-2])return false;return true}
+  function pos(n){
+    if(!(n>1))return 0;
+    var d=decks[n];
+    if(!d||!d.length){var base=[],k=0;for(var r=0;r<2;r++)for(var i=0;i<n;i++)base.push(i);
+      do{d=sh(base);k++}while(!runOK(last.slice(-2).concat(d))&&k<300);decks[n]=d}
+    var p=d.shift();
+    if(last.length>=2&&last[last.length-1]===p&&last[last.length-2]===p){
+      for(var i=0;i<d.length;i++)if(d[i]!==p){var q=d[i];d[i]=p;p=q;break}
+      if(last[last.length-1]===p&&last[last.length-2]===p){var alt=(p+1+Math.floor(Math.random()*(n-1)))%n;d.push(p);p=alt}}
+    last.push(p);if(last.length>4)last.shift();
+    return p;
+  }
+  function place(arr,correct){
+    var f=typeof correct==='function'?correct:function(x){return x===correct};
+    var ci=-1;for(var i=0;i<arr.length;i++)if(f(arr[i],i)){ci=i;break}
+    if(ci<0)return sh(arr);
+    var c=arr[ci],w=sh(arr.filter(function(_,i){return i!==ci}));
+    w.splice(pos(arr.length),0,c);
+    return w;
+  }
+  return {place:place,pos:pos,shuffle:sh};
+})();
+/* 選擇題出題時統一經過 dealQ：正確答案位置平均分散（含 ①②③④ 編號題，重排後重新編號） */
+const DEAL_NUM=['①','②','③','④','⑤','⑥'];
+function dealQ(x){
+  if(!x||!Array.isArray(x.opts)||x.opts.length<2)return x;
+  if(x.opts.some(o=>/^[○✗]/.test(String(o))))return x;
+  const numbered=x.opts.every((o,k)=>String(o).startsWith(DEAL_NUM[k]+' '));
+  if(numbered){
+    const raw=x.opts.map(o=>String(o).slice(2)),ai=x.opts.indexOf(x.a);
+    if(ai<0||raw.some(t=>/^(以上|全部|皆|都)|[①②③④⑤⑥]/.test(t)))return x;
+    const ord=KPDeal.place(raw.map((t,i)=>({t,i})),o=>o.i===ai);
+    const opts=ord.map((o,k)=>DEAL_NUM[k]+' '+o.t);
+    return {...x,opts,a:opts[ord.findIndex(o=>o.i===ai)]};
+  }
+  if(x.opts.indexOf(x.a)<0)return x;
+  return {...x,opts:KPDeal.place(x.opts,x.a)};
+}
+
 /* ===== 生字資料（翰林六上第一～六課）：課,字,注音,部首,部首外筆畫,總筆畫,語詞(○=本字),易混部首 ===== */
 const RAW=`1,勉,ㄇㄧㄢˇ,力,7,9,○勵,儿刀
 1,弄,ㄋㄨㄥˋ,廾,4,7,賣○,王一
@@ -711,16 +763,16 @@ function zyOpts(z){
   const tones=shuffle(TONES.filter(x=>x!==t).map(x=>b+x));
   const snd=[];SWAP.forEach(([a,c])=>{if(b.includes(a))snd.push(b.replace(a,c)+t);else if(b.includes(c))snd.push(b.replace(c,a)+t)});
   const picks=[...new Set([tones[0],tones[1],...shuffle(snd),tones[2]])].filter(v=>v!==z).slice(0,3);
-  return shuffle([z,...picks]);
+  return KPDeal.place([z,...picks],z);
 }
 function radOpts(x){
   const others=shuffle(x.cf.filter(r=>r!==x.r));
   const fill=shuffle(ALLR.filter(r=>r!==x.r&&!others.includes(r)));
-  return shuffle([x.r,...others.slice(0,2),...fill].slice(0,4));
+  return KPDeal.place([x.r,...others.slice(0,2),...fill].slice(0,4),x.r);
 }
 let qs={};
 const QA={r:'#radArea',z:'#zyArea',s:'#strkArea'};
-function strkOpts(n){const c=[n-2,n-1,n+1,n+2,n+3].filter(v=>v>=0&&v!==n);return shuffle([n,...shuffle(c).slice(0,3)].map(String))}
+function strkOpts(n){const c=[n-2,n-1,n+1,n+2,n+3].filter(v=>v>=0&&v!==n);return KPDeal.place([n,...shuffle(c).slice(0,3)].map(String),String(n))}
 function quizIntro(k){
   const area=QA[k],p=pool();
   $(area).innerHTML=`<div class="qcard">
@@ -897,7 +949,7 @@ function polyPr(){
 }
 function polyQ(){
   if(ps.i>=ps.q.length)return polyDone();
-  const x=ps.q[ps.i],opts=shuffle(Object.keys(x.p.r));
+  const x=ps.q[ps.i],opts=KPDeal.place(Object.keys(x.p.r),x.z);
   $('#polyArea').innerHTML=`<div class="qcard"><div class="rhud"></div><span class="prog">第 ${ps.i+1} / ${ps.q.length} 題・答對 ${ps.ok}</span>
     <div class="qchar" style="font-size:clamp(44px,13vw,64px)">${pmark(x.p.c,x.w)}</div>
     <p class="qask">「${x.p.c}」在這個語詞裡怎麼念？</p>
@@ -971,7 +1023,7 @@ function formPr(){
 }
 function formQ(){
   if(fs.i>=fs.q.length)return formDone();
-  const x=fs.q[fs.i],opts=shuffle(x.f.m.map(m=>m.c));
+  const x=fs.q[fs.i],opts=KPDeal.place(x.f.m.map(m=>m.c),x.c);
   $('#formArea').innerHTML=`<div class="qcard"><div class="rhud"></div><span class="prog">第 ${fs.i+1} / ${fs.q.length} 題・答對 ${fs.ok}</span>
     <div class="qchar" style="font-size:clamp(44px,13vw,64px)">${fblank(x)}</div>
     <p class="qask">框框裡的注音是哪一個字？　${sayBtn(x.w,'聽一聽')}</p>
@@ -1010,7 +1062,7 @@ function errOpts(wc,c){
   const same=W.filter(y=>y.z===z).map(y=>y.c);
   const cand=shuffle([...new Set([...fam,...same])].filter(v=>v!==c&&v!==wc));
   const fill=shuffle(W.map(y=>y.c).filter(v=>v!==c&&v!==wc&&!cand.includes(v)));
-  return shuffle([c,wc,...cand.slice(0,2),...fill].slice(0,4));
+  return KPDeal.place([c,wc,...cand.slice(0,2),...fill].slice(0,4),c);
 }
 function errIntro(){
   const it=errPool();
@@ -1087,7 +1139,7 @@ function idmIntro(){
 }
 function idmQ(){
   if(is.i>=is.q.length)return idmDone();
-  const x=is.q[is.i],opts=shuffle(x.s.ws.split(' '));
+  const x=is.q[is.i],opts=KPDeal.place(x.s.ws.split(' '),x.a);
   $('#idmArea').innerHTML=`<div class="qcard"><div class="rhud"></div><span class="prog">第 ${is.i+1} / ${is.q.length} 題・答對 ${is.ok}</span>
     <p class="kai" style="font-size:22px;line-height:1.7;margin:0">${esc(x.t).replace('（　）','<span class="box" style="min-width:5em">＿＿＿＿</span>')}</p>
     <div class="opts">${opts.map(o=>`<button class="opt" data-v="${o}"><span class="o1" style="font-size:22px">${o}</span><span class="mark"></span></button>`).join('')}</div>
@@ -1243,7 +1295,7 @@ function mqIntro(key){
 function mqQ(){
   const c=MQ[ms.key],area=c.area;
   if(ms.i>=ms.q.length)return mqDone();
-  const x=ms.q[ms.i];
+  ms.q[ms.i]=dealQ(ms.q[ms.i]);const x=ms.q[ms.i];
   const ctx=x.ctx!=null?`<details class="passage" ${ms.lastCtx!==x.ctx?'open':''}><summary>📖 ${esc(READ[x.ctx].t)}（點一下展開／收起）</summary><div class="ptext">${READ[x.ctx].body}</div></details>`:'';
   ms.lastCtx=x.ctx;
   $(area).innerHTML=`<div class="qcard"><div class="rhud"></div><span class="prog">第 ${ms.i+1} / ${ms.q.length} 題・答對 ${ms.ok}${x.g?`・${GN[x.g-1]}`:''}</span>
@@ -1256,9 +1308,9 @@ function mqQ(){
       if(o.dataset.v===x.a){o.classList.add('ok');o.querySelector('.mark').textContent='✓ 正確答案'}
       else if(o===b){o.classList.add('bad');o.querySelector('.mark').textContent='✗ 你選的'}});
     if(right){ms.ok++;SFX.ok()}else{SFX.bad();ms.bad.push(x);wrongM[x.id]={n:((wrongM[x.id]||{}).n||0)+1,lab:x.lab,k:ms.key};save('hw6c-wrongm',wrongM);renderScope()}
-    $('#mFb').innerHTML=`<div class="fb ${right?'ok':'bad'}">${right?'答對了！':b?'再記一次：':'時間到！'}${x.why}</div>
+    document.querySelector(area+' #mFb').innerHTML=`<div class="fb ${right?'ok':'bad'}">${right?'答對了！':b?'再記一次：':'時間到！'}${x.why}</div>
       <div class="center" style="margin-top:10px"><button class="btn primary" id="mNext">${ms.i+1<ms.q.length?'下一題':'看成績'}</button></div>`;
-    $('#mNext').onclick=()=>{ms.i++;ms.answered=false;mqQ()};$('#mNext').focus();
+    {const nx=document.querySelector(area+' #mNext');nx.onclick=()=>{ms.i++;ms.answered=false;mqQ()};nx.focus();}
   };
   document.querySelectorAll(area+' .opt').forEach(b=>b.onclick=()=>answer(b));
   rtQ(()=>answer(null));
