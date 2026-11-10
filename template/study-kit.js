@@ -1,7 +1,7 @@
 /* =====================================================================
    study-kit.js — read-aloud, level map and 素養題組 for any practice app
    Canonical copy: github.com/iam5980/kids-practice/template/study-kit.js
-   Version: 2026-10-25
+   Version: 2026-11-10 (single-choice answers spread evenly via KPDeal when present)
 
    HOW TO USE: paste the whole file inside the page's main <script> (before
    the app code). Works for 中文部 apps and English apps alike. Call
@@ -199,7 +199,7 @@ var KidKit = (function () {
         (q.type === "multi" ? ' <small>' + T.pick2 + "</small>" : "")));
       var area = el("div", "kk-area"); qbox.appendChild(area);
       if (q.type === "mc" || q.type === "tf") {
-        var opts = q.type === "tf" ? [zh ? "⭕ 對" : "TRUE", zh ? "❌ 錯" : "FALSE"] : shuffle(q.choices);
+        var opts = q.type === "tf" ? [zh ? "⭕ 對" : "TRUE", zh ? "❌ 錯" : "FALSE"] : (typeof KPDeal !== "undefined" ? KPDeal.place(q.choices, q.choices[0]) : shuffle(q.choices));
         var right = q.type === "tf" ? (q.answer ? 0 : 1) : opts.indexOf(q.choices[0]);
         var used = false;
         opts.forEach(function (c, k) {

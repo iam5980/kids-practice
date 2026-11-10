@@ -162,6 +162,11 @@ var AppCore = (function () {
         for (var i = 0; i < decks[n].length; i++) if (decks[n][i] !== p) {
           var q = decks[n][i]; decks[n][i] = p; p = q; break;
         }
+        if (last[last.length - 1] === p && last[last.length - 2] === p) {
+          // deck was empty: use another position and put p back for later
+          var alt = (p + 1 + Math.floor(Math.random() * (n - 1))) % n;
+          decks[n].push(p); p = alt;
+        }
       }
       last.push(p); if (last.length > 4) last.shift();
       return p;
