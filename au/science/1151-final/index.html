@@ -30,42 +30,6 @@ body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:1
 .ac-ans,.ac-fb b{white-space:pre-line}
 </style></head><body><div id="app"></div>
 <script>
-/* ===== KPDeal：選擇題正確答案位置平均分散（練習小站共用，版本 2026-11-10b）=====
-   規則：每個位置（A/B/C/D…）出現次數一樣多，且正確答案不會連續 3 題在同一位置。
-   用法（整段貼進 App 的 <script>，放在使用它的程式之前）：
-     KPDeal.place(options, correct)   → 回傳新陣列：錯誤選項打亂，正確選項放到平均分散的位置
-                                         correct 可以是「值」或「判斷函式 (item,index)=>boolean」
-     KPDeal.pos(n)                    → 只要位置編號（0..n-1）時使用
-     KPDeal.shuffle(arr)              → 一般打亂（回傳新陣列）
-   注意：凡是「一題 + 數個選項 + 一個正解」的地方都要用 place，不要再用 shuffle 決定選項順序。
-*/
-var KPDeal=(function(){
-  var decks={},last=[];
-  function sh(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
-  function runOK(s){for(var i=2;i<s.length;i++)if(s[i]===s[i-1]&&s[i]===s[i-2])return false;return true}
-  function pos(n){
-    if(!(n>1))return 0;
-    var d=decks[n];
-    if(!d||!d.length){var base=[],k=0;for(var r=0;r<2;r++)for(var i=0;i<n;i++)base.push(i);
-      do{d=sh(base);k++}while(!runOK(last.slice(-2).concat(d))&&k<300);decks[n]=d}
-    var p=d.shift();
-    if(last.length>=2&&last[last.length-1]===p&&last[last.length-2]===p){
-      for(var i=0;i<d.length;i++)if(d[i]!==p){var q=d[i];d[i]=p;p=q;break}
-      if(last[last.length-1]===p&&last[last.length-2]===p){var alt=(p+1+Math.floor(Math.random()*(n-1)))%n;d.push(p);p=alt}}
-    last.push(p);if(last.length>4)last.shift();
-    return p;
-  }
-  function place(arr,correct){
-    var f=typeof correct==='function'?correct:function(x){return x===correct};
-    var ci=-1;for(var i=0;i<arr.length;i++)if(f(arr[i],i)){ci=i;break}
-    if(ci<0)return sh(arr);
-    var c=arr[ci],w=sh(arr.filter(function(_,i){return i!==ci}));
-    w.splice(pos(arr.length),0,c);
-    return w;
-  }
-  return {place:place,pos:pos,shuffle:sh};
-})();
-
 /* =====================================================================
    app-core.js — shared core for the kids' exam-practice apps
    Canonical copy: github.com/iam5980/kids-practice/template/app-core.js
@@ -1199,7 +1163,7 @@ var AppCore = (function () {
 /* =====================================================================
    study-kit.js — read-aloud, level map and 素養題組 for any practice app
    Canonical copy: github.com/iam5980/kids-practice/template/study-kit.js
-   Version: 2026-10-25
+   Version: 2026-11-10 (single-choice answers spread evenly via KPDeal when present)
 
    HOW TO USE: paste the whole file inside the page's main <script> (before
    the app code). Works for 中文部 apps and English apps alike. Call
@@ -1840,6 +1804,202 @@ var TVOCAB = {
   ]
 };
 
+/* Workbook (Reading and Writing + Assessment) and textbook Lesson Review items — 1151-Science workbook-Final-Beethoven.pdf, textbook p.42–99 */
+BANK = BANK.concat([
+  /* ----- Animals and Their Parts: Outline (WB p.15–16) ----- */
+  {L:"AP",ty:"fill",src:"wb",t:"One characteristic that most animals have in common is that they can ___.",a:"move",w:["make food","grow leaves","stay still"]},
+  {L:"AP",ty:"fill",src:"wb",t:"Unlike plants, animals cannot make their own ___.",a:"food",w:["water","shelter","oxygen"]},
+  {L:"AP",ty:"fill",src:"wb",t:"Animals are able to ___ to their environments much more noticeably than plants.",a:"respond",w:["move","breathe","grow"]},
+  {L:"AP",ty:"fill",src:"wb",t:"Wings and tails are ___ that help animals get what they need.",a:"structures",w:["shelters","organisms","nutrients"]},
+  {L:"AP",ty:"fill",src:"wb",t:"Animals move toward food and away from ___.",a:"danger",w:["water","shelter","oxygen"]},
+  {L:"AP",ty:"fill",src:"wb",t:"Wolves can run and jump because of their ___.",a:"muscles",w:["gills","beaks","quills"]},
+  {L:"AP",ty:"fill",src:"wb",t:"Fins and tails help ___ move through the water.",a:"fish",w:["birds","wolves","snails"]},
+  {L:"AP",ty:"fill",src:"wb",t:"Ducks and geese have webbed ___ that help them swim.",a:"feet",w:["wings","beaks","tails"]},
+  {L:"AP",ty:"fill",src:"wb",t:"Birds use structures called ___ to get food and water.",a:"beaks",w:["gills","quills","trunks"]},
+  {L:"AP",ty:"fill",src:"wb",t:"Lions use their sharp ___ for biting.",a:"teeth",w:["feet","tails","fins"]},
+  {L:"AP",ty:"fill",src:"wb",t:"Animals that have flat back teeth use them for ___.",a:"chewing",w:["biting","flying","swimming"]},
+  {L:"AP",ty:"fill",src:"wb",t:"Lungs and gills help animals take in ___.",a:"oxygen",w:["food","water","sunlight"]},
+  {L:"AP",ty:"fill",src:"wb",t:"Rocks and trees are examples of safe places, or ___, for animals.",a:"shelters",w:["structures","muscles","nests"]},
+  {L:"AP",ty:"fill",src:"wb",t:"A snail has a(n) ___ to keep it safe in its environment.",a:"shell",w:["quill","gill","trunk"]},
+  /* Vocabulary (WB p.17) */
+  {L:"AP",ty:"mc",src:"wb",q:"a kind of shelter for young birds",a:"nest",w:["shelter","wings"]},
+  {L:"AP",ty:"mc",src:"wb",q:"a structure that takes in oxygen from air",a:"lungs",w:["gills","trunk"]},
+  {L:"AP",ty:"mc",src:"wb",q:"structures that take in oxygen from water",a:"gills",w:["lungs","muscles"]},
+  {L:"AP",ty:"mc",src:"wb",q:"a structure that helps elephants pull food to their mouths",a:"trunk",w:["quills","wings"]},
+  {L:"AP",ty:"mc",src:"wb",q:"structures that help birds fly and glide through the air",a:"wings",w:["muscles","quills"]},
+  {L:"AP",ty:"mc",src:"wb",q:"structures that help protect a porcupine from other animals",a:"quills",w:["gills","nest"]},
+  {L:"AP",ty:"mc",src:"wb",q:"structures that help a snake move",a:"muscles",w:["wings","lungs"]},
+  /* Cloze (WB p.18) */
+  {L:"AP",ty:"cloze",src:"wb",title:"Cloze Activity — Animals and Their Parts",t:"Animals can fly, run, jump, or ___. They eat other ___ instead of making their own food. Animals ___ to their environments more noticeably than plants. They have different kinds of ___ for biting and chewing. Lungs and gills help animals get oxygen from ___ and water. Feet, legs, and wings help different animals ___.",a:["swim","organisms","respond","teeth","air","move"],bank:["swim","organisms","respond","teeth","air","move"]},
+  /* Lesson test (WB p.33) + Lesson Review (p.49) */
+  {L:"AP",ty:"mc",src:"wb",q:"Which of the following is an example of a structure that helps keep an animal safe?",a:"quills",w:["gills","nests"]},
+  {L:"AP",ty:"mc",src:"wb",q:"What are lungs?",a:"animal structures that take in oxygen from the air",w:["animal structures that take in oxygen from the water","plant structures that carry water"]},
+  {L:"AP",ty:"mc",src:"wb",q:"What is one thing all animals have in common?",a:"All animals eat other organisms for food.",w:["All animals have fur.","All animals breathe through lungs."]},
+  {L:"AP",ty:"mc",src:"wb",q:"How do worms take in oxygen?",a:"through their skin",w:["through gills","through sunlight"]},
+  {L:"AP",ty:"mc",src:"wb",q:"Animals use all the structures below to get oxygen except…",a:"eyes",w:["lungs","gills"]},
+  {L:"AP",ty:"open",src:"wb",q:"Critical Thinking: A sponge is an animal. Adult sponges do not move. Why do you think a sponge is classified as an animal?",a:"A sponge cannot make its own food. It takes in food (other organisms) from the water, so it is an animal.",points:[["food","eat","eats","organisms"],["cannot make","can't make","not make","doesn't make","water"]],need:1},
+  {L:"AP",ty:"open",src:"wb",q:"Critical Thinking: Compare a bear with a giraffe. How do their structures help them survive?",a:"A bear has sharp claws and teeth to catch and eat food and thick fur to stay warm. A giraffe has a long neck to reach leaves high in trees.",points:[["claws","teeth","fur"],["neck","long","leaves","tall"]],need:2},
+  {L:"AP",ty:"open",src:"wb",q:"Critical Thinking: How might long legs help a bird that lives in a pond environment?",a:"Long legs help the bird walk in the water without getting wet and catch fish.",points:[["water","pond","wade","walk"],["food","fish","catch","eat","dry","wet"]],need:2},
+  {L:"AP",ty:"open",src:"wb",q:"What is a shelter?",a:"A shelter is a place where an animal can stay safe from bad weather or danger.",points:[["place"],["safe","protect"],["weather","danger"]],need:2},
+  /* ----- Classifying Animals: Outline (WB p.19–20) ----- */
+  {L:"CA",ty:"fill",src:"wb",t:"Scientists group, or ___, animals so that they can study them.",a:"classify",w:["structure","respond","hatch"]},
+  {L:"CA",ty:"fill",src:"wb",t:"One way to classify animals is by the presence or absence of a(n) ___.",a:"backbone",w:["shell","nest","gill"]},
+  {L:"CA",ty:"fill",src:"wb",t:"The covering around an insect is thin and ___.",a:"hard",w:["soft","wet","furry"]},
+  {L:"CA",ty:"fill",src:"wb",t:"A spider is an invertebrate because it is covered by a(n) ___.",a:"exoskeleton",w:["backbone","shell","scales"]},
+  {L:"CA",ty:"fill",src:"wb",t:"Crabs have an exoskeleton called a ___.",a:"shell",w:["fur","feather","scale"]},
+  {L:"CA",ty:"fill",src:"wb",t:"Birds have lightweight bones and wings to help them ___.",a:"fly",w:["swim","crawl","dig"]},
+  {L:"CA",ty:"fill",src:"wb",t:"Birds and ___ have lungs and they lay eggs.",a:"reptiles",w:["mammals","fish","sponges"]},
+  {L:"CA",ty:"fill",src:"wb",t:"Reptiles live in wet or dry places because their skin is ___.",a:"waterproof",w:["slippery","furry","soft"]},
+  {L:"CA",ty:"fill",src:"wb",t:"Frogs and toads breathe through ___ when they are young.",a:"gills",w:["lungs","skin","beaks"]},
+  {L:"CA",ty:"fill",src:"wb",t:"Amphibians can live on land because they grow lungs and ___.",a:"legs",w:["fins","feathers","scales"]},
+  {L:"CA",ty:"fill",src:"wb",t:"Fish have scales and a flat shape to move easily through ___.",a:"water",w:["air","sand","trees"]},
+  {L:"CA",ty:"fill",src:"wb",t:"People are a kind of vertebrate called a ___.",a:"mammal",w:["reptile","amphibian","bird"]},
+  {L:"CA",ty:"fill",src:"wb",t:"Mammals feed ___ to their young.",a:"milk",w:["nectar","seeds","leaves"]},
+  {L:"CA",ty:"fill",src:"wb",t:"Some mammals are covered with thick ___.",a:"fur",w:["scales","feathers","shells"]},
+  /* What am I? (WB p.21) */
+  {L:"CA",ty:"mc",src:"wb",q:"What am I? I am a hard, outer covering around animals with no backbone.",a:"exoskeleton",w:["vertebrate","mammal"]},
+  {L:"CA",ty:"mc",src:"wb",q:"What am I? I am a vertebrate that spends part of my life in water and part of my life on land.",a:"amphibian",w:["fish","mammal"]},
+  {L:"CA",ty:"mc",src:"wb",q:"What am I? I have a soft body and no backbone.",a:"invertebrate",w:["vertebrate","amphibian"]},
+  {L:"CA",ty:"mc",src:"wb",q:"What am I? I am an animal with a backbone.",a:"vertebrate",w:["invertebrate","exoskeleton"]},
+  {L:"CA",ty:"mc",src:"wb",q:"What am I? I am a vertebrate with gills and I live in water my whole life.",a:"fish",w:["amphibian","mammal"]},
+  {L:"CA",ty:"mc",src:"wb",q:"What am I? I am a vertebrate with hair. I feed milk to my young and care for them.",a:"mammal",w:["reptile","bird"]},
+  /* Cloze (WB p.22) */
+  {L:"CA",ty:"cloze",src:"wb",title:"Cloze Activity — Classifying Animals",t:"Two main groups of animals are vertebrates and ___. Invertebrates have an ___ to protect their bodies. There are five kinds of ___, and all of them have a ___ to support their bodies. The kind of vertebrate that lays eggs and can fly is a ___. A ___ has scaly skin and breathes with lungs. An ___ looks like a fish when it hatches. Vertebrates that swim and have scales are called ___.",a:["invertebrates","exoskeleton","vertebrates","backbone","bird","reptile","amphibian","fish"],bank:["invertebrates","exoskeleton","vertebrates","backbone","bird","reptile","amphibian","fish","gills"]},
+  /* Chapter / lesson tests (WB p.25–38) */
+  {L:"CA",ty:"mc",src:"wb",q:"Most of the animals on Earth are…",a:"invertebrates",w:["vertebrates","mammals"]},
+  {L:"CA",ty:"mc",src:"wb",q:"Which of the following is an example of an invertebrate?",a:"sea star",w:["lizard","goldfish"]},
+  {L:"CA",ty:"mc",src:"wb",q:"What does it mean to classify an animal?",a:"to put it into a group with other animals that are similar",w:["to capture it for research","to release it into the wild"]},
+  {L:"CA",ty:"mc",src:"wb",q:"Clams, snails, and octopuses are part of which group of invertebrates?",a:"mollusks",w:["arthropods","sponges"]},
+  {L:"CA",ty:"mc",src:"wb",q:"What type of animal has fur and breathes using lungs?",a:"mammal",w:["amphibian","fish"]},
+  {L:"CA",ty:"mc",src:"wb",q:"Which animal spends part of its life in water and part on land?",a:"amphibian",w:["bird","fish"]},
+  {L:"CA",ty:"mc",src:"wb",q:"Which animal has gills and cannot survive out of water?",a:"fish",w:["amphibian","mammal"]},
+  {L:"CA",ty:"mc",src:"wb",q:"Which of these animals look like fish when they hatch?",a:"amphibians",w:["birds","reptiles"]},
+  {L:"CA",ty:"mc",src:"wb",q:"An animal that has gills and lungs during its life is a(n)…",a:"amphibian",w:["fish","reptile"]},
+  {L:"CA",ty:"mc",src:"wb",q:"A vertebrate that has hair and gives birth to its young is a(n)…",a:"mammal",w:["bird","reptile"]},
+  {L:"CA",ty:"mc",src:"wb",q:"An animal that has feathers and breathes with lungs is a(n)…",a:"bird",w:["reptile","amphibian"]},
+  {L:"CA",ty:"mc",src:"wb",q:"A structure that land animals use to breathe air is a(n)…",a:"lung",w:["gill","exoskeleton"]},
+  {L:"CA",ty:"mc",src:"wb",q:"All reptiles are animals that have…",a:"backbones and lungs",w:["backbones and gills","backbones and fins"]},
+  {L:"CA",ty:"fill",src:"wb",t:"Vertebrates that have scaly skin and breathe through lungs are called ___.",a:"reptiles",w:["mammals","amphibians","invertebrates"]},
+  {L:"CA",ty:"fill",src:"wb",t:"A thin, hard covering that surrounds certain animals' bodies is called a(n) ___.",a:"exoskeleton",w:["shelter","structure","environment"]},
+  {L:"CA",ty:"fill",src:"wb",t:"All living things are ___.",a:"organisms",w:["structures","shelters","cells"]},
+  {L:"CA",ty:"fill",src:"wb",t:"A place in which an animal can stay safe is called a(n) ___.",a:"shelter",w:["structure","exoskeleton","environment"]},
+  {L:"CA",ty:"mc",src:"wb",q:"Classify: strong muscles; lightweight bones",a:"birds",w:["fish","reptiles"]},
+  {L:"CA",ty:"mc",src:"wb",q:"Classify: breathe through gills; spend entire lives in the water",a:"fish",w:["amphibians","birds"]},
+  {L:"CA",ty:"mc",src:"wb",q:"Classify: scaly skin; can live on land or water",a:"reptiles",w:["mammals","birds"]},
+  {L:"CA",ty:"mc",src:"wb",q:"Classify: start out with gills; grow lungs to live on land",a:"amphibians",w:["fish","reptiles"]},
+  {L:"CA",ty:"open",src:"wb",q:"Classify: What kind of animal is a zebra? How do you know?",a:"A zebra is a mammal because it has hair and feeds milk to its young.",points:[["mammal"],["hair","fur","milk","born"]],need:2},
+  {L:"CA",ty:"open",src:"wb",q:"Define: How are lungs and gills similar?",a:"Lungs and gills both help animals take in oxygen.",points:[["oxygen","breathe","breathing"]],need:1},
+  {L:"CA",ty:"open",src:"wb",q:"Name three characteristics of mammals and tell how one is useful.",a:"Mammals have hair or fur, feed milk to their young, and breathe with lungs. Fur keeps them warm.",points:[["hair","fur"],["milk"],["lungs","born","care","backbone"]],need:2},
+  {L:"CA",ty:"open",src:"wb",q:"Thinking Like a Scientist: Tell how you would classify an alligator.",a:"An alligator is a vertebrate and a reptile because it has a backbone, scaly skin, breathes with lungs and lays eggs.",points:[["reptile"],["scaly","scales","lungs","eggs","backbone"]],need:2},
+  {L:"CA",ty:"open",src:"wb",q:"Critical Thinking: What characteristics do lions have that help scientists classify them?",a:"Lions have a backbone, fur, and feed milk to their young, so they are mammals.",points:[["backbone","vertebrate"],["fur","hair","milk","mammal"]],need:2},
+  /* ----- Plant Life Cycles: Outline (WB p.42–43) ----- */
+  {L:"PL",ty:"fill",src:"wb",t:"The structure inside an apple that grows into a new plant is a(n) ___.",a:"seed",w:["fruit","flower","cone"]},
+  {L:"PL",ty:"fill",src:"wb",t:"A seed has stored food and nutrients to help the ___ survive.",a:"embryo",w:["pollen","flower","fruit"]},
+  {L:"PL",ty:"fill",src:"wb",t:"When conditions are right, a seed will begin to grow, or ___.",a:"germinate",w:["pollinate","decompose","hatch"]},
+  {L:"PL",ty:"fill",src:"wb",t:"An adult plant grows from a small plant called a(n) ___.",a:"seedling",w:["embryo","spore","bulb"]},
+  {L:"PL",ty:"fill",src:"wb",t:"You can find a ___ around the seeds.",a:"fruit",w:["cone","bulb","spore"]},
+  {L:"PL",ty:"fill",src:"wb",t:"The part of a flowering plant that makes seeds is a(n) ___.",a:"flower",w:["root","stem","leaf"]},
+  {L:"PL",ty:"fill",src:"wb",t:"Seeds form when an egg joins with ___.",a:"pollen",w:["nectar","water","soil"]},
+  {L:"PL",ty:"fill",src:"wb",t:"Flowers have colors and smells that attract animals to drink their ___.",a:"nectar",w:["pollen","milk","water"]},
+  {L:"PL",ty:"fill",src:"wb",t:"When plants die, they add ___ to the soil.",a:"nutrients",w:["seeds","pollen","spores"]},
+  {L:"PL",ty:"fill",src:"wb",t:"Two kinds of plants that reproduce by making seeds are flowering plants and ___.",a:"conifers",w:["ferns","mushrooms","onions"]},
+  {L:"PL",ty:"fill",src:"wb",t:"Pollen moves from small male cones to large female cones when the ___ blows.",a:"wind",w:["rain","sun","snow"]},
+  {L:"PL",ty:"fill",src:"wb",t:"An onion can grow a new plant from its underground stem, or ___.",a:"bulb",w:["spore","seed","cone"]},
+  /* Vocabulary (WB p.44) */
+  {L:"PL",ty:"mc",src:"wb",q:"a structure that can grow into a new plant",a:"seed",w:["pollen","cone"]},
+  {L:"PL",ty:"mc",src:"wb",q:"a structure in flowering plants that makes seeds",a:"flower",w:["fruit","embryo"]},
+  {L:"PL",ty:"mc",src:"wb",q:"all of the stages in an organism's life",a:"life cycle",w:["pollination","embryo"]},
+  {L:"PL",ty:"mc",src:"wb",q:"the process that takes place when pollen moves from the male part of a flower to the female part",a:"pollination",w:["life cycle","germination"]},
+  {L:"PL",ty:"mc",src:"wb",q:"a structure that holds seeds",a:"fruit",w:["flower","pollen"]},
+  {L:"PL",ty:"mc",src:"wb",q:"a young plant inside a seed",a:"embryo",w:["seedling","cone"]},
+  {L:"PL",ty:"mc",src:"wb",q:"a structure in conifers that makes seeds",a:"cone",w:["flower","fruit"]},
+  {L:"PL",ty:"mc",src:"wb",q:"a powder made by the male part of a flower or cone",a:"pollen",w:["nectar","embryo"]},
+  /* Cloze (WB p.45) */
+  {L:"PL",ty:"cloze",src:"wb",title:"Cloze Activity — Plant Life Cycles",t:"Plants go through stages known as a life cycle. Plants ___ from seeds and grow into adult plants. Then the plants ___. Flowers produce pollen and eggs. Animals and ___ move pollen to eggs. This movement is called ___. After a flower is pollinated, a seed forms and is protected by a ___ that grows around it.",a:["germinate","reproduce","wind","pollination","fruit"],bank:["germinate","reproduce","wind","pollination","fruit","cone"]},
+  /* Tests (WB p.58–64) + Lesson Review */
+  {L:"PL",ty:"mc",src:"wb",q:"Which structure of a flowering plant holds seeds?",a:"fruit",w:["cone","egg"]},
+  {L:"PL",ty:"mc",src:"wb",q:"When pollen joins an egg in the ovary of a flower, what is formed?",a:"a seed",w:["a cone","a flower"]},
+  {L:"PL",ty:"mc",src:"wb",q:"Which plant structure makes seeds?",a:"flower",w:["fruit","embryo"]},
+  {L:"PL",ty:"mc",src:"wb",q:"The inside of a seed contains a(n)…",a:"embryo",w:["egg","larva"]},
+  {L:"PL",ty:"mc",src:"wb",q:"What must happen before a seed forms in a flower or a cone?",a:"pollination",w:["metamorphosis","germination"]},
+  {L:"PL",ty:"mc",src:"wb",q:"Which structure in conifers makes seeds?",a:"cone",w:["flower","fruit"]},
+  {L:"PL",ty:"mc",src:"wb",q:"When a seed is planted in the soil and the conditions are right, it begins to grow in a process called…",a:"germination",w:["pollination","decomposition"]},
+  {L:"PL",ty:"mc",src:"wb",q:"What happens to a seed when it germinates?",a:"It begins to grow.",w:["It dies.","It blooms."]},
+  {L:"PL",ty:"mc",src:"wb",q:"Which two parts of a flower help it make seeds?",a:"pollen and eggs",w:["roots and stems","fruit and nectar"]},
+  {L:"PL",ty:"mc",src:"wb",q:"What has to happen before a seed can germinate?",a:"It has to be planted in soil.",w:["It has to have fruit.","It has to be carried by wind."]},
+  {L:"PL",ty:"mc",src:"wb",q:"Animals such as bees carry pollen from one plant to another in a process called…",a:"pollination",w:["germination","decomposition"]},
+  {L:"PL",ty:"mc",src:"wb",q:"How does a conifer reproduce?",a:"with cones",w:["with flowers","with spores"]},
+  {L:"PL",ty:"open",src:"wb",q:"Critical Thinking: How can a flower's sweet smell help it to become pollinated?",a:"The sweet smell attracts animals like bees. They drink the nectar and carry pollen to other flowers.",points:[["attract","animals","bees","insects"],["pollen","nectar"]],need:2},
+  {L:"PL",ty:"open",src:"wb",q:"What are the steps in the life cycle of a flowering plant? Use seed, germinate, seedling, flower and pollination.",a:"A seed germinates and grows into a seedling. The seedling grows into an adult plant with flowers. After pollination, the flowers make new seeds.",points:[["germinate","germinates"],["seedling"],["flower","flowers"],["pollination","pollinated"]],need:3},
+  /* ----- Animal Life Cycles: Outline (WB p.46–47) ----- */
+  {L:"AL",ty:"fill",src:"wb",t:"After an animal is born, it grows, changes, reproduces, and ___.",a:"dies",w:["hatches","sleeps","molts"]},
+  {L:"AL",ty:"fill",src:"wb",t:"A ___ changes into a frog as it grows.",a:"tadpole",w:["caterpillar","larva","chick"]},
+  {L:"AL",ty:"fill",src:"wb",t:"During their life cycles, some animals change form through the process of ___.",a:"metamorphosis",w:["pollination","germination","heredity"]},
+  {L:"AL",ty:"fill",src:"wb",t:"Metamorphosis happens in the life cycles of amphibians and some ___.",a:"insects",w:["mammals","birds","fish"]},
+  {L:"AL",ty:"fill",src:"wb",t:"Another name for an insect that has just hatched is a ___.",a:"larva",w:["pupa","adult","tadpole"]},
+  {L:"AL",ty:"fill",src:"wb",t:"Fish lay their eggs in ___.",a:"water",w:["nests","sand","trees"]},
+  {L:"AL",ty:"fill",src:"wb",t:"Unlike most reptiles and fish, ___ protect their eggs and raise their young.",a:"birds",w:["frogs","insects","snakes"]},
+  {L:"AL",ty:"fill",src:"wb",t:"Most mammals do not hatch from eggs, but are born ___.",a:"live",w:["dead","tiny","wet"]},
+  {L:"AL",ty:"fill",src:"wb",t:"Mammals look after their young until the young can ___ on their own.",a:"survive",w:["swim","hatch","fly"]},
+  /* Vocabulary (WB p.48) */
+  {L:"AL",ty:"mc",src:"wb",q:"a structure containing food and nutrients that young animals need in order to grow",a:"egg",w:["larva","pupa"]},
+  {L:"AL",ty:"mc",src:"wb",q:"the stages through which animals grow, change, reproduce, and die",a:"life cycle",w:["metamorphosis","hatching"]},
+  {L:"AL",ty:"mc",src:"wb",q:"the process by which an animal breaks out of an egg",a:"hatching",w:["metamorphosis","pollination"]},
+  {L:"AL",ty:"mc",src:"wb",q:"a young insect that has just hatched",a:"larva",w:["pupa","adult"]},
+  {L:"AL",ty:"mc",src:"wb",q:"the stage of an animal's life cycle when it reproduces",a:"adult",w:["larva","egg"]},
+  {L:"AL",ty:"mc",src:"wb",q:"the stage in which an insect is changing into an adult",a:"pupa",w:["larva","egg"]},
+  {L:"AL",ty:"mc",src:"wb",q:"the process by which an organism's body changes form",a:"metamorphosis",w:["life cycle","heredity"]},
+  {L:"AL",ty:"mc",src:"wb",q:"a young frog that breathes with gills",a:"tadpole",w:["larva","pupa"]},
+  /* Cloze (WB p.49) */
+  {L:"AL",ty:"cloze",src:"wb",title:"Cloze Activity — Animal Life Cycles",t:"All animals change during their ___. Animals are hatched from eggs or born ___. At the end of their life cycles, all animals ___. Reptiles, fish, and birds all ___. Young birds and mammals look similar to their ___. Amphibians and insects in the ___ stage look very different from their parents. Larvae hatch from eggs, and then change into ___ through a process called ___.",a:["life cycles","live","die","lay eggs","parents","larva","adults","metamorphosis"],bank:["life cycles","live","die","lay eggs","parents","larva","adults","metamorphosis","hatch"]},
+  /* Tests (WB p.58–69) + Lesson Review */
+  {L:"AL",ty:"mc",src:"wb",q:"Which structure contains food and nutrients for developing animals?",a:"egg",w:["embryo","pupa"]},
+  {L:"AL",ty:"mc",src:"wb",q:"Which young animal looks very different from its parents?",a:"beetle larva",w:["kitten","chick"]},
+  {L:"AL",ty:"mc",src:"wb",q:"In which stage does an insect change into an adult?",a:"pupa",w:["larva","life cycle"]},
+  {L:"AL",ty:"mc",src:"wb",q:"Which stage happens before the pupa stage?",a:"larva",w:["adult","seed"]},
+  {L:"AL",ty:"mc",src:"wb",q:"What is the first stage in the life cycle of a ladybug?",a:"egg",w:["larva","pupa"]},
+  {L:"AL",ty:"mc",src:"wb",q:"What is the larval stage of a frog called?",a:"tadpole",w:["caterpillar","pupa"]},
+  {L:"AL",ty:"mc",src:"wb",q:"What is the second stage in a beetle's life cycle?",a:"larva",w:["egg","pupa"]},
+  {L:"AL",ty:"mc",src:"wb",q:"What is the name for the larval stage of a butterfly?",a:"caterpillar",w:["tadpole","pupa"]},
+  {L:"AL",ty:"mc",src:"wb",q:"The hard case in which the pupa lives is the…",a:"cocoon",w:["nest","shell"]},
+  {L:"AL",ty:"mc",src:"wb",q:"How are birds, fish, and reptiles alike?",a:"They all begin their lives in eggs.",w:["They all have legs.","They all breathe through lungs."]},
+  {L:"AL",ty:"mc",src:"wb",q:"Ladybug life cycle: egg → ___ → pupa → adult",a:"larva",w:["chrysalis","tadpole"]},
+  {L:"AL",ty:"mc",src:"wb",q:"An iguana's life cycle would be most like a…",a:"turtle's",w:["cheetah's","fly's"]},
+  {L:"AL",ty:"order",src:"wb",q:"Sequence: put the four stages of a butterfly's life cycle in order.",items:["egg","larva (caterpillar)","pupa","adult"]},
+  {L:"AL",ty:"open",src:"wb",q:"Critical Thinking: Why do mammals care for their young until they can get food on their own, and reptiles and fish do not?",a:"Young mammals are born small and cannot find food by themselves. Young reptiles and fish look like their parents and can find food on their own.",points:[["food","feed","milk"],["own","themselves","small","cannot","can't","like their parents"]],need:2},
+  {L:"AL",ty:"open",src:"wb",q:"Critical Thinking: Do you go through metamorphosis? How do you know?",a:"No. I grow bigger, but my body does not change form. I look like my parents.",points:[["no","not","don't"],["form","shape","change","look like","parents","bigger"]],need:2},
+  /* ----- From Parents to Young: Outline (WB p.52–53) ----- */
+  {L:"PY",ty:"fill",src:"wb",t:"Features that make an organism unique are called ___.",a:"traits",w:["skills","offspring","cells"]},
+  {L:"PY",ty:"fill",src:"wb",t:"Examples of human traits are eye and hair ___.",a:"color",w:["skills","length","size"]},
+  {L:"PY",ty:"fill",src:"wb",t:"People use traits to ___ an organism.",a:"identify",w:["classify","hatch","feed"]},
+  {L:"PY",ty:"fill",src:"wb",t:"The passing on of a trait from parents to young is called ___.",a:"heredity",w:["metamorphosis","pollination","environment"]},
+  {L:"PY",ty:"fill",src:"wb",t:"The features that your parents passed on to you are called ___.",a:"inherited traits",w:["learned traits","skills","offspring"]},
+  {L:"PY",ty:"fill",src:"wb",t:"You look like your ___ because of inherited traits.",a:"parents",w:["friends","teachers","pets"]},
+  {L:"PY",ty:"fill",src:"wb",t:"Most organisms have a(n) ___ of traits from both parents.",a:"mixture",w:["skill","heredity","copy"]},
+  {L:"PY",ty:"fill",src:"wb",t:"An organism will look more like the parent that passes on ___ traits.",a:"visible",w:["learned","hidden","small"]},
+  {L:"PY",ty:"fill",src:"wb",t:"Both parents pass on traits to their young, otherwise known as ___.",a:"offspring",w:["heredity","adults","seedlings"]},
+  {L:"PY",ty:"fill",src:"wb",t:"Traits that people and animals learn over time are ___.",a:"learned traits",w:["inherited traits","offspring","heredity"]},
+  {L:"PY",ty:"fill",src:"wb",t:"Learned traits and traits caused by the environment are not ___.",a:"inherited",w:["learned","visible","living"]},
+  {L:"PY",ty:"fill",src:"wb",t:"A scar is a trait caused by the ___.",a:"environment",w:["parents","heredity","offspring"]},
+  {L:"PY",ty:"fill",src:"wb",t:"Hair that gets lighter from the Sun is an example of a trait caused by the ___.",a:"environment",w:["heredity","parents","offspring"]},
+  /* Cloze (WB p.55) */
+  {L:"PY",ty:"cloze",src:"wb",title:"Cloze Activity — From Parents to Young",t:"Some traits are passed from parents to their ___. These traits are called ___. Organisms look like both parents because they get a(n) ___ of traits from both parents. Other traits are new ___, like learning to read. Skills that an animal learns are called ___. Traits can change or appear because of the ___.",a:["offspring","inherited traits","mixture","skills","learned traits","environment"],bank:["offspring","inherited traits","mixture","skills","learned traits","environment"]},
+  /* Tests (WB p.58–68) + Lesson Review */
+  {L:"PY",ty:"mc",src:"wb",q:"Which is an example of a learned trait?",a:"speaking a language",w:["eye color","flower shape"]},
+  {L:"PY",ty:"mc",src:"wb",q:"Any feature of a living thing is called a(n)…",a:"trait",w:["instinct","offspring"]},
+  {L:"PY",ty:"mc",src:"wb",q:"Inherited traits come from…",a:"parents",w:["skills","environment"]},
+  {L:"PY",ty:"mc",src:"wb",q:"Riding a bicycle is an example of what kind of trait?",a:"learned trait",w:["inherited trait","environmental trait"]},
+  {L:"PY",ty:"mc",src:"wb",q:"What three factors affect an organism's traits?",a:"heredity, environment, learning",w:["heredity, growth, learning","environment, sunlight, location"]},
+  {L:"PY",ty:"mc",src:"wb",q:"What is another name for an organism's young?",a:"offspring",w:["egg","pupa"]},
+  {L:"PY",ty:"mc",src:"wb",q:"Which of the following is not an inherited trait?",a:"a person's soccer skills",w:["a person's eye color","a dog's fur color"]},
+  {L:"PY",ty:"mc",src:"wb",q:"What is an example of a learned trait?",a:"a person using a hammer",w:["a flower blooming","a bear hibernating"]},
+  {L:"PY",ty:"mc",src:"wb",q:"Inherited: curly brown hair. Learned: playing the flute. Which is another LEARNED trait?",a:"likes to sing",w:["curly brown hair","blue eyes"]},
+  {L:"PY",ty:"mc",src:"wb",q:"Which of the following is an inherited trait?",a:"hair color",w:["tanned skin","small scar"]},
+  {L:"PY",ty:"mc",src:"wb",q:"A plant loses branches during a storm. This is an example of…",a:"a trait affected by the environment",w:["an inherited trait","a learned trait"]},
+  {L:"PY",ty:"open",src:"wb",q:"Critical Thinking: Why is it that children born of the same parents do not look exactly alike?",a:"Each child gets a different mixture of traits from both parents.",points:[["mixture","mix","different"],["both parents","parents","mother","father"]],need:2},
+  {L:"PY",ty:"open",src:"wb",q:"What is the difference between traits that are inherited and traits that are not inherited? Give examples.",a:"Inherited traits come from parents, like eye color. Traits that are not inherited are learned or caused by the environment, like riding a bike or a scar.",points:[["parents"],["learned","learn","environment"],["eye","hair","bike","read","scar"]],need:2}
+]);
+
 /* Oral practice — Estimated from the lessons (no teacher Oral sheet yet). */
 var ORAL_EST = true;
 var ORAL = [
@@ -1914,6 +2074,7 @@ function vocabItems(L) {
   var all = VOCAB[L], out = [];
   all.forEach(function (v) {
     var others = AppCore.shuffle(all.filter(function (x) { return x !== v; }));
+    if (others.length < 4) { var more = []; Object.keys(VOCAB).forEach(function (k) { if (k !== L) more = more.concat(VOCAB[k]); }); others = others.concat(AppCore.shuffle(more)).slice(0, 4); }
     var ex = v[0] + zhOf(v[0]) + ": " + v[1];
     out.push({L: L, ty: "mc", q: "Which word means: “" + v[1] + "”?", a: v[0], w: [others[0][0], others[1][0]], vocab: true, exp: ex});
     out.push({L: L, ty: "mc", q: "What does “" + v[0] + "” mean?", a: v[1], w: [others[2][1], others[3][1]], vocab: true, exp: ex});
@@ -1945,6 +2106,11 @@ function home() {
   var g = el("div", "hs-games");
   g.appendChild(AppCore.btn("🃏 Word Flip", "ac-primary", function () { pickLesson("🃏 Word Flip — which lesson?", flip, true); }));
   if (typeof SORTS !== "undefined") g.appendChild(AppCore.btn("🧺 Sort It", "ac-primary", function () { pickLesson("🧺 Sort It — which lesson?", sortIt, false, false, function (id) { return !!SORTS[id]; }); }));
+  if (APP.race) g.appendChild(AppCore.btn("⏱ Sentence Race", "ac-primary", function () {
+    window.scrollTo(0, 0); root.innerHTML = "";
+    var it = BANK.filter(function (q) { return q.ty === "scramble"; }).map(function (q) { return {answer: q.a, extra: q.extra, hint: q.q, exp: q.exp}; });
+    AppCore.sentenceRace(root, {key: KEY + "-race", seconds: 90, items: it, onHome: home});
+  }));
   if (BANK.some(function (q) { return q.ty === "evid"; })) g.appendChild(AppCore.btn("🔎 Find the Proof", "ac-primary", function () { pickLesson("🔎 Find the Proof — which story?", proof, true, false, function (id) { return BANK.some(function (q) { return q.L === id && q.ty === "evid"; }); }); }));
   root.appendChild(g);
   root.appendChild(el("h2", "hs-h2", "🎤 Speak · 🎧 Listen · 🔤 Spell"));
@@ -2054,6 +2220,7 @@ function run(items, o) {
     root.appendChild(AppCore.drillBar({title: o.title + " · " + (i + 1) + " / " + items.length, onBack: home, onFinish: end, game: G}));
     var card = el("div", "hs-card"); root.appendChild(card);
     var tag = q.vocab ? "Vocabulary" : q.tv ? "Teacher's word list" : q.ty === "oral" ? "Oral" + (typeof ORAL_EST !== "undefined" && ORAL_EST ? " · Estimated — confirm with teacher" : "") : {listen: "Listening", spell: "Spelling", evid: "Find the evidence", scramble: "Build the sentence", mc: "Multiple choice", tf: "True or False", fill: Array.isArray(q.a) ? "Outline" : "Fill in the blank", order: "Put in order", open: "Critical thinking", cloze: "Cloze Activity", match: "Vocabulary matching", label: "Label the diagram"}[q.ty];
+    if (q.src === "wb") tag = "📘 Workbook · " + tag; else if (q.src === "tb") tag = "📗 Textbook · " + tag;
     card.appendChild(el("div", "hs-tag", lessonById(q.L).icon + " " + esc(lessonById(q.L).name) + " · " + tag));
     var area = el("div"); card.appendChild(area);
     var next = el("div", "hs-next"); card.appendChild(next);
@@ -2132,7 +2299,7 @@ function run(items, o) {
       AppCore.wordBank(wb, {text: q.t, bank: AppCore.shuffle(q.bank), answers: q.a, exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a.join(" / ")); }});
     } else if (q.ty === "fill") {
       var others = q.w ? q.w.slice() : AppCore.shuffle(VOCAB[q.L].map(function (v) { return v[0]; }).filter(function (w) { return w.toLowerCase() !== q.a.toLowerCase() && w !== q.base; })).slice(0, 3);
-      AppCore.wordBank(area, {text: q.t, bank: D.place(q.a, others).choices, answers: [q.a], exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a); }});
+      AppCore.wordBank(area, {text: q.t, bank: AppCore.shuffle([q.a].concat(others)), answers: [q.a], exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a); }});
     } else if (q.ty === "order") {
       AppCore.tiles(area, {unit: "item", items: q.items, hint: q.q, exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.items.join(" → ")); }});
     } else if (q.ty === "open") {
@@ -2552,5 +2719,6 @@ home();
   });
   document.body.appendChild(b);
 })();
+
 </script>
 </body></html>

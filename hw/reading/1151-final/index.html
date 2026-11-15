@@ -30,42 +30,6 @@ body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:1
 .ac-ans,.ac-fb b{white-space:pre-line}
 </style></head><body><div id="app"></div>
 <script>
-/* ===== KPDeal：選擇題正確答案位置平均分散（練習小站共用，版本 2026-11-10b）=====
-   規則：每個位置（A/B/C/D…）出現次數一樣多，且正確答案不會連續 3 題在同一位置。
-   用法（整段貼進 App 的 <script>，放在使用它的程式之前）：
-     KPDeal.place(options, correct)   → 回傳新陣列：錯誤選項打亂，正確選項放到平均分散的位置
-                                         correct 可以是「值」或「判斷函式 (item,index)=>boolean」
-     KPDeal.pos(n)                    → 只要位置編號（0..n-1）時使用
-     KPDeal.shuffle(arr)              → 一般打亂（回傳新陣列）
-   注意：凡是「一題 + 數個選項 + 一個正解」的地方都要用 place，不要再用 shuffle 決定選項順序。
-*/
-var KPDeal=(function(){
-  var decks={},last=[];
-  function sh(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
-  function runOK(s){for(var i=2;i<s.length;i++)if(s[i]===s[i-1]&&s[i]===s[i-2])return false;return true}
-  function pos(n){
-    if(!(n>1))return 0;
-    var d=decks[n];
-    if(!d||!d.length){var base=[],k=0;for(var r=0;r<2;r++)for(var i=0;i<n;i++)base.push(i);
-      do{d=sh(base);k++}while(!runOK(last.slice(-2).concat(d))&&k<300);decks[n]=d}
-    var p=d.shift();
-    if(last.length>=2&&last[last.length-1]===p&&last[last.length-2]===p){
-      for(var i=0;i<d.length;i++)if(d[i]!==p){var q=d[i];d[i]=p;p=q;break}
-      if(last[last.length-1]===p&&last[last.length-2]===p){var alt=(p+1+Math.floor(Math.random()*(n-1)))%n;d.push(p);p=alt}}
-    last.push(p);if(last.length>4)last.shift();
-    return p;
-  }
-  function place(arr,correct){
-    var f=typeof correct==='function'?correct:function(x){return x===correct};
-    var ci=-1;for(var i=0;i<arr.length;i++)if(f(arr[i],i)){ci=i;break}
-    if(ci<0)return sh(arr);
-    var c=arr[ci],w=sh(arr.filter(function(_,i){return i!==ci}));
-    w.splice(pos(arr.length),0,c);
-    return w;
-  }
-  return {place:place,pos:pos,shuffle:sh};
-})();
-
 /* =====================================================================
    app-core.js — shared core for the kids' exam-practice apps
    Canonical copy: github.com/iam5980/kids-practice/template/app-core.js
@@ -1199,7 +1163,7 @@ var AppCore = (function () {
 /* =====================================================================
    study-kit.js — read-aloud, level map and 素養題組 for any practice app
    Canonical copy: github.com/iam5980/kids-practice/template/study-kit.js
-   Version: 2026-10-25
+   Version: 2026-11-10 (single-choice answers spread evenly via KPDeal when present)
 
    HOW TO USE: paste the whole file inside the page's main <script> (before
    the app code). Works for 中文部 apps and English apps alike. Call
@@ -1863,6 +1827,7 @@ function vocabItems(L) {
   var all = VOCAB[L], out = [];
   all.forEach(function (v) {
     var others = AppCore.shuffle(all.filter(function (x) { return x !== v; }));
+    if (others.length < 4) { var more = []; Object.keys(VOCAB).forEach(function (k) { if (k !== L) more = more.concat(VOCAB[k]); }); others = others.concat(AppCore.shuffle(more)).slice(0, 4); }
     var ex = v[0] + zhOf(v[0]) + ": " + v[1];
     out.push({L: L, ty: "mc", q: "Which word means: “" + v[1] + "”?", a: v[0], w: [others[0][0], others[1][0]], vocab: true, exp: ex});
     out.push({L: L, ty: "mc", q: "What does “" + v[0] + "” mean?", a: v[1], w: [others[2][1], others[3][1]], vocab: true, exp: ex});
@@ -1894,6 +1859,11 @@ function home() {
   var g = el("div", "hs-games");
   g.appendChild(AppCore.btn("🃏 Word Flip", "ac-primary", function () { pickLesson("🃏 Word Flip — which lesson?", flip, true); }));
   if (typeof SORTS !== "undefined") g.appendChild(AppCore.btn("🧺 Sort It", "ac-primary", function () { pickLesson("🧺 Sort It — which lesson?", sortIt, false, false, function (id) { return !!SORTS[id]; }); }));
+  if (APP.race) g.appendChild(AppCore.btn("⏱ Sentence Race", "ac-primary", function () {
+    window.scrollTo(0, 0); root.innerHTML = "";
+    var it = BANK.filter(function (q) { return q.ty === "scramble"; }).map(function (q) { return {answer: q.a, extra: q.extra, hint: q.q, exp: q.exp}; });
+    AppCore.sentenceRace(root, {key: KEY + "-race", seconds: 90, items: it, onHome: home});
+  }));
   if (BANK.some(function (q) { return q.ty === "evid"; })) g.appendChild(AppCore.btn("🔎 Find the Proof", "ac-primary", function () { pickLesson("🔎 Find the Proof — which story?", proof, true, false, function (id) { return BANK.some(function (q) { return q.L === id && q.ty === "evid"; }); }); }));
   root.appendChild(g);
   root.appendChild(el("h2", "hs-h2", "🎤 Speak · 🎧 Listen · 🔤 Spell"));
@@ -2003,6 +1973,7 @@ function run(items, o) {
     root.appendChild(AppCore.drillBar({title: o.title + " · " + (i + 1) + " / " + items.length, onBack: home, onFinish: end, game: G}));
     var card = el("div", "hs-card"); root.appendChild(card);
     var tag = q.vocab ? "Vocabulary" : q.tv ? "Teacher's word list" : q.ty === "oral" ? "Oral" + (typeof ORAL_EST !== "undefined" && ORAL_EST ? " · Estimated — confirm with teacher" : "") : {listen: "Listening", spell: "Spelling", evid: "Find the evidence", scramble: "Build the sentence", mc: "Multiple choice", tf: "True or False", fill: Array.isArray(q.a) ? "Outline" : "Fill in the blank", order: "Put in order", open: "Critical thinking", cloze: "Cloze Activity", match: "Vocabulary matching", label: "Label the diagram"}[q.ty];
+    if (q.src === "wb") tag = "📘 Workbook · " + tag; else if (q.src === "tb") tag = "📗 Textbook · " + tag;
     card.appendChild(el("div", "hs-tag", lessonById(q.L).icon + " " + esc(lessonById(q.L).name) + " · " + tag));
     var area = el("div"); card.appendChild(area);
     var next = el("div", "hs-next"); card.appendChild(next);
@@ -2081,7 +2052,7 @@ function run(items, o) {
       AppCore.wordBank(wb, {text: q.t, bank: AppCore.shuffle(q.bank), answers: q.a, exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a.join(" / ")); }});
     } else if (q.ty === "fill") {
       var others = q.w ? q.w.slice() : AppCore.shuffle(VOCAB[q.L].map(function (v) { return v[0]; }).filter(function (w) { return w.toLowerCase() !== q.a.toLowerCase() && w !== q.base; })).slice(0, 3);
-      AppCore.wordBank(area, {text: q.t, bank: D.place(q.a, others).choices, answers: [q.a], exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a); }});
+      AppCore.wordBank(area, {text: q.t, bank: AppCore.shuffle([q.a].concat(others)), answers: [q.a], exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a); }});
     } else if (q.ty === "order") {
       AppCore.tiles(area, {unit: "item", items: q.items, hint: q.q, exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.items.join(" → ")); }});
     } else if (q.ty === "open") {
@@ -2501,5 +2472,6 @@ home();
   });
   document.body.appendChild(b);
 })();
+
 </script>
 </body></html>

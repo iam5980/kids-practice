@@ -30,42 +30,6 @@ body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:1
 .ac-ans,.ac-fb b{white-space:pre-line}
 </style></head><body><div id="app"></div>
 <script>
-/* ===== KPDeal：選擇題正確答案位置平均分散（練習小站共用，版本 2026-11-10b）=====
-   規則：每個位置（A/B/C/D…）出現次數一樣多，且正確答案不會連續 3 題在同一位置。
-   用法（整段貼進 App 的 <script>，放在使用它的程式之前）：
-     KPDeal.place(options, correct)   → 回傳新陣列：錯誤選項打亂，正確選項放到平均分散的位置
-                                         correct 可以是「值」或「判斷函式 (item,index)=>boolean」
-     KPDeal.pos(n)                    → 只要位置編號（0..n-1）時使用
-     KPDeal.shuffle(arr)              → 一般打亂（回傳新陣列）
-   注意：凡是「一題 + 數個選項 + 一個正解」的地方都要用 place，不要再用 shuffle 決定選項順序。
-*/
-var KPDeal=(function(){
-  var decks={},last=[];
-  function sh(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
-  function runOK(s){for(var i=2;i<s.length;i++)if(s[i]===s[i-1]&&s[i]===s[i-2])return false;return true}
-  function pos(n){
-    if(!(n>1))return 0;
-    var d=decks[n];
-    if(!d||!d.length){var base=[],k=0;for(var r=0;r<2;r++)for(var i=0;i<n;i++)base.push(i);
-      do{d=sh(base);k++}while(!runOK(last.slice(-2).concat(d))&&k<300);decks[n]=d}
-    var p=d.shift();
-    if(last.length>=2&&last[last.length-1]===p&&last[last.length-2]===p){
-      for(var i=0;i<d.length;i++)if(d[i]!==p){var q=d[i];d[i]=p;p=q;break}
-      if(last[last.length-1]===p&&last[last.length-2]===p){var alt=(p+1+Math.floor(Math.random()*(n-1)))%n;d.push(p);p=alt}}
-    last.push(p);if(last.length>4)last.shift();
-    return p;
-  }
-  function place(arr,correct){
-    var f=typeof correct==='function'?correct:function(x){return x===correct};
-    var ci=-1;for(var i=0;i<arr.length;i++)if(f(arr[i],i)){ci=i;break}
-    if(ci<0)return sh(arr);
-    var c=arr[ci],w=sh(arr.filter(function(_,i){return i!==ci}));
-    w.splice(pos(arr.length),0,c);
-    return w;
-  }
-  return {place:place,pos:pos,shuffle:sh};
-})();
-
 /* =====================================================================
    app-core.js — shared core for the kids' exam-practice apps
    Canonical copy: github.com/iam5980/kids-practice/template/app-core.js
@@ -1199,7 +1163,7 @@ var AppCore = (function () {
 /* =====================================================================
    study-kit.js — read-aloud, level map and 素養題組 for any practice app
    Canonical copy: github.com/iam5980/kids-practice/template/study-kit.js
-   Version: 2026-10-25
+   Version: 2026-11-10 (single-choice answers spread evenly via KPDeal when present)
 
    HOW TO USE: paste the whole file inside the page's main <script> (before
    the app code). Works for 中文部 apps and English apps alike. Call
@@ -1527,15 +1491,14 @@ var KidKit = (function () {
            starsFor: starsFor, passageSet: passageSet, injectCSS: injectCSS, esc: esc, VERSION: "2026-10-25" };
 })();
 
-/* ===== Howard · Science Final · A Closer Look 4 — scope from the 5 lesson recordings ===== */
-var APP = {key: "hw-science-1151-final", title: "🔬 Howard's Science Final", sub: "A Closer Look 4 · 5 lessons · defeat every boss, then beat the Final Boss!",
-  scope: "Changes Caused by the Weather; Minerals and Rocks; Soil; Resources from the Past; Water (from the lesson recordings). Question types follow the midterm workbook pages: Outline, Cloze Activity, Vocabulary matching, Label the diagram, Critical thinking."};
+/* ===== Howard · Science Final · A Closer Look 4 — scope from the textbook + lesson recordings (Water left out) ===== */
+var APP = {key: "hw-science-1151-final", title: "🔬 Howard's Science Final", sub: "A Closer Look 4 · 4 lessons · defeat every boss, then beat the Final Boss!",
+  scope: "Changes Caused by the Weather; Minerals and Rocks; Soil; Resources from the Past (textbook p.236–281 + lesson recordings). Water is left out until the scope is confirmed. Question types follow the midterm workbook pages and the textbook Lesson Review / Chapter Review / Test Preparation."};
 var LESSONS = [
   {id: "W", name: "Changes Caused by the Weather", icon: "🌪️", boss: "Storm Spinner"},
   {id: "R", name: "Minerals and Rocks", icon: "🪨", boss: "Rock Golem"},
   {id: "S", name: "Soil", icon: "🌱", boss: "Mud Muncher"},
-  {id: "F", name: "Resources from the Past", icon: "🦴", boss: "Fossil Phantom"},
-  {id: "A", name: "Water", icon: "💧", boss: "Flood Serpent"}
+  {id: "F", name: "Resources from the Past", icon: "🦴", boss: "Fossil Phantom"}
 ];
 var VOCAB = {
   W: [
@@ -1590,19 +1553,6 @@ var VOCAB = {
     ["solar cell", "a tool that changes energy from sunlight into electricity"],
     ["acid rain", "rain made harmful by air pollution from burning fossil fuels"]
   ],
-  A: [
-    ["fresh water", "water without much salt"],
-    ["seawater", "ocean water that contains a great deal of salt"],
-    ["ice cap", "a thick layer of ice on land"],
-    ["soil water", "water that soaks into the soil"],
-    ["groundwater", "water that fills the cracks and spaces of rocks under the ground"],
-    ["watershed", "an area where water flows downhill into a common stream, lake or river"],
-    ["reservoir", "a storage area for holding and managing fresh water"],
-    ["well", "a deep hole dug below the ground to get groundwater"],
-    ["runoff", "water that flows over the land without evaporating or soaking into the ground"],
-    ["water treatment plant", "a place where water is made clean and pure"],
-    ["irrigation", "a way to bring water into the soil through pipes or ditches"]
-  ]
 };
 /* ty: mc (a + w[2]) | tf | fill (t with ___ , a) | order (items in order) | open (a + points) */
 var BANK = [
@@ -1724,36 +1674,13 @@ var BANK = [
   {L:"F",ty:"open",q:"How do you and your family rely on fossil fuels? Give two examples.",a:"We use them to make electricity and to drive cars (gasoline from oil). Natural gas can heat homes or cook food.",points:[["electricity","power"],["car","cars","drive","gas","gasoline","vehicle","bus"],["cook","heat","stove"]],need:2},
 
   /* ---------- A: Water ---------- */
-  {L:"A",ty:"mc",q:"Oceans and seas cover about how much of Earth's surface?",a:"almost three-fourths",w:["about one-half","about one-tenth"]},
-  {L:"A",ty:"mc",q:"Why can't we drink seawater or use it on soil?",a:"It contains a great deal of salt.",w:["It is too cold.","It has no minerals."]},
-  {L:"A",ty:"mc",q:"Where is most of Earth's fresh water?",a:"in glaciers and ice caps",w:["in rivers","in wells"]},
-  {L:"A",ty:"mc",q:"A giant ice cap covers…",a:"Antarctica",w:["the Great Plains","Arizona"]},
-  {L:"A",ty:"mc",q:"Where do most large towns and cities get their water?",a:"from reservoirs",w:["from the ocean","from ice caps"]},
-  {L:"A",ty:"mc",q:"What is the most common way of getting groundwater?",a:"digging a well",w:["building a dam","melting ice"]},
-  {L:"A",ty:"mc",q:"What carries bacteria and harmful chemicals to a water source?",a:"runoff",w:["irrigation","ice caps"]},
-  {L:"A",ty:"mc",q:"At a water treatment plant, what does the filter remove?",a:"trash and other large objects",w:["salt","harmful organisms"]},
-  {L:"A",ty:"mc",q:"Why are chemicals added at a water treatment plant?",a:"to kill harmful organisms",w:["to add salt","to change the color"]},
-  {L:"A",ty:"mc",q:"What problem does irrigation solve?",a:"It brings water to crops where there is not enough rain.",w:["It makes water salty.","It stops floods."]},
-  {L:"A",ty:"tf",q:"Most of Earth's fresh water is in a liquid state.",a:false,exp:"Most fresh water is solid — in glaciers and ice caps."},
-  {L:"A",ty:"tf",q:"Fresh water is rarely pure.",a:true},
-  {L:"A",ty:"tf",q:"You should drink water directly from streams or lakes.",a:false,exp:"It may have bacteria or harmful chemicals."},
-  {L:"A",ty:"tf",q:"Water is used to generate electricity.",a:true},
-  {L:"A",ty:"tf",q:"Laws and government agencies help protect watersheds.",a:true},
-  {L:"A",ty:"fill",t:"___ is water that fills the cracks and spaces of rocks under the ground.",a:"groundwater"},
-  {L:"A",ty:"fill",t:"A ___ is a storage area for holding and managing fresh water.",a:"reservoir"},
-  {L:"A",ty:"fill",t:"An area where water flows downhill into a common stream, lake or river is a ___.",a:"watershed"},
-  {L:"A",ty:"fill",t:"___ is a way to bring water into the soil through pipes or ditches.",a:"irrigation"},
-  {L:"A",ty:"order",q:"Put the steps at a water treatment plant in order.",items:["Water passes through a filter.","The filter removes trash and large objects.","Chemicals are added to kill harmful organisms.","Clean water is stored in reservoirs until it is needed."]},
-  {L:"A",ty:"order",q:"Put the path of water under the ground in order.",items:["Water soaks into the soil and becomes soil water.","Plants use some of the soil water.","The rest seeps down to a layer without cracks.","It collects as groundwater in the spaces above."]},
-  {L:"A",ty:"open",q:"Describe three ways that people could use a river.",a:"For drinking water, for farming (irrigation), to make electricity, to transport goods by ship, and for fun like swimming, boating and fishing.",points:[["drink","drinking"],["farm","farming","irrigation","crops"],["electricity","power"],["ship","ships","transport","boat","boating"],["swim","swimming","fish","fishing","fun"]],need:3}
 ];
 /* mini-game sort sets */
 var SORTS = {
   W: {title:"Fast change: which kind?",bins:["Storm","Water / fire","Gravity"],items:[{t:"tornado",bin:0},{t:"hurricane",bin:0},{t:"flood",bin:1},{t:"wildfire",bin:1},{t:"landslide",bin:2},{t:"avalanche",bin:2}]},
   R: {title:"Which kind of rock?",bins:["Igneous","Sedimentary","Metamorphic"],items:[{t:"granite",bin:0},{t:"obsidian",bin:0},{t:"basalt",bin:0},{t:"pumice",bin:0},{t:"sandstone",bin:1},{t:"limestone",bin:1},{t:"shale",bin:1},{t:"marble",bin:2,exp:"Marble forms from limestone."},{t:"gneiss",bin:2,exp:"Gneiss forms from granite."},{t:"quartzite",bin:2,exp:"Quartzite forms from sandstone."},{t:"slate",bin:2}]},
   S: {title:"Which soil layer?",bins:["A horizon (topsoil)","B horizon (subsoil)","C horizon"],items:[{t:"rich in humus and minerals",bin:0},{t:"home to many living things",bin:0},{t:"lighter and harder, with bits of clay",bin:1},{t:"strong plant roots may reach here",bin:1},{t:"made of weathered bedrock",bin:2},{t:"just above the bedrock",bin:2}]},
-  F: {title:"Renewable or nonrenewable?",bins:["Renewable","Nonrenewable"],items:[{t:"sunlight",bin:0},{t:"wind",bin:0},{t:"flowing water",bin:0},{t:"ocean tides",bin:0},{t:"heat inside Earth",bin:0},{t:"coal",bin:1},{t:"oil",bin:1},{t:"natural gas",bin:1}]},
-  A: {title:"Fresh water or salt water?",bins:["Fresh water","Salt water"],items:[{t:"most rivers",bin:0},{t:"lakes and ponds",bin:0},{t:"wells",bin:0},{t:"glaciers and ice caps",bin:0},{t:"oceans",bin:1},{t:"seas",bin:1}]}
+  F: {title:"Renewable or nonrenewable?",bins:["Renewable","Nonrenewable"],items:[{t:"sunlight",bin:0},{t:"wind",bin:0},{t:"flowing water",bin:0},{t:"ocean tides",bin:0},{t:"heat inside Earth",bin:0},{t:"coal",bin:1},{t:"oil",bin:1},{t:"natural gas",bin:1}]}
 };
 /* ===== Harder, workbook-style items (Outline / Cloze Activity / Label / Critical thinking) — modeled on the midterm practice pages ===== */
 var SOIL_SVG = '<svg viewBox="0 0 320 200" width="100%" style="max-width:420px;display:block;margin:6px auto"><rect x="40" y="10" width="170" height="40" fill="#5b3a1e"/><rect x="40" y="50" width="170" height="45" fill="#a0703c"/><rect x="40" y="95" width="170" height="50" fill="#b9a27a"/><circle cx="70" cy="120" r="9" fill="#8b8172"/><circle cx="150" cy="125" r="12" fill="#8b8172"/><rect x="40" y="145" width="170" height="45" fill="#6b6b6b"/><g font-size="20" font-weight="700" fill="#fff"><text x="225" y="36">1</text><text x="225" y="78">2</text><text x="225" y="126">3</text><text x="225" y="173">4</text></g><path d="M60 10 v25 M90 10 v35 M120 10 v20" stroke="#2f6b1f" stroke-width="3"/></svg>';
@@ -1768,8 +1695,6 @@ var HARD = [
   {L:"S",ty:"fill",t:"Materials with pore spaces are said to be ___. They hold ___ and water.",a:["porous","air"],bank:["porous","air","permeable","oil","salt"]},
   {L:"F",ty:"fill",t:"Most fossils are found in ___ rocks. Sediments bury the ___ of a plant or animal.",a:["sedimentary","remains"],bank:["sedimentary","remains","igneous","bubbles","metamorphic"]},
   {L:"F",ty:"fill",t:"A ___ resource can be replaced quickly in nature, but a ___ resource is gone forever once it is used up.",a:["renewable","nonrenewable"],bank:["renewable","nonrenewable","fossil","petrified","solar"]},
-  {L:"A",ty:"fill",t:"Most of Earth's fresh water is ___, held in glaciers and ___.",a:["solid","ice caps"],bank:["solid","ice caps","liquid","reservoirs","wells"]},
-  {L:"A",ty:"fill",t:"Water seeps down until it reaches a layer without cracks or ___. Then it collects as ___.",a:["pore spaces","groundwater"],bank:["pore spaces","groundwater","runoff","soil water","bands"]},
   {L:"W",ty:"fill",t:"A hurricane is much ___ than a tornado. It can span hundreds of ___.",a:["bigger","kilometers"],bank:["bigger","kilometers","smaller","meters","seconds"]},
   {L:"W",ty:"fill",t:"Floods ___ the soil quickly, but afterwards new soil is ___ on the land.",a:["erode","deposited"],bank:["erode","deposited","freeze","burned","melted"]},
 
@@ -1779,7 +1704,6 @@ var HARD = [
   {L:"S",ty:"cloze",title:"Cloze Activity — Soil",t:"Soil is made of bits of rock, minerals and ___. The top layer, or ___, is rich in humus. Below it is the ___. Sandy soil has high ___, so water moves through it quickly.",a:["humus","topsoil","subsoil","permeability"],bank:["humus","topsoil","subsoil","permeability","magma","amber"]},
   {L:"F",ty:"cloze",title:"Cloze Activity — Fossils",t:"A shell can leave a hollow ___ in rock. If minerals fill it, a ___ forms. Insects can be trapped in ___. Wood and bones can become ___, or turned to stone.",a:["mold","cast","amber","petrified"],bank:["mold","cast","amber","petrified","imprint","lava"]},
   {L:"F",ty:"cloze",title:"Cloze Activity — Energy",t:"Coal, oil and natural gas are ___ fuels. They are ___ resources. Burning them causes air ___. Sunlight and wind are ___ resources.",a:["fossil","nonrenewable","pollution","renewable"],bank:["fossil","nonrenewable","pollution","renewable","solar","fresh"]},
-  {L:"A",ty:"cloze",title:"Cloze Activity — Water",t:"Most cities get water from a ___. People dig a ___ to get groundwater. Water that flows over the land is called ___. A water ___ plant makes water clean and pure.",a:["reservoir","well","runoff","treatment"],bank:["reservoir","well","runoff","treatment","watershed","glacier"]},
   {L:"W",ty:"cloze",title:"Cloze Activity — Fast changes",t:"Heavy rain can cause a ___. A column of spinning wind is a ___. A very large swirling storm over warm oceans is a ___. Gravity can pull rock and soil down a slope in a ___.",a:["flood","tornado","hurricane","landslide"],bank:["flood","tornado","hurricane","landslide","avalanche","fossil"]},
 
   /* Label the diagram */
@@ -1793,11 +1717,76 @@ var HARD = [
   {L:"S",ty:"open",q:"A farmer wants to grow a crop on flat land. The soil has lots of humus. Is this a good idea? Why?",a:"Yes. Flat land has thick soil that does not erode quickly, and humus has nutrients that help plants grow.",points:[["yes","good"],["humus","nutrients"],["flat","thick","erode"]],need:2},
   {L:"F",ty:"open",q:"How could ferns have lived on Antarctica?",a:"Long ago Earth's climate was warmer, so Antarctica was warm enough for ferns to grow.",points:[["warm","warmer"],["long ago","past","climate","changed"]],need:2},
   {L:"F",ty:"open",q:"Should scientists develop new ways to use renewable energy? Why?",a:"Yes. Fossil fuels are nonrenewable and cause pollution, but renewable resources like sun and wind are replaced quickly.",points:[["yes"],["nonrenewable","run out","gone","pollution"],["sun","sunlight","wind","water","renewable","replaced"]],need:2},
-  {L:"A",ty:"open",q:"Why shouldn't you drink water directly from streams or lakes?",a:"It may have bacteria or harmful chemicals carried in by runoff.",points:[["bacteria","germs","organisms"],["chemicals","runoff","dirty","pollution"]],need:1},
-  {L:"A",ty:"open",q:"How could we use salt water?",a:"Ships can travel on it, people can swim, boat and fish in it, and fish and other animals live in it.",points:[["ship","ships","boat","boats","transport"],["swim","swimming","fish","fishing"],["animals","fish live","live"]],need:1},
   {L:"W",ty:"open",q:"Why might it be risky to build a town on a soft hillside?",a:"Heavy rain and gravity can cause a landslide that moves rock and soil quickly downhill onto the town.",points:[["landslide","slide","mudslide"],["rain","gravity","downhill"]],need:2}
 ];
 BANK = BANK.concat(HARD);
+
+/* Textbook Lesson Review, Chapter Review and Test Preparation items — 1151-Science-textbook-Final-Orchid.pdf (p.236–305). Lesson "Water" is left out until the scope is confirmed. */
+BANK = BANK.concat([
+  /* ----- Changes Caused by the Weather (p.236–243, Ch.5 Review / Test Prep) ----- */
+  {L:"W",ty:"mc",src:"tb",q:"What word describes a large, sudden movement of ice or snow downhill?",a:"avalanche",w:["landslide","flood"]},
+  {L:"W",ty:"mc",src:"tb",q:"A photograph shows fallen palm trees along a beach in the southeastern United States. What kind of event most likely caused this?",a:"a hurricane",w:["an avalanche","a landslide"]},
+  {L:"W",ty:"mc",src:"tb",q:"Which of these events can help plants grow?",a:"floods",w:["tornadoes","landslides"],exp:"Floods leave new soil with nutrients that help plants grow."},
+  {L:"W",ty:"mc",src:"tb",q:"Heavy rainfall can cause a(n)…",a:"flood",w:["avalanche","fault"]},
+  {L:"W",ty:"mc",src:"tb",q:"A large, swirling storm with strong winds and heavy rain is called a(n)…",a:"hurricane",w:["tornado","avalanche"]},
+  {L:"W",ty:"mc",src:"tb",q:"Which event would most likely cause a flood?",a:"hurricane",w:["tornado","forest fire"]},
+  {L:"W",ty:"mc",src:"tb",q:"A tornado can cause all of the following EXCEPT…",a:"formation of moraines",w:["uprooted trees","flattened buildings"]},
+  {L:"W",ty:"mc",src:"tb",q:"Each of the following causes rapid changes to Earth's surface EXCEPT…",a:"weathering",w:["landslides","a volcanic eruption"]},
+  {L:"W",ty:"mc",src:"tb",q:"All of these are causes of erosion EXCEPT…",a:"sunlight",w:["gravity","wind"]},
+  {L:"W",ty:"mc",src:"tb",q:"Too little rain can lead to…",a:"fires",w:["floods","avalanches"]},
+  {L:"W",ty:"tf",src:"tb",q:"In landslides and avalanches, large amounts of land, ice, or snow slide downhill suddenly.",a:true},
+  {L:"W",ty:"tf",src:"tb",q:"Floods, fires, storms, avalanches and landslides change the land slowly over millions of years.",a:false,exp:"They can change the land quickly."},
+  {L:"W",ty:"open",src:"tb",q:"Critical Thinking: Some radios are powered by batteries. How could such a radio help you prepare for a severe storm?",a:"If the power goes out, a battery radio still works, so you can hear storm warnings and news about what to do.",points:[["power","electricity","batteries","battery"],["warning","warnings","news","listen","hear","information"]],need:2},
+  {L:"W",ty:"open",src:"tb",q:"Essential Question: How does weather shape and change the land?",a:"Floods, fires, storms like tornadoes and hurricanes, landslides and avalanches can change the land quickly.",points:[["flood","floods","fire","fires"],["tornado","tornadoes","hurricane","hurricanes","storm","storms"],["landslide","landslides","avalanche","avalanches","quickly"]],need:2},
+  {L:"W",ty:"open",src:"tb",q:"Predict: A field is plowed just before a heavy rainstorm. What effect will the rainstorm have on the plowed soil?",a:"The rain will wash the loose soil away (erosion), because nothing is holding it in place.",points:[["wash","carry","erode","erosion","away"],["loose","plowed","no plants","nothing"]],need:1},
+  /* ----- Minerals and Rocks (p.250–259, Ch.6 Review / Test Prep) ----- */
+  {L:"R",ty:"mc",src:"tb",q:"Which property of a mineral does Mohs' scale measure?",a:"hardness",w:["luster","color"]},
+  {L:"R",ty:"mc",src:"tb",q:"Which mineral is softest? (Mohs' hardness scale)",a:"gypsum",w:["diamond","quartz"]},
+  {L:"R",ty:"mc",src:"tb",q:"Which properties are most helpful in identifying minerals?",a:"luster, streak",w:["size, ability to float","weight, shape"]},
+  {L:"R",ty:"mc",src:"tb",q:"Most fossils are found in…",a:"sedimentary rocks",w:["igneous rocks","metamorphic rocks"]},
+  {L:"R",ty:"mc",src:"tb",q:"A rock is soft and has layers. The rock is most likely…",a:"sedimentary",w:["igneous","metamorphic"]},
+  {L:"R",ty:"mc",src:"tb",q:"Look at a diamond. In which group does it belong?",a:"mineral resource",w:["renewable resource","fossil fuel"]},
+  {L:"R",ty:"mc",src:"tb",q:"Rocks that have been changed into new rock by heat and pressure are called…",a:"metamorphic rocks",w:["igneous rocks","sedimentary rocks"]},
+  {L:"R",ty:"mc",src:"tb",q:"The nonliving substance that makes up rock is called a(n)…",a:"mineral",w:["fossil","humus"]},
+  {L:"R",ty:"mc",src:"tb",q:"Rocks change form through the…",a:"rock cycle",w:["water cycle","life cycle"]},
+  {L:"R",ty:"mc",src:"tb",q:"What is a mineral?",a:"a natural, nonliving, usually solid material from Earth's crust",w:["the remains of a living thing","a mix of humus and water"]},
+  {L:"R",ty:"tf",src:"tb",q:"Heat and pressure can change the properties of a rock.",a:true,exp:"That is how metamorphic rock forms."},
+  {L:"R",ty:"tf",src:"tb",q:"Minerals are the building blocks of rocks.",a:true},
+  {L:"R",ty:"open",src:"tb",q:"Critical Thinking: Would you be more likely to find a fossil in a metamorphic rock or a sedimentary rock? Explain.",a:"A sedimentary rock, because it forms in layers that can bury plants and animals. Heat and pressure in metamorphic rock usually destroy fossils.",points:[["sedimentary"],["layers","sediment","buried","bury"],["heat","pressure","destroy","melt"]],need:2},
+  {L:"R",ty:"open",src:"tb",q:"Main Idea and Details: How are the three types of rock formed? Give an example for each.",a:"Igneous rock forms when melted rock cools (granite). Sedimentary rock forms when layers of sediment are pressed together (sandstone). Metamorphic rock forms when heat and pressure change rock (marble).",points:[["igneous","cool","cools","melted","magma","lava"],["sedimentary","layers","sediment","pressed"],["metamorphic","heat","pressure"]],need:3},
+  {L:"R",ty:"open",src:"tb",q:"Sequence: What happens in the rock cycle?",a:"Rocks are weathered into sediment, pressed into sedimentary rock, changed by heat and pressure into metamorphic rock, and melted into magma that cools into igneous rock.",points:[["weather","weathering","sediment","erosion"],["heat","pressure","metamorphic"],["melt","melted","magma","cool","igneous"]],need:2},
+  /* ----- Soil (p.262–269, Ch.6 Review / Test Prep) ----- */
+  {L:"S",ty:"mc",src:"tb",q:"Soil forms in layers called…",a:"horizons",w:["minerals","pore spaces"]},
+  {L:"S",ty:"mc",src:"tb",q:"What can pore spaces hold in soil?",a:"air and water",w:["air only","water only"]},
+  {L:"S",ty:"mc",src:"tb",q:"Which soil is likely to have the thinnest layers?",a:"soil along a steep slope",w:["soil on flat land","any clay soil"]},
+  {L:"S",ty:"mc",src:"tb",q:"The properties of soils…",a:"vary from place to place",w:["are the same in all climates","are similar in all horizons"]},
+  {L:"S",ty:"mc",src:"tb",q:"A soil sample has a coarse texture and high permeability. It is most likely…",a:"sand",w:["clay","bedrock"]},
+  {L:"S",ty:"mc",src:"tb",q:"Sandy soils have a higher ___ than clay soils.",a:"permeability",w:["humus","hardness"]},
+  {L:"S",ty:"mc",src:"tb",q:"Nonliving plant and animal matter that has nutrients for plants to grow is called…",a:"humus",w:["bedrock","pollution"]},
+  {L:"S",ty:"mc",src:"tb",q:"What is topsoil?",a:"the surface soil layer, rich in nonliving plant and animal matter and minerals",w:["the solid rock under the soil","the layer of weathered bedrock"]},
+  {L:"S",ty:"mc",src:"tb",q:"Soil is made of…",a:"humus, weathered rock, and minerals",w:["only sand","only water and air"]},
+  {L:"S",ty:"tf",src:"tb",q:"Soil properties include color, texture, and the number of pore spaces.",a:true},
+  {L:"S",ty:"tf",src:"tb",q:"Soil permeability affects the organisms that live in soil.",a:true},
+  {L:"S",ty:"open",src:"tb",q:"Draw Conclusions: What can you conclude about a soil's permeability by observing its texture?",a:"Coarse soil like sand has big pore spaces, so water passes through quickly (high permeability). Fine soil like clay has small pore spaces, so water passes slowly.",points:[["coarse","sand","sandy","big","large"],["fine","clay","small"],["fast","quickly","slow","slowly","high","low"]],need:2},
+  {L:"S",ty:"open",src:"tb",q:"Critical Thinking: Why might a desert plant grow poorly in clay soil?",a:"Clay soil holds too much water because water passes through it slowly, but desert plants need soil that drains quickly.",points:[["water","wet"],["slow","slowly","holds","drain","drains","permeability"]],need:2},
+  {L:"S",ty:"mc",src:"tb",q:"A student adds 35 mL of water to a soil sample. Then 28 mL drip out. How much water is the soil still holding?",a:"7 mL",w:["63 mL","28 mL"]},
+  /* ----- Resources from the Past (p.272–281, Ch.6 Review / Test Prep) ----- */
+  {L:"F",ty:"mc",src:"tb",q:"Which resource is renewable?",a:"wind",w:["coal","diamonds"]},
+  {L:"F",ty:"mc",src:"tb",q:"The energy from wind can be used again and again. This makes wind a(n)…",a:"renewable resource",w:["nonrenewable resource","fossil fuel"]},
+  {L:"F",ty:"mc",src:"tb",q:"A fossil of a warm-climate plant was found in a tundra biome. What can you most likely infer?",a:"The climate has gotten colder.",w:["The climate has gotten warmer.","Fossil fuels cannot be found here."]},
+  {L:"F",ty:"mc",src:"tb",q:"Which human activity most likely has a negative impact on the environment?",a:"burning fossil fuels",w:["composting","recycling notebook paper"]},
+  {L:"F",ty:"mc",src:"tb",q:"The evidence of a living thing from long ago is a(n)…",a:"fossil",w:["mineral","resource"]},
+  {L:"F",ty:"mc",src:"tb",q:"What is a fossil fuel?",a:"an energy source from the remains of an organism that lived millions of years ago",w:["a fuel made from wind","a mineral used for building"]},
+  {L:"F",ty:"mc",src:"tb",q:"Nature can quickly replace a(n) ___, such as air or water.",a:"renewable resource",w:["fossil fuel","mineral"]},
+  {L:"F",ty:"mc",src:"tb",q:"A material or object that people can use is called a(n)…",a:"resource",w:["fossil","pollution"]},
+  {L:"F",ty:"mc",src:"tb",q:"Dead plants sink to the bottom of a swamp. Under intense heat and pressure, soft coal turns into…",a:"hard coal",w:["oil","sand"]},
+  {L:"F",ty:"tf",src:"tb",q:"Fossil fuels are a renewable resource.",a:false,exp:"Fossil fuels took millions of years to form, so they cannot be replaced quickly — they are nonrenewable."},
+  {L:"F",ty:"tf",src:"tb",q:"Coal, oil, and natural gas are fossil fuels.",a:true},
+  {L:"F",ty:"tf",src:"tb",q:"Renewable resources include wind, water, and sunlight.",a:true},
+  {L:"F",ty:"order",src:"tb",q:"Put the steps of how coal forms in order.",items:["Plants die and sink to the bottom of a swamp.","Layers of sediment cover the plants.","Pressure and heat change the plants into soft coal.","Under intense heat and pressure, soft coal turns to hard coal."]},
+  {L:"F",ty:"open",src:"tb",q:"Windmills are a renewable source of electricity. Name another renewable energy source and explain how it can reduce pollution.",a:"Sunlight (solar energy). Solar cells make electricity without burning fossil fuels, so there is less air pollution.",points:[["sun","sunlight","solar","water","tides","heat inside"],["pollution","burn","burning","fossil","cleaner","less"]],need:2},
+  {L:"F",ty:"open",src:"tb",q:"Critical Thinking: What do fossils tell scientists about how life on Earth has changed?",a:"Fossils show what plants and animals lived long ago, and how the land and climate were different.",points:[["plants","animals","organisms","life"],["long ago","past","changed","climate","land"]],need:2}
+]);
 
 /* Oral practice — Estimated from the lessons (no teacher Oral sheet yet). */
 var ORAL_EST = true;
@@ -1813,10 +1802,7 @@ var ORAL = [
   {L: "S", q: "What is permeability, and how does pore size affect it?", a: "Permeability is how fast water passes through soil. Big pore spaces let water pass through faster, and small pore spaces slow it down.", keywords: ["how fast water passes", "pore spaces", "bigger = faster"]},
   {L: "F", q: "What is a fossil? Name two kinds.", a: "A fossil is evidence of an organism that lived long ago. Molds, casts, imprints, petrified wood and insects in amber are fossils.", keywords: ["evidence", "long ago", "mold / cast / imprint / amber"]},
   {L: "F", q: "Why are fossil fuels called nonrenewable resources?", a: "Fossil fuels took millions of years to form, so they cannot be replaced easily once we use them up.", keywords: ["millions of years", "cannot be replaced"]},
-  {L: "F", q: "Name two renewable energy sources and why they are helpful.", a: "Sunlight with solar cells and wind are renewable. They are replaced quickly in nature and make less pollution than fossil fuels.", keywords: ["solar", "wind", "replaced quickly", "less pollution"]},
-  {L: "A", q: "Where is Earth's fresh water found?", a: "Most fresh water is frozen in ice caps and glaciers. The rest is groundwater, soil water, and water in lakes and rivers.", keywords: ["ice caps", "groundwater", "lakes and rivers"]},
-  {L: "A", q: "How does a water treatment plant clean water?", a: "It removes dirt and germs from the water so that people can drink it safely.", keywords: ["removes dirt", "germs", "safe to drink"]},
-  {L: "A", q: "Describe three ways people use a river.", a: "People use rivers for drinking water, for irrigation on farms, to make electricity, to move goods by ship, and for fun like swimming and fishing.", keywords: ["drinking", "irrigation", "electricity", "transport"]}
+  {L: "F", q: "Name two renewable energy sources and why they are helpful.", a: "Sunlight with solar cells and wind are renewable. They are replaced quickly in nature and make less pollution than fossil fuels.", keywords: ["solar", "wind", "replaced quickly", "less pollution"]}
 ];
 
 /* ===== App code ===== */
@@ -1868,6 +1854,7 @@ function vocabItems(L) {
   var all = VOCAB[L], out = [];
   all.forEach(function (v) {
     var others = AppCore.shuffle(all.filter(function (x) { return x !== v; }));
+    if (others.length < 4) { var more = []; Object.keys(VOCAB).forEach(function (k) { if (k !== L) more = more.concat(VOCAB[k]); }); others = others.concat(AppCore.shuffle(more)).slice(0, 4); }
     var ex = v[0] + zhOf(v[0]) + ": " + v[1];
     out.push({L: L, ty: "mc", q: "Which word means: “" + v[1] + "”?", a: v[0], w: [others[0][0], others[1][0]], vocab: true, exp: ex});
     out.push({L: L, ty: "mc", q: "What does “" + v[0] + "” mean?", a: v[1], w: [others[2][1], others[3][1]], vocab: true, exp: ex});
@@ -1899,6 +1886,11 @@ function home() {
   var g = el("div", "hs-games");
   g.appendChild(AppCore.btn("🃏 Word Flip", "ac-primary", function () { pickLesson("🃏 Word Flip — which lesson?", flip, true); }));
   if (typeof SORTS !== "undefined") g.appendChild(AppCore.btn("🧺 Sort It", "ac-primary", function () { pickLesson("🧺 Sort It — which lesson?", sortIt, false, false, function (id) { return !!SORTS[id]; }); }));
+  if (APP.race) g.appendChild(AppCore.btn("⏱ Sentence Race", "ac-primary", function () {
+    window.scrollTo(0, 0); root.innerHTML = "";
+    var it = BANK.filter(function (q) { return q.ty === "scramble"; }).map(function (q) { return {answer: q.a, extra: q.extra, hint: q.q, exp: q.exp}; });
+    AppCore.sentenceRace(root, {key: KEY + "-race", seconds: 90, items: it, onHome: home});
+  }));
   if (BANK.some(function (q) { return q.ty === "evid"; })) g.appendChild(AppCore.btn("🔎 Find the Proof", "ac-primary", function () { pickLesson("🔎 Find the Proof — which story?", proof, true, false, function (id) { return BANK.some(function (q) { return q.L === id && q.ty === "evid"; }); }); }));
   root.appendChild(g);
   root.appendChild(el("h2", "hs-h2", "🎤 Speak · 🎧 Listen · 🔤 Spell"));
@@ -2008,6 +2000,7 @@ function run(items, o) {
     root.appendChild(AppCore.drillBar({title: o.title + " · " + (i + 1) + " / " + items.length, onBack: home, onFinish: end, game: G}));
     var card = el("div", "hs-card"); root.appendChild(card);
     var tag = q.vocab ? "Vocabulary" : q.tv ? "Teacher's word list" : q.ty === "oral" ? "Oral" + (typeof ORAL_EST !== "undefined" && ORAL_EST ? " · Estimated — confirm with teacher" : "") : {listen: "Listening", spell: "Spelling", evid: "Find the evidence", scramble: "Build the sentence", mc: "Multiple choice", tf: "True or False", fill: Array.isArray(q.a) ? "Outline" : "Fill in the blank", order: "Put in order", open: "Critical thinking", cloze: "Cloze Activity", match: "Vocabulary matching", label: "Label the diagram"}[q.ty];
+    if (q.src === "wb") tag = "📘 Workbook · " + tag; else if (q.src === "tb") tag = "📗 Textbook · " + tag;
     card.appendChild(el("div", "hs-tag", lessonById(q.L).icon + " " + esc(lessonById(q.L).name) + " · " + tag));
     var area = el("div"); card.appendChild(area);
     var next = el("div", "hs-next"); card.appendChild(next);
@@ -2086,7 +2079,7 @@ function run(items, o) {
       AppCore.wordBank(wb, {text: q.t, bank: AppCore.shuffle(q.bank), answers: q.a, exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a.join(" / ")); }});
     } else if (q.ty === "fill") {
       var others = q.w ? q.w.slice() : AppCore.shuffle(VOCAB[q.L].map(function (v) { return v[0]; }).filter(function (w) { return w.toLowerCase() !== q.a.toLowerCase() && w !== q.base; })).slice(0, 3);
-      AppCore.wordBank(area, {text: q.t, bank: D.place(q.a, others).choices, answers: [q.a], exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a); }});
+      AppCore.wordBank(area, {text: q.t, bank: AppCore.shuffle([q.a].concat(others)), answers: [q.a], exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.a); }});
     } else if (q.ty === "order") {
       AppCore.tiles(area, {unit: "item", items: q.items, hint: q.q, exp: q.exp}, {onResult: function (ok, given) { done(ok, given, q.items.join(" → ")); }});
     } else if (q.ty === "open") {
@@ -2506,5 +2499,6 @@ home();
   });
   document.body.appendChild(b);
 })();
+
 </script>
 </body></html>
