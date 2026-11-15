@@ -39,6 +39,22 @@ details.old .term{color:var(--muted)}
 .bd{font-size:13px;padding:4px 9px;border-radius:999px;border:1px solid var(--line);opacity:.35;filter:grayscale(1)}
 .bd.on{opacity:1;filter:none;border-color:var(--c);background:color-mix(in srgb,var(--c) 12%,transparent)}
 .dexbox summary{cursor:pointer;font-weight:700}.dexgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;margin-top:10px}.dx{text-align:center;border:1px solid var(--line);border-radius:12px;padding:6px 4px;opacity:.55}.dx.on{opacity:1;background:var(--card)}.dxp{width:64px;height:64px;margin:0 auto}.dxn{font-size:13px;font-weight:700}.dxr{font-size:11px;color:var(--muted)}
+.dx.on{cursor:pointer}.dx.on:active{transform:scale(.96)}.dx.myth{border-color:#db2777}
+.goal{display:flex;align-items:center;gap:8px;font-size:14px;margin:4px 0}.goal .bar{flex:1;height:10px;border-radius:99px;background:var(--line);overflow:hidden}.goal .bar i{display:block;height:100%;background:var(--c)}.goal.done{font-weight:700}
+.dxh{font-size:15px;font-weight:800;margin:14px 0 2px}
+.hm-mask{position:fixed;inset:0;z-index:9500;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:14px}
+.hm-card{background:var(--card);color:var(--ink);border-radius:20px;padding:16px;max-width:420px;width:100%;max-height:90vh;overflow:auto;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.hm-card h3{margin:0 0 2px;font-size:21px}.hm-card button{font:inherit;min-height:48px;border-radius:12px;border:0;padding:10px 18px;margin:6px 4px;cursor:pointer;background:var(--c);color:#fff;font-weight:700}
+.evo{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:2px;margin:10px 0}.evo .st{border:1px solid var(--line);border-radius:12px;padding:4px}.evo .st.lock{opacity:.45}.evo .ar{font-size:18px;color:var(--muted)}
+.evo .pic,.forms .pic{width:100%;aspect-ratio:1}.evo .lb,.forms .lb{font-size:12px;color:var(--muted)}
+.forms{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 4px}.forms>div{border:1px solid var(--line);border-radius:12px;padding:4px}.forms .lock{opacity:.45}
+.gacha .machine{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:8px 0}.gacha .ball{font-size:54px;line-height:1}
+.gbtn{font:inherit;font-weight:800;min-height:52px;border:0;border-radius:14px;padding:10px 18px;background:var(--c);color:#fff;cursor:pointer}.gbtn[disabled]{opacity:.45;cursor:default}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}.tabs button{font:inherit;font-size:14px;min-height:40px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:4px 12px;cursor:pointer}.tabs button[aria-pressed=true]{border-color:var(--c);color:var(--c);font-weight:700}
+.album{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.gc{border-radius:12px;padding:8px 4px;text-align:center;border:2px solid var(--line);background:var(--card)}.gc .em{font-size:38px;line-height:1.2}.gc .nm{font-size:13px;font-weight:700}.gc .rr{font-size:11px;color:var(--muted)}.gc.off{opacity:.35}.gc.off .em{filter:grayscale(1) brightness(.4)}
+.gc.R{border-color:#2563eb}.gc.SR{border-color:#d97706;background:linear-gradient(135deg,#fef3c7,#fde68a)}.gc.SR .nm,.gc.SR .rr{color:#78350f}
+@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(720deg)}}.spin{animation:spin .9s ease-in-out}
+@keyframes pop{0%{transform:scale(.3)}70%{transform:scale(1.15)}100%{transform:scale(1)}}.pop{animation:pop .5s}
 </style>
 </head>
 <body>
@@ -51,6 +67,7 @@ details.old .term{color:var(--muted)}
 </div>
 <div id="pts"></div>
 <div id="dex"></div>
+<div id="gacha"></div>
 <div id="list"></div>
 <section class="shared">
   <h2 style="--c:var(--sh)">一起練</h2>
@@ -122,13 +139,68 @@ function showPoints(kid,c){
     '<div class="badges">'+BADGES.map(function(b){return '<span class="bd'+(d.badges&&d.badges[b[0]]?' on':'')+'" title="'+b[2]+'">'+b[1]+' '+b[2]+'</span>'}).join("")+'</div>'+
     (function(){var Q=(window.SitePoints&&SitePoints.quests)||[];var q=(d.q&&d.q.day===ts)?d.q:{correct:0,rounds:0,streak:0,done:{}};return Q.length?'<div class="sm" style="margin-top:8px">🎯 今天的任務（每項＋50 點）：'+Q.map(function(x){var v=Math.min(x.goal,q[x.f]||0);return '<span class="bd'+(q.done&&q.done[x.id]?' on':'')+'">'+x.icon+' '+x.name+' '+v+'/'+x.goal+'</span>'}).join(' ')+'</div>':''})()+(d.points?'':'<div class="sm" style="margin-top:8px">做練習答對就會集點，點數只存在這台裝置。</div>')+'</div>';
 }
+function hmModal(html){var m=document.createElement("div");m.className="hm-mask";m.innerHTML='<div class="hm-card" role="dialog" aria-modal="true">'+html+'<div><button type="button" class="hm-x">關閉</button></div></div>';m.addEventListener("click",function(e){if(e.target===m||e.target.classList.contains("hm-x"))m.remove()});document.body.appendChild(m);return m}
+function dxDetail(kid,id){
+  var D=window.SiteDex,x=D.list.filter(function(y){return y[0]===id})[0],dx=D.read(kid),h=dx[id];if(!h)return;
+  var st=D.stage(h.n),need=[0,3,6],cols=['★','★★','★★★'],names=['幼年','進化','完全體'];
+  var evo=[1,2,3].map(function(k){var got=st>=k;return '<div class="st'+(got?'':' lock')+'"><div class="pic">'+D.svg(id,!got,{stage:k})+'</div><div class="lb">'+cols[k-1]+' '+names[k-1]+'<br>'+(got?'✅ 已解鎖':'🔒 抓到 '+need[k-1]+' 隻')+'</div></div>'}).join('<div class="ar">➜</div>');
+  var forms='<div class="'+(h.s?'':'lock')+'"><div class="pic">'+D.svg(id,!h.s,{stage:st,shiny:true})+'</div><div class="lb">✨ 閃亮版 '+(h.s?'×'+h.s:'🔒 還沒遇到')+'</div></div>'+
+    '<div class="'+(h.g?'':'lock')+'"><div class="pic">'+D.svg(id,!h.g,{stage:st,giant:true})+'</div><div class="lb">🌟 巨大化 '+(h.g?'×'+h.g:'🔒 100 分時可能出現')+'</div></div>';
+  var tip=st<3?'再抓 '+(need[st]-h.n)+' 隻就會進化成 '+cols[st]+'！':'已經是完全體了！'+(!h.s||!h.g?'再去找找 '+(!h.s?'✨閃亮版':'')+(!h.s&&!h.g?'和':'')+(!h.g?'🌟巨大化':'')+'吧！':'這隻全部收集完成 🏅');
+  hmModal('<p style="margin:0;font-weight:800;color:'+D.rareColor[x[2]]+'">'+D.rarity[x[2]]+'</p><h3>'+x[1]+'</h3><p class="sm" style="margin:2px 0 0">一共抓到 '+h.n+' 隻・第一次抓到：'+(h.d||'')+'</p>'+
+    '<div class="dxh">進化過程</div><div class="evo">'+evo+'</div><div class="dxh">特別型態</div><div class="forms">'+forms+'</div><p>'+tip+'</p>');
+}
 function showDex(kid,c){
   var D=window.SiteDex;if(!D){return}
-  var dx={};try{dx=JSON.parse(localStorage.getItem("kp-dex-"+kid)||"{}")||{}}catch(e){}
-  var got=0,full=0,sh=0,gi=0;D.list.forEach(function(x){var h=dx[x[0]];if(h){got++;if(D.stage(h.n)===3)full++;if(h.s)sh++;if(h.g)gi++}});
-  document.getElementById("dex").innerHTML='<details class="pcard dexbox" style="--c:'+c+'"><summary>🎒 我的圖鑑 <b>'+got+' / '+D.list.length+'</b>　<span class="sm">完全體 '+full+'・✨閃亮 '+sh+'・🌟巨大化 '+gi+'</span></summary>'+
-    '<div class="sm" style="margin:8px 0 0">同一隻抓到 3 隻會進化成 ★★、6 隻變完全體 ★★★；偶爾會遇到 ✨ 閃亮版；100 分時已進化的夥伴可能 🌟 巨大化出現。全部收集：24 種 × 完全體 × 閃亮 × 巨大化！</div><div class="dexgrid">'+
-    D.list.map(function(x){var h=dx[x[0]],st=h?D.stage(h.n):1;return '<div class="dx'+(h?' on':'')+'"><div class="dxp">'+D.svg(x[0],!h,{stage:st})+'</div><div class="dxn">'+(h?x[1]:'？？？')+'</div><div class="dxr">'+D.rarity[x[2]]+(h?' '+'★★★'.slice(0,st)+' ×'+h.n:'')+(h&&h.s?' ✨':'')+(h&&h.g?' 🌟':'')+'</div></div>'}).join('')+'</div></details>';
+  var dx=D.read(kid),base=D.base?D.base():D.list,myth=D.list.filter(function(x){return x[2]===3});
+  var got=0,full=0,sh=0,gi=0,my=0;base.forEach(function(x){var h=dx[x[0]];if(h){got++;if(D.stage(h.n)===3)full++;if(h.s)sh++;if(h.g)gi++}});myth.forEach(function(x){if(dx[x[0]])my++});
+  var open=D.mythOpen?D.mythOpen(kid):false,N=base.length;
+  function tile(x){var h=dx[x[0]],st=h?D.stage(h.n):1;return '<div class="dx'+(h?' on':'')+(x[2]===3?' myth':'')+'"'+(h?' data-id="'+x[0]+'" role="button" tabindex="0"':'')+'><div class="dxp">'+D.svg(x[0],!h,{stage:st})+'</div><div class="dxn">'+(h?x[1]:'？？？')+'</div><div class="dxr">'+D.rarity[x[2]]+(h?' '+'★★★'.slice(0,st)+' ×'+h.n:'')+(h&&h.s?' ✨':'')+(h&&h.g?' 🌟':'')+'</div></div>'}
+  function goal(icon,name,v,max){return '<div class="goal'+(v>=max?' done':'')+'"><span>'+icon+' '+name+'</span><span class="bar"><i style="width:'+Math.round(v/max*100)+'%"></i></span><span>'+v+'/'+max+(v>=max?' 🏅':'')+'</span></div>'}
+  document.getElementById("dex").innerHTML='<details class="pcard dexbox" style="--c:'+c+'"><summary>🎒 我的圖鑑 <b>'+got+' / '+N+'</b>　<span class="sm">完全體 '+full+'・✨閃亮 '+sh+'・🌟巨大化 '+gi+(my?'・🌈神話 '+my:'')+'</span></summary>'+
+    '<div class="sm" style="margin:8px 0 0">點一下抓到的夥伴，可以看牠的進化過程和特別型態。同一隻抓到 3 隻進化成 ★★、6 隻變完全體 ★★★。</div>'+
+    '<div class="dxh">🏆 收集挑戰</div>'+goal('🎒','抓到全部種類',got,N)+goal('👑','全部變完全體',full,N)+goal('✨','閃亮版',sh,N)+goal('🌟','巨大化',gi,N)+goal('🌈','神話夥伴',my,myth.length)+
+    '<div class="dexgrid">'+base.map(tile).join('')+'</div>'+
+    '<div class="dxh">🌈 神話夥伴</div><div class="sm">'+(open?'封印解開了！100 分的回合有機會遇到神話夥伴，牠們很難抓喔。':'🔒 封印中：'+N+' 種夥伴全部變成完全體 ★★★（目前 '+full+'/'+N+'）後，100 分的回合才會出現。')+'</div>'+
+    '<div class="dexgrid">'+myth.map(tile).join('')+'</div></details>';
+  document.querySelectorAll("#dex .dx.on").forEach(function(t){t.addEventListener("click",function(){dxDetail(kid,t.dataset.id)})});
+}
+/* 🎰 扭蛋機與卡冊：用集點卡的點數扭蛋（扣的是「可用點數」，集點卡總點數和徽章不受影響）。存在 kp-gacha-<kid>。所有卡片都是原創的圖示卡。 */
+var GACHA_COST=100;
+var ALBUMS=[
+  {id:"dino",name:"🦖 恐龍世界",cards:[["🦖","暴龍","N"],["🦕","腕龍","N"],["🥚","恐龍蛋","N"],["🦴","化石","N"],["🌋","火山","N"],["🌿","蕨類","N"],["🪶","始祖鳥羽毛","R"],["🦷","暴龍牙","R"],["☄️","大隕石","SR"]]},
+  {id:"space",name:"🚀 太空探險",cards:[["🚀","火箭","N"],["🌙","月亮","N"],["☀️","太陽","N"],["🪐","土星","N"],["🛰️","人造衛星","N"],["🔭","望遠鏡","N"],["👩‍🚀","太空人","R"],["🌌","銀河","R"],["🌠","流星雨","SR"]]},
+  {id:"sea",name:"🌊 海洋生物",cards:[["🐠","熱帶魚","N"],["🐢","海龜","N"],["🦀","螃蟹","N"],["🐙","章魚","N"],["🐚","貝殼","N"],["🪸","珊瑚","N"],["🐬","海豚","R"],["🦈","鯊魚","R"],["🐋","藍鯨","SR"]]},
+  {id:"sweet",name:"🍰 甜點派對",cards:[["🍪","餅乾","N"],["🍩","甜甜圈","N"],["🧁","杯子蛋糕","N"],["🍦","冰淇淋","N"],["🍮","布丁","N"],["🍭","棒棒糖","N"],["🍫","巧克力","R"],["🍓","草莓塔","R"],["🎂","生日大蛋糕","SR"]]}
+];
+function gLoad(kid){var g=null;try{g=JSON.parse(localStorage.getItem("kp-gacha-"+kid)||"null")}catch(e){}return g||{spent:0,c:{},album:"dino"}}
+function gSave(kid,g){try{localStorage.setItem("kp-gacha-"+kid,JSON.stringify(g))}catch(e){}}
+function gPoints(kid){var d=null;try{d=JSON.parse(localStorage.getItem("kp-points-"+kid)||"null")}catch(e){}return (d&&d.points)||0}
+function gDraw(){var r=Math.random(),rar=r<0.06?"SR":r<0.3?"R":"N",a=ALBUMS[Math.floor(Math.random()*ALBUMS.length)],pool=a.cards.filter(function(x){return x[2]===rar});var c=pool[Math.floor(Math.random()*pool.length)];return {a:a,c:c,id:a.id+":"+c[1]}}
+function showGacha(kid,c){
+  var g=gLoad(kid),avail=Math.max(0,gPoints(kid)-g.spent),cur=ALBUMS.filter(function(a){return a.id===g.album})[0]||ALBUMS[0];
+  var total=0,have=0;ALBUMS.forEach(function(a){a.cards.forEach(function(x){total++;if(g.c[a.id+":"+x[1]])have++})});
+  function cnt(a){return a.cards.filter(function(x){return g.c[a.id+":"+x[1]]}).length}
+  var el=document.getElementById("gacha");
+  el.innerHTML='<details class="pcard gacha" style="--c:'+c+'"'+(el.dataset.open?' open':'')+'><summary style="cursor:pointer;font-weight:700">🎰 扭蛋機與卡冊 <b>'+have+' / '+total+'</b>　<span class="sm">可用點數 ⭐ '+avail+'</span></summary>'+
+    '<div class="machine"><div class="ball" id="gball">🎁</div><div><button type="button" class="gbtn" id="gspin"'+(avail<GACHA_COST?' disabled':'')+'>扭一次（'+GACHA_COST+' 點）</button>'+
+    '<div class="sm">'+(avail<GACHA_COST?'再集 '+(GACHA_COST-avail)+' 點就可以扭蛋！':'每扭一次用 '+GACHA_COST+' 點，會隨機得到一張卡片')+'</div><div class="sm">機率：一般 N 70%・稀有 R 24%・超稀有 SR 6%。扭蛋不會減少集點卡的總點數和徽章。</div></div></div>'+
+    '<div class="tabs">'+ALBUMS.map(function(a){var n=cnt(a);return '<button type="button" data-al="'+a.id+'" aria-pressed="'+(a.id===cur.id)+'">'+a.name+' '+n+'/'+a.cards.length+(n===a.cards.length?' 🏅':'')+'</button>'}).join('')+'</div>'+
+    '<div class="album">'+cur.cards.map(function(x){var n=g.c[cur.id+":"+x[1]]||0;return '<div class="gc '+x[2]+(n?'':' off')+'"><div class="em">'+(n?x[0]:'❔')+'</div><div class="nm">'+(n?x[1]:'？？？')+'</div><div class="rr">'+x[2]+(n>1?' ×'+n:'')+'</div></div>'}).join('')+'</div>'+
+    (cnt(cur)===cur.cards.length?'<p class="sm">🏅 這本卡冊收集完成了！</p>':'')+'</details>';
+  var det=el.querySelector("details");det.addEventListener("toggle",function(){el.dataset.open=det.open?"1":""});
+  el.querySelectorAll("[data-al]").forEach(function(b){b.addEventListener("click",function(){var g2=gLoad(kid);g2.album=b.dataset.al;gSave(kid,g2);showGacha(kid,c)})});
+  var sp=document.getElementById("gspin");if(sp)sp.addEventListener("click",function(){
+    var g2=gLoad(kid);if(gPoints(kid)-g2.spent<GACHA_COST)return;
+    sp.disabled=true;var ball=document.getElementById("gball");ball.className="ball spin";
+    setTimeout(function(){
+      var r=gDraw(),first=!g2.c[r.id];g2.spent+=GACHA_COST;g2.c[r.id]=(g2.c[r.id]||0)+1;g2.album=r.a.id;gSave(kid,g2);
+      var done=r.a.cards.every(function(x){return g2.c[r.a.id+":"+x[1]]});
+      el.dataset.open="1";showGacha(kid,c);
+      hmModal('<p style="margin:0;font-weight:800">'+r.a.name+'</p><div class="gc '+r.c[2]+' pop" style="max-width:180px;margin:10px auto"><div class="em" style="font-size:72px">'+r.c[0]+'</div><div class="nm" style="font-size:18px">'+r.c[1]+'</div><div class="rr">'+({N:"一般 N",R:"稀有 R",SR:"超稀有 SR ✨"})[r.c[2]]+'</div></div>'+
+        '<p>'+(first?'🎉 新卡片！放進卡冊了':'又抽到一張（這張有 '+g2.c[r.id]+' 張）')+(done&&first?'<br>🏅 <b>'+r.a.name+' 卡冊收集完成！</b>':'')+'</p>');
+    },900);
+  });
 }
 function show(kid){
   document.querySelectorAll(".kid").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.kid==kid)});
@@ -148,7 +220,7 @@ function show(kid){
     }
     html+='</section>';
   });
-  showPoints(kid,c);showDex(kid,c);
+  showPoints(kid,c);showDex(kid,c);showGacha(kid,c);
   document.getElementById("list").innerHTML=html||'<p class="sub">目前還沒有練習。</p>';
   try{localStorage.setItem("kid",kid)}catch(e){}
 }
@@ -161,7 +233,7 @@ show(k);
 /* =====================================================================
    site-home.js — 📚 小站 button + 全站集點 (site-wide points & badges)
    Canonical copy: github.com/iam5980/kids-practice/template/site-home.js
-   Version: 2026-11-08c（🔊 念解釋、🎒 抓寶＋進化／閃亮／巨大化、🎯 每日任務）
+   Version: 2026-11-15（🌈 神話夥伴：24 種都變完全體後出現；首頁圖鑑可看進化過程、🎰 扭蛋機與卡冊）
 
    HOW TO USE: paste this whole file in its own <script> block just before
    </body> of EVERY page published to kids-practice (English and 中文部,
@@ -207,7 +279,8 @@ show(k);
   ];
   function kidFromPath() {
     var m = location.pathname.match(/\/kids-practice\/([a-z0-9]+)\//i);
-    return m && m[1] !== "template" && m[1] !== "shadowing" ? m[1] : null;
+    if (m && m[1] === "shadowing") { try { return localStorage.getItem("kp-shadow-kid") || null; } catch (e) { return null; } }
+    return m && m[1] !== "template" ? m[1] : null;
   }
   function today() { var d = new Date(); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
   function dayDiff(a, b) { return Math.round((new Date(b) - new Date(a)) / 864e5); }
@@ -366,9 +439,14 @@ show(k);
     ["rhet","修辭孔雀",1,"#2dd4bf","tuft","fan"],["spell","拼字海豚",1,"#38bdf8","none","fin"],["poem","詩詞鶴",1,"#e2e8f0","tuft","beak"],
     ["abacus","算盤狸",1,"#b45309","round","stripe"],["globe","地球儀龜",1,"#60a5fa","none","globe"],
     ["phoenix","金榜鳳凰",2,"#f97316","crest","fire"],["qilin","滿分麒麟",2,"#fbbf24","horn","star"],
-    ["dragon","智慧神龍",2,"#22d3ee","horn","wing"],["uni","星光獨角獸",2,"#f0abfc","uni","star"]
+    ["dragon","智慧神龍",2,"#22d3ee","horn","wing"],["uni","星光獨角獸",2,"#f0abfc","uni","star"],
+    /* 🌈 神話 (tier 3): appear only after all 24 above are 完全體 ★★★, in 100-point rounds */
+    ["mwhale","星海鯨王",3,"#6366f1","none","fin"],["mfox","九尾書狐",3,"#f43f5e","cat","tail"],["mturtle","萬年墨龜",3,"#0f766e","none","shell"],
+    ["mowl","月光學者梟",3,"#a78bfa","tuft","beak"],["mlion","雷電獅王",3,"#eab308","mane","fire"],["mdragon","七彩天龍",3,"#ec4899","horn","wing"]
   ];
-  var RARE = ["一般", "稀有", "傳說"], RARE_C = ["#64748b", "#2563eb", "#d97706"];
+  var RARE = ["一般", "稀有", "傳說", "神話"], RARE_C = ["#64748b", "#2563eb", "#d97706", "#db2777"];
+  function dxBase() { return DEX.filter(function (x) { return x[2] < 3; }); }
+  function dxMythOpen(dx) { return dxBase().every(function (x) { return dx[x[0]] && dxStage(dx[x[0]].n) === 3; }); }
   function dxStage(n) { return n >= 6 ? 3 : n >= 3 ? 2 : 1; }
   function dxSvg(id, hidden, o) {
     o = o || {};
@@ -405,6 +483,7 @@ show(k);
       if (f === "clip") s += '<path d="M76 58 v18 a5 5 0 0 0 10 0 v-14 a3 3 0 0 0 -6 0 v12" stroke="#64748b" stroke-width="2.5" fill="none"/>';
     }
     var pre = "", post = "", st = hidden ? 1 : (o.stage || 1);
+    if (!hidden && d[2] === 3) pre += '<defs><linearGradient id="rb' + id + '" x1="0" x2="1"><stop offset="0" stop-color="#f87171"/><stop offset=".33" stop-color="#facc15"/><stop offset=".66" stop-color="#34d399"/><stop offset="1" stop-color="#818cf8"/></linearGradient></defs><circle cx="50" cy="56" r="46" fill="none" stroke="url(#rb' + id + ')" stroke-width="5" opacity=".9"/>';
     if (!hidden && o.giant) pre += '<circle cx="50" cy="56" r="47" fill="none" stroke="#ef4444" stroke-width="4" stroke-dasharray="6 4" opacity=".8"/><circle cx="50" cy="56" r="44" fill="#fecaca" opacity=".35"/>';
     if (st >= 3) pre += '<circle cx="50" cy="56" r="45" fill="#fde68a" opacity=".45"/>';
     if (st >= 2) post += '<path d="M24 74 Q50 86 76 74 L74 80 Q50 92 26 80Z" fill="#ef4444"/><path d="M66 80 L72 94 L62 88Z" fill="#dc2626"/>';
@@ -419,7 +498,8 @@ show(k);
   var dxLast = 0;
   function dxPick(pct) {
     var r = Math.random(), tier = 0;
-    if (pct >= 100 && r < 0.12) tier = 2; else if (pct >= 90 && r < 0.4) tier = 1;
+    if (pct >= 100 && kid && dxMythOpen(dxLoad(kid)) && r < 0.3) tier = 3;
+    else if (pct >= 100 && r < 0.12) tier = 2; else if (pct >= 90 && r < 0.4) tier = 1;
     var pool = DEX.filter(function (x) { return x[2] === tier; });
     return pool[Math.floor(Math.random() * pool.length)];
   }
@@ -427,7 +507,7 @@ show(k);
     if (!kid || !document.body || document.querySelector(".sd-mask")) return;
     var d = dxPick(pct), dx0 = dxLoad(kid), rec0 = dx0[d[0]], st0 = rec0 ? dxStage(rec0.n) : 1;
     var shiny = Math.random() < 1 / 15, giant = pct >= 100 && st0 >= 2 && Math.random() < 0.3;
-    var tries = 3, rate = ([0.55, 0.35, 0.2][d[2]] + (pct >= 100 ? 0.1 : 0)) * (giant ? 0.6 : 1);
+    var tries = 3, rate = ([0.55, 0.35, 0.2, 0.15][d[2]] + (pct >= 100 ? 0.1 : 0)) * (giant ? 0.6 : 1);
     var label = (shiny ? "✨閃亮 " : "") + d[1];
     var m = document.createElement("div"); m.className = "sd-mask";
     m.innerHTML = '<div class="sd-card" role="dialog" aria-modal="true"><p class="sd-tag" style="color:' + RARE_C[d[2]] + '">✨ ' + RARE[d[2]] + (giant ? "・🌟 巨大化" : "") + (shiny ? "・閃亮" : "") + '</p>' +
@@ -444,14 +524,14 @@ show(k);
         if (Math.random() < rate) {
           var dx = dxLoad(kid), r = dx[d[0]] || { n: 0, d: today(), s: 0, g: 0 }, first = !dx[d[0]], before = dxStage(r.n);
           r.n++; if (shiny) r.s = (r.s || 0) + 1; if (giant) r.g = (r.g || 0) + 1; dx[d[0]] = r; dxSave(kid, dx);
-          var after = dxStage(r.n), have = DEX.filter(function (x) { return dx[x[0]]; }).length;
+          var after = dxStage(r.n), have = dxBase().filter(function (x) { return dx[x[0]]; }).length, myth = d[2] === 3;
           var evo = after > before;
           pic.innerHTML = dxSvg(d[0], false, { stage: after, shiny: shiny, giant: giant });
           pic.className = "sd-pic sd-got";
           msg.innerHTML = "🎉 抓到了！" + (first ? "新夥伴加入圖鑑" : "又抓到一隻（第 " + r.n + " 隻）") +
             (evo ? "<br>✨ <b>" + d[1] + " 進化了！</b>現在是 " + "★★★".slice(0, after) + (after === 3 ? "（完全體）" : "") : (after < 3 ? "<br>再抓 " + ((after === 1 ? 3 : 6) - r.n) + " 隻就會進化" : "")) +
             (shiny ? "<br>✨ 閃亮版收集 +1" : "") + (giant ? "<br>🌟 巨大化收集 +1" : "") +
-            "<br>圖鑑 <b>" + have + " / " + DEX.length + "</b>（回小站可以看）";
+            (myth ? "<br>🌈 神話夥伴收集 <b>" + DEX.filter(function (x) { return x[2] === 3 && dx[x[0]]; }).length + " / 6</b>" : "<br>圖鑑 <b>" + have + " / " + dxBase().length + "</b>") + "（回小站首頁可以看進化過程）";
           th.remove(); sk.textContent = "好耶，繼續練習";
         } else if (tries > 0) {
           pic.className = "sd-pic sd-bob"; th.disabled = false;
@@ -464,7 +544,8 @@ show(k);
     };
   }
   var SiteDex = {
-    list: DEX, rarity: RARE, svg: dxSvg, stage: dxStage, read: function (k) { return dxLoad(k || kid); },
+    list: DEX, rarity: RARE, rareColor: RARE_C, svg: dxSvg, stage: dxStage, read: function (k) { return dxLoad(k || kid); },
+    base: dxBase, mythOpen: function (k) { return dxMythOpen(dxLoad(k || kid)); },
     maybe: function (pct, n) {
       if (!kid || n === 0 || pct < 70) return;
       var now = Date.now(); if (now - dxLast < 5000) return; dxLast = now;
@@ -529,7 +610,7 @@ show(k);
   b.addEventListener("click", function () {
     if (document.getElementById("sh-mask")) return;
     var m = document.createElement("div"); m.id = "sh-mask";
-    var pts = kid ? "<p>目前集點：⭐ " + load(kid).points + " 點・🎒 圖鑑 " + DEX.filter(function (x) { return dxLoad(kid)[x[0]]; }).length + " / " + DEX.length + "</p>" + qHtml() : "";
+    var pts = kid ? "<p>目前集點：⭐ " + load(kid).points + " 點・🎒 圖鑑 " + dxBase().filter(function (x) { return dxLoad(kid)[x[0]]; }).length + " / " + dxBase().length + "</p><p>🎒 圖鑑的進化過程、🎰 扭蛋機和卡冊都在小站首頁。</p>" + qHtml() : "";
     m.innerHTML = '<div id="sh-card" role="dialog" aria-modal="true"><h3>📚 回到練習小站？</h3>' +
       '<p>這一輪的作答不會保留（點數和最高分紀錄會留著）。</p>' + pts +
       '<button id="sh-go" type="button">回到練習小站</button><button id="sh-stay" type="button">繼續練習</button></div>';
@@ -545,7 +626,6 @@ show(k);
   });
   document.body.appendChild(b);
 })();
-
 </script>
 <script>try{show(localStorage.getItem("kid")||"au")}catch(e){show("au")}</script>
 </body>
