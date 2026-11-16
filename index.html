@@ -172,30 +172,47 @@ var ALBUMS=[
   {id:"dino",name:"🦖 恐龍世界",cards:[["🦖","暴龍","N"],["🦕","腕龍","N"],["🥚","恐龍蛋","N"],["🦴","化石","N"],["🌋","火山","N"],["🌿","蕨類","N"],["🪶","始祖鳥羽毛","R"],["🦷","暴龍牙","R"],["☄️","大隕石","SR"]]},
   {id:"space",name:"🚀 太空探險",cards:[["🚀","火箭","N"],["🌙","月亮","N"],["☀️","太陽","N"],["🪐","土星","N"],["🛰️","人造衛星","N"],["🔭","望遠鏡","N"],["👩‍🚀","太空人","R"],["🌌","銀河","R"],["🌠","流星雨","SR"]]},
   {id:"sea",name:"🌊 海洋生物",cards:[["🐠","熱帶魚","N"],["🐢","海龜","N"],["🦀","螃蟹","N"],["🐙","章魚","N"],["🐚","貝殼","N"],["🪸","珊瑚","N"],["🐬","海豚","R"],["🦈","鯊魚","R"],["🐋","藍鯨","SR"]]},
-  {id:"sweet",name:"🍰 甜點派對",cards:[["🍪","餅乾","N"],["🍩","甜甜圈","N"],["🧁","杯子蛋糕","N"],["🍦","冰淇淋","N"],["🍮","布丁","N"],["🍭","棒棒糖","N"],["🍫","巧克力","R"],["🍓","草莓塔","R"],["🎂","生日大蛋糕","SR"]]}
+  {id:"sweet",name:"🍰 甜點派對",cards:[["🍪","餅乾","N"],["🍩","甜甜圈","N"],["🧁","杯子蛋糕","N"],["🍦","冰淇淋","N"],["🍮","布丁","N"],["🍭","棒棒糖","N"],["🍫","巧克力","R"],["🍓","草莓塔","R"],["🎂","生日大蛋糕","SR"]]},
+  {id:"pets",name:"🐾 可愛動物",cards:[["🐶","小狗","N"],["🐱","小貓","N"],["🐰","兔子","N"],["🐹","倉鼠","N"],["🐼","熊貓","N"],["🐨","無尾熊","N"],["🦒","長頸鹿","R"],["🐧","企鵝","R"],["🦁","獅子王","SR"]]},
+  {id:"bug",name:"🐞 昆蟲世界",cards:[["🐞","瓢蟲","N"],["🐜","螞蟻","N"],["🐝","蜜蜂","N"],["🐛","毛毛蟲","N"],["🦗","蟋蟀","N"],["🐌","蝸牛","N"],["🦋","蝴蝶","R"],["🕷️","蜘蛛","R"],["🪲","獨角仙","SR"]]},
+  {id:"car",name:"🚗 交通工具",cards:[["🚗","汽車","N"],["🚌","公車","N"],["🚲","腳踏車","N"],["🚕","計程車","N"],["🚒","消防車","N"],["🚑","救護車","N"],["🚄","高鐵","R"],["🚁","直升機","R"],["✈️","噴射客機","SR"]]},
+  {id:"sport",name:"⚽ 運動場",cards:[["⚽","足球","N"],["🏀","籃球","N"],["⚾","棒球","N"],["🏸","羽毛球","N"],["🏓","桌球","N"],["🏊","游泳","N"],["🥋","空手道","R"],["⛸️","溜冰","R"],["🏆","冠軍獎盃","SR"]]},
+  {id:"music",name:"🎵 音樂教室",cards:[["🎹","鋼琴","N"],["🎸","吉他","N"],["🥁","鼓","N"],["🎺","小號","N"],["🎻","小提琴","N"],["🪈","長笛","N"],["🎷","薩克斯風","R"],["🎤","麥克風","R"],["🎼","交響樂譜","SR"]]},
+  {id:"lab",name:"🔬 科學實驗室",cards:[["🔬","顯微鏡","N"],["🧪","試管","N"],["🧲","磁鐵","N"],["🌡️","溫度計","N"],["⚗️","燒瓶","N"],["🪨","岩石標本","N"],["🔋","電池","R"],["🧬","DNA","R"],["💎","鑽石","SR"]]},
+  {id:"world",name:"🗺️ 世界地標",cards:[["🗼","鐵塔","N"],["🗽","自由女神","N"],["🏯","城堡","N"],["🕌","清真寺","N"],["⛩️","鳥居","N"],["🎡","摩天輪","N"],["🗻","富士山","R"],["🏝️","熱帶小島","R"],["🌋","火山島","SR"]]},
+  {id:"magic",name:"🪄 奇幻王國",cards:[["🪄","魔法棒","N"],["🔮","水晶球","N"],["🧚","小精靈","N"],["🧙","魔法師","N"],["🏰","魔法城堡","N"],["🧜","人魚","N"],["🐉","飛龍","R"],["👑","王冠","R"],["🦄","彩虹獨角獸","SR"]]}
 ];
 function gLoad(kid){var g=null;try{g=JSON.parse(localStorage.getItem("kp-gacha-"+kid)||"null")}catch(e){}return g||{spent:0,c:{},album:"dino"}}
 function gSave(kid,g){try{localStorage.setItem("kp-gacha-"+kid,JSON.stringify(g))}catch(e){}}
 function gPoints(kid){var d=null;try{d=JSON.parse(localStorage.getItem("kp-points-"+kid)||"null")}catch(e){}return (d&&d.points)||0}
-function gDraw(){var r=Math.random(),rar=r<0.06?"SR":r<0.3?"R":"N",a=ALBUMS[Math.floor(Math.random()*ALBUMS.length)],pool=a.cards.filter(function(x){return x[2]===rar});var c=pool[Math.floor(Math.random()*pool.length)];return {a:a,c:c,id:a.id+":"+c[1]}}
+function gDraw(a){var r=Math.random(),rar=r<0.06?"SR":r<0.3?"R":"N",pool=a.cards.filter(function(x){return x[2]===rar});var c=pool[Math.floor(Math.random()*pool.length)];return {a:a,c:c,id:a.id+":"+c[1]}}
 function showGacha(kid,c){
   var g=gLoad(kid),avail=Math.max(0,gPoints(kid)-g.spent),cur=ALBUMS.filter(function(a){return a.id===g.album})[0]||ALBUMS[0];
   var total=0,have=0;ALBUMS.forEach(function(a){a.cards.forEach(function(x){total++;if(g.c[a.id+":"+x[1]])have++})});
   function cnt(a){return a.cards.filter(function(x){return g.c[a.id+":"+x[1]]}).length}
+  var doneAl=ALBUMS.filter(function(a){return cnt(a)===a.cards.length}).length;
+  var dup=0;cur.cards.forEach(function(x){var n=g.c[cur.id+":"+x[1]]||0;if(n>1)dup+=n-1});var miss=cur.cards.length-cnt(cur);
   var el=document.getElementById("gacha");
   el.innerHTML='<details class="pcard gacha" style="--c:'+c+'"'+(el.dataset.open?' open':'')+'><summary style="cursor:pointer;font-weight:700">🎰 扭蛋機與卡冊 <b>'+have+' / '+total+'</b>　<span class="sm">可用點數 ⭐ '+avail+'</span></summary>'+
-    '<div class="machine"><div class="ball" id="gball">🎁</div><div><button type="button" class="gbtn" id="gspin"'+(avail<GACHA_COST?' disabled':'')+'>扭一次（'+GACHA_COST+' 點）</button>'+
-    '<div class="sm">'+(avail<GACHA_COST?'再集 '+(GACHA_COST-avail)+' 點就可以扭蛋！':'每扭一次用 '+GACHA_COST+' 點，會隨機得到一張卡片')+'</div><div class="sm">機率：一般 N 70%・稀有 R 24%・超稀有 SR 6%。扭蛋不會減少集點卡的總點數和徽章。</div></div></div>'+
-    '<div class="tabs">'+ALBUMS.map(function(a){var n=cnt(a);return '<button type="button" data-al="'+a.id+'" aria-pressed="'+(a.id===cur.id)+'">'+a.name+' '+n+'/'+a.cards.length+(n===a.cards.length?' 🏅':'')+'</button>'}).join('')+'</div>'+
+    '<div class="machine"><div class="ball" id="gball">🎁</div><div><button type="button" class="gbtn" id="gspin"'+(avail<GACHA_COST?' disabled':'')+'>扭「'+cur.name+'」（'+GACHA_COST+' 點）</button>'+
+    '<div class="sm">'+(avail<GACHA_COST?'再集 '+(GACHA_COST-avail)+' 點就可以扭蛋！':'先在下面選一本卡冊，扭蛋就會抽那一本的卡片')+'</div><div class="sm">機率：一般 N 70%・稀有 R 24%・超稀有 SR 6%。扭蛋不會減少集點卡的總點數和徽章。</div></div></div>'+
+    '<p class="sm" style="margin:4px 0 0">📚 完成的卡冊：<b>'+doneAl+' / '+ALBUMS.length+'</b>（共 '+ALBUMS.length+' 本，每本 9 張）</p><div class="tabs">'+ALBUMS.map(function(a){var n=cnt(a);return '<button type="button" data-al="'+a.id+'" aria-pressed="'+(a.id===cur.id)+'">'+a.name+' '+n+'/'+a.cards.length+(n===a.cards.length?' 🏅':'')+'</button>'}).join('')+'</div>'+
     '<div class="album">'+cur.cards.map(function(x){var n=g.c[cur.id+":"+x[1]]||0;return '<div class="gc '+x[2]+(n?'':' off')+'"><div class="em">'+(n?x[0]:'❔')+'</div><div class="nm">'+(n?x[1]:'？？？')+'</div><div class="rr">'+x[2]+(n>1?' ×'+n:'')+'</div></div>'}).join('')+'</div>'+
-    (cnt(cur)===cur.cards.length?'<p class="sm">🏅 這本卡冊收集完成了！</p>':'')+'</details>';
+    (miss===0?'<p class="sm">🏅 這本卡冊收集完成了！</p>':'<div style="margin-top:10px"><button type="button" class="gbtn" id="gtrade"'+(dup>=3?'':' disabled')+'>🔁 3 張重複卡換 1 張沒有的</button><div class="sm">這本的重複卡：'+dup+' 張'+(dup>=3?'':'（集到 3 張就能換）')+'</div></div>')+'</details>';
   var det=el.querySelector("details");det.addEventListener("toggle",function(){el.dataset.open=det.open?"1":""});
   el.querySelectorAll("[data-al]").forEach(function(b){b.addEventListener("click",function(){var g2=gLoad(kid);g2.album=b.dataset.al;gSave(kid,g2);showGacha(kid,c)})});
+  var tr=document.getElementById("gtrade");if(tr)tr.addEventListener("click",function(){
+    var g2=gLoad(kid),left=3,got=cur.cards.filter(function(x){return !g2.c[cur.id+":"+x[1]]});if(!got.length)return;
+    cur.cards.slice().sort(function(a,b){return "SRN".indexOf(b[2])-"SRN".indexOf(a[2])}).forEach(function(x){var k=cur.id+":"+x[1];while(left>0&&(g2.c[k]||0)>1){g2.c[k]--;left--}});
+    if(left>0)return;var c2=got[Math.floor(Math.random()*got.length)];g2.c[cur.id+":"+c2[1]]=1;gSave(kid,g2);el.dataset.open="1";showGacha(kid,c);
+    var done=cur.cards.every(function(x){return g2.c[cur.id+":"+x[1]]});
+    hmModal('<p style="margin:0;font-weight:800">🔁 交換成功！</p><div class="gc '+c2[2]+' pop" style="max-width:180px;margin:10px auto"><div class="em" style="font-size:72px">'+c2[0]+'</div><div class="nm" style="font-size:18px">'+c2[1]+'</div><div class="rr">'+c2[2]+'</div></div>'+(done?'<p>🏅 <b>'+cur.name+' 卡冊收集完成！</b></p>':''));
+  });
   var sp=document.getElementById("gspin");if(sp)sp.addEventListener("click",function(){
     var g2=gLoad(kid);if(gPoints(kid)-g2.spent<GACHA_COST)return;
     sp.disabled=true;var ball=document.getElementById("gball");ball.className="ball spin";
     setTimeout(function(){
-      var r=gDraw(),first=!g2.c[r.id];g2.spent+=GACHA_COST;g2.c[r.id]=(g2.c[r.id]||0)+1;g2.album=r.a.id;gSave(kid,g2);
+      var r=gDraw(ALBUMS.filter(function(a){return a.id===g2.album})[0]||ALBUMS[0]),first=!g2.c[r.id];g2.spent+=GACHA_COST;g2.c[r.id]=(g2.c[r.id]||0)+1;g2.album=r.a.id;gSave(kid,g2);
       var done=r.a.cards.every(function(x){return g2.c[r.a.id+":"+x[1]]});
       el.dataset.open="1";showGacha(kid,c);
       hmModal('<p style="margin:0;font-weight:800">'+r.a.name+'</p><div class="gc '+r.c[2]+' pop" style="max-width:180px;margin:10px auto"><div class="em" style="font-size:72px">'+r.c[0]+'</div><div class="nm" style="font-size:18px">'+r.c[1]+'</div><div class="rr">'+({N:"一般 N",R:"稀有 R",SR:"超稀有 SR ✨"})[r.c[2]]+'</div></div>'+
