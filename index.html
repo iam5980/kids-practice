@@ -76,8 +76,9 @@ details.old .term{color:var(--muted)}
 </main>
 <script>
 /* 新增練習：在對應孩子的陣列加一行即可（順序不拘，首頁會自動依學期排序、分英文部／中文部）。 */
-var SUBJ={reading:"📖 Reading",science:"🔬 Science",grammar:"✏️ Grammar",social:"🌍 Social Studies",chinese:"🀄 國語","zh-science":"🌱 自然","zh-social":"🗺️ 社會",math:"🔢 數學"};
-var TERM=function(t){var m=t.match(/^(\d{3})(\d)-(mid|final)$/);return m?m[1]+"-"+m[2]+(m[3]=="mid"?" 期中":" 期末"):t};
+var SUBJ={reading:"📖 Reading",science:"🔬 Science",grammar:"✏️ Grammar",social:"🌍 Social Studies",chinese:"🀄 國語","zh-science":"🌱 自然","zh-social":"🗺️ 社會",math:"🔢 數學",logic:"🧠 數理邏輯"};
+var TNAME={gaoqiao:"高僑 私中模擬考"};
+var TERM=function(t){if(TNAME[t])return TNAME[t];var m=t.match(/^(\d{3})(\d)-(mid|final)$/);return m?m[1]+"-"+m[2]+(m[3]=="mid"?" 期中":" 期末"):t};
 var CATALOG={
   au:[
     {s:"chinese",t:"1151-final"},
@@ -96,6 +97,7 @@ var CATALOG={
     {s:"chinese",t:"1151-mid"}
   ],
   hw:[
+    {s:"logic",t:"gaoqiao"},
     {s:"math",t:"1151-final"},
     {s:"zh-social",t:"1151-final"},
     {s:"zh-science",t:"1151-final"},
@@ -113,7 +115,8 @@ var CATALOG={
 };
 /* 分部：英文部 / 中文部（新增科目時把代碼加進對應的陣列） */
 var DEPTS=[{name:"🌏 英文部",subj:["reading","grammar","science","social"]},
-           {name:"🀄 中文部",subj:["chinese","zh-science","zh-social","math"]}];
+           {name:"🀄 中文部",subj:["chinese","zh-science","zh-social","math"]},
+           {name:"🏫 私中準備",subj:["logic"]}];
 function termKey(t){var m=t.match(/^(\d{3})(\d)-(mid|final)$/);return m?(+m[1])*100+(+m[2])*10+(m[3]=="final"?1:0):0}
 function cards(kid,list){
   var h='<div class="grid">';
