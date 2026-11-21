@@ -1493,7 +1493,7 @@ var KidKit = (function () {
 
 /* ===== Audrey · Grammar Final (Grammar 3 · Pathway) — Unit 2 (p.14–23) + Unit 4 (p.34–43) ===== */
 var APP = {key: "au-grammar-1151-final", title: "✏️ Audrey's Grammar Final", sub: "Grammar 3 · Unit 2 + Unit 4 · defeat every boss, then beat the Final Boss!",
-  scope: "Unit 2 (p.14–23): What do you do? · Where do you work? · Why do you like your job? · When…? · Simple present vs. present continuous. Unit 4 (p.34–43): What's the weather like? · Going to (affirmative, negative, questions, question words) · Let's talk.",
+  scope: "Unit 2 (p.14–23): What do you do? · Where do you work? · Why do you like your job? · When…? · Simple present vs. present continuous. Unit 4 (p.34–43): What's the weather like? · Going to (affirmative, negative, questions, question words) · Let's talk. + Pop Quiz Fix-Up (Unit 4 pop quiz mistakes).",
   flipHint: "Match each word with its meaning. Flip two cards at a time!", mockScramble: 4, race: true};
 var LESSONS = [
   {id: "JB", name: "What do you do? / Where do you work?", icon: "👩‍🚒", boss: "Job Jumbler"},
@@ -1501,7 +1501,8 @@ var LESSONS = [
   {id: "SP", name: "Simple present vs. present continuous", icon: "⏰", boss: "Tense Troll"},
   {id: "WE", name: "What's the weather like?", icon: "⛅", boss: "Storm Sprite"},
   {id: "GT", name: "Going to: yes and no", icon: "🎯", boss: "Plan Pirate"},
-  {id: "GQ", name: "Going to: questions + Let's talk", icon: "🗺️", boss: "Quiz Wizard"}
+  {id: "GQ", name: "Going to: questions + Let's talk", icon: "🗺️", boss: "Quiz Wizard"},
+  {id: "PQ", name: "Pop Quiz Fix-Up: going to", icon: "📝", boss: "Mistake Monster"}
 ];
 var VOCAB = {
   JB: [
@@ -1558,6 +1559,16 @@ var VOCAB = {
     ["shall we", "words you use to ask a friend to do something with you"],
     ["how about", "words you use to give an idea (How about going swimming?)"],
     ["let's", "let us — we will do it together"]
+  ],
+  PQ: [
+    ["sweep", "to clean the floor with a broom"],
+    ["swim", "to move through water using your arms and legs"],
+    ["homework", "school work you do at home"],
+    ["party", "a time when friends get together to eat, play and have fun"],
+    ["ocean", "a very big area of salty water"],
+    ["fight", "to argue or hit each other"],
+    ["later", "after now, at a time in the future"],
+    ["tomorrow", "the day after today"]
   ]
 };
 /* ty: mc (a + w) | tf | fill (t with ___, a, w) | open | scramble (a + extra) */
@@ -1757,7 +1768,45 @@ var BANK = [
   {L:"GQ",ty:"scramble",q:"Unscramble: are / watch / going to / you / a movie on TV",a:"Are you going to watch a movie on TV?",extra:["Do"]},
   {L:"GQ",ty:"scramble",q:"Build the question.",a:"What are you going to do?",extra:["is"]},
   {L:"GQ",ty:"scramble",q:"Build the question.",a:"How are you going to travel?",extra:["does"]},
-  {L:"GQ",ty:"open",q:"Write: Are you going to ride your bike next weekend? (Answer yes or no.)",a:"Yes, I am. / No, I'm not.",points:[["am","not","m"]],need:1,exp:"Answer with am: Yes, I am. / No, I'm not."}
+  {L:"GQ",ty:"open",q:"Write: Are you going to ride your bike next weekend? (Answer yes or no.)",a:"Yes, I am. / No, I'm not.",points:[["am","not","m"]],need:1,exp:"Answer with am: Yes, I am. / No, I'm not."},
+  /* ---------- Pop Quiz Fix-Up (Pathway 3 Unit 4 Pop Quiz mistakes) ---------- */
+  {L:"PQ",src:"pq",ty:"fill",t:"My friends are not going to ___ tomorrow.",a:"come",w:["coming","comes","came"],exp:"be + going to + base verb: are not going to come. Don't forget the verb!"},
+  {L:"PQ",src:"pq",ty:"fill",t:"I am not going to ___ in the ocean.",a:"swim",w:["swimming","swims","swam"],exp:"am not going to + swim. Don't forget the verb!"},
+  {L:"PQ",src:"pq",ty:"fill",t:"Alice is going to ___ the floor.",a:"sweep",w:["sweeps","sweeping","swept"],exp:"After going to use the base verb: sweep (no -s, even with she)."},
+  {L:"PQ",src:"pq",ty:"fill",t:"Tom is going to ___ his room.",a:"clean",w:["cleans","cleaning","cleaned"],exp:"After going to use the base verb: clean (no -s)."},
+  {L:"PQ",src:"pq",ty:"fill",t:"My mom is going to ___ dinner.",a:"cook",w:["cooks","cooking","cooked"],exp:"After going to use the base verb: cook (no -s)."},
+  {L:"PQ",src:"pq",ty:"fill",t:"___ you going to live in Spain next year?",a:"Are",w:["Do","Is","Be"],exp:"Questions: Are you going to …?"},
+  {L:"PQ",src:"pq",ty:"fill",t:"Is it going to ___ later?",a:"rain",w:["rains","raining","rained"],exp:"Is it going to rain later?"},
+  {L:"PQ",src:"pq",ty:"fill",t:"Are you going to live in Spain next year? No, I'm ___.",a:"not",w:["don't","isn't","aren't"],exp:"Answer with am: No, I'm not. (not No, I don't)"},
+  {L:"PQ",src:"pq",ty:"fill",t:"Are Judy and Jolin going to fight with each other? No, they ___.",a:"aren't",w:["don't","isn't","doesn't"],exp:"No, they aren't."},
+  {L:"PQ",src:"pq",ty:"mc",q:"Which sentence is correct?",a:"Alice is going to sweep the floor.",w:["Alice is going to sweeps the floor.","Alice going to sweep the floor."],exp:"be + going to + base verb (no -s)."},
+  {L:"PQ",src:"pq",ty:"mc",q:"Which sentence is correct?",a:"My friends are not going to come tomorrow.",w:["My friends are not going to tomorrow.","My friends are not going to comes tomorrow."],exp:"Don't forget the verb after going to: going to come."},
+  {L:"PQ",src:"pq",ty:"mc",q:"Which sentence is correct?",a:"I am not going to swim in the ocean.",w:["I am not going to in the ocean.","I not going to swim in the ocean."],exp:"am not going to + swim."},
+  {L:"PQ",src:"pq",ty:"mc",q:"you / live in Spain next year — Which question is correct?",a:"Are you going to live in Spain next year?",w:["Are you be live in Spain next year?","Do you going to live in Spain next year?"],exp:"Move are to the front; keep going to + live: Are you going to live …?"},
+  {L:"PQ",src:"pq",ty:"mc",q:"it / rain later — Which question is correct?",a:"Is it going to rain later?",w:["Is it rain later?","Does it going to rain later?"],exp:"Is it going to rain later? Don't drop going to."},
+  {L:"PQ",src:"pq",ty:"mc",q:"Judy and Jolin / fight with each other — Which question is correct?",a:"Are Judy and Jolin going to fight with each other?",w:["Are Judy and Jolin fight with each other?","Is Judy and Jolin going to fight with each other?"],exp:"Judy and Jolin = they → Are … going to fight …?"},
+  {L:"PQ",src:"pq",ty:"mc",q:"she / visit her grandma — Which question is correct?",a:"Is she going to visit her grandma?",w:["Is she visit her grandma?","Does she going to visit her grandma?"],exp:"Is she going to visit …?"},
+  {L:"PQ",src:"pq",ty:"mc",q:"they / play soccer after school — Which question is correct?",a:"Are they going to play soccer after school?",w:["Are they play soccer after school?","Do they going to play soccer after school?"],exp:"Are they going to play …?"},
+  {L:"PQ",src:"pq",ty:"mc",q:"Are you going to live in Spain next year?",a:"No, I'm not.",w:["No, I don't.","No, you aren't."],exp:"Answer a be-question with be: No, I'm not."},
+  {L:"PQ",src:"pq",ty:"mc",q:"Is it going to rain later?",a:"Yes, it is.",w:["Yes, it does.","Yes, it going."],exp:"Yes, it is."},
+  {L:"PQ",src:"pq",ty:"mc",q:"Are Judy and Jolin going to fight with each other?",a:"No, they aren't.",w:["No, they don't.","No, they isn't."],exp:"No, they aren't."},
+  {L:"PQ",src:"pq",ty:"mc",q:"Is Alice going to sweep the floor?",a:"Yes, she is.",w:["Yes, she does.","Yes, she sweeps."],exp:"Yes, she is."},
+  {L:"PQ",src:"pq",ty:"mc",q:"I'm going to ___ my homework.",a:"do",w:["doing","does"],exp:"I'm going to do my homework."},
+  {L:"PQ",src:"pq",ty:"tf",q:"\"Alice is going to sweeps the floor\" is correct.",a:false,exp:"No -s after going to: is going to sweep."},
+  {L:"PQ",src:"pq",ty:"tf",q:"\"My friends are not going to tomorrow\" is a complete sentence.",a:false,exp:"The verb is missing: are not going to come tomorrow."},
+  {L:"PQ",src:"pq",ty:"tf",q:"\"Is it rain later?\" is a correct going-to question.",a:false,exp:"Is it going to rain later?"},
+  {L:"PQ",src:"pq",ty:"tf",q:"\"Are you going to live in Spain? — No, I'm not.\" is correct.",a:true},
+  {L:"PQ",src:"pq",ty:"tf",q:"\"Are you going to swim? — No, I don't.\" is correct.",a:false,exp:"Answer with am: No, I'm not."},
+  {L:"PQ",src:"pq",ty:"tf",q:"In a going-to question, only am / is / are moves to the front.",a:true,exp:"You are going to live → Are you going to live?"},
+  {L:"PQ",src:"pq",ty:"scramble",q:"Build the question: you / live in Spain next year",a:"Are you going to live in Spain next year?",extra:["be","do"]},
+  {L:"PQ",src:"pq",ty:"scramble",q:"Build the question: it / rain later",a:"Is it going to rain later?",extra:["does"]},
+  {L:"PQ",src:"pq",ty:"scramble",q:"Build the question: Judy and Jolin / fight with each other",a:"Are Judy and Jolin going to fight with each other?",extra:["is"]},
+  {L:"PQ",src:"pq",ty:"scramble",q:"Build the sentence: Alice / sweep the floor",a:"Alice is going to sweep the floor.",extra:["sweeps"]},
+  {L:"PQ",src:"pq",ty:"scramble",q:"Build the sentence: My friends / not come tomorrow",a:"My friends are not going to come tomorrow.",extra:["comes"]},
+  {L:"PQ",src:"pq",ty:"scramble",q:"Build the sentence: I / not swim in the ocean",a:"I am not going to swim in the ocean.",extra:["swimming"]},
+  {L:"PQ",src:"pq",ty:"open",q:"Write the question: you / live in Spain next year",a:"Are you going to live in Spain next year?",points:[["are you going to"],["live in spain"]],need:2,exp:"Are you going to live in Spain next year?"},
+  {L:"PQ",src:"pq",ty:"open",q:"Write the question: it / rain later",a:"Is it going to rain later?",points:[["is it going to"],["rain later"]],need:2,exp:"Is it going to rain later?"},
+  {L:"PQ",src:"pq",ty:"open",q:"Write the question: Judy and Jolin / fight with each other",a:"Are Judy and Jolin going to fight with each other?",points:[["are judy and jolin going to"],["fight with each other"]],need:2,exp:"Are Judy and Jolin going to fight with each other?"}
 ];
 var SORTS = {
   GQ: {title: "Which question word?", bins: ["Where?", "When?", "How?", "Why?", "What?"], items: [
@@ -1790,7 +1839,9 @@ var ORAL = [
   {L: "GT", q: "What are you going to be when you grow up?", a: "I'm going to be a scientist.", keywords: ["I'm going to be"]},
   {L: "GT", q: "Tell me one thing you are going to do and one thing you aren't going to do this weekend.", a: "I'm going to ride my bike. I'm not going to watch TV.", keywords: ["I'm going to", "I'm not going to"]},
   {L: "GQ", q: "Are you going to have a party next weekend?", a: "No, I'm not. I'm going to visit my grandma.", keywords: ["Yes, I am / No, I'm not", "going to"]},
-  {L: "GQ", q: "Your friend says, \"I'm bored.\" Give an idea.", a: "How about going swimming? Let's go swimming!", keywords: ["How about …ing", "Let's"]}
+  {L: "GQ", q: "Your friend says, \"I'm bored.\" Give an idea.", a: "How about going swimming? Let's go swimming!", keywords: ["How about …ing", "Let's"]},
+  {L: "PQ", q: "Ask me if I am going to live in Spain next year.", a: "Are you going to live in Spain next year?", keywords: ["Are you going to", "live"]},
+  {L: "PQ", q: "Is it going to rain later? Answer with a short answer.", a: "Yes, it is. / No, it isn't.", keywords: ["it is / it isn't"]}
 ];
 
 /* ===== App code ===== */
@@ -1988,7 +2039,7 @@ function run(items, o) {
     root.appendChild(AppCore.drillBar({title: o.title + " · " + (i + 1) + " / " + items.length, onBack: home, onFinish: end, game: G}));
     var card = el("div", "hs-card"); root.appendChild(card);
     var tag = q.vocab ? "Vocabulary" : q.tv ? "Teacher's word list" : q.ty === "oral" ? "Oral" + (typeof ORAL_EST !== "undefined" && ORAL_EST ? " · Estimated — confirm with teacher" : "") : {listen: "Listening", spell: "Spelling", evid: "Find the evidence", scramble: "Build the sentence", mc: "Multiple choice", tf: "True or False", fill: Array.isArray(q.a) ? "Outline" : "Fill in the blank", order: "Put in order", open: "Critical thinking", cloze: "Cloze Activity", match: "Vocabulary matching", label: "Label the diagram"}[q.ty];
-    if (q.src === "wb") tag = "📘 Workbook · " + tag; else if (q.src === "tb") tag = "📗 Textbook · " + tag;
+    if (q.src === "pq") tag = "📝 Pop Quiz · " + tag; else if (q.src === "wb") tag = "📘 Workbook · " + tag; else if (q.src === "tb") tag = "📗 Textbook · " + tag;
     card.appendChild(el("div", "hs-tag", lessonById(q.L).icon + " " + esc(lessonById(q.L).name) + " · " + tag));
     var area = el("div"); card.appendChild(area);
     var next = el("div", "hs-next"); card.appendChild(next);
