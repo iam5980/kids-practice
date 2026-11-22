@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Howard 私中考前 錯題重做</title>
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--ink:#1f2933;--mute:#6b7280;--line:#e5e1d8;--acc:#2f6f5e;--acc2:#e8f1ee;--ok:#2e7d32;--okbg:#e8f5e9;--bad:#c62828;--badbg:#fdecea;--warn:#b26a00}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--acc);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px}
+header h1{font-size:18px;margin:0;flex:1}
+header button{background:rgba(255,255,255,.15);color:#fff;border:0;border-radius:8px;padding:6px 10px;font-size:15px}
+main{max-width:760px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.muted{color:var(--mute);font-size:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 14px;font-size:16px;cursor:pointer;color:var(--ink)}
+.btn.pri{background:var(--acc);color:#fff;border-color:var(--acc)}
+.btn.sm{padding:6px 10px;font-size:14px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px;font-size:14px;cursor:pointer}
+.chip.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.cl{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;margin-top:8px;background:#fff;cursor:pointer;text-align:left;width:100%;font-size:16px}
+.cl:hover{border-color:var(--acc)}
+.tag{font-size:12px;border-radius:6px;padding:2px 7px;background:var(--acc2);color:var(--acc);white-space:nowrap}
+.tag.w{background:#fff4e0;color:var(--warn)}
+.big{font-size:28px;font-weight:700}
+.q{font-size:19px;margin:4px 0 14px}
+.opt{display:block;width:100%;text-align:left;border:2px solid var(--line);background:#fff;border-radius:12px;padding:12px 14px;margin:8px 0;font-size:17px;cursor:pointer;color:var(--ink)}
+.opt.ok{border-color:var(--ok);background:var(--okbg)}
+.opt.bad{border-color:var(--bad);background:var(--badbg)}
+.fb{border-radius:12px;padding:12px 14px;margin-top:10px}
+.fb.ok{background:var(--okbg)} .fb.bad{background:var(--badbg)}
+ul.kp{margin:6px 0 0;padding-left:20px}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--acc)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+td,th{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left;vertical-align:top}
+.hide{display:none}
+</style>
+</head>
+<body>
+<header><h1 id="ttl">錯題重做</h1><button id="home">首頁</button></header>
+<main id="app"></main>
+<script>
+const DATA=[["M1", "數學", "算對卻填錯選項", 19, "作答習慣", ["19 題的算式其實都對了，是最容易救回的分數", "第 7、8、10 回改成選擇題後才大量出現"], "算完先把數字寫在括號旁 → 到選項找一樣的數字 → 最後才填編號", [["10-21", "重疊部分佔長方形 2/5、六邊形 1/4，面積差 15，求重疊", "②10（孩子選④）", "重疊設 2 份：長方形 5 份、六邊形 8 份，差 3 份＝15，1 份＝5"], ["10-28", "10 個半徑 5 的圓排一排，外圍粗線長", "④125.6（孩子選①）", "角度加總 1440°＝4 個整圓，4×31.4"]], [["用 36 塊邊長 1 公分的正方形全部拼成長方形，可以拼出幾種不同尺寸？", ["5", "6", "9", "4"], 0, "36 的因數配對：1×36、2×18、3×12、4×9、6×6，共 5 種。⚠ 算出 5 就到選項找「5」。"], ["重疊部分佔甲的 1/3、佔乙的 1/4，甲、乙面積相差 10 平方公分，重疊部分是多少？", ["70", "10", "30", "40"], 1, "重疊設 1 份：甲 3 份、乙 4 份，差 1 份＝10。30、40 是甲、乙的面積，不是題目問的。"]]], ["M2", "數學", "審題錯：答成中間值或問錯對象", 12, "作答習慣", ["算出「剩下的」卻問「買的」、算出「總價」卻問「單價」", "單位沒換：公分 vs 公尺、總量 vs 每單位"], "讀題時圈出最後一句「求什麼」，寫答案前再看一次", [["9-7", "甲乙丙各有 1000 元…甲買的東西值多少？", "640", "2×甲剩 − 220＝500，甲剩 360；題目問「買的」→ 1000 − 360"], ["5-33", "圓柱水池水深 30 cm 裝 3768 公升，半徑幾「公尺」？", "②2（孩子選④200）", "算出 200 cm 是對的，沒換成公尺"]], [["甲、乙各有 800 元，買完東西後甲剩的比乙多 60 元，兩人剩的共 500 元。乙花了多少元？", ["220", "280", "520", "580"], 3, "乙剩＝(500 − 60) ÷ 2＝220，乙花了 800 − 220＝580。220 是「剩下的」。"], ["圓柱水池水深 50 公分，裝了 1570 公升的水，底面半徑是幾「公尺」？", ["10", "100", "1000", "1"], 3, "1570 公升＝1570000 cm³，÷50＝31400 cm²，÷3.14＝10000，半徑 100 cm＝1 公尺。"]]], ["M3", "數學", "公因數、公倍數應用", 13, "五上", ["等距、最大、切成最大正方體 → 最大公因數", "同時、再次相遇、最少多久 → 最小公倍數", "「不夠幾個」先補上、「多出幾個」先拿掉，再求公因數"], "問「最大的一份」用公因數；問「下一次一起」用公倍數", [["1-5", "糖果 120 顆不夠 6 顆、餅乾 110 塊多 5 塊，人數最多 a、最少 b", "28", "126、105 的公因數，且人數要比 6 多 → 7 和 21"], ["1-24", "成熟香蕉佔 3/7，每箱 15、20、30 公斤都裝完，最少進貨", "140", "[15,20,30]＝60 是成熟的部分，全部＝60 ÷ 3/7"]], [["鉛筆 58 枝分給小朋友不夠 2 枝，橡皮擦 77 個分完多 5 個，每人分得一樣多。小朋友最多有幾人？", ["36", "6", "12", "24"], 2, "鉛筆補 2 枝＝60，橡皮擦拿掉 5 個＝72，(60,72)＝12，而且 12 比 5 多。"], ["甲每 6 天、乙每 8 天去一次圖書館。3 月 1 日兩人一起去，下次一起去是幾月幾日？", ["3 月 24 日", "3 月 25 日", "4 月 1 日", "3 月 14 日"], 1, "[6,8]＝24 天，3/1 ＋ 24 天＝3/25。"]]], ["M4", "數學", "圓與扇形（組合圖形、弧長、周長）", 10, "六上", ["葉子形＝0.57 × r²；四分之一圓＝0.785 × r²", "弧長＝直徑 × 3.14 × 圓心角 ÷ 360", "周長只算外框：弧＋直線段都要列出來"], "先把角度或半徑平方加總，最後只乘一次 3.14", [["7-1", "正方形邊長 10，四邊為直徑畫半圓，斜線面積", "③200", "外圈 4 個半圓＝2 個圓＝157；正方形扣葉子 100 − 57＝43；157＋43"], ["5-39", "長方形加兩個四分之一圓弧，求斜線周長", "③19.7", "大弧＋小弧＝(12＋8)×3.14÷4＝15.7，再加兩段直線 2＋2"]], [["邊長 10 公分的正方形，以兩個相對的頂點為圓心、10 公分為半徑各畫四分之一圓，中間重疊的葉子形面積是多少？", ["78.5", "43", "114", "57"], 3, "葉子＝0.57 × 10²＝57。78.5 是一個四分之一圓。"], ["半徑 6 公分、圓心角 120° 的扇形，周長是多少公分？", ["37.68", "18.56", "12.56", "24.56"], 3, "弧長＝12 × 3.14 × 1/3＝12.56，再加兩條半徑 12，共 24.56。只算弧長會選錯。"]]], ["M5", "數學", "週期、日期、時刻表、時鐘", 11, "三～五年級＋延伸", ["三步：找週期 → 算餘數 → 對應位置", "大月 31 天餘 3、小月 30 天餘 2", "兩班車同時發車：每隔「最小公倍數」一次", "時鐘夾角＝｜30 × 時 − 5.5 × 分｜"], "先寫出週期長度，再看「起點那次」算不算", [["2-18", "A 工作 6 休 1、B 工作 4 休 1，7/1 同休，下次同休", "8 月 5 日", "每 7 天、每 5 天休一次，[7,5]＝35 天，7 月有 31 天"], ["10-12", "2 點 40 分時針分針較小夾角", "②160°", "｜60 − 220｜＝160，時針會跟著分鐘移動"]], [["5 月 1 日是星期四，6 月 1 日是星期幾？", ["星期日", "星期一", "星期三", "星期六"], 0, "5 月有 31 天，31 ÷ 7 餘 3，星期四往後 3 天是星期日。"], ["3 點 20 分時，時針與分針的較小夾角是幾度？", ["10°", "40°", "20°", "30°"], 2, "｜30×3 − 5.5×20｜＝｜90 − 110｜＝20°。"]]], ["M6", "數學", "百分率：折扣、命中率、濃度", 11, "五下", ["加幾成＝×(1＋幾成)；打幾折＝×0.幾", "命中率、平均要用「全部」重新算", "加水稀釋時溶質不變", "連續 +25%、−25% 不會抵銷，一定變少"], "把每一句百分率都改寫成「× 倍率」", [["2-4", "射擊 120 發命中 35%，再打 50 發要達 40%，至少再中幾發", "④26", "總共 170 發 × 40%＝68，已中 42"], ["10-19", "1000 cc 含糖 18% 稀釋成 15%，加多少水", "③200", "糖 180 不變，新總量 180 ÷ 15%＝1200"]], [["小明做了 120 題答對 30%，再做 30 題，要讓全部的正確率達到 40%，新的題目至少要答對幾題？", ["24", "30", "60", "12"], 0, "全部 150 題 × 40%＝60 題，已經對 36 題，還要 24 題。"], ["500 克含鹽 20% 的鹽水，加水稀釋成 10%，要加多少克水？", ["100", "250", "500", "1000"], 2, "鹽 100 克不變，新總量＝100 ÷ 10%＝1000 克，加水 1000 − 500＝500 克。"]]], ["M7", "數學", "和差倍、年齡、倒推", 9, "延伸", ["兩人「加一樣多」或「年齡增加」，差不變", "用線段圖把大家補成一樣長", "倒推：先加回再除以分率"], "先找「不變的量」（差或總和），再設份數", [["1-18", "兄 1260、弟 370，各給一樣多後兄是弟 3 倍", "①75", "差 890 不變＝弟的 2 倍 → 弟 445"], ["9-16", "年齡比 5:3，6 年後 3:2，甲現在幾歲", "30", "差不變：3:2 改寫成 6:4，多 1 份＝6 年"]], [["姊姊有 900 元、弟弟有 300 元。兩人各再存一樣多的錢後，姊姊的錢是弟弟的 2 倍。每人各存了多少元？", ["600", "150", "200", "300"], 3, "差 600 不變，等於弟弟的 1 倍 → 弟弟存後 600 元，存了 300 元。"], ["今年爸爸和兒子的年齡比是 4：1，8 年後變成 8：3。兒子今年幾歲？", ["16", "8", "10", "12"], 2, "差不變：4：1 的差 3 份、8：3 的差 5 份，改寫成 20：5 和 24：9，多 4 份＝8 年，1 份＝2，兒子 5 × 2＝10 歲。"]]], ["M8", "數學", "速率：追趕、相遇、速度比", 7, "六年級", ["同向追趕：時間＝距離差 ÷ 速度差", "反向相遇：時間＝距離 ÷ 速度和", "時間相同，路程比＝速度比", "先統一單位（秒／分、公尺／公里）"], "同向用差、反向用和；最後確認問的是哪一段路", [["4-3(3)", "小高每分 40 m 先走 6 分，小僑每秒 0.8 m 同向追", "30 分", "0.8 m/秒＝48 m/分，240 ÷ 8"], ["10-25", "小高速度是小僑 1.4 倍，小僑差 240 m，全程", "④840（孩子選①600）", "路程比 7:5，差 2 份＝240，全程 7 份"]], [["甲每分鐘走 60 公尺，先出發 5 分鐘；乙每分鐘走 80 公尺，從同一地點同方向追。乙出發幾分鐘後追上甲？", ["20", "15", "5", "12"], 1, "甲先走 300 公尺，速度差 20，300 ÷ 20＝15 分。"], ["400 公尺環形跑道，甲每秒 5 公尺、乙每秒 3 公尺，同地反方向出發，2 分鐘內相遇幾次？", ["4", "5", "2", "3"], 2, "反向用速度和：400 ÷ 8＝50 秒遇一次，120 ÷ 50＝2.4，相遇 2 次。"]]], ["M9", "數學", "規律與數列：等差和、倍增", 12, "延伸", ["等差數列和＝(首項＋末項) × 項數 ÷ 2，別忘了 ÷ 2", "每次變 2 倍：倒過來想，前一天是一半", "先看差，差有規律再看差的差"], "項數＝(末 − 首) ÷ 公差 ＋ 1", [["2-8", "101～200 之間 3 的倍數總和", "②4950", "102～198 共 33 個，(102＋198)×33÷2"], ["3-32", "荷葉每天擴大一倍，20 天蓋滿，幾天蓋一半", "③19", "倒過來想，不是 20 ÷ 2"]], [["1 到 100 之間所有 4 的倍數，總和是多少？", ["1300", "1250", "2600", "1400"], 0, "4～100 共 25 個，(4＋100) × 25 ÷ 2＝1300。忘了 ÷2 會得 2600。"], ["細菌每 10 分鐘數量變 2 倍，2 小時剛好裝滿瓶子。第幾分鐘時剛好半瓶？", ["100", "110", "115", "60"], 1, "2 小時＝120 分，倒回 10 分鐘就是一半：110 分。"]]], ["M10", "數學", "立體：切割、塗漆、裝箱", 5, "五～六年級", ["切成最大的相同正方體 → 三邊的最大公因數", "完全沒漆的小方塊：每個方向去頭尾 2 層", "有蓋木箱的內部：長寬高各扣兩片厚度"], "每個方向分開算，最後相乘", [["2-16", "42×30×48 切最大正方體，個數", "④280", "(42,30,48)＝6，7×5×8"], ["3-46", "有蓋木箱外部 130×80×100、厚 5，放 24×7×18 木塊", "②250", "內部 120×70×90，5×10×5"]], [["長 36、寬 24、高 12 公分的長方體，切成最大且一樣大的正方體，沒有剩餘，共可切成幾個？", ["6", "12", "24", "72"], 0, "(36,24,12)＝12，36÷12 × 24÷12 × 12÷12＝3×2×1＝6 個。"], ["大正方體表面塗漆後，切成 4×4×4 個小正方體。完全沒有漆的小正方體有幾個？", ["24", "27", "8", "16"], 2, "每個方向去頭尾：(4−2)³＝2×2×2＝8 個。"]]], ["S1", "自然", "地球運動、四季、太陽直射與晝夜", 8, "國中地科", ["地軸傾斜 23.5° 造成四季、晝夜長短與永晝永夜", "夏至直射北回歸線、春秋分赤道、冬至南回歸線", "北半球夏天日出東北、日落西北；冬天日出東南、日落西南", "從北極上空看逆時針，從南極上空看順時針"], "先在公轉圖標出四個節氣，再判斷日期落在哪一段", [["4-10", "從南極上空看自轉與公轉方向", "④兩者都順時針", "北極看逆時針，南極看剛好相反"], ["10-57", "2 月 6 日地球位置與晝夜", "①冬至～春分之間，晝短夜長", "還沒到春分，北半球晝短夜長"]], [["冬至那天，正午太陽直射在哪裡？", ["北極", "北回歸線", "赤道", "南回歸線"], 3, "冬至太陽直射南回歸線（南緯 23.5°），北半球白天最短。"], ["夏至那天傍晚在臺灣看夕陽，太陽落在哪個方向？", ["西北", "西南", "東北", "正西"], 0, "北半球夏季太陽日出東北、日落西北。"]]], ["S2", "自然", "溶液濃度與飽和", 7, "國小五年級＋國中", ["濃度＝溶質 ÷（溶質＋水）× 100%，分母要加溶質", "先算最多能溶多少，沒溶的不算溶質", "杯底有沉澱一定飽和；沒沉澱不一定未飽和", "飽和溶液的濃度只和溫度有關"], "先判斷「有沒有超過溶解度」，再算濃度", [["6-1", "溶解度 25g/100g 水，700g 水加 300g", "②20%（孩子選④）", "只溶 175g，175 ÷ 875"], ["9-17", "25g 溶於 100g 水的濃度", "②20%（孩子選③25%）", "分母忘了加溶質"]], [["某物質溶解度是每 100 克水 25 克。在同溫下，200 克水加入 80 克該物質，濃度是多少？", ["28.6%", "40%", "20%", "25%"], 2, "200 克水最多溶 50 克，濃度＝50 ÷ 250＝20%。28.6% 是把沒溶的 30 克也算進去。"], ["一杯糖水的杯底還有糖沒溶解，這杯糖水一定是？", ["濃度是 0", "無法判斷", "未飽和溶液", "飽和溶液"], 3, "杯底有沉澱表示已經溶不下了，一定是飽和溶液。"]]], ["S3", "自然", "輪軸與滑輪", 7, "國小六年級", ["施力 × 輪半徑＝物重 × 軸半徑", "施力在輪：省力費時；施力在軸：費力省時", "定滑輪不省力只改方向；動滑輪省一半力、繩長 2 倍"], "先找「力在哪、物在哪」，再用半徑比", [["4-5", "軸半徑 10、輪半徑 50，100 公斤重掛軸", "施力 20 公斤重", "F × 50＝100 × 10"], ["10-41", "定滑輪不同方向拉 F₁、F₂，動滑輪 F₃", "④F₁＝F₂＞F₃", "定滑輪怎麼拉都等於物重"]], [["輪軸的輪半徑 40 公分、軸半徑 10 公分，80 公斤重的物體掛在軸上，施力在輪上，需要多少公斤重？", ["320", "80", "20", "40"], 2, "F × 40＝80 × 10，F＝20 公斤重。"], ["用一個動滑輪把 60 公克重的物體等速拉高 20 公分（不計滑輪重），施力與拉出的繩長是？", ["30 公克重、40 公分", "60 公克重、20 公分", "30 公克重、20 公分", "120 公克重、10 公分"], 0, "動滑輪省一半力、費一倍距離。"]]], ["S4", "自然", "靜摩擦力與力平衡", 5, "國中理化", ["物體靜止：受力平衡，靜摩擦力＝要抵抗的那個力", "水平和垂直分開看", "材質相同不代表摩擦力相同，斜面越陡摩擦力越大"], "問摩擦力時，先找「是什麼想讓它動」", [["7-31", "800 gw 水平力把 500 gw 物體壓在牆上", "③500", "往下的重力 500 由向上的摩擦力抵銷"], ["10-39", "手握杯子注水，何者錯誤", "①握力與重力平衡（錯）", "握力是水平方向，撐住重量的是摩擦力"]], [["用 50 公克重的水平力把 200 公克重的書壓在牆上，書靜止不動。書受到的摩擦力是多少？", ["50 公克重", "200 公克重", "250 公克重", "0"], 1, "書沒掉下來，向上的摩擦力等於重力 200。50 是水平方向，由牆抵銷。"], ["木塊靜止在桌上，左邊用 6 公克重向右推、右邊用 15 公克重向左推。木塊受到的摩擦力是？", ["0", "9 公克重，向右", "9 公克重，向左", "21 公克重，向右"], 1, "合力 9 公克重向左，摩擦力大小相同、方向相反：向右 9。"]]], ["S5", "自然", "氣壓、鋒面、季風天氣圖", 5, "國中地科", ["北半球高壓：順時針向外吹、氣流下沉、晴朗", "北半球低壓：逆時針向內吹、氣流上升、多雲雨", "冷鋒三角形、暖鋒半圓形、滯留鋒兩者分在兩側", "冬季東北季風讓北部、東北部下雨"], "風從高壓吹向低壓", [["4-9", "甲、乙兩個氣壓中心的氣流", "③甲高壓下沉、乙低壓上升", "往外順時針是高壓"], ["6-25", "暖空氣沿冷空氣爬升處的符號", "③半圓形", "暖鋒"]], [["北半球的高氣壓中心，地面氣流與天氣如何？", ["逆時針向外、空氣下沉", "逆時針向內、空氣上升", "順時針向外、空氣下沉", "順時針向內、空氣上升"], 2, "高壓：順時針向外、下沉、晴朗。"], ["天氣圖上「冷鋒」的符號是？", ["三角形與半圓分在兩側", "三角形", "半圓形", "三角形與半圓同在一側交錯"], 1, "冷鋒三角形、暖鋒半圓、滯留鋒三角與半圓分兩側。"]]], ["S6", "自然", "植物構造與運輸", 4, "國中生物", ["木質部在內側，把水和礦物質往上送", "韌皮部在外側，把葉子做的糖往下送到果實、根", "水往上運輸的主要動力是葉片的蒸散作用", "有葉綠體的是葉肉細胞和保衛細胞"], "水走木質部往上、糖走韌皮部往下", [["6-20", "液體肥料的運輸方向與構造", "④往上、內側木質部", "肥料跟著水走"], ["6-21", "芭樂的糖份從哪來", "③葉片光合作用，經韌皮部運送", "糖不是從土裡吸收"]], [["芒果果實裡的糖，主要是怎麼來的？", ["莖自己製造", "從空氣中吸收", "根從土壤吸收，經木質部運送", "葉片光合作用製造，經韌皮部運送"], 3, "糖是葉子做的，經外側的韌皮部運到果實。"], ["植物把水往上運送到葉子，主要的動力是什麼？", ["蒸散作用", "光合作用", "呼吸作用", "根壓"], 0, "葉片蒸散作用把水往上拉；陽光、風、乾燥會讓蒸散變快。"]]], ["S7", "自然", "植物分類", 5, "國中生物", ["苔蘚：沒有維管束，用孢子繁殖", "蕨類：有維管束，用孢子繁殖，不開花", "裸子植物：有種子、有毬果、不開花（松、杉、蘇鐵）", "被子植物：開花結果"], "先問：有沒有維管束 → 有沒有種子 → 有沒有花", [["6-8", "植物「唯一」的敘述何者錯誤", "②蕨類是唯一有孢子的（錯）", "苔蘚也有孢子"], ["10-46", "最不可能以蘇鐵為例的書", "①花朵圖鑑", "蘇鐵是裸子植物，不開花"]], [["下列哪一種植物不會開花？", ["稻子", "百合", "蘇鐵", "玫瑰"], 2, "蘇鐵是裸子植物，有毬果、不開花。"], ["有維管束、但用孢子繁殖的是哪一類植物？", ["苔蘚", "蕨類", "裸子植物", "被子植物"], 1, "蕨類有維管束和根莖葉，但沒有種子，用孢子繁殖。"]]], ["S8", "自然", "學名與生物分類", 4, "國中生物", ["學名＝屬名＋種小名（二名法），第一個字是屬名", "同種一定同屬，同屬不一定同種", "細菌、藍綠菌是原核生物，沒有細胞核", "特例：鴨嘴獸、針鼴是卵生哺乳類；海豚用肺呼吸"], "比學名先看第一個字", [["8-47", "Diplazium donianum 與 Diplazium esculentum", "④同屬不同種", "第一個字相同"], ["8-35", "細菌、藍綠菌 vs 酵母菌、草履蟲的分類依據", "②有沒有細胞核", "原核與真核"]], [["Canis lupus（狼）和 Canis latrans（郊狼）是什麼關係？", ["同種", "同屬不同種", "不同屬", "同種不同屬"], 1, "第一個字 Canis 相同是同屬，第二個字不同所以不同種。"], ["下列哪一種生物沒有細胞核？", ["大腸桿菌", "變形蟲", "酵母菌", "草履蟲"], 0, "大腸桿菌是細菌，屬於原核生物。"]]], ["S9", "自然", "白煙、白霧、起霧都是小水滴", 4, "國小高年級", ["水蒸氣和二氧化碳氣體都看不見", "看得見的白煙、白霧都是凝結的小水滴", "哪一邊熱，水氣就從哪一邊來，霧凝結在那一側"], "看得見的「白」一定是液態", [["8-31", "乾冰在舞臺上的白煙", "②小水滴（孩子選①二氧化碳）", "乾冰吸熱讓空氣中水蒸氣凝結"], ["10-36", "冬天車內溫暖，車窗起霧", "②車內水氣凝結", "霧在玻璃內側"]], [["冬天車內開暖氣，車窗起霧，霧在玻璃的哪一側？", ["兩側都有", "不會起霧", "外側", "內側"], 3, "車內暖、水氣多，碰到冷玻璃凝結在內側。夏天開冷氣則在外側。"], ["燒開水時，壺嘴上方看到的「白煙」是什麼？", ["水蒸氣", "小水滴", "二氧化碳", "空氣"], 1, "水蒸氣看不見，離開壺嘴遇冷凝結成小水滴才看得見。"]]], ["S10", "自然", "光的成像與色光", 3, "國中理化", ["平面鏡、凸面鏡只成虛像；投在布幕上的才是實像", "凸面鏡：正立縮小（路口反光鏡、照後鏡）", "色紙只讓同色光通過，其他顏色吸收；沒光透過就是黑色"], "能投在屏幕上的是實像", [["9-2", "湯匙凸面看自己", "②縮小正立", "凸面鏡"], ["8-32", "綠光照紅色玻璃紙", "黑色", "紅紙擋掉綠光"]], [["用紅光照射綠色玻璃紙，紙後面的白板會呈現什麼顏色？", ["黑色", "紅色", "綠色", "黃色"], 0, "綠色玻璃紙只讓綠光通過，紅光被吸收，沒有光透過就是黑色。"], ["下列哪一種是實像？", ["看汽車照後鏡", "用放大鏡看小字", "投影機投在布幕上", "照平面鏡"], 2, "實像是光線真的匯聚，能投在屏幕上。"]]], ["S11", "自然", "神經系統：反射與大腦", 2, "國中生物", ["所有感覺（痛、苦、冷）都在大腦產生", "反射：不用想、很快，由脊髓控制（縮手、膝跳）", "有想過才做的動作由大腦控制"], "問「有沒有經過思考」", [["3-12", "吃到苦的吐出來", "④感覺在大腦、吐出是意識動作", ""], ["2-37", "不急不忙撥掉蟲子", "②大腦控制", "有意識的動作"]], [["過馬路看到紅燈而停下腳步，主要由哪裡控制？", ["腦幹", "脊髓", "大腦", "小腦"], 2, "看到、想一下才停，是有意識的動作，由大腦控制。"], ["手碰到熱鍋立刻縮回，主要由哪裡控制？", ["脊髓", "小腦", "腦幹", "大腦"], 0, "這是反射，走脊髓的捷徑，縮手比感到痛還快。"]]], ["S12", "自然", "循環系統與血液", 3, "國中生物", ["上下大靜脈注入右心房", "捐血、輸血都用靜脈；量脈搏量動脈", "剛離開肺的血含氧多", "紅血球運氧、白血球防禦、血小板凝血；血紅素運送不製造氧"], "經過肺 → 含氧多；經過器官 → 含氧少", [["6-7", "血管敘述何者正確", "④量脈搏是量動脈", ""], ["10-48", "血液組成何者正確", "①血漿主要成分是水", "紅血球也沒有細胞核"]], [["量脈搏時，量的是哪一種血管的跳動？", ["心房", "動脈", "靜脈", "微血管"], 1, "脈搏是動脈隨心跳的跳動。"], ["血液中負責對抗病菌的是什麼？", ["血小板", "血漿", "紅血球", "白血球"], 3, "白血球防禦疾病。"]]], ["S13", "自然", "電磁鐵與電路", 3, "國中理化", ["電磁鐵變強：增加圈數、加大電流、加鐵芯", "銅不會被磁化，換成銅棒磁場變弱", "右手定則：四指順電流，大拇指指 N 極", "沒有燈泡的導線分支接通會短路，燈全不亮"], "先把短路的部分圈出來", [["10-43", "電磁鐵何者錯誤", "③換成導電性更好的銅棒會更強（錯）", "要鐵芯"], ["7-36", "按下開關後幾盞燈亮", "①0 盞", "K₁ 分支沒有燈，短路"]], [["想讓電磁鐵的磁力變強，下列哪一項做法沒有用？", ["把鐵芯換成銅棒", "增加線圈圈數", "加大電流", "放入鐵芯"], 0, "銅不會被磁化，換成銅棒反而變弱。"], ["電路中有一條沒有燈泡的導線直接接在電池兩端，會發生什麼事？", ["只有一顆燈亮", "沒有影響", "燈泡更亮", "短路，燈泡都不亮"], 3, "電流全部走沒有電阻的路，形成短路。"]]], ["S14", "自然", "病毒與微生物", 2, "國中生物", ["病毒沒有細胞構造，只有蛋白質外殼包著遺傳物質", "只能寄生在活細胞裡繁殖", "太小，要用電子顯微鏡才看得到", "病毒不屬於原核生物"], "病毒＝外殼＋遺傳物質，沒有細胞", [["4-22", "伊波拉疫情敘述", "④和流感一樣由病毒感染", ""], ["4-23", "伊波拉病毒構造", "③蛋白質外殼包覆遺傳物質", ""]], [["要觀察病毒的形狀，需要使用哪一種工具？", ["解剖顯微鏡", "電子顯微鏡", "放大鏡", "複式顯微鏡"], 1, "病毒太小，光學顯微鏡看不到。"], ["關於病毒的構造，何者正確？", ["由蛋白質外殼包著遺傳物質", "有細胞核", "有葉綠體", "有細胞膜"], 0, "病毒沒有細胞構造。"]]], ["C1", "國語", "成語意思與褒貶", 7, "國小高年級", ["先看句子前後文意有沒有矛盾，矛盾的就是答案", "分清褒義、貶義：好高騖遠、紙上談兵、班門弄斧是貶義或自謙", "易混：揠苗助長（急躁壞事）、畫蛇添足（多此一舉）、守株待兔（只等運氣）"], "把成語的意思換回白話，放進句子讀一次", [["4-42", "一味開罰反而激起反感", "③揠苗助長（孩子選②畫蛇添足）", "強迫求快反而壞事"], ["9-41", "親鳥假裝受傷把敵人引開", "④調虎離山（孩子選①圍魏救趙）", "重點是「引開」"]], [["「他只想一步登天，卻不肯每天踏實練習。」最適合用哪個成語形容？", ["好高騖遠", "身體力行", "腳踏實地", "循序漸進"], 0, "目標很高、不肯踏實去做，是貶義的好高騖遠。"], ["下列哪一個成語不適合用來稱讚別人？", ["獨具慧眼", "博學多聞", "班門弄斧", "出類拔萃"], 2, "班門弄斧是在專家面前賣弄，只能用在自謙或批評。"]]], ["C2", "國語", "修辭判斷", 5, "國小高年級", ["倒反：嘴上誇、其實在批評", "狀聲詞：模仿聲音（轆轆、琅琅）；描寫樣子的不是（翩翩、亮晶晶）", "諧音雙關：把括號字還原成原詞，有被換字才是", "擬人：把物寫成人在做事；對偶要上下字數相同"], "先刪去：有沒有像／如（譬喻）、有沒有問號（設問）、字數是否對稱（對偶）", [["1-10", "嘴上說有才華，其實諷刺報告太簡單", "①倒反", ""], ["8-6", "哪個成語沒有狀聲詞", "③翩翩起舞（孩子選④）", "翩翩是樣子"]], [["「你真是太『準時』了，才遲到一個小時。」使用了哪一種修辭？", ["誇飾", "擬人", "譬喻", "倒反"], 3, "嘴上說準時，其實是批評遲到。"], ["下列哪一個詞語「不是」狀聲詞？", ["嘰嘰喳喳", "嘩啦啦", "轟隆隆", "亮晶晶"], 3, "亮晶晶描寫樣子，不是聲音。"]]], ["C3", "國語", "字音：多音字與形近字", 3, "國小高年級", ["剎那 ㄔㄚˋ／剎車 ㄕㄚ", "倔強 ㄐㄩㄝˊ／倔脾氣 ㄐㄩㄝˋ", "偏旁相同不一定同音：詢 ㄒㄩㄣˊ、絢 ㄒㄩㄢˋ", "湛藍、精湛都讀 ㄓㄢˋ"], "易錯字做成小卡，每天念一遍", [["10-17", "剎那、諦聽、倔強、酬謝的注音", "④酬謝ㄔㄡˊ正確", "剎那ㄔㄚˋ、諦聽ㄉㄧˋ、倔強ㄐㄩㄝˊ"], ["8-2", "注音兩兩不同", "④詢／絢", ""]], [["「剎那」的「剎」應該怎麼讀？", ["ㄔㄚˋ", "ㄕㄚˋ", "ㄘㄚˋ", "ㄕㄚ"], 0, "剎那讀 ㄔㄚˋ，只有剎車讀 ㄕㄚ。"], ["「倔強」的「倔」應該怎麼讀？", ["ㄑㄩㄝˋ", "ㄐㄩˋ", "ㄐㄩㄝˊ", "ㄐㄩㄝˋ"], 2, "倔強讀二聲 ㄐㄩㄝˊ。"]]], ["C4", "國語", "詞性與詞義", 4, "國小高年級", ["接名詞用「的」（形容詞），接動詞用「地」（副詞）", "詞類活用：寶貝、便宜在句中可當動詞", "聯綿詞拆開沒有意思（蝴蝶、猶豫）；拆開有意思就不是（文化）", "同一個詞放回句子判斷意思（問個「究竟」是名詞）"], "看這個詞後面接什麼", [["10-7", "「努力的完成作業」的詞性", "④副詞", "後面接動詞，應寫「地」"], ["10-14", "何者不是聯綿詞", "③文化", ""]], [["「他慢慢＿走回家。」空格最適合填入哪個字？", ["的", "地", "得", "底"], 1, "後面接動詞「走」，用副詞的「地」。"], ["下列哪一個「不是」聯綿詞？", ["葡萄", "猶豫", "朋友", "蝴蝶"], 2, "「朋」「友」拆開各有意思，所以不是聯綿詞。"]]], ["C5", "國語", "年齡代稱", 2, "國小高年級", ["志學 15、弱冠 20（男）、及笄 15（女）", "而立 30、不惑 40、知命 50", "花甲／耳順 60、古稀 70", "看到「以上皆是」要每個選項都檢查"], "口訣：十五志學、三十而立、四十不惑、五十知命、六十耳順、七十古稀", [["1-9", "國三約 15 歲的年齡代稱", "②志學（孩子選①）", ""], ["10-2", "年齡代稱何者正確", "④以上皆是（孩子選②）", "沒看完選項"]], [["四十歲稱為什麼？", ["花甲", "而立", "不惑", "知命"], 2, "四十不惑。"], ["「古稀之年」是指幾歲？", ["70", "80", "50", "60"], 0, "人生七十古來稀。"]]], ["C6", "國語", "文言文：字義與摘錄原文", 3, "國中", ["摘錄原文：題目給的前提不用抄，只抄剛好回答的部分", "錯一字扣一分：槁、墜、銜、鸛", "寧……邪＝難道……嗎（反問）"], "先看題目問「誰」的「什麼」", [["4-51", "依原文回答禾苗最終狀態", "苗則槁矣", "「其子趨而往視之」是兒子的動作"], ["5-4", "「寧可以急相棄邪」的意思", "②難道可以……嗎（孩子選①寧願）", ""]], [["「宋人揠苗，其子趨而往視之，苗則槁矣。」題目問「禾苗最後變成什麼狀態」，最恰當的摘錄是？", ["宋人揠苗", "其子趨而往視之，苗則槁矣", "其子趨而往視之", "苗則槁矣"], 3, "只抄剛好回答的部分，多抄兒子的動作會被扣分。"], ["「寧可以急相棄邪」中的「寧……邪」是什麼意思？", ["寧可……呢", "寧願……吧", "難道……嗎", "安寧……啊"], 2, "反問句：難道可以因為危急就丟下他嗎？"]]], ["C7", "國語", "閱讀題審題（表格、跨文本）", 2, "國小高年級", ["問「錯誤」時，每個選項都回表格對數字", "跨文本題：選項要兩篇都說得通", "題目有「不是」「不適合」「以上皆是」先圈起來"], "答案一定要在文章或表格裡找得到根據", [["4-41", "減塑政策表格推論何者錯誤", "③排序錯誤", "逐項對照數字"], ["4-48", "甲乙兩文共同的錯誤態度", "②", "④只符合甲文"]], [["跨文本比較題問「兩篇共同的看法」，正確選項必須符合什麼條件？", ["和常識相符就好", "字數最多的選項", "只要符合其中一篇", "兩篇文章都說得通"], 3, "只符合一篇的選項要刪掉。"], ["題目問「下列何者不適合」，作答前第一步最好做什麼？", ["直接看最後一個選項", "先猜答案", "先選第一個看起來對的", "把「不適合」圈起來"], 3, "第 10 回 11 題就是漏看「不適合」而錯。"]]], ["E1", "英文", "閱讀：細節換字陷阱", 5, "國小高年級", ["TRUE／NOT／last 題：每個選項都回原文找對應句", "陷阱：偷換人名（誰送什麼）、星期幾、數字、coaches／players", "表格下方的補充說明也要看"], "選項裡的每個關鍵字都要在原文劃到", [["3-5", "課表最後一項活動", "④Closing Party（孩子選③）", "下方補充說明寫 4 點有 closing party"], ["1-38", "誰送了什麼禮物", "①（孩子選④）", "把送禮的人搞混"]], [["Tom gave Amy a book. Lily gave Amy a pen. What did Lily give Amy?", ["a pen", "a bag", "nothing", "a book"], 0, "送筆的是 Lily，送書的是 Tom。"], ["The shop opens at 9:00 on weekdays and at 10:00 on Sundays. When does it open on Sunday?", ["11:00", "8:00", "9:00", "10:00"], 3, "要看 Sundays 那一句。"]]], ["E2", "英文", "閱讀：推論與時間計算", 7, "國小高年級～國中", ["兩條資訊要合起來算（開門時間＋早一小時）", "看到 probably／infer 就是要推論，不是找原句", "推情緒看結局轉折：出乎意料 → surprised", "生字片語：看前後句的語氣"], "在題目旁邊寫下時間算式", [["5-10", "超市比一般商店早一小時開", "①9:00（孩子選④不知道）", "10:00 − 1 小時"], ["10-45", "故事結尾人物感受", "④Surprised（孩子選①Angry）", ""]], [["School ends at 3:40. Ken walks 15 minutes to the club. The club starts at 4:00. Can Ken get there on time?", ["Yes, he arrives at 3:55.", "No, he arrives at 4:05.", "No, he arrives at 4:15.", "Yes, he arrives at 4:00."], 0, "3:40 ＋ 15 分＝3:55，比 4:00 早。"], ["The bakery opens at 8:00. The café opens two hours later. When does the café open?", ["6:00", "8:00", "10:00", "12:00"], 2, "8:00 ＋ 2 小時＝10:00。"]]], ["E3", "英文", "文法易錯點", 7, "國小高年級～國中", ["Let's 的否定：Let's not ＋ 原V", "spend ＋ 時間 ＋ on N／V-ing；cost 的主詞是物", "one／ones 代替同類另一個；it／them 代替同一個", "時態一致：前面過去式，後面也過去式", "on the evening of＋日期；past／after／to 的時間說法"], "先找句子裡的時間線索和固定句型", [["7-29", "Let's ___ inside", "①not go（孩子選②don't go）", ""], ["8-31", "the red ___（shoes）", "②ones（孩子選①one）", "shoes 是複數"]], [["It's raining. Let's ___ out.", ["go not", "no go", "not go", "don't go"], 2, "Let's 的否定是 Let's not ＋ 原形動詞。"], ["These socks are dirty. Please give me the clean ___.", ["one", "ones", "it", "them"], 1, "代替同類的另一雙，而且是複數，用 ones。"], ["I ___ two hours on my homework last night.", ["spent", "cost", "took", "spend"], 0, "人 spend 時間 on 事；last night 用過去式 spent。"]]], ["H1", "社會", "臺灣史各時期分辨", 12, "國小五年級", ["荷西：南荷北西；荷蘭為西拉雅族創新港文、在新港社辦第一所學校", "明鄭：屯田（左營）、承天府、建孔廟", "清領：一府三縣 → 建省；林爽文事件後賜名嘉義；朱一貴是鴨母王；劉銘傳首任巡撫", "開港通商：北部茶與樟腦、南部糖；海關報告看貿易", "地名時間：大肚（原住民）→ 左營（明鄭）→ 嘉義（清）→ 松山（日治）→ 三民（戰後）"], "做一條時間軸，每個時期寫人物、建設、地名", [["9-29", "西方傳教士的教育", "④荷蘭在新港社辦第一所學校", "新港文是荷蘭人創的"], ["8-46", "地名產生的時間先後", "②大肚→左營→嘉義→松山→三民", ""]], [["為南部西拉雅族創造羅馬拼音文字（新港文）的是哪一個時期的人？", ["西班牙人", "荷蘭人", "明鄭政府", "清朝官員"], 1, "荷蘭人在南部傳教時創了新港文。"], ["清末開港通商後，臺灣北部最重要的出口品是什麼？", ["鹽", "糖", "茶與樟腦", "稻米"], 2, "北部茶、樟腦，南部糖。"]]], ["H2", "社會", "戰後政治與外交", 5, "國小六年級", ["1947 二二八 → 1949 戒嚴 → 1986 民進黨成立 → 1987 解嚴 → 1990 野百合 → 1996 總統直選 → 2000 政黨輪替", "1954 中美共同防禦條約、1971 退出聯合國、1979 美中建交與臺灣關係法", "國父是孫中山，不是蔣中正"], "以 1987 解嚴為分界排事件", [["6-25", "不是戒嚴時期的事件", "④野百合學運（1990）", ""], ["7-42", "臺灣關係法資料", "④彈性外交", "關鍵句「與北京建交」→ 1979"]], [["臺灣在哪一年解除戒嚴？", ["2000", "1947", "1971", "1987"], 3, "1987 年解嚴。"], ["「臺灣關係法」是在哪一年制定的？", ["1971", "1979", "2000", "1954"], 1, "1979 年美國與中共建交後制定。"]]], ["H3", "社會", "公民：國籍、政府、親屬、福利", 9, "國小六年級", ["取得國籍：出生（父母一方是我國人）或歸化（外國人申請）", "人民 ＞ 國民（有國籍）＞ 公民（成年、有參政權）", "名稱有「行政院、中央」是中央機關；縣市政府是地方機關", "收養是擬制血親；社會保險要繳費（健保）、社會救助給弱勢", "國家四要素：人民、領土、政府、主權"], "題目有「不是」先圈起來，再一個個對要素", [["4-33", "取得國籍方式", "④歸化", "外國人才麥克"], ["9-40", "哪個是地方機關", "④花蓮縣政府", ""]], [["外國人申請成為中華民國國民，屬於哪一種取得國籍的方式？", ["歸化", "收養", "結婚後自動取得", "出生"], 0, "外國人經申請取得國籍叫歸化。"], ["下列哪一個是地方機關？", ["立法院", "臺中市政府", "中央氣象署", "內政部"], 1, "縣市政府是地方機關，其他都是中央機關。"]]], ["H4", "社會", "地理：讀圖與區域特色", 10, "國小高年級", ["臺灣在北緯、東經（約 22°～25°N、120°～122°E）", "冬季東北季風：北部、東北部多雨；南部冬乾夏雨", "鐵路環島：西部幹線、北迴、花東、南迴", "北部服務業最高、中部工業高、東部農業比例最高", "流速快侵蝕、流速慢堆積"], "讀圖先看圖例、方位和單位", [["9-35", "光復鄉的經緯度", "②23.3°N、121.2°E", ""], ["9-34", "從左營搭火車到花蓮", "①高雄→臺東→花蓮", "南迴＋花東"]], [["臺灣的位置用經緯度表示，屬於哪一種？", ["南緯、西經", "北緯、東經", "南緯、東經", "北緯、西經"], 1, "臺灣在赤道以北、本初子午線以東。"], ["冬季降雨最多的是臺灣哪一個地區？", ["南部", "中部", "澎湖", "北部與東北部"], 3, "冬季東北季風迎風面在北部、東北部。"]]], ["H5", "社會", "經濟名詞", 4, "國小六年級", ["入超＝進口大於出口；出超＝出口大於進口", "機會成本＝放棄的選項中價值最高的那一個", "1960 加工出口區 → 1970 十大建設 → 1980 科學園區；2002 加入 WTO", "亞洲四小龍：臺灣、韓國、新加坡、香港"], "「入」超就是買「進」來的多", [["6-40", "對哪國入超", "③日本（孩子選②美國）", "入超出超弄反"], ["7-44", "機會成本表格，哪牌最貴", "①ㄅ", ""]], [["一個國家的進口值大於出口值，稱為什麼？", ["入超", "通貨膨脹", "經濟成長", "出超"], 0, "買進來的比較多就是入超。"], ["「機會成本」指的是什麼？", ["所有放棄的選項加起來", "放棄的選項中價值最高的那一個", "買到的東西本身", "最便宜的選項"], 1, "只算放棄的選項裡最好的一個。"]]], ["H6", "社會", "原住民族分布", 2, "國小五年級", ["凱達格蘭族：臺北盆地、北投", "噶瑪蘭族：宜蘭（清代被迫遷到花蓮）；西拉雅族：臺南", "達悟族：蘭嶼（拼板舟）；排灣族：琉璃珠、百步蛇", "山地原住民區：烏來、復興、和平是泰雅；那瑪夏、桃源是布農；茂林是魯凱"], "一族配一個地點、一個代表物", [["4-30", "北投一帶的原住民族", "③凱達格蘭族（孩子選④噶瑪蘭）", ""], ["6-32", "山地原住民區與族群配對", "③烏來：泰雅", ""]], [["清代臺北盆地、北投一帶主要是哪一族的居住地？", ["西拉雅族", "凱達格蘭族", "道卡斯族", "噶瑪蘭族"], 1, "凱達格蘭族住在臺北盆地。"], ["會划拼板舟的達悟族住在哪裡？", ["澎湖", "小琉球", "綠島", "蘭嶼"], 3, "達悟族在蘭嶼。"]]]], PLAN=[["11/22（日）", ["數學｜算對卻填錯選項", "自然｜地球運動、四季、太陽直射與晝夜", "社會｜臺灣史各時期分辨"], ["M1", "S1", "H1"]], ["11/23（一）", ["數學｜公因數、公倍數應用", "自然｜溶液濃度與飽和", "社會｜地理：讀圖與區域特色"], ["M3", "S2", "H4"]], ["11/24（二）", ["數學｜審題錯：答成中間值或問錯對象", "自然｜輪軸與滑輪", "社會｜公民：國籍、政府、親屬、福利"], ["M2", "S3", "H3"]], ["11/25（三）", ["數學｜規律與數列：等差和、倍增", "自然｜靜摩擦力與力平衡", "國語｜成語意思與褒貶"], ["M9", "S4", "C1"]], ["11/26（四）", ["數學｜週期、日期、時刻表、時鐘", "自然｜氣壓、鋒面、季風天氣圖", "英文｜閱讀：推論與時間計算"], ["M5", "S5", "E2"]], ["11/27（五）", ["數學｜百分率：折扣、命中率、濃度", "自然｜植物分類", "英文｜文法易錯點"], ["M6", "S7", "E3"]], ["11/28（六）", ["數學｜圓與扇形（組合圖形、弧長、周長）", "自然｜植物構造與運輸", "國語｜修辭判斷"], ["M4", "S6", "C2"]], ["11/29（日）", ["數學｜和差倍、年齡、倒推", "自然｜學名與生物分類", "英文｜閱讀：細節換字陷阱"], ["M7", "S8", "E1"]], ["11/30（一）", ["數學｜速率：追趕、相遇、速度比", "自然｜白煙、白霧、起霧都是小水滴", "社會｜戰後政治與外交"], ["M8", "S9", "H2"]], ["12/1（二）", ["數學｜立體：切割、塗漆、裝箱", "自然｜光的成像與色光", "國語｜詞性與詞義"], ["M10", "S10", "C4"]], ["12/2（三）", ["自然｜循環系統與血液", "社會｜經濟名詞", "國語｜字音：多音字與形近字"], ["S12", "H5", "C3"]], ["12/3（四）", ["自然｜電磁鐵與電路", "國語｜文言文：字義與摘錄原文", "國語｜年齡代稱"], ["S13", "C6", "C5"]], ["12/4（五）", ["自然｜神經系統：反射與大腦", "自然｜病毒與微生物", "國語｜閱讀題審題（表格、跨文本）", "社會｜原住民族分布"], ["S11", "S14", "C7", "H6"]], ["12/7（一）", ["數學｜算對卻填錯選項", "數學｜公因數、公倍數應用", "數學｜審題錯：答成中間值或問錯對象", "自然｜地球運動、四季、太陽直射與晝夜", "自然｜溶液濃度與飽和", "自然｜輪軸與滑輪"], ["M1", "M3", "M2", "S1", "S2", "S3"]], ["12/8（二）", ["數學｜規律與數列：等差和、倍增", "數學｜週期、日期、時刻表、時鐘", "數學｜百分率：折扣、命中率、濃度", "自然｜靜摩擦力與力平衡", "自然｜氣壓、鋒面、季風天氣圖", "自然｜植物分類", "國語｜詞性與詞義", "國語｜年齡代稱", "國語｜文言文：字義與摘錄原文", "國語｜閱讀題審題（表格、跨文本）"], ["M9", "M5", "M6", "S4", "S5", "S7", "C4", "C5", "C6", "C7"]], ["12/9（三）", ["數學｜圓與扇形（組合圖形、弧長、周長）", "數學｜和差倍、年齡、倒推", "數學｜速率：追趕、相遇、速度比", "數學｜立體：切割、塗漆、裝箱", "自然｜植物構造與運輸", "自然｜學名與生物分類", "自然｜白煙、白霧、起霧都是小水滴", "自然｜光的成像與色光"], ["M4", "M7", "M8", "M10", "S6", "S8", "S9", "S10"]], ["12/10（四）", ["自然｜神經系統：反射與大腦", "自然｜循環系統與血液", "自然｜電磁鐵與電路", "自然｜病毒與微生物", "國語｜成語意思與褒貶", "國語｜修辭判斷", "國語｜字音：多音字與形近字", "英文｜閱讀：細節換字陷阱", "英文｜閱讀：推論與時間計算", "英文｜文法易錯點"], ["S11", "S12", "S13", "S14", "C1", "C2", "C3", "E1", "E2", "E3"]]];
+const C='①②③④', SUBJ=['全部','數學','自然','國語','英文','社會'];
+const st=(()=>{let s={wb:{},done:{},log:[]};try{const r=localStorage.getItem('hw_gq_v1');if(r)s=Object.assign(s,JSON.parse(r))}catch(e){}return s})();
+function save(){try{localStorage.setItem('hw_gq_v1',JSON.stringify(st))}catch(e){}}
+// flatten drills
+const Q=[];DATA.forEach(c=>c[8].forEach(d=>Q.push({n:Q.length+1,cid:c[0],subj:c[1],cname:c[2],q:d[0],o:d[1],a:d[2],x:d[3]})));
+const CM={};DATA.forEach(c=>CM[c[0]]=c);
+const $=s=>document.querySelector(s), app=$('#app');
+const esc=s=>String(s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function todayIdx(){const d=new Date(),m=d.getMonth()+1,day=d.getDate();const key=m+'/'+day;
+  const i=PLAN.findIndex(p=>p[0].startsWith(key+'（'));if(i>=0)return i;
+  const first=PLAN[0][0].split('（')[0].split('/').map(Number);
+  if(m<first[0]||(m===first[0]&&day<first[1]))return 0; return -1}
+let subj='全部';
+function isToday(s){const d=new Date();return s.startsWith((d.getMonth()+1)+'/'+d.getDate()+'（')}
+$('#home').onclick=()=>home();
+
+function home(){
+  $('#ttl').textContent='Howard 私中考前 錯題重做';
+  const ti=todayIdx(), wbN=Object.keys(st.wb).length, doneN=Object.keys(st.done).length;
+  let h=`<div class="card"><div class="row" style="justify-content:space-between"><div><div class="muted">考試</div><b>12/6 衛道</b><div class="muted">國英社自數</div><b>12/12 明道</b><div class="muted">國英數自</div></div>
+  <div><div class="muted">已練過的類題</div><b>${doneN} / ${Q.length}</b></div><div><div class="muted">錯題本</div><b style="color:var(--bad)">${wbN}</b> 題</div></div>
+  <div class="bar" style="margin-top:10px"><i style="width:${Math.round(doneN/Q.length*100)}%"></i></div></div>`;
+  if(ti>=0){const p=PLAN[ti];h+=`<div class="card"><b>📅 ${isToday(p[0])?'今天':'第一天'} ${p[0]} 的觀念</b><div class="muted">${ti>=PLAN.findIndex(x=>x[0].startsWith('12/7'))?'第二輪（明道，不考社會）：先做下面的錯題本，再做今天的觀念':'先看重點，再做類題'}</div>`+
+    p[2].map(id=>conceptBtn(CM[id])).join('')+`<div class="row" style="margin-top:12px"><button class="btn pri" onclick="startSet(PLAN[${ti}][2])">今天的類題一起做</button></div></div>`}
+  else h+=`<div class="card"><b>📅 考前總複習</b><div class="muted">計畫的天數已經結束，建議每天做一次錯題本，再挑錯次多的觀念重看。</div></div>`;
+  h+=`<div class="card"><b>🔁 錯題本</b><div class="muted">答錯的題目會進來，連續答對 2 次才會移出。</div><div class="row" style="margin-top:10px">
+  <button class="btn pri" ${wbN?'':'disabled'} onclick="startWB()">做錯題本（${wbN}）</button><button class="btn" onclick="plan()">看完整計畫</button><button class="btn" onclick="randomAll()">全部隨機 20 題</button></div></div>`;
+  h+=`<div class="card"><b>📚 所有觀念</b><div class="row" style="margin:8px 0">`+SUBJ.map(s=>`<span class="chip ${s===subj?'on':''}" onclick="subj='${s}';home()">${s}</span>`).join('')+`</div>`+
+    DATA.filter(c=>subj==='全部'||c[1]===subj).map(conceptBtn).join('')+`</div>`;
+  h+=`<p class="muted" style="text-align:center">類題是依錯過的觀念另外編的練習題，不是原考題。<br><button class="btn sm" onclick="resetAll()">清除練習紀錄</button></p>`;
+  app.innerHTML=h;scrollTo(0,0)}
+function conceptBtn(c){const qs=Q.filter(q=>q.cid===c[0]),d=qs.filter(q=>st.done[q.n]).length,w=qs.filter(q=>st.wb[q.n]).length;
+  return `<button class="cl" onclick="concept('${c[0]}')"><span><span class="tag">${c[1]}</span> ${esc(c[2])}</span><span class="muted" style="white-space:nowrap">錯 ${c[3]} 次${w?` · <span style="color:var(--bad)">待重做 ${w}</span>`:''} · ${d}/${qs.length}</span></button>`}
+function concept(id){const c=CM[id];$('#ttl').textContent=c[1]+'｜'+c[2];
+  let h=`<div class="card"><div class="row"><span class="tag">${c[1]}</span><span class="tag w">錯 ${c[3]} 次</span><span class="muted">${esc(c[4])}</span></div>
+  <h2 style="margin:8px 0">${esc(c[2])}</h2><b>重點</b><ul class="kp">${c[5].map(k=>`<li>${esc(k)}</li>`).join('')}</ul>
+  <p><b>快解：</b>${esc(c[6])}</p></div>`;
+  if(c[7].length)h+=`<div class="card"><b>當時錯的題目</b><table><tr><th>回-題</th><th>題目</th><th>正解</th></tr>`+c[7].map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}${r[3]&&r[3]!=='—'?`<div class="muted">${esc(r[3])}</div>`:''}</td><td>${esc(r[2])}</td></tr>`).join('')+`</table></div>`;
+  h+=`<div class="row"><button class="btn pri" onclick="startSet(['${id}'])">做這個觀念的類題</button><button class="btn" onclick="home()">回首頁</button></div>`;
+  app.innerHTML=h;scrollTo(0,0)}
+function plan(){$('#ttl').textContent='考前複習計畫';const ti=todayIdx();
+  app.innerHTML=`<div class="card"><table><tr><th>日期</th><th>觀念</th></tr>`+PLAN.map((p,i)=>`<tr style="${i===ti?'background:var(--acc2)':''}"><td style="white-space:nowrap">${p[0]}</td><td>${p[2].map(id=>`<a href="#" onclick="concept('${id}');return false">${esc(CM[id][1]+'｜'+CM[id][2])}</a>`).join('<br>')}</td></tr>`).join('')+`</table></div>
+  <p class="muted">12/5、12/11 考前一天：只看講義的「一頁速查表」，早點睡。</p><button class="btn" onclick="home()">回首頁</button>`;scrollTo(0,0)}
+
+let S=null;
+function startSet(ids){run(shuffle(Q.filter(q=>ids.includes(q.cid))),'類題練習')}
+function startWB(){run(shuffle(Q.filter(q=>st.wb[q.n])),'錯題本')}
+function randomAll(){run(shuffle(Q).slice(0,20),'隨機 20 題')}
+function run(list,name){if(!list.length)return home();S={list,i:0,ok:0,name,wrong:[]};show()}
+function show(){const q=S.list[S.i];$('#ttl').textContent=`${S.name} ${S.i+1}/${S.list.length}`;
+  const ord=shuffle([0,1,2,3]);S.ord=ord;S.answered=false;
+  const wb=st.wb[q.n];
+  app.innerHTML=`<div class="card"><div class="row"><span class="tag">${q.subj}</span><span class="muted">${esc(q.cname)}</span>${wb?`<span class="tag w">錯題本：已連對 ${wb.s}/2</span>`:''}</div>
+  <div class="bar" style="margin:10px 0"><i style="width:${S.i/S.list.length*100}%"></i></div>
+  <div class="q">${esc(q.q)}</div>${ord.map((k,j)=>`<button class="opt" data-k="${k}" onclick="pick(${k},this)">${C[j]} ${esc(q.o[k])}</button>`).join('')}<div id="fb"></div></div>`;scrollTo(0,0)}
+function pick(k,el){if(S.answered)return;S.answered=true;const q=S.list[S.i],ok=k===q.a;
+  document.querySelectorAll('.opt').forEach(b=>{const bk=+b.dataset.k;if(bk===q.a)b.classList.add('ok');else if(b===el)b.classList.add('bad')});
+  st.done[q.n]=1;let note='';
+  if(ok){S.ok++;if(st.wb[q.n]){st.wb[q.n].s++;if(st.wb[q.n].s>=2){delete st.wb[q.n];note='　🎉 連續答對 2 次，移出錯題本！'}else note='　錯題本：再答對 1 次就能移出'}}
+  else{st.wb[q.n]={s:0};S.wrong.push(q);note='　已放進錯題本'}
+  try{window.SitePoints&&SitePoints.answer(ok)}catch(e){}
+  st.log.push([Date.now(),q.n,ok?1:0]);if(st.log.length>2000)st.log=st.log.slice(-2000);save();
+  const right=C[S.ord.indexOf(q.a)];
+  $('#fb').innerHTML=`<div class="fb ${ok?'ok':'bad'}"><b>${ok?'✅ 答對了':'❌ 正確答案是 '+right}</b><span class="muted">${note}</span><div style="margin-top:6px">${esc(q.x)}</div></div>
+  <div class="row" style="margin-top:12px"><button class="btn pri" id="nx" onclick="next()">${S.i+1<S.list.length?'下一題':'看結果'}</button><button class="btn" onclick="concept('${q.cid}')">回看這個觀念</button></div>`;
+  $('#nx').focus()}
+function next(){S.i++;if(S.i<S.list.length)return show();
+  const n=S.list.length,p=Math.round(S.ok/n*100);$('#ttl').textContent='結果';try{window.SitePoints&&SitePoints.roundEnd(p)}catch(e){}
+  app.innerHTML=`<div class="card" style="text-align:center"><div class="big">${S.ok} / ${n}</div><div class="muted">正確率 ${p}%</div>
+  <p>${p===100?'🎉 全對！':p>=80?'很不錯，錯的題目明天再做一次。':'錯的題目已放進錯題本，先回看觀念重點再重做。'}</p></div>`+
+  (S.wrong.length?`<div class="card"><b>這次錯的</b>`+S.wrong.map(q=>`<div style="margin-top:8px">${esc(q.q)}<div class="muted">正解：${esc(q.o[q.a])}</div></div>`).join('')+`</div>`:'')+
+  `<div class="row">${S.wrong.length?`<button class="btn pri" onclick="run(shuffle(S.wrong),'錯的再做一次')">錯的馬上再做一次</button>`:''}<button class="btn" onclick="home()">回首頁</button></div>`;scrollTo(0,0)}
+function resetAll(){if(!confirmReset)return;}
+let confirmReset=false;
+resetAll=function(){const b=event.target;if(!confirmReset){confirmReset=true;b.textContent='再按一次確認清除';setTimeout(()=>{confirmReset=false;b.textContent='清除練習紀錄'},3000);return}
+  st.wb={};st.done={};st.log=[];save();confirmReset=false;home()}
+document.addEventListener('keydown',e=>{if(!S||!document.querySelector('.opt'))return;const i='1234'.indexOf(e.key);
+  if(i>=0&&!S.answered){const b=document.querySelectorAll('.opt')[i];b&&b.click()}else if(e.key==='Enter'&&S.answered){const n=$('#nx');n&&n.click()}});
+home();
+</script>
+<script>
+/* =====================================================================
+   site-home.js — 📚 小站 button + 全站集點 (site-wide points & badges)
+   Canonical copy: github.com/iam5980/kids-practice/template/site-home.js
+   Version: 2026-11-15（🌈 神話夥伴：24 種都變完全體後出現；首頁圖鑑可看進化過程、🎰 扭蛋機與卡冊）
+
+   HOW TO USE: paste this whole file in its own <script> block just before
+   </body> of EVERY page published to kids-practice (English and 中文部,
+   apps, oral pages, listening players). Nothing else is required.
+
+   1) "📚 小站" pill, bottom-left → in-page confirm card → site home.
+   2) SitePoints — points and badges per kid, shared by every app on the
+      site (same origin), shown on the home page 集點卡. Kept only on
+      this device (localStorage).
+        SitePoints.answer(ok)       after every judged answer
+        SitePoints.roundEnd(pct)    when a round / drill ends (0–100)
+        SitePoints.literacy(allOk)  when a 素養題組 is finished
+      Points: correct +10, streak bonus +2 per answer in a row (max +10).
+      No speed bonus — accuracy only.
+   3) Auto-hooks, so older apps need no code changes:
+        中文部 engine:  rtAns(right) → answer;  celebrate() → perfect round
+        AppCore apps:   AppCore calls SitePoints itself (app-core ≥ 2026-10-25)
+   ===================================================================== */
+(function () {
+  "use strict";
+  if (window.__siteHome) return;
+  window.__siteHome = true;
+  var LIVE = "https://iam5980.github.io/kids-practice/";
+  function homeUrl() {
+    var p = location.pathname, i = p.indexOf("/kids-practice/");
+    if (location.protocol.indexOf("http") === 0 && i >= 0) return location.origin + p.slice(0, i) + "/kids-practice/";
+    return LIVE;
+  }
+
+  /* ---------------- SitePoints ---------------- */
+  var BADGES = [
+    { id: "first",   icon: "🌱", name: "第一次答對" },
+    { id: "perfect", icon: "💯", name: "第一次滿分" },
+    { id: "streak10",icon: "🔥", name: "連對 10 題" },
+    { id: "streak20",icon: "🚀", name: "連對 20 題" },
+    { id: "days3",   icon: "📅", name: "連續練習 3 天" },
+    { id: "days7",   icon: "🗓️", name: "連續練習 7 天" },
+    { id: "lit1",    icon: "🧩", name: "第一組素養題全對" },
+    { id: "lit10",   icon: "🎓", name: "素養題達人（10 組全對）" },
+    { id: "p500",    icon: "⭐", name: "累積 500 點" },
+    { id: "p2000",   icon: "🌟", name: "累積 2000 點" },
+    { id: "p5000",   icon: "🏆", name: "累積 5000 點" }
+  ];
+  function kidFromPath() {
+    var m = location.pathname.match(/\/kids-practice\/([a-z0-9]+)\//i);
+    if (m && m[1] === "shadowing") { try { return localStorage.getItem("kp-shadow-kid") || null; } catch (e) { return null; } }
+    return m && m[1] !== "template" ? m[1] : null;
+  }
+  function today() { var d = new Date(); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+  function dayDiff(a, b) { return Math.round((new Date(b) - new Date(a)) / 864e5); }
+  function load(kid) {
+    var d = null;
+    try { d = JSON.parse(localStorage.getItem("kp-points-" + kid) || "null"); } catch (e) {}
+    return d || { points: 0, today: "", todayPts: 0, days: [], badges: {}, correct: 0, perfects: 0, lit: 0, bestStreak: 0 };
+  }
+  function save(kid, d) { try { localStorage.setItem("kp-points-" + kid, JSON.stringify(d)); } catch (e) {} }
+  function dayStreak(days) {
+    if (!days.length) return 0;
+    var s = days.slice().sort(), n = 1;
+    if (dayDiff(s[s.length - 1], today()) > 1) return 0;
+    for (var i = s.length - 1; i > 0; i--) { if (dayDiff(s[i - 1], s[i]) === 1) n++; else break; }
+    return n;
+  }
+  var kid = kidFromPath(), streak = 0;
+  function toast(html, big) {
+    var t = document.createElement("div");
+    t.className = "sp-toast" + (big ? " sp-big" : "");
+    t.innerHTML = html;
+    document.body.appendChild(t);
+    setTimeout(function () { t.classList.add("sp-out"); }, big ? 2200 : 900);
+    setTimeout(function () { t.remove(); }, big ? 2700 : 1300);
+  }
+  function grant(d, id) {
+    if (d.badges[id]) return;
+    d.badges[id] = today();
+    var b = BADGES.filter(function (x) { return x.id === id; })[0];
+    if (b) toast("🏅 獲得徽章<br><b>" + b.icon + " " + b.name + "</b>", true);
+  }
+  function update(fn) {
+    if (!kid) return;
+    var d = load(kid), t = today();
+    if (d.today !== t) { d.today = t; d.todayPts = 0; }
+    if (d.days.indexOf(t) < 0) { d.days.push(t); if (d.days.length > 60) d.days = d.days.slice(-60); }
+    fn(d);
+    var ds = dayStreak(d.days);
+    if (ds >= 3) grant(d, "days3");
+    if (ds >= 7) grant(d, "days7");
+    if (d.points >= 500) grant(d, "p500");
+    if (d.points >= 2000) grant(d, "p2000");
+    if (d.points >= 5000) grant(d, "p5000");
+    save(kid, d);
+  }
+  /* 🎯 每日任務 — reset every day; each one gives +50 once */
+  var QUESTS = [
+    { id: "c20", icon: "✅", name: "今天答對 20 題", goal: 20, f: "correct" },
+    { id: "r3",  icon: "🔁", name: "今天完成 3 輪練習", goal: 3, f: "rounds" },
+    { id: "s10", icon: "🔥", name: "今天連對 10 題", goal: 10, f: "streak" }
+  ];
+  function qDay(d) { var t = today(); if (!d.q || d.q.day !== t) d.q = { day: t, correct: 0, rounds: 0, streak: 0, done: {} }; }
+  function qCheck(d) {
+    QUESTS.forEach(function (q) {
+      if (!d.q.done[q.id] && d.q[q.f] >= q.goal) {
+        d.q.done[q.id] = 1; d.points += 50; d.todayPts += 50;
+        toast("🎯 每日任務完成<br><b>" + q.icon + " " + q.name + "</b><br>＋50 點", true);
+      }
+    });
+  }
+  var SitePoints = {
+    kid: kid,
+    badges: BADGES,
+    read: function (k) { var d = load(k || kid); d.dayStreak = dayStreak(d.days); return d; },
+    answer: function (ok) {
+      update(function (d) {
+        if (ok) {
+          streak++;
+          var pts = 10 + Math.min(10, (streak - 1) * 2);
+          d.points += pts; d.todayPts += pts; d.correct++;
+          qDay(d); d.q.correct++; d.q.streak = Math.max(d.q.streak, streak); qCheck(d);
+          d.bestStreak = Math.max(d.bestStreak, streak);
+          grant(d, "first");
+          if (streak >= 10) grant(d, "streak10");
+          if (streak >= 20) grant(d, "streak20");
+          toast("+" + pts);
+        } else { streak = 0; }
+      });
+    },
+    quests: QUESTS,
+    roundEnd: function (pct, noPerfect) {
+      update(function (d) { qDay(d); d.q.rounds++; qCheck(d); });
+      if (pct >= 100 && !noPerfect) update(function (d) { d.perfects++; grant(d, "perfect"); });
+    },
+    perfect: function () {
+      update(function (d) { d.perfects++; grant(d, "perfect"); });
+    },
+    literacy: function (allOk) {
+      if (allOk) update(function (d) { d.lit++; grant(d, "lit1"); if (d.lit >= 10) grant(d, "lit10"); });
+    }
+  };
+  window.SitePoints = SitePoints;
+
+  /* auto-hooks for the 中文部 engine (global rtAns / celebrate) */
+  if (typeof window.rtAns === "function" && !window.rtAns.__sp) {
+    var oAns = window.rtAns;
+    window.rtAns = function (right) { try { SitePoints.answer(!!right); } catch (e) {} return oAns.apply(this, arguments); };
+    window.rtAns.__sp = true;
+  }
+  if (typeof window.celebrate === "function" && !window.celebrate.__sp) {
+    var oCel = window.celebrate;
+    window.celebrate = function () { try { SitePoints.perfect(); } catch (e) {} return oCel.apply(this, arguments); };
+    window.celebrate.__sp = true;
+  }
+
+
+  /* ---------------- 🔊 念解釋（ReadAloud）----------------
+     Every explanation / definition box on every app gets a small 🔊 button:
+     .fb .ac-fb .ac-exp .ac-ans td.hint .qmean .why .explain .sp-read
+     Chinese text → zh-TW voice; otherwise en-US. */
+  var RA_SEL = ".fb,.ac-fb,.ac-exp,.ac-ans,td.hint,.qmean,.why,.explain,.sp-read";
+  function raText(el) {
+    var c = el.cloneNode(true);
+    Array.prototype.forEach.call(c.querySelectorAll("button,.sp-say,script,style"), function (x) { x.remove(); });
+    return (c.textContent || "").replace(/\s+/g, " ").trim();
+  }
+  function raSpeak(t) {
+    if (!window.speechSynthesis || !t) return;
+    try {
+      speechSynthesis.cancel();
+      var zh = /[一-鿿]/.test(t), u = new SpeechSynthesisUtterance(t);
+      u.lang = zh ? "zh-TW" : "en-US"; u.rate = zh ? 0.95 : 0.9;
+      var vs = speechSynthesis.getVoices() || [], pref = zh ? ["zh-TW", "zh_TW", "zh-HK", "zh"] : ["en-US", "en_US", "en-GB", "en"];
+      for (var i = 0; i < pref.length && !u.voice; i++) for (var j = 0; j < vs.length; j++) if (vs[j].lang && vs[j].lang.indexOf(pref[i]) === 0) { u.voice = vs[j]; break; }
+      speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+  function raScan() {
+    Array.prototype.forEach.call(document.querySelectorAll(RA_SEL), function (el) {
+      if (el.__ra || el.closest("#sh-card,.sd-card,.sp-toast") || (el.parentElement && el.parentElement.closest(RA_SEL))) return;
+      var t = raText(el); if (t.length < 2) return;
+      el.__ra = true;
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "sp-say"; b.textContent = "🔊";
+      b.title = b.ariaLabel = /[一-鿿]/.test(t) ? "念給我聽" : "Read aloud";
+      b.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); raSpeak(raText(el)); }, true);
+      el.appendChild(b);
+    });
+  }
+  var raPending = false;
+  function raQueue() { if (raPending) return; raPending = true; setTimeout(function () { raPending = false; raScan(); }, 120); }
+  if (window.MutationObserver && document.body) new MutationObserver(raQueue).observe(document.body, { childList: true, subtree: true });
+  raQueue();
+
+  /* ---------------- 🎒 抓寶（SiteDex）----------------
+     After a good round, an original creature may appear; tap 🫙 to catch it.
+     Collection per kid in localStorage "kp-dex-<kid>", shown on the home page 圖鑑.
+     SiteDex.maybe(pct, n)  — called from roundEnd and the 中文部 rtEnd hook.
+     All creatures are original designs (no existing characters). */
+  var DEX = [
+    ["ink","墨墨兔",0,"#94a3b8","bunny","drop"],["plane","紙飛鼠",0,"#cbd5e1","round","wing"],["eraser","橡皮熊",0,"#f9a8d4","round","none"],
+    ["chalk","粉筆鴨",0,"#fde68a","none","beak"],["mark","書籤狐",0,"#fb923c","cat","tail"],["pencil","鉛筆刺蝟",0,"#a16207","spike","pencil"],
+    ["ruler","尺子龜",0,"#86efac","none","shell"],["crayon","蠟筆貓",0,"#c4b5fd","cat","stripe"],["glue","膠水蝸牛",0,"#67e8f9","antenna","swirl"],
+    ["clip","迴紋小蛇",0,"#a3e635","none","clip"],["note","便利貼蛙",0,"#facc15","frog","note"],["compass","圓規鳥",0,"#7dd3fc","tuft","beak"],
+    ["zhuyin","注音龍寶",1,"#34d399","horn","wing"],["radical","部首獅",1,"#f59e0b","mane","none"],["idiom","成語鹿",1,"#d97706","antler","spots"],
+    ["rhet","修辭孔雀",1,"#2dd4bf","tuft","fan"],["spell","拼字海豚",1,"#38bdf8","none","fin"],["poem","詩詞鶴",1,"#e2e8f0","tuft","beak"],
+    ["abacus","算盤狸",1,"#b45309","round","stripe"],["globe","地球儀龜",1,"#60a5fa","none","globe"],
+    ["phoenix","金榜鳳凰",2,"#f97316","crest","fire"],["qilin","滿分麒麟",2,"#fbbf24","horn","star"],
+    ["dragon","智慧神龍",2,"#22d3ee","horn","wing"],["uni","星光獨角獸",2,"#f0abfc","uni","star"],
+    /* 🌈 神話 (tier 3): appear only after all 24 above are 完全體 ★★★, in 100-point rounds */
+    ["mwhale","星海鯨王",3,"#6366f1","none","fin"],["mfox","九尾書狐",3,"#f43f5e","cat","tail"],["mturtle","萬年墨龜",3,"#0f766e","none","shell"],
+    ["mowl","月光學者梟",3,"#a78bfa","tuft","beak"],["mlion","雷電獅王",3,"#eab308","mane","fire"],["mdragon","七彩天龍",3,"#ec4899","horn","wing"]
+  ];
+  var RARE = ["一般", "稀有", "傳說", "神話"], RARE_C = ["#64748b", "#2563eb", "#d97706", "#db2777"];
+  function dxBase() { return DEX.filter(function (x) { return x[2] < 3; }); }
+  function dxMythOpen(dx) { return dxBase().every(function (x) { return dx[x[0]] && dxStage(dx[x[0]].n) === 3; }); }
+  function dxStage(n) { return n >= 6 ? 3 : n >= 3 ? 2 : 1; }
+  function dxSvg(id, hidden, o) {
+    o = o || {};
+    var d = DEX.filter(function (x) { return x[0] === id; })[0]; if (!d) return "";
+    var c = hidden ? "#94a3b8" : d[3], k = hidden ? "#94a3b8" : "#1f2937", ear = d[4], f = d[5], s = "";
+    var lite = hidden ? "#cbd5e1" : "rgba(255,255,255,.55)";
+    if (ear === "bunny") s += '<ellipse cx="38" cy="22" rx="7" ry="18" fill="' + c + '"/><ellipse cx="62" cy="22" rx="7" ry="18" fill="' + c + '"/>';
+    if (ear === "cat" || ear === "mane") s += '<path d="M26 40 L32 16 L46 32Z M74 40 L68 16 L54 32Z" fill="' + c + '"/>';
+    if (ear === "round") s += '<circle cx="30" cy="30" r="10" fill="' + c + '"/><circle cx="70" cy="30" r="10" fill="' + c + '"/>';
+    if (ear === "horn" || ear === "uni") s += ear === "uni" ? '<path d="M50 4 L45 30 L55 30Z" fill="' + (hidden ? c : "#fde047") + '"/>' : '<path d="M36 30 L32 8 L44 26Z M64 30 L68 8 L56 26Z" fill="' + (hidden ? c : "#fde68a") + '"/>';
+    if (ear === "antler") s += '<path d="M36 30 L28 8 M30 16 L22 12 M64 30 L72 8 M70 16 L78 12" stroke="' + (hidden ? c : "#78350f") + '" stroke-width="4" stroke-linecap="round" fill="none"/>';
+    if (ear === "tuft" || ear === "crest") s += '<path d="M50 10 Q44 22 48 30 Q50 18 56 12 Q52 22 54 30" fill="' + c + '"/>';
+    if (ear === "antenna") s += '<path d="M42 30 L36 10 M58 30 L64 10" stroke="' + c + '" stroke-width="3"/><circle cx="36" cy="10" r="4" fill="' + c + '"/><circle cx="64" cy="10" r="4" fill="' + c + '"/>';
+    if (ear === "frog") s += '<circle cx="34" cy="30" r="11" fill="' + c + '"/><circle cx="66" cy="30" r="11" fill="' + c + '"/>';
+    if (ear === "spike") s += '<path d="M20 50 L14 34 L30 40 L28 22 L42 32 L50 16 L58 32 L72 22 L70 40 L86 34 L80 50Z" fill="' + (hidden ? c : "#78350f") + '"/>';
+    if (ear === "mane") s += '<circle cx="50" cy="56" r="38" fill="' + (hidden ? c : "#b45309") + '"/>';
+    if (f === "wing" || f === "fire") s += '<path d="M16 56 Q2 40 8 70 Q14 66 22 68Z M84 56 Q98 40 92 70 Q86 66 78 68Z" fill="' + (f === "fire" && !hidden ? "#ef4444" : c) + '" opacity=".85"/>';
+    if (f === "tail") s += '<path d="M78 74 Q100 60 92 40 Q86 62 70 70Z" fill="' + c + '"/><path d="M92 40 Q90 50 86 52" stroke="#fff" stroke-width="4"/>';
+    if (f === "fan") s += '<path d="M50 60 L10 30 L22 20 L40 14 L60 14 L78 20 L90 30Z" fill="' + (hidden ? c : "#0d9488") + '" opacity=".7"/>';
+    if (f === "shell" || f === "globe") s += '<ellipse cx="50" cy="70" rx="40" ry="20" fill="' + (hidden ? c : f === "globe" ? "#16a34a" : "#15803d") + '"/>';
+    if (f === "fin") s += '<path d="M50 30 L60 12 L64 34Z" fill="' + c + '"/>';
+    s += '<ellipse cx="50" cy="60" rx="30" ry="28" fill="' + c + '"/><ellipse cx="50" cy="70" rx="17" ry="13" fill="' + lite + '"/>';
+    if (!hidden) {
+      s += '<circle cx="40" cy="55" r="5" fill="' + k + '"/><circle cx="60" cy="55" r="5" fill="' + k + '"/><circle cx="41.5" cy="53.5" r="1.6" fill="#fff"/><circle cx="61.5" cy="53.5" r="1.6" fill="#fff"/>';
+      s += '<ellipse cx="33" cy="64" rx="4" ry="2.5" fill="#fb7185" opacity=".55"/><ellipse cx="67" cy="64" rx="4" ry="2.5" fill="#fb7185" opacity=".55"/>';
+      s += f === "beak" ? '<path d="M44 62 L56 62 L50 69Z" fill="#f59e0b"/>' : '<path d="M45 63 Q50 67 55 63" stroke="' + k + '" stroke-width="2" fill="none" stroke-linecap="round"/>';
+      if (f === "spots") s += '<circle cx="30" cy="70" r="3" fill="#fff"/><circle cx="70" cy="72" r="3" fill="#fff"/><circle cx="64" cy="80" r="2.5" fill="#fff"/>';
+      if (f === "stripe") s += '<path d="M24 52 L32 54 M22 60 L30 61 M76 52 L68 54 M78 60 L70 61" stroke="#1f2937" stroke-width="2" opacity=".5"/>';
+      if (f === "star") s += '<path d="M80 16 L83 24 L91 24 L85 29 L87 37 L80 32 L73 37 L75 29 L69 24 L77 24Z" fill="#fde047"/>';
+      if (f === "pencil") s += '<rect x="74" y="64" width="18" height="6" rx="1" fill="#facc15" transform="rotate(-30 83 67)"/>';
+      if (f === "note") s += '<rect x="70" y="66" width="16" height="16" fill="#fef08a" stroke="#ca8a04"/>';
+      if (f === "drop") s += '<path d="M80 60 Q86 70 80 74 Q74 70 80 60Z" fill="#1e293b"/>';
+      if (f === "swirl") s += '<path d="M74 78 a8 8 0 1 1 8 -8 a5 5 0 1 1 -5 5" stroke="#0e7490" stroke-width="3" fill="none"/>';
+      if (f === "clip") s += '<path d="M76 58 v18 a5 5 0 0 0 10 0 v-14 a3 3 0 0 0 -6 0 v12" stroke="#64748b" stroke-width="2.5" fill="none"/>';
+    }
+    var pre = "", post = "", st = hidden ? 1 : (o.stage || 1);
+    if (!hidden && d[2] === 3) pre += '<defs><linearGradient id="rb' + id + '" x1="0" x2="1"><stop offset="0" stop-color="#f87171"/><stop offset=".33" stop-color="#facc15"/><stop offset=".66" stop-color="#34d399"/><stop offset="1" stop-color="#818cf8"/></linearGradient></defs><circle cx="50" cy="56" r="46" fill="none" stroke="url(#rb' + id + ')" stroke-width="5" opacity=".9"/>';
+    if (!hidden && o.giant) pre += '<circle cx="50" cy="56" r="47" fill="none" stroke="#ef4444" stroke-width="4" stroke-dasharray="6 4" opacity=".8"/><circle cx="50" cy="56" r="44" fill="#fecaca" opacity=".35"/>';
+    if (st >= 3) pre += '<circle cx="50" cy="56" r="45" fill="#fde68a" opacity=".45"/>';
+    if (st >= 2) post += '<path d="M24 74 Q50 86 76 74 L74 80 Q50 92 26 80Z" fill="#ef4444"/><path d="M66 80 L72 94 L62 88Z" fill="#dc2626"/>';
+    if (st >= 3) post += '<path d="M36 26 L40 14 L46 22 L50 10 L54 22 L60 14 L64 26Z" fill="#facc15" stroke="#ca8a04" stroke-width="1.5"/>';
+    if (!hidden && o.shiny) post += '<path d="M12 20 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3Z M88 70 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2Z" fill="#fde047"/>';
+    var g = !hidden && o.shiny ? '<g style="filter:hue-rotate(150deg) saturate(1.5) brightness(1.05)">' + s + "</g>" : s;
+    var tr = !hidden && o.giant ? ' transform="translate(50 56) scale(1.12) translate(-50 -56)"' : "";
+    return '<svg viewBox="0 0 100 100" width="100%" height="100%" aria-hidden="true">' + pre + "<g" + tr + ">" + g + post + "</g></svg>";
+  }
+  function dxLoad(k) { try { return JSON.parse(localStorage.getItem("kp-dex-" + k) || "{}") || {}; } catch (e) { return {}; } }
+  function dxSave(k, d) { try { localStorage.setItem("kp-dex-" + k, JSON.stringify(d)); } catch (e) {} }
+  var dxLast = 0;
+  function dxPick(pct) {
+    var r = Math.random(), tier = 0;
+    if (pct >= 100 && kid && dxMythOpen(dxLoad(kid)) && r < 0.3) tier = 3;
+    else if (pct >= 100 && r < 0.12) tier = 2; else if (pct >= 90 && r < 0.4) tier = 1;
+    var pool = DEX.filter(function (x) { return x[2] === tier; });
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  function dxEncounter(pct) {
+    if (!kid || !document.body || document.querySelector(".sd-mask")) return;
+    var d = dxPick(pct), dx0 = dxLoad(kid), rec0 = dx0[d[0]], st0 = rec0 ? dxStage(rec0.n) : 1;
+    var shiny = Math.random() < 1 / 15, giant = pct >= 100 && st0 >= 2 && Math.random() < 0.3;
+    var tries = 3, rate = ([0.55, 0.35, 0.2, 0.15][d[2]] + (pct >= 100 ? 0.1 : 0)) * (giant ? 0.6 : 1);
+    var label = (shiny ? "✨閃亮 " : "") + d[1];
+    var m = document.createElement("div"); m.className = "sd-mask";
+    m.innerHTML = '<div class="sd-card" role="dialog" aria-modal="true"><p class="sd-tag" style="color:' + RARE_C[d[2]] + '">✨ ' + RARE[d[2]] + (giant ? "・🌟 巨大化" : "") + (shiny ? "・閃亮" : "") + '</p>' +
+      '<h3>' + (giant ? "巨大化的" : "野生的") + "「" + label + '」出現了！</h3><div class="sd-pic sd-bob">' + dxSvg(d[0], false, { stage: st0, shiny: shiny, giant: giant }) + '</div><p class="sd-msg">' + (giant ? "巨大化的夥伴比較難抓！" : "答得好！") + '快丟星星瓶抓住牠（還有 <b>3</b> 次機會）</p>' +
+      '<button type="button" class="sd-throw">🫙 丟星星瓶</button><button type="button" class="sd-skip">先不要</button></div>';
+    document.body.appendChild(m);
+    var pic = m.querySelector(".sd-pic"), msg = m.querySelector(".sd-msg"), th = m.querySelector(".sd-throw"), sk = m.querySelector(".sd-skip");
+    function close() { m.remove(); }
+    sk.onclick = close;
+    th.onclick = function () {
+      th.disabled = true; pic.className = "sd-pic sd-shake";
+      setTimeout(function () {
+        tries--;
+        if (Math.random() < rate) {
+          var dx = dxLoad(kid), r = dx[d[0]] || { n: 0, d: today(), s: 0, g: 0 }, first = !dx[d[0]], before = dxStage(r.n);
+          r.n++; if (shiny) r.s = (r.s || 0) + 1; if (giant) r.g = (r.g || 0) + 1; dx[d[0]] = r; dxSave(kid, dx);
+          var after = dxStage(r.n), have = dxBase().filter(function (x) { return dx[x[0]]; }).length, myth = d[2] === 3;
+          var evo = after > before;
+          pic.innerHTML = dxSvg(d[0], false, { stage: after, shiny: shiny, giant: giant });
+          pic.className = "sd-pic sd-got";
+          msg.innerHTML = "🎉 抓到了！" + (first ? "新夥伴加入圖鑑" : "又抓到一隻（第 " + r.n + " 隻）") +
+            (evo ? "<br>✨ <b>" + d[1] + " 進化了！</b>現在是 " + "★★★".slice(0, after) + (after === 3 ? "（完全體）" : "") : (after < 3 ? "<br>再抓 " + ((after === 1 ? 3 : 6) - r.n) + " 隻就會進化" : "")) +
+            (shiny ? "<br>✨ 閃亮版收集 +1" : "") + (giant ? "<br>🌟 巨大化收集 +1" : "") +
+            (myth ? "<br>🌈 神話夥伴收集 <b>" + DEX.filter(function (x) { return x[2] === 3 && dx[x[0]]; }).length + " / 6</b>" : "<br>圖鑑 <b>" + have + " / " + dxBase().length + "</b>") + "（回小站首頁可以看進化過程）";
+          th.remove(); sk.textContent = "好耶，繼續練習";
+        } else if (tries > 0) {
+          pic.className = "sd-pic sd-bob"; th.disabled = false;
+          msg.innerHTML = "差一點！牠跳出來了，再試一次（還有 <b>" + tries + "</b> 次機會）";
+        } else {
+          pic.className = "sd-pic sd-run"; th.remove(); sk.textContent = "下次再來";
+          msg.innerHTML = "牠跑走了… 下一輪答得好，還有機會再遇到！";
+        }
+      }, 900);
+    };
+  }
+  var SiteDex = {
+    list: DEX, rarity: RARE, rareColor: RARE_C, svg: dxSvg, stage: dxStage, read: function (k) { return dxLoad(k || kid); },
+    base: dxBase, mythOpen: function (k) { return dxMythOpen(dxLoad(k || kid)); },
+    maybe: function (pct, n) {
+      if (!kid || n === 0 || pct < 70) return;
+      var now = Date.now(); if (now - dxLast < 5000) return; dxLast = now;
+      var p = pct >= 100 ? 1 : pct >= 90 ? 0.6 : 0.35;
+      if (Math.random() < p) setTimeout(function () { dxEncounter(pct); }, 1800);
+    }
+  };
+  window.SiteDex = SiteDex;
+  var oRE = SitePoints.roundEnd;
+  SitePoints.roundEnd = function (pct, noPerfect, n) { oRE(pct, noPerfect); try { SiteDex.maybe(pct, n); } catch (e) {} };
+  if (typeof window.rtEnd === "function" && !window.rtEnd.__sd) {
+    var oEnd = window.rtEnd;
+    window.rtEnd = function () {
+      try { var r = window.rt || (typeof rt !== "undefined" ? rt : null); if (r && !r.done && r.n >= 1) SitePoints.roundEnd(Math.round(r.ok / r.n * 100), true, r.n >= 5 ? r.n : 0); } catch (e) {}
+      return oEnd.apply(this, arguments);
+    };
+    window.rtEnd.__sd = true;
+  }
+
+  /* ---------------- styles ---------------- */
+  var css = document.createElement("style");
+  css.textContent =
+    "#sh-btn{position:fixed;left:max(12px,env(safe-area-inset-left));bottom:max(12px,env(safe-area-inset-bottom));z-index:9000;" +
+    "height:44px;padding:0 14px 0 10px;border-radius:999px;border:2px solid rgba(255,255,255,.9);background:#334155;color:#fff;font:700 16px/1 -apple-system,'PingFang TC','Noto Sans TC',sans-serif;" +
+    "box-shadow:0 4px 14px rgba(0,0,0,.28);cursor:pointer;opacity:.9;touch-action:manipulation;white-space:nowrap}" +
+    "#sh-btn:active{transform:scale(.94)}" +
+    "#sh-mask{position:fixed;inset:0;z-index:9001;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px}" +
+    "#sh-card{background:#fff;color:#0f172a;border-radius:18px;padding:20px 18px;max-width:340px;width:100%;text-align:center;" +
+    "font:17px/1.5 -apple-system,'PingFang TC','Noto Sans TC',sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.3)}" +
+    "#sh-card h3{margin:0 0 6px;font-size:20px}#sh-card p{margin:0 0 16px;color:#475569;font-size:15px}" +
+    "#sh-card button{font:inherit;min-height:48px;border-radius:12px;border:0;padding:10px 16px;margin:4px;cursor:pointer}" +
+    "#sh-go{background:#0284c7;color:#fff;font-weight:700}#sh-stay{background:#e2e8f0;color:#0f172a}" +
+    "@media (prefers-color-scheme:dark){#sh-card{background:#1e293b;color:#e2e8f0}#sh-card p{color:#94a3b8}#sh-stay{background:#334155;color:#e2e8f0}}" +
+    ".sp-say{font:14px/1 sans-serif;border:1px solid rgba(100,116,139,.45);background:transparent;border-radius:999px;padding:3px 7px;margin-left:6px;cursor:pointer;vertical-align:middle;color:inherit}" +
+    ".sd-mask{position:fixed;inset:0;z-index:9003;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px}" +
+    ".sd-card{background:#fff;color:#0f172a;border-radius:20px;padding:18px;max-width:340px;width:100%;text-align:center;font:16px/1.5 -apple-system,'PingFang TC','Noto Sans TC',sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.35)}" +
+    ".sd-card h3{margin:0 0 4px;font-size:20px}.sd-tag{margin:0;font-weight:800}.sd-msg{color:#475569;margin:6px 0 12px}" +
+    ".sd-pic{width:150px;height:150px;margin:6px auto}.sd-bob{animation:sdb 1.1s ease-in-out infinite}.sd-shake{animation:sds .3s linear 3}.sd-got{animation:sdg .6s ease-out}.sd-run{animation:sdr .8s ease-in forwards}" +
+    "@keyframes sdb{50%{transform:translateY(-10px)}}@keyframes sds{25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}@keyframes sdg{0%{transform:scale(.6)}70%{transform:scale(1.15)}}@keyframes sdr{to{transform:translateX(220px);opacity:0}}" +
+    ".sd-card button{font:inherit;min-height:48px;border-radius:12px;border:0;padding:10px 16px;margin:4px;cursor:pointer}.sd-throw{background:#7c3aed;color:#fff;font-weight:800}.sd-skip{background:#e2e8f0;color:#0f172a}" +
+    "@media (prefers-color-scheme:dark){.sd-card{background:#1e293b;color:#e2e8f0}.sd-msg{color:#94a3b8}.sd-skip{background:#334155;color:#e2e8f0}}" +
+    "body{padding-bottom:max(76px,calc(64px + env(safe-area-inset-bottom)))!important}" +
+    ".sp-toast{position:fixed;left:max(84px,calc(72px + env(safe-area-inset-left)));bottom:max(18px,calc(6px + env(safe-area-inset-bottom)));z-index:9002;" +
+    "background:#f59e0b;color:#1f2937;font:800 16px/1.3 -apple-system,'PingFang TC',sans-serif;padding:8px 12px;border-radius:999px;" +
+    "box-shadow:0 4px 12px rgba(0,0,0,.25);pointer-events:none;transition:opacity .4s,transform .4s}" +
+    ".sp-toast.sp-big{left:50%;bottom:auto;top:30%;transform:translateX(-50%);text-align:center;font-size:18px;padding:14px 22px;border-radius:18px}" +
+    ".sp-toast.sp-out{opacity:0;transform:translateY(-14px)}.sp-toast.sp-big.sp-out{transform:translate(-50%,-14px)}";
+  document.head.appendChild(css);
+
+  function qHtml() {
+    var d = load(kid); qDay(d);
+    return '<p style="text-align:left;font-size:14px;margin:-8px 0 14px">🎯 今天的任務：<br>' + QUESTS.map(function (q) {
+      var v = Math.min(q.goal, d.q[q.f] || 0); return (d.q.done[q.id] ? "✅ " : "⬜ ") + q.name + "（" + v + "/" + q.goal + "）";
+    }).join("<br>") + "</p>";
+  }
+  /* ---------------- 📚 小站 button ---------------- */
+  if (!document.body || window.__siteHomeNoBtn) return;
+  var b = document.createElement("button");
+  b.id = "sh-btn"; b.type = "button";
+  b.setAttribute("aria-label", "回到練習小站"); b.title = "回到練習小站";
+  b.textContent = "📚 小站";
+  b.addEventListener("click", function () {
+    if (document.getElementById("sh-mask")) return;
+    var m = document.createElement("div"); m.id = "sh-mask";
+    var pts = kid ? "<p>目前集點：⭐ " + load(kid).points + " 點・🎒 圖鑑 " + dxBase().filter(function (x) { return dxLoad(kid)[x[0]]; }).length + " / " + dxBase().length + "</p><p>🎒 圖鑑的進化過程、🎰 扭蛋機和卡冊都在小站首頁。</p>" + qHtml() : "";
+    m.innerHTML = '<div id="sh-card" role="dialog" aria-modal="true"><h3>📚 回到練習小站？</h3>' +
+      '<p>這一輪的作答不會保留（點數和最高分紀錄會留著）。</p>' + pts +
+      '<button id="sh-go" type="button">回到練習小站</button><button id="sh-stay" type="button">繼續練習</button></div>';
+    document.body.appendChild(m);
+    function close() { m.remove(); }
+    m.addEventListener("click", function (e) { if (e.target === m) close(); });
+    document.getElementById("sh-stay").addEventListener("click", close);
+    document.getElementById("sh-go").addEventListener("click", function () {
+      try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
+      location.href = homeUrl();
+    });
+    document.getElementById("sh-go").focus();
+  });
+  document.body.appendChild(b);
+})();
+
+</script>
+</body>
+</html>
