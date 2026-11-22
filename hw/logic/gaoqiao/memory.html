@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Howard 錯題記憶圖卡</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+/* VOICE: 給小六生的考前筆記本，親切、清楚、一眼記住
+   IDEA: 一疊彩色記憶卡，每張卡＝錯在哪＋口訣＋一張圖
+   PICTURE: 每個觀念都配一張自己畫的 SVG 圖解
+   COLOUR and TYPE: 紙白底、五科五色標籤，Noto Sans TC 粗體口訣
+   LAYOUT: 頂部科目導覽，卡片雙欄（手機單欄），可列印 */
+:root{color-scheme:light dark;--bg:light-dark(#fbfaf6,#16181c);--card:light-dark(#fff,#1f2228);--ink:light-dark(#1d232b,#e9ecef);--mute:light-dark(#5d6670,#a5adb6);--line:light-dark(#e3dfd4,#343a42);
+--m:#1f6feb;--s:#1a8f5a;--c:#c2410c;--e:#7c3aed;--h:#b45309;--bad:#d1242f;--soft:light-dark(#f3f1ea,#262a31)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;overflow-x:clip}
+header{padding:28px max(5vw,16px) 8px;max-width:1180px;margin:auto}
+h1{font-size:clamp(28px,5vw,42px);line-height:1.1;margin:0 0 8px;font-weight:900;text-wrap:balance}
+.lead{color:var(--mute);max-width:62ch;margin:0}
+nav{position:sticky;top:0;z-index:4;background:var(--bg);border-bottom:1px solid var(--line)}
+nav .in{max-width:1180px;margin:auto;padding:8px max(5vw,16px);display:flex;gap:8px;overflow-x:auto}
+nav a{flex:none;text-decoration:none;color:#fff;font-weight:700;border-radius:999px;padding:6px 14px;font-size:15px}
+main{max-width:1180px;margin:auto;padding:8px max(5vw,16px) 40px}
+section{margin-top:28px;scroll-margin-top:60px}
+h2{font-size:26px;margin:0 0 4px;display:flex;align-items:center;gap:10px}
+h2 .dot{width:14px;height:14px;border-radius:4px;background:var(--k)}
+.sum{color:var(--mute);margin:0 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,520px),1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-top:5px solid var(--k);border-radius:14px;padding:16px;break-inside:avoid}
+.card h3{margin:0 0 6px;font-size:19px}
+.err{font-size:14px;color:var(--bad);margin:0 0 8px}
+.kou{background:var(--soft);border-radius:10px;padding:10px 12px;font-weight:900;font-size:clamp(18px,2.4vw,21px);line-height:1.45;margin:8px 0}
+.kou small{display:block;font-weight:400;font-size:14px;color:var(--mute);margin-top:2px}
+.card ul{margin:8px 0 0;padding-left:20px}
+svg{width:100%;height:auto;display:block;margin:6px 0}
+svg text{font-family:"Noto Sans TC",sans-serif;fill:var(--ink)}
+.t-m{--k:var(--m)}.t-s{--k:var(--s)}.t-c{--k:var(--c)}.t-e{--k:var(--e)}.t-h{--k:var(--h)}.t-a{--k:var(--bad)}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
+.steps div{background:var(--card);border:2px solid var(--bad);border-radius:12px;padding:12px;text-align:center}
+.steps b{display:block;font-size:22px}
+.steps span{font-size:14px;color:var(--mute)}
+table{border-collapse:collapse;width:100%;font-size:15px;margin-top:6px}
+td,th{border-bottom:1px solid var(--line);padding:5px 4px;text-align:left;vertical-align:top}
+.note{font-size:13px;color:var(--mute);margin-top:30px}
+@media(max-width:600px){.steps{grid-template-columns:1fr}}
+@media print{nav{display:none}body{background:#fff}.card{border-color:#ccc}section{break-before:page}section:first-of-type{break-before:auto}}
+</style>
+</head>
+<body>
+<header>
+<h1>Howard 錯題記憶圖卡</h1>
+<p class="lead">從高僑模擬考 1～10 回的 334 題錯題整理。每張卡：錯在哪 → 一句口訣 → 一張圖。考前一天每科翻一遍就好。</p>
+</header>
+<nav><div class="in">
+<a href="#all" style="background:var(--bad)">全科習慣</a><a href="#math" style="background:var(--m)">數學</a><a href="#sci" style="background:var(--s)">自然</a><a href="#soc" style="background:var(--h)">社會</a><a href="#chi" style="background:var(--c)">國語</a><a href="#eng" style="background:var(--e)">英文</a>
+</div></nav>
+<main>
+
+<section id="all" class="t-a">
+<h2><span class="dot"></span>全科作答習慣</h2>
+<p class="sum">每 6 題錯題就有 1 題不是不會，是讀題或填答失誤（61 題）。這是最容易救回來的分數。</p>
+<div class="kou">口訣：「問啥答啥，否定圈起，選項看完」</div>
+<div class="steps">
+<div><b>① 圈「問什麼」</b><span>剩下？共有？每一個？單位是公尺還是公分？</span></div>
+<div><b>② 圈否定詞</b><span>不是、不適合、錯誤、最小、唯一、並不是</span></div>
+<div><b>③ 對回選項</b><span>答案先寫在括號，再找選項；四個選項全部看完</span></div>
+</div>
+</section>
+
+<section id="math" class="t-m">
+<h2><span class="dot"></span>數學</h2>
+<p class="sum">錯 122 題：算對卻填錯 19、問錯對象 15、觀念不熟 88。最弱是「比、分數與份數」26 題。</p>
+<div class="grid">
+
+<div class="card"><h3>差不變：畫兩條線段</h3>
+<p class="err">錯在：年齡、存錢、各給一樣多的題目（如 1-18、3-34、9-16）</p>
+<div class="kou">「一起加、一起減，相差永遠不會變」<small>先找差，差＝幾份，就能求 1 份</small></div>
+<svg viewBox="0 0 520 190" role="img" aria-label="姊弟存錢線段圖">
+<text x="0" y="20" font-size="14" font-weight="700">例：姊 900 元、弟 300 元，各存一樣多後，姊是弟的 2 倍</text>
+<text x="0" y="62" font-size="15">姊</text><rect x="34" y="46" width="300" height="24" rx="4" fill="#1f6feb" opacity=".85"/><rect x="334" y="46" width="100" height="24" rx="4" fill="#1f6feb" opacity=".35"/>
+<text x="0" y="112" font-size="15">弟</text><rect x="34" y="96" width="100" height="24" rx="4" fill="#1f6feb" opacity=".85"/><rect x="134" y="96" width="100" height="24" rx="4" fill="#1f6feb" opacity=".35"/>
+<text x="140" y="62" font-size="13" fill="#fff">900</text><text x="70" y="113" font-size="13" fill="#fff">300</text>
+<text x="360" y="62" font-size="13">＋存的</text><text x="160" y="113" font-size="13">＋存的</text>
+<line x1="234" y1="132" x2="434" y2="132" stroke="#d1242f" stroke-width="3"/><line x1="234" y1="125" x2="234" y2="139" stroke="#d1242f" stroke-width="3"/><line x1="434" y1="125" x2="434" y2="139" stroke="#d1242f" stroke-width="3"/>
+<text x="250" y="156" font-size="14" fill="#d1242f" font-weight="700">差 600 不變 ＝ 弟的 1 份</text>
+<text x="0" y="182" font-size="14">弟存後 600 → 存了 600 − 300 ＝ 300 元</text>
+</svg>
+<ul><li>比例改變時：把兩個比的「差」調成一樣，再看多了幾份（第 14 題）。</li><li>倒推題：從最後的結果一步一步往回算。</li></ul>
+</div>
+
+<div class="card"><h3>重疊部分：用「份」來想</h3>
+<p class="err">錯在：8-16、10-21 是同一種題型，兩次都錯</p>
+<div class="kou">「重疊當 1 份，誰幾分之一就有幾份」</div>
+<svg viewBox="0 0 520 170" role="img" aria-label="重疊份數圖">
+<rect x="30" y="30" width="210" height="70" fill="#1f6feb" opacity=".25" stroke="#1f6feb" stroke-width="2"/>
+<rect x="170" y="30" width="280" height="70" fill="#1a8f5a" opacity=".2" stroke="#1a8f5a" stroke-width="2"/>
+<rect x="170" y="30" width="70" height="70" fill="#d1242f" opacity=".35"/>
+<text x="60" y="72" font-size="16" font-weight="700">甲 3 份</text><text x="330" y="72" font-size="16" font-weight="700">乙 4 份</text><text x="180" y="72" font-size="14" font-weight="700">重疊1</text>
+<text x="30" y="130" font-size="14">重疊 ＝ 甲的 1/3 ＝ 乙的 1/4</text>
+<text x="30" y="156" font-size="14">甲乙相差 1 份 ＝ 10 → 重疊就是 10（不是 30、40）</text>
+</svg>
+</div>
+
+<div class="card"><h3>單位換算階梯</h3>
+<p class="err">錯在：圖形與單位 21 題，算對卻沒換成公尺（5-33）</p>
+<div class="kou">「長度乘 100，面積乘 1 萬，體積乘 100 萬」<small>1 公升 ＝ 1000 立方公分</small></div>
+<svg viewBox="0 0 520 150" role="img" aria-label="單位換算">
+<g font-size="15">
+<rect x="10" y="20" width="150" height="34" rx="8" fill="#1f6feb" opacity=".15"/><text x="22" y="43">1 公尺 ＝ 100 公分</text>
+<rect x="180" y="20" width="160" height="34" rx="8" fill="#1f6feb" opacity=".25"/><text x="190" y="43">1 m² ＝ 10000 cm²</text>
+<rect x="360" y="20" width="155" height="34" rx="8" fill="#1f6feb" opacity=".35"/><text x="366" y="43">1 m³ ＝ 100 萬 cm³</text>
+<rect x="10" y="80" width="250" height="34" rx="8" fill="#1a8f5a" opacity=".2"/><text x="22" y="103">1 公升 ＝ 1000 cm³ ＝ 1000 毫升</text>
+<rect x="280" y="80" width="235" height="34" rx="8" fill="#d1242f" opacity=".15"/><text x="290" y="103">算完先看：題目要哪個單位？</text>
+</g></svg>
+</div>
+
+<div class="card"><h3>公因數還是公倍數？</h3>
+<p class="err">錯在：因數倍數 18 題</p>
+<div class="kou">「切最大、分最多 → 公因數；再碰面、一起去 → 公倍數」</div>
+<svg viewBox="0 0 520 150" role="img" aria-label="公因數公倍數判斷">
+<rect x="10" y="14" width="240" height="120" rx="12" fill="#1f6feb" opacity=".12"/><rect x="270" y="14" width="240" height="120" rx="12" fill="#1a8f5a" opacity=".14"/>
+<text x="26" y="42" font-size="17" font-weight="900">最大公因數（變小）</text>
+<text x="26" y="70" font-size="14">切成最大正方形</text><text x="26" y="94" font-size="14">分給最多人、沒有剩</text><text x="26" y="118" font-size="14">不夠／多出來 → 先補或先扣</text>
+<text x="286" y="42" font-size="17" font-weight="900">最小公倍數（變大）</text>
+<text x="286" y="70" font-size="14">下一次一起去</text><text x="286" y="94" font-size="14">排成最小正方形</text><text x="286" y="118" font-size="14">鐘、紅綠燈同時響／亮</text>
+</svg>
+</div>
+
+<div class="card"><h3>時鐘夾角與星期</h3>
+<p class="err">錯在：週期、日期、時鐘 11 題</p>
+<div class="kou">「夾角 ＝ ｜30 × 時 − 5.5 × 分｜」<small>大於 180° 就用 360° 去減</small></div>
+<svg viewBox="0 0 520 160" role="img" aria-label="時鐘與星期">
+<circle cx="80" cy="80" r="62" fill="none" stroke="#1f6feb" stroke-width="3"/>
+<line x1="80" y1="80" x2="80" y2="28" stroke="#1d232b" stroke-width="2" style="stroke:var(--ink)" transform="rotate(120 80 80)"/>
+<line x1="80" y1="80" x2="80" y2="44" stroke="#d1242f" stroke-width="4" transform="rotate(100 80 80)"/>
+<text x="40" y="154" font-size="13">3:20 → 20°</text>
+<text x="170" y="40" font-size="15">時針每分鐘走 0.5°，分針走 6°</text>
+<text x="170" y="74" font-size="15">星期：天數 ÷ 7 看「餘數」往後數</text>
+<text x="170" y="104" font-size="14">5/1 星期四，5 月有 31 天</text>
+<text x="170" y="128" font-size="14">31 ÷ 7 餘 3 → 四往後 3 天 ＝ 星期日</text>
+</svg>
+</div>
+
+<div class="card"><h3>算對卻填錯</h3>
+<p class="err">錯在：19 次，數學最大的失分來源</p>
+<div class="kou">「算完寫括號，括號對選項」</div>
+<svg viewBox="0 0 520 110" role="img" aria-label="填答流程">
+<g font-size="15" font-weight="700">
+<rect x="6" y="30" width="140" height="46" rx="10" fill="#1f6feb" opacity=".15"/><text x="30" y="59">算出答案</text>
+<rect x="190" y="30" width="140" height="46" rx="10" fill="#1f6feb" opacity=".3"/><text x="208" y="59">寫在（ ）裡</text>
+<rect x="374" y="30" width="140" height="46" rx="10" fill="#d1242f" opacity=".2"/><text x="390" y="59">找相同選項</text>
+<path d="M150 53h34M334 53h34" stroke="#1d232b" style="stroke:var(--ink)" stroke-width="2" marker-end="url(#ar)"/>
+</g><defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0L8,4L0,8z" fill="#888"/></marker></defs>
+</svg>
+<ul><li>答案卡最後再從頭對一次題號。</li></ul>
+</div>
+</div>
+</section>
+
+<section id="sci" class="t-s">
+<h2><span class="dot"></span>自然</h2>
+<p class="sum">錯 116 題，幾乎都是觀念：生物 36、地球科學 25、物質 21、聲光熱 18、力與機械 16。另有 14 題題目含「不是／錯誤／最小」。</p>
+<div class="grid">
+
+<div class="card"><h3>植物怎麼運送</h3>
+<p class="err">錯在：芒果、芭樂的糖從哪來；水往上的動力（3-13、6-20、6-21）</p>
+<div class="kou">「木質部運水往上衝，韌皮部送糖到處送」<small>木材就是木質部；水往上的動力是葉子的蒸散作用</small></div>
+<svg viewBox="0 0 520 190" role="img" aria-label="莖的運輸">
+<circle cx="110" cy="95" r="80" fill="#1a8f5a" opacity=".15" stroke="#1a8f5a" stroke-width="2"/>
+<circle cx="110" cy="95" r="58" fill="none" stroke="#b45309" stroke-width="10" opacity=".7"/>
+<circle cx="110" cy="95" r="44" fill="none" stroke="#1f6feb" stroke-width="12" opacity=".6"/>
+<text x="88" y="100" font-size="13">髓</text>
+<text x="210" y="50" font-size="15" fill="#b45309" font-weight="700">外圈：韌皮部 → 運糖（葉子做的養分）</text>
+<text x="210" y="84" font-size="15" fill="#1f6feb" font-weight="700">內圈：木質部 → 運水和礦物質，往上</text>
+<text x="210" y="120" font-size="14">糖：葉子光合作用製造</text>
+<text x="210" y="144" font-size="14">水：根吸收，靠葉子「蒸散作用」拉上去</text>
+<text x="210" y="168" font-size="14">液體肥料澆在土裡 → 走木質部往上</text>
+</svg>
+</div>
+
+<div class="card"><h3>植物分類樹</h3>
+<p class="err">錯在：蘇鐵會不會開花、蕨類怎麼繁殖（6-8、9-22、10-46）</p>
+<div class="kou">「先問有沒有管，再問有沒有種子，再問有沒有花」</div>
+<svg viewBox="0 0 520 228" role="img" aria-label="植物分類樹">
+<g font-size="14" text-anchor="middle">
+<rect x="200" y="8" width="120" height="30" rx="8" fill="#1a8f5a" opacity=".25"/><text x="260" y="28" font-weight="700">植物</text>
+<path d="M260 38V54H90V70M260 54H380V70" fill="none" stroke="#888" stroke-width="2"/>
+<rect x="20" y="70" width="140" height="44" rx="8" fill="#e3dfd4" opacity=".7"/><text x="90" y="90">沒有維管束</text><text x="90" y="107" font-weight="700">苔蘚</text>
+<rect x="310" y="70" width="140" height="30" rx="8" fill="#1a8f5a" opacity=".2"/><text x="380" y="90">有維管束</text>
+<path d="M380 100V116H250V130M380 116H450V130" fill="none" stroke="#888" stroke-width="2"/>
+<rect x="180" y="130" width="140" height="44" rx="8" fill="#e3dfd4" opacity=".7"/><text x="250" y="150">沒有種子・孢子</text><text x="250" y="167" font-weight="700">蕨類</text>
+<rect x="390" y="130" width="120" height="30" rx="8" fill="#1a8f5a" opacity=".2"/><text x="450" y="150">有種子</text>
+<path d="M450 160V172H405V180M450 172H490V180" fill="none" stroke="#888" stroke-width="2"/>
+<text x="400" y="198" font-weight="700" font-size="13">裸子：毬果</text><text x="400" y="212" font-size="11">松、蘇鐵、銀杏</text>
+<text x="492" y="198" font-weight="700" font-size="13">被子</text><text x="492" y="212" font-size="11">會開花</text>
+</g></svg>
+<ul><li>學名：第一個字（屬名）一樣＝同屬；第二個字不同＝不同種。</li></ul>
+</div>
+
+<div class="card"><h3>太陽直射跟著季節走</h3>
+<p class="err">錯在：四季、晝夜、日落方位（地球科學 25 題）</p>
+<div class="kou">「夏至北回、冬至南回、春秋分在赤道」<small>夏天太陽東北升、西北落；冬天東南升、西南落</small></div>
+<svg viewBox="0 0 520 180" role="img" aria-label="太陽直射位置">
+<ellipse cx="130" cy="90" rx="80" ry="80" fill="#1f6feb" opacity=".12" stroke="#1f6feb" stroke-width="2"/>
+<line x1="50" y1="90" x2="210" y2="90" stroke="#888" stroke-dasharray="5 4"/><line x1="58" y1="58" x2="202" y2="58" stroke="#d1242f" stroke-width="2"/><line x1="58" y1="122" x2="202" y2="122" stroke="#1f6feb" stroke-width="2"/>
+<text x="220" y="62" font-size="14" fill="#d1242f" font-weight="700">北回歸線 23.5°N ← 夏至 6/21</text>
+<text x="220" y="94" font-size="14" font-weight="700">赤道 ← 春分 3/21、秋分 9/23</text>
+<text x="220" y="126" font-size="14" fill="#1f6feb" font-weight="700">南回歸線 23.5°S ← 冬至 12/22</text>
+<text x="220" y="160" font-size="13">直射在北半球 → 北半球晝長夜短</text>
+</svg>
+</div>
+
+<div class="card"><h3>高氣壓、低氣壓、鋒面</h3>
+<p class="err">錯在：天氣圖判讀（5 題）</p>
+<div class="kou">「高壓順時往外降，天晴；低壓逆時往內升，下雨」<small>北半球。冷鋒三角、暖鋒半圓：「冷尖暖圓」</small></div>
+<svg viewBox="0 0 520 190" role="img" aria-label="高低氣壓與鋒面">
+<circle cx="70" cy="75" r="46" fill="#b45309" opacity=".12" stroke="#b45309" stroke-width="2"/><text x="60" y="82" font-size="22" font-weight="900" fill="#b45309">高</text>
+<path d="M70 29a46 46 0 0 1 46 46" fill="none" stroke="#b45309" stroke-width="3" marker-end="url(#ar)"/>
+<text x="20" y="145" font-size="13">順時針、往外、下沉 → 晴</text>
+<circle cx="230" cy="75" r="46" fill="#1f6feb" opacity=".12" stroke="#1f6feb" stroke-width="2"/><text x="220" y="82" font-size="22" font-weight="900" fill="#1f6feb">低</text>
+<path d="M276 75a46 46 0 0 0 -46 -46" fill="none" stroke="#1f6feb" stroke-width="3" marker-end="url(#ar)"/>
+<text x="180" y="145" font-size="13">逆時針、往內、上升 → 雨</text>
+<line x1="330" y1="40" x2="510" y2="40" stroke="#1f6feb" stroke-width="3"/><path d="M345 40l8-14 8 14M385 40l8-14 8 14M425 40l8-14 8 14M465 40l8-14 8 14" fill="#1f6feb"/><text x="330" y="64" font-size="13">冷鋒：三角形</text>
+<line x1="330" y1="100" x2="510" y2="100" stroke="#d1242f" stroke-width="3"/><path d="M345 100a8 8 0 0 1 16 0M385 100a8 8 0 0 1 16 0M425 100a8 8 0 0 1 16 0M465 100a8 8 0 0 1 16 0" fill="#d1242f"/><text x="330" y="124" font-size="13">暖鋒：半圓形</text>
+<text x="330" y="182" font-size="13">滯留鋒：三角與半圓分在兩側</text>
+</svg>
+</div>
+
+<div class="card"><h3>輪軸、滑輪、摩擦力</h3>
+<p class="err">錯在：力與機械 16 題（輪軸、動滑輪、靜摩擦力）</p>
+<div class="kou">「輪大省力；動滑輪省一半力、拉兩倍繩；不動就平衡」</div>
+<svg viewBox="0 0 520 170" role="img" aria-label="輪軸與動滑輪">
+<circle cx="80" cy="70" r="50" fill="none" stroke="#1a8f5a" stroke-width="3"/><circle cx="80" cy="70" r="14" fill="#1a8f5a" opacity=".5"/>
+<line x1="130" y1="70" x2="130" y2="130" stroke="#d1242f" stroke-width="2"/><text x="118" y="148" font-size="13" fill="#d1242f">施力</text>
+<line x1="66" y1="70" x2="66" y2="120" stroke="#888" stroke-width="2"/><rect x="50" y="120" width="32" height="22" fill="#888"/><text x="44" y="162" font-size="13">重物</text>
+<text x="160" y="40" font-size="14">力 × 輪半徑 ＝ 重 × 軸半徑</text><text x="160" y="62" font-size="14">80 × 10 ＝ 力 × 40 → 力 ＝ 20</text>
+<text x="160" y="98" font-size="14">動滑輪：60 公克重 → 施力 30，繩拉 2 倍長</text>
+<text x="160" y="132" font-size="14">靜止不動 → 摩擦力 ＝ 其他力的合力，方向相反</text>
+<text x="160" y="154" font-size="13">書壓在牆上不掉 → 摩擦力 ＝ 書重（向上）</text>
+</svg>
+</div>
+
+<div class="card"><h3>神經：誰在指揮？</h3>
+<p class="err">錯在：有意識的動作與反射（3-12、2-37）</p>
+<div class="kou">「想一下 → 大腦；來不及想 → 脊髓」<small>小腦管平衡；腦幹管呼吸、心跳</small></div>
+<svg viewBox="0 0 520 120" role="img" aria-label="神經指揮">
+<g font-size="15">
+<rect x="6" y="14" width="240" height="44" rx="10" fill="#1a8f5a" opacity=".18"/><text x="18" y="42">看到紅燈停下 → 大腦</text>
+<rect x="270" y="14" width="244" height="44" rx="10" fill="#d1242f" opacity=".15"/><text x="282" y="42">碰到熱鍋縮手 → 脊髓（反射）</text>
+<rect x="6" y="68" width="240" height="44" rx="10" fill="#e3dfd4" opacity=".6"/><text x="18" y="96">走路平衡 → 小腦</text>
+<rect x="270" y="68" width="244" height="44" rx="10" fill="#e3dfd4" opacity=".6"/><text x="282" y="96">呼吸、心跳 → 腦幹</text>
+</g></svg>
+</div>
+
+<div class="card"><h3>看得見的「白」都是小水滴</h3>
+<p class="err">錯在：白煙、白霧、車窗起霧（S9）</p>
+<div class="kou">「水蒸氣看不見；看得見的白是小水滴」<small>車窗起霧：哪一邊又暖又濕，霧就在哪一邊</small></div>
+<svg viewBox="0 0 520 120" role="img" aria-label="車窗起霧">
+<rect x="250" y="10" width="14" height="66" fill="#1f6feb" opacity=".4"/><text x="236" y="10" font-size="11"> </text>
+<text x="30" y="40" font-size="15" font-weight="700">冬天開暖氣</text><text x="30" y="64" font-size="14">車內暖濕 → 霧在「內側」</text>
+<text x="290" y="40" font-size="15" font-weight="700">夏天開冷氣</text><text x="290" y="64" font-size="14">車外暖濕 → 霧在「外側」</text>
+<text x="30" y="100" font-size="13">壺嘴的白煙、冰箱冒的白霧 → 都是小水滴</text>
+</svg>
+</div>
+
+<div class="card"><h3>光與溶液</h3>
+<p class="err">錯在：色光、實像，溶解度與飽和</p>
+<div class="kou">「玻璃紙只放同色光；能上屏幕是實像；杯底有沉澱就是飽和」</div>
+<ul><li>紅光照綠色玻璃紙 → 紅光被吃掉 → 黑色。</li><li>實像：投影機、照相機底片；虛像：鏡子、放大鏡看字。</li><li>濃度 ＝ 溶質 ÷（溶質＋水）。超過溶解度的部分不算，沒溶的不能加進去。</li></ul>
+</div>
+</div>
+</section>
+
+<section id="soc" class="t-h">
+<h2><span class="dot"></span>社會<span style="font-size:14px;color:var(--mute);font-weight:400">（只有 12/6 衛道考）</span></h2>
+<p class="sum">錯 47 題，幾乎都是記憶型：臺灣史 19、地理 10、公民 10、經濟 4。</p>
+<div class="grid">
+
+<div class="card" style="grid-column:1/-1"><h3>臺灣史時間軸</h3>
+<p class="err">錯在：各時期的人物、建設、地名混在一起（清領 9、戰後 5）</p>
+<div class="kou">「荷西 → 明鄭 → 清領 → 日治 → 戰後」<small>地名也照順序：大肚 → 左營 → 嘉義 → 松山 → 三民</small></div>
+<svg viewBox="0 0 1040 210" role="img" aria-label="臺灣史時間軸">
+<line x1="20" y1="60" x2="1020" y2="60" stroke="#b45309" stroke-width="4"/>
+<g font-size="15" text-anchor="middle">
+<circle cx="90" cy="60" r="9" fill="#b45309"/><text x="90" y="40" font-weight="900">1624 荷西</text>
+<text x="90" y="92" font-size="13">荷蘭佔南、西班牙佔北</text><text x="90" y="112" font-size="13">「南荷北西」</text><text x="90" y="132" font-size="13">新港文（西拉雅族）</text>
+<circle cx="280" cy="60" r="9" fill="#b45309"/><text x="280" y="40" font-weight="900">1662 明鄭</text>
+<text x="280" y="92" font-size="13">屯田（左營）</text><text x="280" y="112" font-size="13">承天府、孔廟</text>
+<circle cx="470" cy="60" r="9" fill="#b45309"/><text x="470" y="40" font-weight="900">1683 清領</text>
+<text x="470" y="92" font-size="13">一府三縣 → 建省（劉銘傳）</text><text x="470" y="112" font-size="13">林爽文事件後諸羅改嘉義</text><text x="470" y="132" font-size="13">開港：北「茶、樟腦」南「糖」</text>
+<circle cx="680" cy="60" r="9" fill="#b45309"/><text x="680" y="40" font-weight="900">1895 日治</text>
+<text x="680" y="92" font-size="13">松山等日式地名</text>
+<circle cx="890" cy="60" r="9" fill="#b45309"/><text x="890" y="40" font-weight="900">1945 戰後</text>
+<text x="890" y="92" font-size="13">1947 二二八、1949 戒嚴</text><text x="890" y="112" font-size="13">1971 退出聯合國</text><text x="890" y="132" font-size="13">1979 臺灣關係法</text><text x="890" y="152" font-size="13">1987 解嚴、1990 野百合</text><text x="890" y="172" font-size="13">1996 總統直選、2000 政黨輪替</text>
+</g></svg>
+</div>
+
+<div class="card"><h3>入超、出超、機會成本</h3>
+<p class="err">錯在：6-40 入超出超弄反、7-44 機會成本</p>
+<div class="kou">「入超＝買『進』來的多；出超＝賣『出』去的多」<small>機會成本：放棄的選項裡「最好的那一個」</small></div>
+<svg viewBox="0 0 520 140" role="img" aria-label="入超天平">
+<line x1="260" y1="30" x2="260" y2="120" stroke="#888" stroke-width="3"/><line x1="120" y1="60" x2="400" y2="40" stroke="#b45309" stroke-width="4"/>
+<rect x="90" y="60" width="80" height="44" rx="6" fill="#d1242f" opacity=".3"/><text x="104" y="88" font-size="15" font-weight="700">進口多</text>
+<rect x="360" y="40" width="80" height="28" rx="6" fill="#1a8f5a" opacity=".3"/><text x="374" y="60" font-size="14">出口少</text>
+<text x="90" y="134" font-size="14" font-weight="700">進口 ＞ 出口 → 入超</text>
+</svg>
+</div>
+
+<div class="card"><h3>公民：中央還是地方？國籍怎麼來？</h3>
+<p class="err">錯在：4-33 取得國籍、9-40 地方機關</p>
+<div class="kou">「院、部、署 → 中央；縣、市政府 → 地方」<small>國籍：出生（父或母是本國人）或歸化（外國人申請）</small></div>
+<ul><li>國家四要素：人民、領土、政府、主權。</li><li>收養是擬制血親；健保是社會保險（要繳費），社會救助是幫弱勢。</li><li>臺灣的位置：北緯、東經；冬天東北季風讓北部、東北部多雨。</li></ul>
+</div>
+</div>
+</section>
+
+<section id="chi" class="t-c">
+<h2><span class="dot"></span>國語</h2>
+<p class="sum">錯 29 題：觀念不熟 23（成語 7、修辭 5、詞性 4）、讀題失誤 6。</p>
+<div class="grid">
+
+<div class="card"><h3>的、地、得</h3>
+<p class="err">錯在：詞性與詞義</p>
+<div class="kou">「名詞前面用『的』，動詞前面用『地』，動詞後面用『得』」</div>
+<svg viewBox="0 0 520 120" role="img" aria-label="的地得">
+<g font-size="17">
+<rect x="6" y="14" width="160" height="90" rx="10" fill="#c2410c" opacity=".12"/><text x="20" y="46" font-weight="900">的 ＋ 名詞</text><text x="20" y="80">美麗「的」花</text>
+<rect x="180" y="14" width="160" height="90" rx="10" fill="#c2410c" opacity=".2"/><text x="194" y="46" font-weight="900">地 ＋ 動詞</text><text x="194" y="80">慢慢「地」走</text>
+<rect x="354" y="14" width="160" height="90" rx="10" fill="#c2410c" opacity=".28"/><text x="368" y="46" font-weight="900">動詞 ＋ 得</text><text x="368" y="80">跑「得」很快</text>
+</g></svg>
+</div>
+
+<div class="card"><h3>年齡代稱階梯</h3>
+<p class="err">錯在：10-2 沒看完選項（以上皆是）</p>
+<div class="kou">「三十而立，四十不惑，五十知命，六十耳順，七十古稀」</div>
+<svg viewBox="0 0 520 150" role="img" aria-label="年齡階梯">
+<g font-size="15" font-weight="700">
+<rect x="10" y="110" width="90" height="30" fill="#c2410c" opacity=".15"/><text x="22" y="131">30 而立</text>
+<rect x="110" y="86" width="90" height="54" fill="#c2410c" opacity=".22"/><text x="122" y="107">40 不惑</text>
+<rect x="210" y="62" width="90" height="78" fill="#c2410c" opacity=".29"/><text x="216" y="83">50 知天命</text>
+<rect x="310" y="38" width="95" height="102" fill="#c2410c" opacity=".36"/><text x="316" y="59">60 耳順</text><text x="316" y="80" font-size="13">（花甲）</text>
+<rect x="415" y="14" width="95" height="126" fill="#c2410c" opacity=".45"/><text x="421" y="35">70 古稀</text>
+</g></svg>
+</div>
+
+<div class="card"><h3>修辭與成語褒貶</h3>
+<p class="err">錯在：成語 7、修辭 5</p>
+<div class="kou">「說反話＝倒反；說過頭＝誇飾；把東西當人＝擬人」<small>成語先判斷是誇人還是罵人，再看句子</small></div>
+<table><tr><th>稱讚用</th><th>不能稱讚用</th></tr>
+<tr><td>博學多聞、出類拔萃、獨具慧眼、腳踏實地</td><td>班門弄斧（自謙或諷刺）、好高騖遠</td></tr></table>
+<ul><li>狀聲詞是聲音：嘩啦啦、轟隆隆；亮晶晶是樣子，不是聲音。</li><li>剎那讀 ㄔㄚˋ；倔強讀 ㄐㄩㄝˊ。</li></ul>
+</div>
+
+<div class="card"><h3>閱讀題三招</h3>
+<p class="err">錯在：漏看「不適合」、摘錄抄太多、跨文本只對一篇</p>
+<div class="kou">「圈不適合、只抄剛好、兩篇都要對」</div>
+<ul><li>摘錄原文：只抄剛好回答問題的句子（「苗則槁矣」）。</li><li>兩篇共同看法：選項要在兩篇文章裡都找得到。</li><li>表格題：選項的數字一個一個回表格核對。</li></ul>
+</div>
+</div>
+</section>
+
+<section id="eng" class="t-e">
+<h2><span class="dot"></span>英文</h2>
+<p class="sum">錯 20 題：閱讀理解 12、文法 8；約 3 成是細節被偷換。</p>
+<div class="grid">
+
+<div class="card"><h3>閱讀細節：圈「人、日、數」</h3>
+<p class="err">錯在：誰送什麼、星期幾、數字被偷換，表格下方的補充說明沒看</p>
+<div class="kou">「人名、日期、數字，選項裡每個都回原文找」</div>
+<svg viewBox="0 0 520 130" role="img" aria-label="細節換字陷阱">
+<g font-size="15">
+<rect x="6" y="14" width="160" height="70" rx="10" fill="#7c3aed" opacity=".14"/><text x="20" y="42" font-weight="900">人 Who</text><text x="20" y="68" font-size="13">Tom 送書、Lily 送筆</text>
+<rect x="180" y="14" width="160" height="70" rx="10" fill="#7c3aed" opacity=".22"/><text x="194" y="42" font-weight="900">日 When</text><text x="194" y="68" font-size="13">weekdays ≠ Sundays</text>
+<rect x="354" y="14" width="160" height="70" rx="10" fill="#7c3aed" opacity=".3"/><text x="368" y="42" font-weight="900">數 How many</text><text x="368" y="68" font-size="13">coaches ≠ players</text>
+<text x="6" y="116" font-size="14">時間推算寫在旁邊：3:40 ＋ 15 分 ＝ 3:55</text>
+</g></svg>
+</div>
+
+<div class="card"><h3>文法三個坑</h3>
+<p class="err">錯在：7-29、8-31、spend 用法</p>
+<div class="kou">「Let's not ＋ 原形；複數用 ones；花時間用 spend → spent」</div>
+<table>
+<tr><th>✗ 錯</th><th>✓ 對</th></tr>
+<tr><td>Let's don't go.</td><td>Let's <b>not</b> go.</td></tr>
+<tr><td>the red one（shoes）</td><td>the red <b>ones</b></td></tr>
+<tr><td>I cost two hours on it.</td><td>I <b>spent</b> two hours on it.</td></tr>
+</table>
+<ul><li>one／ones 代替「同類的另一個」；it／them 指「同一個」。</li><li>last night、yesterday → 用過去式。</li></ul>
+</div>
+</div>
+</section>
+
+<p class="note">資料來源：高僑模擬考 1～10 回的錯題紀錄。社會第 3、5 回和英文第 4 回沒有紀錄，這兩科的弱點可能被低估。錯誤型態是依當時的筆記判斷，不是老師的批改結果。</p>
+</main>
+<script>
+/* =====================================================================
+   site-home.js — 📚 小站 button + 全站集點 (site-wide points & badges)
+   Canonical copy: github.com/iam5980/kids-practice/template/site-home.js
+   Version: 2026-11-15（🌈 神話夥伴：24 種都變完全體後出現；首頁圖鑑可看進化過程、🎰 扭蛋機與卡冊）
+
+   HOW TO USE: paste this whole file in its own <script> block just before
+   </body> of EVERY page published to kids-practice (English and 中文部,
+   apps, oral pages, listening players). Nothing else is required.
+
+   1) "📚 小站" pill, bottom-left → in-page confirm card → site home.
+   2) SitePoints — points and badges per kid, shared by every app on the
+      site (same origin), shown on the home page 集點卡. Kept only on
+      this device (localStorage).
+        SitePoints.answer(ok)       after every judged answer
+        SitePoints.roundEnd(pct)    when a round / drill ends (0–100)
+        SitePoints.literacy(allOk)  when a 素養題組 is finished
+      Points: correct +10, streak bonus +2 per answer in a row (max +10).
+      No speed bonus — accuracy only.
+   3) Auto-hooks, so older apps need no code changes:
+        中文部 engine:  rtAns(right) → answer;  celebrate() → perfect round
+        AppCore apps:   AppCore calls SitePoints itself (app-core ≥ 2026-10-25)
+   ===================================================================== */
+(function () {
+  "use strict";
+  if (window.__siteHome) return;
+  window.__siteHome = true;
+  var LIVE = "https://iam5980.github.io/kids-practice/";
+  function homeUrl() {
+    var p = location.pathname, i = p.indexOf("/kids-practice/");
+    if (location.protocol.indexOf("http") === 0 && i >= 0) return location.origin + p.slice(0, i) + "/kids-practice/";
+    return LIVE;
+  }
+
+  /* ---------------- SitePoints ---------------- */
+  var BADGES = [
+    { id: "first",   icon: "🌱", name: "第一次答對" },
+    { id: "perfect", icon: "💯", name: "第一次滿分" },
+    { id: "streak10",icon: "🔥", name: "連對 10 題" },
+    { id: "streak20",icon: "🚀", name: "連對 20 題" },
+    { id: "days3",   icon: "📅", name: "連續練習 3 天" },
+    { id: "days7",   icon: "🗓️", name: "連續練習 7 天" },
+    { id: "lit1",    icon: "🧩", name: "第一組素養題全對" },
+    { id: "lit10",   icon: "🎓", name: "素養題達人（10 組全對）" },
+    { id: "p500",    icon: "⭐", name: "累積 500 點" },
+    { id: "p2000",   icon: "🌟", name: "累積 2000 點" },
+    { id: "p5000",   icon: "🏆", name: "累積 5000 點" }
+  ];
+  function kidFromPath() {
+    var m = location.pathname.match(/\/kids-practice\/([a-z0-9]+)\//i);
+    if (m && m[1] === "shadowing") { try { return localStorage.getItem("kp-shadow-kid") || null; } catch (e) { return null; } }
+    return m && m[1] !== "template" ? m[1] : null;
+  }
+  function today() { var d = new Date(); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+  function dayDiff(a, b) { return Math.round((new Date(b) - new Date(a)) / 864e5); }
+  function load(kid) {
+    var d = null;
+    try { d = JSON.parse(localStorage.getItem("kp-points-" + kid) || "null"); } catch (e) {}
+    return d || { points: 0, today: "", todayPts: 0, days: [], badges: {}, correct: 0, perfects: 0, lit: 0, bestStreak: 0 };
+  }
+  function save(kid, d) { try { localStorage.setItem("kp-points-" + kid, JSON.stringify(d)); } catch (e) {} }
+  function dayStreak(days) {
+    if (!days.length) return 0;
+    var s = days.slice().sort(), n = 1;
+    if (dayDiff(s[s.length - 1], today()) > 1) return 0;
+    for (var i = s.length - 1; i > 0; i--) { if (dayDiff(s[i - 1], s[i]) === 1) n++; else break; }
+    return n;
+  }
+  var kid = kidFromPath(), streak = 0;
+  function toast(html, big) {
+    var t = document.createElement("div");
+    t.className = "sp-toast" + (big ? " sp-big" : "");
+    t.innerHTML = html;
+    document.body.appendChild(t);
+    setTimeout(function () { t.classList.add("sp-out"); }, big ? 2200 : 900);
+    setTimeout(function () { t.remove(); }, big ? 2700 : 1300);
+  }
+  function grant(d, id) {
+    if (d.badges[id]) return;
+    d.badges[id] = today();
+    var b = BADGES.filter(function (x) { return x.id === id; })[0];
+    if (b) toast("🏅 獲得徽章<br><b>" + b.icon + " " + b.name + "</b>", true);
+  }
+  function update(fn) {
+    if (!kid) return;
+    var d = load(kid), t = today();
+    if (d.today !== t) { d.today = t; d.todayPts = 0; }
+    if (d.days.indexOf(t) < 0) { d.days.push(t); if (d.days.length > 60) d.days = d.days.slice(-60); }
+    fn(d);
+    var ds = dayStreak(d.days);
+    if (ds >= 3) grant(d, "days3");
+    if (ds >= 7) grant(d, "days7");
+    if (d.points >= 500) grant(d, "p500");
+    if (d.points >= 2000) grant(d, "p2000");
+    if (d.points >= 5000) grant(d, "p5000");
+    save(kid, d);
+  }
+  /* 🎯 每日任務 — reset every day; each one gives +50 once */
+  var QUESTS = [
+    { id: "c20", icon: "✅", name: "今天答對 20 題", goal: 20, f: "correct" },
+    { id: "r3",  icon: "🔁", name: "今天完成 3 輪練習", goal: 3, f: "rounds" },
+    { id: "s10", icon: "🔥", name: "今天連對 10 題", goal: 10, f: "streak" }
+  ];
+  function qDay(d) { var t = today(); if (!d.q || d.q.day !== t) d.q = { day: t, correct: 0, rounds: 0, streak: 0, done: {} }; }
+  function qCheck(d) {
+    QUESTS.forEach(function (q) {
+      if (!d.q.done[q.id] && d.q[q.f] >= q.goal) {
+        d.q.done[q.id] = 1; d.points += 50; d.todayPts += 50;
+        toast("🎯 每日任務完成<br><b>" + q.icon + " " + q.name + "</b><br>＋50 點", true);
+      }
+    });
+  }
+  var SitePoints = {
+    kid: kid,
+    badges: BADGES,
+    read: function (k) { var d = load(k || kid); d.dayStreak = dayStreak(d.days); return d; },
+    answer: function (ok) {
+      update(function (d) {
+        if (ok) {
+          streak++;
+          var pts = 10 + Math.min(10, (streak - 1) * 2);
+          d.points += pts; d.todayPts += pts; d.correct++;
+          qDay(d); d.q.correct++; d.q.streak = Math.max(d.q.streak, streak); qCheck(d);
+          d.bestStreak = Math.max(d.bestStreak, streak);
+          grant(d, "first");
+          if (streak >= 10) grant(d, "streak10");
+          if (streak >= 20) grant(d, "streak20");
+          toast("+" + pts);
+        } else { streak = 0; }
+      });
+    },
+    quests: QUESTS,
+    roundEnd: function (pct, noPerfect) {
+      update(function (d) { qDay(d); d.q.rounds++; qCheck(d); });
+      if (pct >= 100 && !noPerfect) update(function (d) { d.perfects++; grant(d, "perfect"); });
+    },
+    perfect: function () {
+      update(function (d) { d.perfects++; grant(d, "perfect"); });
+    },
+    literacy: function (allOk) {
+      if (allOk) update(function (d) { d.lit++; grant(d, "lit1"); if (d.lit >= 10) grant(d, "lit10"); });
+    }
+  };
+  window.SitePoints = SitePoints;
+
+  /* auto-hooks for the 中文部 engine (global rtAns / celebrate) */
+  if (typeof window.rtAns === "function" && !window.rtAns.__sp) {
+    var oAns = window.rtAns;
+    window.rtAns = function (right) { try { SitePoints.answer(!!right); } catch (e) {} return oAns.apply(this, arguments); };
+    window.rtAns.__sp = true;
+  }
+  if (typeof window.celebrate === "function" && !window.celebrate.__sp) {
+    var oCel = window.celebrate;
+    window.celebrate = function () { try { SitePoints.perfect(); } catch (e) {} return oCel.apply(this, arguments); };
+    window.celebrate.__sp = true;
+  }
+
+
+  /* ---------------- 🔊 念解釋（ReadAloud）----------------
+     Every explanation / definition box on every app gets a small 🔊 button:
+     .fb .ac-fb .ac-exp .ac-ans td.hint .qmean .why .explain .sp-read
+     Chinese text → zh-TW voice; otherwise en-US. */
+  var RA_SEL = ".fb,.ac-fb,.ac-exp,.ac-ans,td.hint,.qmean,.why,.explain,.sp-read";
+  function raText(el) {
+    var c = el.cloneNode(true);
+    Array.prototype.forEach.call(c.querySelectorAll("button,.sp-say,script,style"), function (x) { x.remove(); });
+    return (c.textContent || "").replace(/\s+/g, " ").trim();
+  }
+  function raSpeak(t) {
+    if (!window.speechSynthesis || !t) return;
+    try {
+      speechSynthesis.cancel();
+      var zh = /[一-鿿]/.test(t), u = new SpeechSynthesisUtterance(t);
+      u.lang = zh ? "zh-TW" : "en-US"; u.rate = zh ? 0.95 : 0.9;
+      var vs = speechSynthesis.getVoices() || [], pref = zh ? ["zh-TW", "zh_TW", "zh-HK", "zh"] : ["en-US", "en_US", "en-GB", "en"];
+      for (var i = 0; i < pref.length && !u.voice; i++) for (var j = 0; j < vs.length; j++) if (vs[j].lang && vs[j].lang.indexOf(pref[i]) === 0) { u.voice = vs[j]; break; }
+      speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+  function raScan() {
+    Array.prototype.forEach.call(document.querySelectorAll(RA_SEL), function (el) {
+      if (el.__ra || el.closest("#sh-card,.sd-card,.sp-toast") || (el.parentElement && el.parentElement.closest(RA_SEL))) return;
+      var t = raText(el); if (t.length < 2) return;
+      el.__ra = true;
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "sp-say"; b.textContent = "🔊";
+      b.title = b.ariaLabel = /[一-鿿]/.test(t) ? "念給我聽" : "Read aloud";
+      b.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); raSpeak(raText(el)); }, true);
+      el.appendChild(b);
+    });
+  }
+  var raPending = false;
+  function raQueue() { if (raPending) return; raPending = true; setTimeout(function () { raPending = false; raScan(); }, 120); }
+  if (window.MutationObserver && document.body) new MutationObserver(raQueue).observe(document.body, { childList: true, subtree: true });
+  raQueue();
+
+  /* ---------------- 🎒 抓寶（SiteDex）----------------
+     After a good round, an original creature may appear; tap 🫙 to catch it.
+     Collection per kid in localStorage "kp-dex-<kid>", shown on the home page 圖鑑.
+     SiteDex.maybe(pct, n)  — called from roundEnd and the 中文部 rtEnd hook.
+     All creatures are original designs (no existing characters). */
+  var DEX = [
+    ["ink","墨墨兔",0,"#94a3b8","bunny","drop"],["plane","紙飛鼠",0,"#cbd5e1","round","wing"],["eraser","橡皮熊",0,"#f9a8d4","round","none"],
+    ["chalk","粉筆鴨",0,"#fde68a","none","beak"],["mark","書籤狐",0,"#fb923c","cat","tail"],["pencil","鉛筆刺蝟",0,"#a16207","spike","pencil"],
+    ["ruler","尺子龜",0,"#86efac","none","shell"],["crayon","蠟筆貓",0,"#c4b5fd","cat","stripe"],["glue","膠水蝸牛",0,"#67e8f9","antenna","swirl"],
+    ["clip","迴紋小蛇",0,"#a3e635","none","clip"],["note","便利貼蛙",0,"#facc15","frog","note"],["compass","圓規鳥",0,"#7dd3fc","tuft","beak"],
+    ["zhuyin","注音龍寶",1,"#34d399","horn","wing"],["radical","部首獅",1,"#f59e0b","mane","none"],["idiom","成語鹿",1,"#d97706","antler","spots"],
+    ["rhet","修辭孔雀",1,"#2dd4bf","tuft","fan"],["spell","拼字海豚",1,"#38bdf8","none","fin"],["poem","詩詞鶴",1,"#e2e8f0","tuft","beak"],
+    ["abacus","算盤狸",1,"#b45309","round","stripe"],["globe","地球儀龜",1,"#60a5fa","none","globe"],
+    ["phoenix","金榜鳳凰",2,"#f97316","crest","fire"],["qilin","滿分麒麟",2,"#fbbf24","horn","star"],
+    ["dragon","智慧神龍",2,"#22d3ee","horn","wing"],["uni","星光獨角獸",2,"#f0abfc","uni","star"],
+    /* 🌈 神話 (tier 3): appear only after all 24 above are 完全體 ★★★, in 100-point rounds */
+    ["mwhale","星海鯨王",3,"#6366f1","none","fin"],["mfox","九尾書狐",3,"#f43f5e","cat","tail"],["mturtle","萬年墨龜",3,"#0f766e","none","shell"],
+    ["mowl","月光學者梟",3,"#a78bfa","tuft","beak"],["mlion","雷電獅王",3,"#eab308","mane","fire"],["mdragon","七彩天龍",3,"#ec4899","horn","wing"]
+  ];
+  var RARE = ["一般", "稀有", "傳說", "神話"], RARE_C = ["#64748b", "#2563eb", "#d97706", "#db2777"];
+  function dxBase() { return DEX.filter(function (x) { return x[2] < 3; }); }
+  function dxMythOpen(dx) { return dxBase().every(function (x) { return dx[x[0]] && dxStage(dx[x[0]].n) === 3; }); }
+  function dxStage(n) { return n >= 6 ? 3 : n >= 3 ? 2 : 1; }
+  function dxSvg(id, hidden, o) {
+    o = o || {};
+    var d = DEX.filter(function (x) { return x[0] === id; })[0]; if (!d) return "";
+    var c = hidden ? "#94a3b8" : d[3], k = hidden ? "#94a3b8" : "#1f2937", ear = d[4], f = d[5], s = "";
+    var lite = hidden ? "#cbd5e1" : "rgba(255,255,255,.55)";
+    if (ear === "bunny") s += '<ellipse cx="38" cy="22" rx="7" ry="18" fill="' + c + '"/><ellipse cx="62" cy="22" rx="7" ry="18" fill="' + c + '"/>';
+    if (ear === "cat" || ear === "mane") s += '<path d="M26 40 L32 16 L46 32Z M74 40 L68 16 L54 32Z" fill="' + c + '"/>';
+    if (ear === "round") s += '<circle cx="30" cy="30" r="10" fill="' + c + '"/><circle cx="70" cy="30" r="10" fill="' + c + '"/>';
+    if (ear === "horn" || ear === "uni") s += ear === "uni" ? '<path d="M50 4 L45 30 L55 30Z" fill="' + (hidden ? c : "#fde047") + '"/>' : '<path d="M36 30 L32 8 L44 26Z M64 30 L68 8 L56 26Z" fill="' + (hidden ? c : "#fde68a") + '"/>';
+    if (ear === "antler") s += '<path d="M36 30 L28 8 M30 16 L22 12 M64 30 L72 8 M70 16 L78 12" stroke="' + (hidden ? c : "#78350f") + '" stroke-width="4" stroke-linecap="round" fill="none"/>';
+    if (ear === "tuft" || ear === "crest") s += '<path d="M50 10 Q44 22 48 30 Q50 18 56 12 Q52 22 54 30" fill="' + c + '"/>';
+    if (ear === "antenna") s += '<path d="M42 30 L36 10 M58 30 L64 10" stroke="' + c + '" stroke-width="3"/><circle cx="36" cy="10" r="4" fill="' + c + '"/><circle cx="64" cy="10" r="4" fill="' + c + '"/>';
+    if (ear === "frog") s += '<circle cx="34" cy="30" r="11" fill="' + c + '"/><circle cx="66" cy="30" r="11" fill="' + c + '"/>';
+    if (ear === "spike") s += '<path d="M20 50 L14 34 L30 40 L28 22 L42 32 L50 16 L58 32 L72 22 L70 40 L86 34 L80 50Z" fill="' + (hidden ? c : "#78350f") + '"/>';
+    if (ear === "mane") s += '<circle cx="50" cy="56" r="38" fill="' + (hidden ? c : "#b45309") + '"/>';
+    if (f === "wing" || f === "fire") s += '<path d="M16 56 Q2 40 8 70 Q14 66 22 68Z M84 56 Q98 40 92 70 Q86 66 78 68Z" fill="' + (f === "fire" && !hidden ? "#ef4444" : c) + '" opacity=".85"/>';
+    if (f === "tail") s += '<path d="M78 74 Q100 60 92 40 Q86 62 70 70Z" fill="' + c + '"/><path d="M92 40 Q90 50 86 52" stroke="#fff" stroke-width="4"/>';
+    if (f === "fan") s += '<path d="M50 60 L10 30 L22 20 L40 14 L60 14 L78 20 L90 30Z" fill="' + (hidden ? c : "#0d9488") + '" opacity=".7"/>';
+    if (f === "shell" || f === "globe") s += '<ellipse cx="50" cy="70" rx="40" ry="20" fill="' + (hidden ? c : f === "globe" ? "#16a34a" : "#15803d") + '"/>';
+    if (f === "fin") s += '<path d="M50 30 L60 12 L64 34Z" fill="' + c + '"/>';
+    s += '<ellipse cx="50" cy="60" rx="30" ry="28" fill="' + c + '"/><ellipse cx="50" cy="70" rx="17" ry="13" fill="' + lite + '"/>';
+    if (!hidden) {
+      s += '<circle cx="40" cy="55" r="5" fill="' + k + '"/><circle cx="60" cy="55" r="5" fill="' + k + '"/><circle cx="41.5" cy="53.5" r="1.6" fill="#fff"/><circle cx="61.5" cy="53.5" r="1.6" fill="#fff"/>';
+      s += '<ellipse cx="33" cy="64" rx="4" ry="2.5" fill="#fb7185" opacity=".55"/><ellipse cx="67" cy="64" rx="4" ry="2.5" fill="#fb7185" opacity=".55"/>';
+      s += f === "beak" ? '<path d="M44 62 L56 62 L50 69Z" fill="#f59e0b"/>' : '<path d="M45 63 Q50 67 55 63" stroke="' + k + '" stroke-width="2" fill="none" stroke-linecap="round"/>';
+      if (f === "spots") s += '<circle cx="30" cy="70" r="3" fill="#fff"/><circle cx="70" cy="72" r="3" fill="#fff"/><circle cx="64" cy="80" r="2.5" fill="#fff"/>';
+      if (f === "stripe") s += '<path d="M24 52 L32 54 M22 60 L30 61 M76 52 L68 54 M78 60 L70 61" stroke="#1f2937" stroke-width="2" opacity=".5"/>';
+      if (f === "star") s += '<path d="M80 16 L83 24 L91 24 L85 29 L87 37 L80 32 L73 37 L75 29 L69 24 L77 24Z" fill="#fde047"/>';
+      if (f === "pencil") s += '<rect x="74" y="64" width="18" height="6" rx="1" fill="#facc15" transform="rotate(-30 83 67)"/>';
+      if (f === "note") s += '<rect x="70" y="66" width="16" height="16" fill="#fef08a" stroke="#ca8a04"/>';
+      if (f === "drop") s += '<path d="M80 60 Q86 70 80 74 Q74 70 80 60Z" fill="#1e293b"/>';
+      if (f === "swirl") s += '<path d="M74 78 a8 8 0 1 1 8 -8 a5 5 0 1 1 -5 5" stroke="#0e7490" stroke-width="3" fill="none"/>';
+      if (f === "clip") s += '<path d="M76 58 v18 a5 5 0 0 0 10 0 v-14 a3 3 0 0 0 -6 0 v12" stroke="#64748b" stroke-width="2.5" fill="none"/>';
+    }
+    var pre = "", post = "", st = hidden ? 1 : (o.stage || 1);
+    if (!hidden && d[2] === 3) pre += '<defs><linearGradient id="rb' + id + '" x1="0" x2="1"><stop offset="0" stop-color="#f87171"/><stop offset=".33" stop-color="#facc15"/><stop offset=".66" stop-color="#34d399"/><stop offset="1" stop-color="#818cf8"/></linearGradient></defs><circle cx="50" cy="56" r="46" fill="none" stroke="url(#rb' + id + ')" stroke-width="5" opacity=".9"/>';
+    if (!hidden && o.giant) pre += '<circle cx="50" cy="56" r="47" fill="none" stroke="#ef4444" stroke-width="4" stroke-dasharray="6 4" opacity=".8"/><circle cx="50" cy="56" r="44" fill="#fecaca" opacity=".35"/>';
+    if (st >= 3) pre += '<circle cx="50" cy="56" r="45" fill="#fde68a" opacity=".45"/>';
+    if (st >= 2) post += '<path d="M24 74 Q50 86 76 74 L74 80 Q50 92 26 80Z" fill="#ef4444"/><path d="M66 80 L72 94 L62 88Z" fill="#dc2626"/>';
+    if (st >= 3) post += '<path d="M36 26 L40 14 L46 22 L50 10 L54 22 L60 14 L64 26Z" fill="#facc15" stroke="#ca8a04" stroke-width="1.5"/>';
+    if (!hidden && o.shiny) post += '<path d="M12 20 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3Z M88 70 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2Z" fill="#fde047"/>';
+    var g = !hidden && o.shiny ? '<g style="filter:hue-rotate(150deg) saturate(1.5) brightness(1.05)">' + s + "</g>" : s;
+    var tr = !hidden && o.giant ? ' transform="translate(50 56) scale(1.12) translate(-50 -56)"' : "";
+    return '<svg viewBox="0 0 100 100" width="100%" height="100%" aria-hidden="true">' + pre + "<g" + tr + ">" + g + post + "</g></svg>";
+  }
+  function dxLoad(k) { try { return JSON.parse(localStorage.getItem("kp-dex-" + k) || "{}") || {}; } catch (e) { return {}; } }
+  function dxSave(k, d) { try { localStorage.setItem("kp-dex-" + k, JSON.stringify(d)); } catch (e) {} }
+  var dxLast = 0;
+  function dxPick(pct) {
+    var r = Math.random(), tier = 0;
+    if (pct >= 100 && kid && dxMythOpen(dxLoad(kid)) && r < 0.3) tier = 3;
+    else if (pct >= 100 && r < 0.12) tier = 2; else if (pct >= 90 && r < 0.4) tier = 1;
+    var pool = DEX.filter(function (x) { return x[2] === tier; });
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  function dxEncounter(pct) {
+    if (!kid || !document.body || document.querySelector(".sd-mask")) return;
+    var d = dxPick(pct), dx0 = dxLoad(kid), rec0 = dx0[d[0]], st0 = rec0 ? dxStage(rec0.n) : 1;
+    var shiny = Math.random() < 1 / 15, giant = pct >= 100 && st0 >= 2 && Math.random() < 0.3;
+    var tries = 3, rate = ([0.55, 0.35, 0.2, 0.15][d[2]] + (pct >= 100 ? 0.1 : 0)) * (giant ? 0.6 : 1);
+    var label = (shiny ? "✨閃亮 " : "") + d[1];
+    var m = document.createElement("div"); m.className = "sd-mask";
+    m.innerHTML = '<div class="sd-card" role="dialog" aria-modal="true"><p class="sd-tag" style="color:' + RARE_C[d[2]] + '">✨ ' + RARE[d[2]] + (giant ? "・🌟 巨大化" : "") + (shiny ? "・閃亮" : "") + '</p>' +
+      '<h3>' + (giant ? "巨大化的" : "野生的") + "「" + label + '」出現了！</h3><div class="sd-pic sd-bob">' + dxSvg(d[0], false, { stage: st0, shiny: shiny, giant: giant }) + '</div><p class="sd-msg">' + (giant ? "巨大化的夥伴比較難抓！" : "答得好！") + '快丟星星瓶抓住牠（還有 <b>3</b> 次機會）</p>' +
+      '<button type="button" class="sd-throw">🫙 丟星星瓶</button><button type="button" class="sd-skip">先不要</button></div>';
+    document.body.appendChild(m);
+    var pic = m.querySelector(".sd-pic"), msg = m.querySelector(".sd-msg"), th = m.querySelector(".sd-throw"), sk = m.querySelector(".sd-skip");
+    function close() { m.remove(); }
+    sk.onclick = close;
+    th.onclick = function () {
+      th.disabled = true; pic.className = "sd-pic sd-shake";
+      setTimeout(function () {
+        tries--;
+        if (Math.random() < rate) {
+          var dx = dxLoad(kid), r = dx[d[0]] || { n: 0, d: today(), s: 0, g: 0 }, first = !dx[d[0]], before = dxStage(r.n);
+          r.n++; if (shiny) r.s = (r.s || 0) + 1; if (giant) r.g = (r.g || 0) + 1; dx[d[0]] = r; dxSave(kid, dx);
+          var after = dxStage(r.n), have = dxBase().filter(function (x) { return dx[x[0]]; }).length, myth = d[2] === 3;
+          var evo = after > before;
+          pic.innerHTML = dxSvg(d[0], false, { stage: after, shiny: shiny, giant: giant });
+          pic.className = "sd-pic sd-got";
+          msg.innerHTML = "🎉 抓到了！" + (first ? "新夥伴加入圖鑑" : "又抓到一隻（第 " + r.n + " 隻）") +
+            (evo ? "<br>✨ <b>" + d[1] + " 進化了！</b>現在是 " + "★★★".slice(0, after) + (after === 3 ? "（完全體）" : "") : (after < 3 ? "<br>再抓 " + ((after === 1 ? 3 : 6) - r.n) + " 隻就會進化" : "")) +
+            (shiny ? "<br>✨ 閃亮版收集 +1" : "") + (giant ? "<br>🌟 巨大化收集 +1" : "") +
+            (myth ? "<br>🌈 神話夥伴收集 <b>" + DEX.filter(function (x) { return x[2] === 3 && dx[x[0]]; }).length + " / 6</b>" : "<br>圖鑑 <b>" + have + " / " + dxBase().length + "</b>") + "（回小站首頁可以看進化過程）";
+          th.remove(); sk.textContent = "好耶，繼續練習";
+        } else if (tries > 0) {
+          pic.className = "sd-pic sd-bob"; th.disabled = false;
+          msg.innerHTML = "差一點！牠跳出來了，再試一次（還有 <b>" + tries + "</b> 次機會）";
+        } else {
+          pic.className = "sd-pic sd-run"; th.remove(); sk.textContent = "下次再來";
+          msg.innerHTML = "牠跑走了… 下一輪答得好，還有機會再遇到！";
+        }
+      }, 900);
+    };
+  }
+  var SiteDex = {
+    list: DEX, rarity: RARE, rareColor: RARE_C, svg: dxSvg, stage: dxStage, read: function (k) { return dxLoad(k || kid); },
+    base: dxBase, mythOpen: function (k) { return dxMythOpen(dxLoad(k || kid)); },
+    maybe: function (pct, n) {
+      if (!kid || n === 0 || pct < 70) return;
+      var now = Date.now(); if (now - dxLast < 5000) return; dxLast = now;
+      var p = pct >= 100 ? 1 : pct >= 90 ? 0.6 : 0.35;
+      if (Math.random() < p) setTimeout(function () { dxEncounter(pct); }, 1800);
+    }
+  };
+  window.SiteDex = SiteDex;
+  var oRE = SitePoints.roundEnd;
+  SitePoints.roundEnd = function (pct, noPerfect, n) { oRE(pct, noPerfect); try { SiteDex.maybe(pct, n); } catch (e) {} };
+  if (typeof window.rtEnd === "function" && !window.rtEnd.__sd) {
+    var oEnd = window.rtEnd;
+    window.rtEnd = function () {
+      try { var r = window.rt || (typeof rt !== "undefined" ? rt : null); if (r && !r.done && r.n >= 1) SitePoints.roundEnd(Math.round(r.ok / r.n * 100), true, r.n >= 5 ? r.n : 0); } catch (e) {}
+      return oEnd.apply(this, arguments);
+    };
+    window.rtEnd.__sd = true;
+  }
+
+  /* ---------------- styles ---------------- */
+  var css = document.createElement("style");
+  css.textContent =
+    "#sh-btn{position:fixed;left:max(12px,env(safe-area-inset-left));bottom:max(12px,env(safe-area-inset-bottom));z-index:9000;" +
+    "height:44px;padding:0 14px 0 10px;border-radius:999px;border:2px solid rgba(255,255,255,.9);background:#334155;color:#fff;font:700 16px/1 -apple-system,'PingFang TC','Noto Sans TC',sans-serif;" +
+    "box-shadow:0 4px 14px rgba(0,0,0,.28);cursor:pointer;opacity:.9;touch-action:manipulation;white-space:nowrap}" +
+    "#sh-btn:active{transform:scale(.94)}" +
+    "#sh-mask{position:fixed;inset:0;z-index:9001;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px}" +
+    "#sh-card{background:#fff;color:#0f172a;border-radius:18px;padding:20px 18px;max-width:340px;width:100%;text-align:center;" +
+    "font:17px/1.5 -apple-system,'PingFang TC','Noto Sans TC',sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.3)}" +
+    "#sh-card h3{margin:0 0 6px;font-size:20px}#sh-card p{margin:0 0 16px;color:#475569;font-size:15px}" +
+    "#sh-card button{font:inherit;min-height:48px;border-radius:12px;border:0;padding:10px 16px;margin:4px;cursor:pointer}" +
+    "#sh-go{background:#0284c7;color:#fff;font-weight:700}#sh-stay{background:#e2e8f0;color:#0f172a}" +
+    "@media (prefers-color-scheme:dark){#sh-card{background:#1e293b;color:#e2e8f0}#sh-card p{color:#94a3b8}#sh-stay{background:#334155;color:#e2e8f0}}" +
+    ".sp-say{font:14px/1 sans-serif;border:1px solid rgba(100,116,139,.45);background:transparent;border-radius:999px;padding:3px 7px;margin-left:6px;cursor:pointer;vertical-align:middle;color:inherit}" +
+    ".sd-mask{position:fixed;inset:0;z-index:9003;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px}" +
+    ".sd-card{background:#fff;color:#0f172a;border-radius:20px;padding:18px;max-width:340px;width:100%;text-align:center;font:16px/1.5 -apple-system,'PingFang TC','Noto Sans TC',sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.35)}" +
+    ".sd-card h3{margin:0 0 4px;font-size:20px}.sd-tag{margin:0;font-weight:800}.sd-msg{color:#475569;margin:6px 0 12px}" +
+    ".sd-pic{width:150px;height:150px;margin:6px auto}.sd-bob{animation:sdb 1.1s ease-in-out infinite}.sd-shake{animation:sds .3s linear 3}.sd-got{animation:sdg .6s ease-out}.sd-run{animation:sdr .8s ease-in forwards}" +
+    "@keyframes sdb{50%{transform:translateY(-10px)}}@keyframes sds{25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}@keyframes sdg{0%{transform:scale(.6)}70%{transform:scale(1.15)}}@keyframes sdr{to{transform:translateX(220px);opacity:0}}" +
+    ".sd-card button{font:inherit;min-height:48px;border-radius:12px;border:0;padding:10px 16px;margin:4px;cursor:pointer}.sd-throw{background:#7c3aed;color:#fff;font-weight:800}.sd-skip{background:#e2e8f0;color:#0f172a}" +
+    "@media (prefers-color-scheme:dark){.sd-card{background:#1e293b;color:#e2e8f0}.sd-msg{color:#94a3b8}.sd-skip{background:#334155;color:#e2e8f0}}" +
+    "body{padding-bottom:max(76px,calc(64px + env(safe-area-inset-bottom)))!important}" +
+    ".sp-toast{position:fixed;left:max(84px,calc(72px + env(safe-area-inset-left)));bottom:max(18px,calc(6px + env(safe-area-inset-bottom)));z-index:9002;" +
+    "background:#f59e0b;color:#1f2937;font:800 16px/1.3 -apple-system,'PingFang TC',sans-serif;padding:8px 12px;border-radius:999px;" +
+    "box-shadow:0 4px 12px rgba(0,0,0,.25);pointer-events:none;transition:opacity .4s,transform .4s}" +
+    ".sp-toast.sp-big{left:50%;bottom:auto;top:30%;transform:translateX(-50%);text-align:center;font-size:18px;padding:14px 22px;border-radius:18px}" +
+    ".sp-toast.sp-out{opacity:0;transform:translateY(-14px)}.sp-toast.sp-big.sp-out{transform:translate(-50%,-14px)}";
+  document.head.appendChild(css);
+
+  function qHtml() {
+    var d = load(kid); qDay(d);
+    return '<p style="text-align:left;font-size:14px;margin:-8px 0 14px">🎯 今天的任務：<br>' + QUESTS.map(function (q) {
+      var v = Math.min(q.goal, d.q[q.f] || 0); return (d.q.done[q.id] ? "✅ " : "⬜ ") + q.name + "（" + v + "/" + q.goal + "）";
+    }).join("<br>") + "</p>";
+  }
+  /* ---------------- 📚 小站 button ---------------- */
+  if (!document.body || window.__siteHomeNoBtn) return;
+  var b = document.createElement("button");
+  b.id = "sh-btn"; b.type = "button";
+  b.setAttribute("aria-label", "回到練習小站"); b.title = "回到練習小站";
+  b.textContent = "📚 小站";
+  b.addEventListener("click", function () {
+    if (document.getElementById("sh-mask")) return;
+    var m = document.createElement("div"); m.id = "sh-mask";
+    var pts = kid ? "<p>目前集點：⭐ " + load(kid).points + " 點・🎒 圖鑑 " + dxBase().filter(function (x) { return dxLoad(kid)[x[0]]; }).length + " / " + dxBase().length + "</p><p>🎒 圖鑑的進化過程、🎰 扭蛋機和卡冊都在小站首頁。</p>" + qHtml() : "";
+    m.innerHTML = '<div id="sh-card" role="dialog" aria-modal="true"><h3>📚 回到練習小站？</h3>' +
+      '<p>這一輪的作答不會保留（點數和最高分紀錄會留著）。</p>' + pts +
+      '<button id="sh-go" type="button">回到練習小站</button><button id="sh-stay" type="button">繼續練習</button></div>';
+    document.body.appendChild(m);
+    function close() { m.remove(); }
+    m.addEventListener("click", function (e) { if (e.target === m) close(); });
+    document.getElementById("sh-stay").addEventListener("click", close);
+    document.getElementById("sh-go").addEventListener("click", function () {
+      try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
+      location.href = homeUrl();
+    });
+    document.getElementById("sh-go").focus();
+  });
+  document.body.appendChild(b);
+})();
+
+</script>
+</body>
+</html>
