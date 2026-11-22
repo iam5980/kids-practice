@@ -97,7 +97,7 @@ var CATALOG={
     {s:"chinese",t:"1151-mid"}
   ],
   hw:[
-    {s:"logic",t:"gaoqiao",extra:[["review.html","🔁 考前錯題重做"],["memory.html","🧠 錯題記憶圖卡"]]},
+    {s:"logic",t:"gaoqiao",extra:[["review.html","五科・81 題類題＋錯題本","🔁 考前錯題重做"],["memory.html","五科・口訣與圖解","📝 錯題記憶圖卡"]]},
     {s:"math",t:"1151-final"},
     {s:"zh-social",t:"1151-final"},
     {s:"zh-science",t:"1151-final"},
@@ -123,7 +123,7 @@ function cards(kid,list){
   list.forEach(function(i){
     var base=kid+"/"+i.s+"/"+i.t+"/";
     h+='<a class="card" href="'+base+'"><div class="t">'+SUBJ[i.s]+'</div><div class="m">練習 App</div></a>';
-    (i.extra||[]).forEach(function(e){h+='<a class="card" href="'+base+e[0]+'"><div class="t">'+SUBJ[i.s]+'</div><div class="m">'+e[1]+'</div></a>'});
+    (i.extra||[]).forEach(function(e){h+='<a class="card" href="'+base+e[0]+'"><div class="t">'+(e[2]||SUBJ[i.s])+'</div><div class="m">'+e[1]+'</div></a>'});
   });
   return h+'</div>';
 }
