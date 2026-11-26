@@ -40,6 +40,7 @@ nav.tabs{display:grid;grid-template-columns:repeat(11,1fr);gap:4px;background:va
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
 nav.tabs button{border:0;background:transparent;border-radius:9px;padding:8px 0;font-size:clamp(12px,3.4vw,15px);font-weight:500;white-space:nowrap}
 @media (max-width:760px){nav.tabs{grid-template-columns:repeat(6,1fr)}}
+.srcTag{display:inline-block;font-size:12px;line-height:1.5;color:var(--sage-deep);background:var(--sage);border-radius:999px;padding:1px 9px;margin:0 0 6px}
 nav.tabs button[aria-selected="true"]{background:var(--card);font-weight:700;color:var(--sage-deep);box-shadow:0 1px 2px rgba(0,0,0,.12)}
 section{display:flex;flex-direction:column;gap:12px}
 .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
@@ -228,7 +229,7 @@ details.passage summary{cursor:pointer;font-weight:700;padding:4px 0}
 <div class="wrap">
   <header class="hdr">
     <div><h1>四上國語期末練功房</h1>
-    <p>翰林四上第七課～第十二課・87 個生字＋多音字＋形近字＋改錯字＋成語＋語詞＋修辭＋課文理解</p></div>
+    <p>翰林四上第七課～第十二課・87 個生字＋多音字＋形近字＋改錯字＋成語＋語詞＋修辭＋課文理解＋考卷題型（部首造詞、短語、造句、閱讀題組）</p></div>
     <button class="chip" id="sfxBtn" aria-pressed="true">音效：開</button>
   </header>
 
@@ -238,6 +239,7 @@ details.passage summary{cursor:pointer;font-weight:700;padding:4px 0}
     <button role="tab" data-tab="cards" aria-selected="true">生字卡</button>
     <button role="tab" data-tab="write" aria-selected="false">寫寫看</button>
     <button role="tab" data-tab="rad" aria-selected="false">部首</button>
+    <button role="tab" data-tab="radw" aria-selected="false">部首造詞</button>
     <button role="tab" data-tab="strk" aria-selected="false">筆畫</button>
     <button role="tab" data-tab="zy" aria-selected="false">注音</button>
     <button role="tab" data-tab="poly" aria-selected="false">多音字</button>
@@ -248,6 +250,10 @@ details.passage summary{cursor:pointer;font-weight:700;padding:4px 0}
     <button role="tab" data-tab="fill" aria-selected="false">選詞填空</button>
     <button role="tab" data-tab="rhe" aria-selected="false">修辭</button>
     <button role="tab" data-tab="txt" aria-selected="false">課文理解</button>
+    <button role="tab" data-tab="sy" aria-selected="false">成語情境</button>
+    <button role="tab" data-tab="phr" aria-selected="false">短語練習</button>
+    <button role="tab" data-tab="sen" aria-selected="false">造句</button>
+    <button role="tab" data-tab="read" aria-selected="false">閱讀題組</button>
     <button role="tab" data-tab="mem" aria-selected="false">翻牌</button>
     <button role="tab" data-tab="mock" aria-selected="false">模擬考</button>
     <button role="tab" data-tab="wrong" aria-selected="false">錯題</button>
@@ -284,6 +290,11 @@ details.passage summary{cursor:pointer;font-weight:700;padding:4px 0}
   <section id="tab-fill" hidden><div id="fillArea"></div></section>
   <section id="tab-rhe" hidden><div id="rheArea"></div></section>
   <section id="tab-txt" hidden><div id="txtArea"></div></section>
+  <section id="tab-radw" hidden><div id="radwArea"></div></section>
+  <section id="tab-sy" hidden><div id="syArea"></div></section>
+  <section id="tab-phr" hidden><div id="phrArea"></div></section>
+  <section id="tab-sen" hidden><div id="senArea"></div></section>
+  <section id="tab-read" hidden><div id="readArea"></div></section>
   <section id="tab-mem" hidden><div id="memArea"></div></section>
   <section id="tab-mock" hidden><div id="mockArea"></div></section>
 
@@ -1179,52 +1190,53 @@ const RP=t=>t.trim().split('\n').map(x=>`<p>${x.trim()}</p>`).join('');
 const READ=[];
 const EXAM=[{"q": "下面哪一組語詞的意思最相近？", "opts": ["頓時／停頓", "模樣／楷模", "停止／終止", "大俠／俠盜"], "a": 2, "src": "期末考卷"}, {"q": "下面哪一個成語，意思和「異口同聲」最相近？", "opts": ["眾說紛紜", "眾口一詞", "各執己見", "議論紛紛"], "a": 1, "src": "期末考卷"}, {"q": "下面哪一個情境，最適合用「懶散」來形容？", "opts": ["哥哥每天早起跑步", "姐姐專心的練習鋼琴", "爸爸假日忙著整理花園", "妹妹寫功課時偷懶不專心，只想玩樂"], "a": 3, "src": "期末考卷"}, {"q": "下面哪一組語詞的意思最相近？", "opts": ["生存／死亡", "汙染／清澈", "成千上萬／不計其數", "繽紛／單調"], "a": 2, "src": "期末考卷"}, {"q": "下面哪一組語詞的意思相反？", "opts": ["打擊／鼓勵", "依照／按照", "烤焦／燒焦", "徵人／找人"], "a": 0, "src": "期末考卷"}, {"q": "下面哪一個「　」中的字，讀音和「嘉」相同？", "opts": ["「假」期", "「加」減", "「甲」蟲", "「價」錢"], "a": 1, "src": "期末考卷"}, {"q": "露營因為下大雨取消了，大家都覺得很（　）。", "opts": ["興奮", "失望", "驕傲", "輕鬆"], "a": 1, "src": "期末考卷"}, {"q": "「停止」的意思是什麼？", "opts": ["停下來休息一會兒再繼續", "不繼續、不進行", "停在原地等人", "停車的地方"], "a": 1, "src": "期末考卷"}, {"q": "「控制不住、不由自主」是下面哪一個語詞的意思？", "opts": ["不禁", "禁忌", "禁止", "嚴禁"], "a": 0, "src": "期末考卷"}, {"q": "〈寧靜的音樂會〉中「魚的歌聲，唱出我的心聲」，作者的心聲是什麼？", "opts": ["以友愛的方式來對待海底生物", "想要學會魚的歌聲", "希望成為歌手", "想去海邊旅行"], "a": 0, "src": "課文"}, {"q": "〈美食島〉中，被奇怪的海藻纏住的是哪些動物？", "opts": ["鯊魚、章魚、螃蟹", "虎鯨、燈籠魚、海星", "海豚、海龜、海鳥", "珊瑚、海藻、海葵"], "a": 2, "src": "課文", "why": "第五段：海豚、海龜、海鳥被奇怪的海藻纏住了身體。"}, {"q": "〈海中的熱帶雨林〉中，珊瑚礁吸引許多海洋生物的原因是什麼？", "opts": ["有足夠的食物", "沒有縫隙可以藏身", "海水特別冰冷", "只有一種顏色"], "a": 0, "src": "課文"}, {"q": "〈王子折箭〉中，國王說自己「撐不到明年春天」，意思是什麼？", "opts": ["明年春天要出國", "不喜歡春天", "可能在明年春天前就離開人世", "春天時身體會變好"], "a": 2, "src": "課文"}, {"q": "〈松鼠先生的麵包〉中，松鼠先生覺得「鹹鹹甜甜，味道剛剛好」，是在做什麼的時候？", "opts": ["揉麵團的時候", "貼徵人啟事的時候", "試吃剛烤好的麵包", "把麵包送給朋友"], "a": 2, "src": "課文"}, {"q": "下面哪一個做法，最符合「江湖救急，義所當為」？", "opts": ["看到同學跌倒，假裝沒看見", "把自己的玩具藏起來", "只幫好朋友的忙", "上前詢問外國旅客是否需要幫忙"], "a": 3, "src": "課文"}, {"q": "〈王子折箭〉中的王子，從名字可以看出他們有什麼特點？", "opts": ["都很懶散", "各有長處", "都很愛吵架", "都很會射箭"], "a": 1, "src": "課文"}, {"q": "關於〈海中的熱帶雨林〉，下面哪一個敘述是錯誤的？", "opts": ["珊瑚礁的面積並不大", "珊瑚像樹枝，所以是植物", "海水溫度過高會讓珊瑚白化", "珊瑚礁和許多動植物的生存有關"], "a": 1, "src": "課文", "why": "珊瑚是動物，不是植物。"}, {"q": "〈美食島〉中，動物們天天到美食島做什麼？", "opts": ["找朋友玩", "曬太陽", "躲避鯊魚", "吃浮游生物吃到飽"], "a": 3, "src": "課文"}, {"q": "〈寧靜的音樂會〉中，作者聽見的心聲在哪裡？", "opts": ["熱鬧的海灘", "學校的禮堂", "城市的廣場", "寧靜優美的深海"], "a": 3, "src": "課文"}, {"q": "〈平凡的大俠〉中，大姐姐「脫口而出」說了一句話，「脫口而出」是什麼意思？", "opts": ["小聲的說", "不加思索，隨口說出", "想了很久才說", "大聲的喊叫"], "a": 1, "src": "課文"}, {"q": "〈海中的熱帶雨林〉中，造成「珊瑚白化」的原因是什麼？", "opts": ["海水溫度過高", "海水溫度太低", "魚兒太多", "海藻太少"], "a": 0, "src": "課文"}, {"q": "關於〈美食島〉，下面哪一個敘述正確？", "opts": ["美食島上長滿了水果", "動物們都不喜歡美食島", "美食島很快就消失了", "有一些動物被特別的海藻纏住了"], "a": 3, "src": "課文"}, {"q": "〈寧靜的音樂會〉中，作者如何知道魚兒的心聲？", "opts": ["聽魚兒說話", "看魚兒寫的信", "讀魚兒的嘴脣", "請翻譯幫忙"], "a": 2, "src": "課文"}, {"q": "松鼠先生做麵包的過程中，心情有什麼轉變？", "opts": ["從悲傷難過轉為自暴自棄", "從信心滿滿轉為灰心不已", "從驕傲自大轉為謙虛有禮", "從充滿自信轉為得意洋洋"], "a": 1, "src": "課文", "why": "松鼠先生從信心滿滿，變得灰心不已。"}, {"q": "松鼠先生最後能成功做出好吃的麵包，下面哪一個「不是」原因？", "opts": ["不怕失敗", "願意不斷嘗試", "依照眼淚的鹹度調整", "擁有好的食譜"], "a": 3, "src": "課文"}];
 /* ===== 模擬考（仿翰林期末考卷題型，交卷後才公布答案）===== */
-const MOCK_SECS=[['一、看注音選國字',6],['二、選出正確的注音',6],['三、改錯字',6],['四、部首',4],['五、選出正確的語詞',6],['六、選擇題',10],['七、成語運用',6],['八、課文文意',6]];
+const MOCK_SECS=[['一、看注音寫國字',6],['二、寫出注音',2],['三、改錯字',6],['四、寫出部首並造詞',4],['五、選擇題',12],['六、素養養成題',5],['七、選詞填寫',4],['八、短語練習',2],['九、造句',3],['十、閱讀素養題',6]];
 let mk=null;
 function mkUniq(a){return a.filter((v,i)=>a.indexOf(v)===i)}
 function mkBuild(){
   const G=st.groups,inG=g=>g===0||G.has(g);
   const qs=[];const take=(arr,n)=>shuffle(arr).slice(0,n);
   const ws=W.filter(x=>inG(x.g));
-  // 一 看注音選國字
   take(ws,6).forEach(x=>{
     const fam=FAM.flatMap(f=>f.m.some(m=>m.c===x.c)?f.m.map(m=>m.c):[]).filter(c=>c!==x.c);
     const oth=mkUniq([...shuffle(fam),...shuffle(W.map(y=>y.c).filter(c=>c!==x.c))]).slice(0,3);
     const w=x.w.replace('○',`<span class="zy" style="border:2px solid var(--line);border-radius:6px;padding:0 4px">${x.z}</span>`);
     qs.push({sec:0,g:x.g,q:`<p class="kai sentq">${w}</p><p class="qask">框框裡的注音是哪一個字？</p>`,opts:shuffle([x.c,...oth]),a:x.c,why:`${x.w.replace('○',x.c)}（${x.c}：${x.z}）`,big:true});
   });
-  // 二 選注音
-  take(ws,6).forEach(x=>qs.push({sec:1,g:x.g,q:`<p class="kai sentq">${x.w.replace('○','「'+x.c+'」')}</p><p class="qask">「${x.c}」的注音是哪一個？</p>`,opts:zyOpts(x.z),a:x.z,why:`「${x.c}」念 ${x.z}`,zy:true}));
-  // 三 改錯字
+  take(ws,2).forEach(x=>qs.push({sec:1,g:x.g,q:`<p class="kai sentq">${x.w.replace('○','「'+x.c+'」')}</p><p class="qask">「${x.c}」的注音是哪一個？</p>`,opts:zyOpts(x.z),a:x.z,why:`「${x.c}」念 ${x.z}`,zy:true}));
   take(ERR.filter(e=>e.fx.length===1&&e.s.length>6&&e.g.some(inG)),6).forEach(e=>{
     const [w,c]=e.fx[0];
     const oth=shuffle(mkUniq([...e.s].filter(ch=>/[一-鿿]/.test(ch)&&ch!==w))).slice(0,3);
     qs.push({sec:2,g:e.g[0],q:`<p class="kai sentq">${esc(e.s)}</p><p class="qask">這句話裡哪一個字寫錯了？</p>`,opts:shuffle([w,...oth]),a:w,why:`「${w}」應改為「${c}」`,big:true});
   });
-  // 四 部首
-  take(ws,4).forEach(x=>qs.push({sec:3,g:x.g,q:`<div class="qword kai">${x.c}</div><p class="qask">「${x.c}」的部首是哪一個？</p>`,opts:radOpts(x),a:x.r,why:`「${x.c}」是「${x.r}」部${VAR[x.c]?`（寫成「${VAR[x.c]}」）`:''}`,big:true}));
-  // 五 選詞
-  const wf=MD.flatMap(L=>(L.word_fill||[]).filter(()=>inG(L.lesson)).map(x=>({...x,g:L.lesson})));
-  take(wf,6).forEach(x=>{const opts=x.opts.length<=4?shuffle(x.opts):shuffle([x.a,...shuffle(x.opts.filter(o=>o!==x.a)).slice(0,3)]);
-    qs.push({sec:4,g:x.g,q:`<p class="kai sentq">${blank(x.s)}</p><p class="qask">選出最適合的語詞：</p>`,opts,a:x.a,why:`答案是「${esc(x.a)}」`})});
-  // 六 選擇題：期末考卷題＋題庫字音字形、語詞＋修辭
+  const fromMQ=(key,n,sec)=>take(mqItems(key).filter(x=>inG(x.g)),n).forEach(x=>qs.push({sec,g:x.g,q:x.q,opts:x.opts,a:x.a,why:x.why,long:x.long}));
+  fromMQ('radw',4,3);
   const ex=EXAM.filter(x=>x.src!=='課文').map(x=>({...x,g:0}));
   const mc=MD.flatMap(L=>inG(L.lesson)?(L.mcq||[]).filter(x=>x.src!=='課文').map(x=>({...x,g:L.lesson})):[]);
   const rh=MD.flatMap(L=>inG(L.lesson)?(L.rhetoric||[]).map(x=>({q:'下面的句子用了哪一種修辭？　'+x.s,opts:x.opts,a:x.opts.indexOf(x.a),g:L.lesson})):[]);
-  mkUniq([...take(ex,4),...take(rh,2),...take(mc,12)]).slice(0,10).forEach(x=>qs.push({sec:5,g:x.g,q:`<p class="qask" style="text-align:left">${esc(x.q)}</p>`,opts:x.opts.map((o,k)=>NUMO[k]+' '+o),a:NUMO[x.a]+' '+x.opts[x.a],why:x.why?esc(x.why):'',long:true,keep:true}));
-  // 七 成語
-  const id=IDM.filter(s=>s.g.some(inG)).flatMap(s=>s.q.map(([t,a])=>({t,a,ws:s.ws.split(' '),g:s.g[0]})));
-  take(id,6).forEach(x=>qs.push({sec:6,g:x.g,q:`<p class="kai sentq">${blank(x.t)}</p><p class="qask">選出最適合的成語：</p>`,opts:shuffle([x.a,...shuffle(x.ws.filter(w=>w!==x.a)).slice(0,3)]),a:x.a,why:`${x.a}：${IDM_MEAN[x.a]||''}`}));
-  // 八 課文
   const kt=[...EXAM.filter(x=>x.src==='課文').map(x=>({...x,g:0})),...MD.flatMap(L=>inG(L.lesson)?(L.mcq||[]).filter(x=>x.src==='課文').map(x=>({...x,g:L.lesson})):[])];
-  const tf=MD.flatMap(L=>inG(L.lesson)?(L.tf||[]).map(x=>({...x,g:L.lesson})):[]);
-  take(kt,4).forEach(x=>qs.push({sec:7,g:x.g,q:`<p class="qask" style="text-align:left">${esc(x.q)}</p>`,opts:x.opts.map((o,k)=>NUMO[k]+' '+o),a:NUMO[x.a]+' '+x.opts[x.a],why:x.why?esc(x.why):'',long:true}));
-  take(tf,2).forEach(x=>qs.push({sec:7,g:x.g,q:`<p class="qask">這句話對不對？</p><p class="kai sentq">${esc(x.s)}</p>`,opts:['○ 對','✗ 不對'],a:x.a?'○ 對':'✗ 不對',why:x.why?esc(x.why):''}));
+  mkUniq([...take(ex,3),...take(rh,1),...take(mc,8)]).slice(0,7).concat(take(kt,5)).forEach(x=>qs.push({sec:4,g:x.g,q:`<p class="qask" style="text-align:left">${esc(x.q)}</p>`,opts:x.opts.map((o,k)=>NUMO[k]+' '+o),a:NUMO[x.a]+' '+x.opts[x.a],why:x.why?esc(x.why):'',long:true,keep:true}));
+  const sy=mqItems('sy').filter(x=>inG(x.g));
+  const id=IDM.filter(s=>s.g.some(inG)).flatMap(s=>s.q.map(([t,a])=>({t,a,ws:s.ws.split(' '),g:s.g[0]})));
+  const nSy=Math.min(3,sy.length);
+  take(sy,nSy).forEach(x=>qs.push({sec:5,g:x.g,q:x.q,opts:x.opts,a:x.a,why:x.why,long:true}));
+  take(id,5-nSy).forEach(x=>qs.push({sec:5,g:x.g,q:`<p class="kai sentq">${blank(x.t)}</p><p class="qask">選出最適合的成語：</p>`,opts:shuffle([x.a,...shuffle(x.ws.filter(w=>w!==x.a)).slice(0,3)]),a:x.a,why:`${x.a}：${IDM_MEAN[x.a]||''}`}));
+  const wf=MD.flatMap(L=>(L.word_fill||[]).filter(()=>inG(L.lesson)).map(x=>({...x,g:L.lesson})));
+  take(wf,4).forEach(x=>{const opts=x.opts.length<=4?shuffle(x.opts):shuffle([x.a,...shuffle(x.opts.filter(o=>o!==x.a)).slice(0,3)]);
+    qs.push({sec:6,g:x.g,q:`<p class="kai sentq">${blank(x.s)}</p><p class="qask">選出最適合的語詞：</p>`,opts,a:x.a,why:`答案是「${esc(x.a)}」`})});
+  fromMQ('phr',2,7);
+  fromMQ('sen',3,8);
+  const ps=shuffle(READ.map((p,pi)=>({p,pi})).filter(o=>o.p.paper));
+  let left=6;
+  for(const o of ps){if(left<=0)break;
+    const n=Math.min(left,o.p.qs.length);
+    o.p.qs.slice(0,n).forEach((x,i)=>qs.push({sec:9,g:0,ph:i===0?`<details class="passage" open><summary>📖 ${esc(o.p.t)}<span class="hint">　${esc(o.p.by||'')}</span></summary><div class="ptext">${o.p.body}</div></details>`:'',q:`<p class="qask" style="text-align:left">${esc(x.q)}</p>`,opts:x.opts.map((t,k)=>NUMO[k]+' '+t),a:NUMO[x.a]+' '+x.opts[x.a],why:esc(x.why||''),long:true}));
+    left-=n;}
   return qs.map(dealQ);
 }
 function mockIntro(){
   const best=load('au4cf-mock-best',null);
-  $('#mockArea').innerHTML=`<div class="qcard"><p class="qask"><b>模擬考</b>：照學校期末考卷的題型出題（看注音寫字、改錯字、部首、選詞、選擇題、成語、課文文意），共 50 題、每題 2 分。</p>
+  $('#mockArea').innerHTML=`<div class="qcard"><p class="qask"><b>模擬考</b>：照學校期末考卷的題型和順序出題（國字注音、改錯字、部首造詞、選擇題、素養養成題、選詞填寫、短語練習、造句、閱讀素養題），共 50 題、每題 2 分。</p>
    <p class="hint">作答時不會顯示對錯，全部寫完按「交卷」才公布分數和答案。每次出的題目都不一樣。範圍依上方選的課次。${best?`<br>最佳成績：<b>${best.sc} 分</b>（${best.t}）`:''}</p>
    <div class="center"><button class="btn primary" id="mkGo">開始模擬考</button></div></div>`;
   $('#mkGo').onclick=()=>{mk={q:mkBuild(),ans:{},t0:Date.now(),done:false};mockRender()};
@@ -1233,6 +1245,7 @@ function mockRender(){
   const n=mk.q.length;let h='',last=-1;
   mk.q.forEach((x,i)=>{
     if(x.sec!==last){last=x.sec;h+=`<div class="groupHead">${MOCK_SECS[x.sec][0]}</div>`}
+    if(x.ph)h+=x.ph;
     const pick=mk.ans[i];
     h+=`<div class="qcard mkq" id="mk${i}"><span class="prog">第 ${i+1} 題</span>${x.q}
       <div class="opts">${x.opts.map(o=>{
@@ -1267,6 +1280,113 @@ function mockScoreHtml(){
   return `<div class="done-box"><div class="score">${sc} 分</div><p class="hint">用時 ${Math.floor(mk.t/60)} 分 ${mk.t%60} 秒。下面標 ✗ 的是寫錯的題目，綠色是正確答案。</p>
    <div class="tbl"><table>${rows}</table></div></div>`;
 }
+
+/* ===== 考卷題型補充（翰林四上 第七～十二課）：短語練習、造句、成語情境、課文文意、閱讀素養題組 =====
+   出處：翰林 課次複習卷（黑貓卷）、期末複習卷 戊卷／己卷、校用卷 期末成績考查。題目為練習用改寫，非原卷。a 一律寫 0（第一個是正解，出題時會再打散）。 */
+const PAPER={
+phr:[
+ {g:3,ex:'（王子）多，（煩惱）多',opts:['朋友多，想法多','朋友多，多想法','多朋友，想法多','朋友很多，想法'],why:'句型是「（名詞）多，（名詞）多」：（朋友）多，（想法）多。',src:'期末複習卷 戊卷'},
+ {g:3,ex:'（王子）多，（煩惱）多',opts:['書本多，知識多','書本多，多知識','多書本，多知識','書本多又知識'],why:'（書本）多，（知識）多，兩個「多」都放在名詞後面。',src:'仿考卷題型'},
+ {g:2,ex:'（看出）（我）（慌張）的（模樣）',opts:['發現他蒼白的臉色','發現蒼白他的臉色','他發現的蒼白臉色','發現他的蒼白'],why:'句型是「動作＋人＋形容詞＋的＋名詞」：（發現）（他）（蒼白）的（臉色）。',src:'課次複習卷 第八課'},
+ {g:2,ex:'（看出）（我）（慌張）的（模樣）',opts:['聽見妹妹開心的笑聲','聽見開心妹妹的笑聲','妹妹聽見的開心笑聲','聽見妹妹的開心'],why:'（聽見）（妹妹）（開心）的（笑聲）。',src:'仿考卷題型'},
+ {g:3,ex:'（門外）傳來（王子們）的（爭吵聲）',opts:['房裡傳來孩子們的歡笑聲','房裡傳來歡笑聲的孩子們','孩子們傳來房裡的歡笑聲','房裡孩子們傳來的歡笑'],why:'句型是「地方＋傳來＋誰＋的＋聲音」：（房裡）傳來（孩子們）的（歡笑聲）。',src:'課次複習卷 第九課'},
+ {g:3,ex:'（門外）傳來（王子們）的（爭吵聲）',opts:['操場傳來同學們的加油聲','操場傳來加油聲的同學們','同學們傳來操場的加油聲','操場同學們的傳來加油'],why:'（操場）傳來（同學們）的（加油聲）。',src:'仿考卷題型'},
+ {g:5,ex:'（星星）在（天上）（閃哪閃）',opts:['小鳥在樹上唱啊唱','小鳥在唱啊唱樹上','在樹上小鳥唱啊唱','小鳥在樹上唱歌'],why:'句型是「誰＋在＋地方＋疊字動作」：（小鳥）在（樹上）（唱啊唱）。',src:'課次複習卷 第十一課'},
+ {g:5,ex:'（星星）在（天上）（閃哪閃）',opts:['魚兒在水裡游啊游','魚兒在游啊游水裡','在水裡魚兒游啊游','魚兒在水裡游泳'],why:'（魚兒）在（水裡）（游啊游），最後要用重複的動作。',src:'仿考卷題型'},
+ {g:6,ex:'（魚）的（歌聲）是（甜美）的（語言）',opts:['書的知識是睿智的老師','書的睿智是知識的老師','知識的書是睿智的老師','書的知識是老師'],why:'句型是「誰的什麼＋是＋形容詞＋的＋名詞」：（書）的（知識）是（睿智）的（老師）。',src:'課次複習卷 第十二課'},
+ {g:6,ex:'（魚）的（歌聲）是（甜美）的（語言）',opts:['媽媽的笑容是溫暖的陽光','媽媽的溫暖是笑容的陽光','笑容的媽媽是溫暖的陽光','媽媽的笑容是陽光'],why:'（媽媽）的（笑容）是（溫暖）的（陽光），把笑容比喻成陽光。',src:'仿考卷題型'},
+],
+sen:[
+ {g:1,w:'其實',opts:['其實他很有實力，只是沒有舞臺讓他發揮。','其實今天下雨，所以天氣很晴朗。','他其實其實很喜歡畫畫。','其實我已經吃飽了，所以要再吃三碗。'],why:'「其實」用來說出真正的情況，常和前面的想法相反。',src:'課次複習卷 第七課'},
+ {g:1,w:'爐火純青',opts:['他投球技術練得爐火純青，閉著眼睛都能投進三分球。','你的方法都行不通，不妨爐火純青，試試其他辦法吧！','他第一次拿筆畫畫，就畫得爐火純青。','媽媽把火關小，讓湯爐火純青。'],why:'爐火純青：比喻學問、技能等達到精純完美的境地。',src:'課次複習卷 第七課'},
+ {g:2,w:'不知所措',opts:['正和他一起晨跑的爺爺突然跌倒，讓他不知所措，趕緊向旁人求助。','他不知所措的把作業寫完，拿到一百分。','媽媽不知所措的煮了一桌好菜。','這題很簡單，大家都不知所措的答對了。'],why:'不知所措：不知道該怎麼辦，形容驚慌失措。',src:'課次複習卷 第八課'},
+ {g:2,w:'茅塞頓開',opts:['這道數學題很難，但經過哥哥的講解，我總算茅塞頓開。','知道自己語文競賽落敗之後，妹妹茅塞頓開的放聲大哭。','他茅塞頓開的把門關起來。','這條路茅塞頓開，車子都塞住了。'],why:'茅塞頓開：比喻閉塞的心思，頓時豁然醒悟。',src:'課次複習卷 第八課'},
+ {g:3,w:'不論……都……',opts:['不論你要去哪裡旅行，都應該要多注意自己的身體安全。','不論今天下雨，所以我們都不出門。','不論他很高，都打籃球。','不論我吃飽了，都還想吃。'],why:'「不論……都……」：不管哪一種情況，結果都一樣。',src:'課次複習卷 第九課'},
+ {g:3,w:'勾心鬥角',opts:['王子們為了爭奪王位勾心鬥角，讓國王非常煩惱。','我們全家人勾心鬥角的一起包水餃。','好朋友勾心鬥角，互相幫忙寫作業。','小狗勾心鬥角的搖著尾巴。'],why:'勾心鬥角：比喻彼此明爭暗鬥，各用心機。',src:'課次複習卷 第九課'},
+ {g:4,w:'成千上萬',opts:['這場比賽吸引成千上萬來自世界各地的選手參與。','教室裡只有成千上萬的兩個人。','他成千上萬的跑到學校。','我今天只吃了成千上萬的一顆蘋果。'],why:'成千上萬：形容數量非常多。',src:'課次複習卷 第十課'},
+ {g:4,w:'息息相關',opts:['大自然的健康和我們的生活息息相關。','這兩件事息息相關，一點關係也沒有。','他息息相關的睡著了。','小貓息息相關的追著毛線球。'],why:'息息相關：形容彼此關係非常密切。',src:'課次複習卷 第十課'},
+ {g:5,w:'異口同聲',opts:['老師一問誰想去郊遊，大家異口同聲的說：「我！」','大家異口同聲，每個人的說法都不一樣。','他一個人異口同聲的唱歌。','小明異口同聲的寫完功課。'],why:'異口同聲：不同的人說出相同的話，大家說法一致。',src:'課次複習卷 第十一課'},
+ {g:6,w:'甜蜜',opts:['回憶童年和姐妹相處的甜蜜時光，她忍不住露出微笑。','這杯苦瓜汁喝起來好甜蜜，我皺起了眉頭。','他因為考不好，心裡覺得很甜蜜。','冬天的風甜蜜得讓人發抖。'],why:'甜蜜：比喻幸福、快樂、美好。',src:'期末複習卷 己卷'},
+ {g:1,w:'不是……而是……',opts:['演員不是要炫耀演技，而是想透過戲劇來傳達理念。','不是今天下雨，而是所以我們不出門。','他不是很高，而是很高。','不是我喜歡吃蘋果，而是。'],why:'「不是……而是……」：先否定一個說法，再說出正確的說法。',src:'期末複習卷 戊卷'},
+],
+sy:[
+ {g:1,q:'「只憑一張老照片找人，很難保證找得到。」可以用哪一個成語形容？',opts:['海底撈針','惱羞成怒','破釜沉舟','約法三章'],why:'海底撈針：比喻極難找到。',src:'期末複習卷 戊卷'},
+ {g:1,q:'「面對大家不停的指責，他暴跳如雷。」可以用哪一個成語形容？',opts:['惱羞成怒','海底撈針','破釜沉舟','約法三章'],why:'惱羞成怒：因羞愧到了極點而轉為憤怒。',src:'期末複習卷 戊卷'},
+ {g:1,q:'「老師再次提醒，自由時間結束後，大家都要回到這裡集合。」可以用哪一個成語形容？',opts:['約法三章','海底撈針','惱羞成怒','破釜沉舟'],why:'約法三章：事先約定好要遵守的規則。',src:'期末複習卷 戊卷'},
+ {g:1,q:'「比賽已經到了最後，所有隊員都奮力一搏，不想就此輸掉比賽。」可以用哪一個成語形容？',opts:['破釜沉舟','約法三章','海底撈針','惱羞成怒'],why:'破釜沉舟：比喻下定決心，不顧一切的拚到底。',src:'期末複習卷 戊卷'},
+ {g:1,q:'老師請同學用「擬人」來造句，哪一位同學「沒有」照老師的要求？',opts:['「春天時，大地的景色很美。」','「大地穿上美麗的衣裳，迎接春天的到來。」','「大地為了歡迎春天，換上美麗的服裝。」','「大地迎接春天時，會穿上美麗的衣裳。」'],why:'「大地的景色很美」只是描寫，沒有把大地當成人來寫。',src:'課次複習卷 第七課'},
+ {g:3,q:'哪一個句子有使用「類疊」？',opts:['今天的天好藍，雲好白，是舒服的好天氣。','比賽時，輸贏是正常的，盡力就好。','王子們終於明白團結的重要。','國王生病了，躺在床上休息。'],why:'「好藍、好白」重複使用「好」，是類疊。',src:'課次複習卷 第九課'},
+ {g:6,q:'哪一個句子有使用「擬人」？',opts:['山靜靜的看著我，無聲的訴說森林的祕密。','風像母親的手，輕輕的吹過。','冬日的陽光暖洋洋的。','海水是藍色的。'],why:'山會「看」、會「訴說」，把山當成人來寫，是擬人；「像母親的手」是譬喻。',src:'課次複習卷 第十二課'},
+ {g:4,q:'「強颱在海面上（　），正朝著臺灣西南部前進，我們要儘早做好防颱措施。」（　）中應填入哪一個語詞？',opts:['形成','生生不息','息息相關','友善'],why:'颱風在海面上「形成」。',src:'課次複習卷 第十課'},
+ {g:4,q:'「我們應該愛護環境生態，大自然才能（　）的延續下去。」（　）中應填入哪一個語詞？',opts:['生生不息','形成','息息相關','成千上萬'],why:'生生不息：不斷的生長、繁殖。',src:'課次複習卷 第十課'},
+ {g:6,q:'「他們原本是（　）的對手，卻在今年同時轉入同一支球隊，成為搭檔。」（　）中應填入哪一個成語？',opts:['並駕齊驅','息事寧人','唇亡齒寒','四通八達'],why:'並駕齊驅：比喻彼此實力相當，不分軒輊。',src:'課次複習卷 第十二課'},
+ {g:6,q:'「阿韻希望可以（　），才不斷退讓，卻反遭對方狠狠敲詐了一筆錢。」（　）中應填入哪一個成語？',opts:['息事寧人','並駕齊驅','唇亡齒寒','四通八達'],why:'息事寧人：平息紛爭，使彼此相安。',src:'課次複習卷 第十二課'},
+ {g:6,q:'「我們家位於市中心，交通（　），不管去哪裡都很方便。」（　）中應填入哪一個成語？',opts:['四通八達','唇亡齒寒','息事寧人','並駕齊驅'],why:'四通八達：四方相通的道路，形容交通便利。',src:'課次複習卷 第十二課'},
+ {g:5,q:'「弟弟得到三張柴犬貼紙，他很『滿意、足夠』。」「　」中的敘述可以用哪一個語詞替代？',opts:['滿足','等待','好奇','新奇'],why:'滿意、足夠＝滿足。',src:'課次複習卷 第十一課'},
+ {g:5,q:'「他第一次看到蛇板，覺得『新奇而感興趣』，想要試玩一下。」「　」中的敘述可以用哪一個語詞替代？',opts:['好奇','滿足','等待','害怕'],why:'對新奇的事物感興趣＝好奇。',src:'課次複習卷 第十一課'},
+ {g:4,q:'小明一家到海邊玩，看到告示牌：「不任意棄置垃圾；不購買、不捕捉海洋生物；浮潛時不破壞、不傷害海洋生物。」哪一個做法符合告示？',opts:['離開時，把製造的垃圾全部打包帶走','看到可愛的寄居蟹，請爸媽買回家養','浮潛時，摸一摸正在覓食的海龜','把吃剩的零食丟進沙灘的洞裡'],why:'不亂丟垃圾、不買賣和捕捉海洋生物、不打擾牠們。',src:'期末複習卷 己卷'},
+],
+mcq:[
+ {g:1,q:'〈松鼠先生的麵包〉中，松鼠先生經過一次又一次的失敗，心情有什麼轉變？',opts:['從信心滿滿轉為灰心不已','從悲傷難過轉為自暴自棄','從驕傲自大轉為謙虛有禮','從充滿自信轉為得意洋洋'],why:'一開始信心滿滿，屢次失敗後非常灰心。',src:'期末複習卷 戊卷'},
+ {g:1,q:'〈松鼠先生的麵包〉中，松鼠先生成功的原因「不包括」哪一個？',opts:['擁有好的食譜','他人的協助','正確的判斷','不斷努力嘗試'],why:'課文沒有提到好食譜，是靠嘗試、判斷和朋友協助。',src:'期末複習卷 戊卷'},
+ {g:1,q:'〈松鼠先生的麵包〉的順序是？甲、麵包一直烤焦、失敗，大受打擊　乙、終於沒烤焦，試吃員卻說太甜了　丙、依照眼淚的鹹度重新調味，大受歡迎　丁、明白失敗是成功必要的調味',opts:['甲乙丙丁','乙甲丙丁','甲丙乙丁','丙甲乙丁'],why:'先失敗（甲），再太甜（乙），用眼淚的鹹度調味成功（丙），最後明白道理（丁）。',src:'課次複習卷 第七課'},
+ {g:2,q:'〈平凡的大俠〉中，大姐姐脫口而出：「江湖救急，義所當為呀！」可以推論她是在什麼情形下說的？',opts:['不加思索','再三思考','猶豫許久','怒氣沖沖'],why:'「脫口而出」表示沒有多想就說出來。',src:'期末複習卷 戊卷'},
+ {g:3,q:'〈王子折箭〉中，下面哪一個敘述正確？',opts:['國王透過折箭告訴王子們團結的重要','四位王子都有折箭','國王四處挑起戰爭，受到人民敬愛','王后在國王生病時搬弄是非'],why:'國王用折箭讓王子們明白團結的力量。',src:'期末複習卷 戊卷'},
+ {g:3,q:'〈王子折箭〉中，國王說他恐怕撐不到明年春天了。從這句話可以推論出什麼？',opts:['國王可能在明年春天前就離開人世','王子想謀反','國王身體健康','國王想睡覺'],why:'「撐不到明年春天」表示國王病得很重。',src:'課次複習卷 第九課'},
+ {g:3,q:'〈王子折箭〉中，從王子們的互動，可以知道國王的擔憂是什麼？',opts:['王子們為了王位明爭暗鬥','王子們為了爭奪財產感情不睦','王子們明白團結合作的重要','王子們沒有找到自己的夢想'],why:'王子們為了王位勾心鬥角，國王很擔心。',src:'課次複習卷 第九課'},
+ {g:3,q:'〈王子折箭〉中，哪一個「不是」國王生病時王子們的表現？',opts:['兄友弟恭','互相批評對方','兄弟間勾心鬥角','急於表現自己'],why:'國王生病時王子們互相爭吵，並沒有兄友弟恭。',src:'課次複習卷 第九課'},
+ {g:4,q:'〈海中的熱帶雨林〉中，是什麼原因使珊瑚「白化」？',opts:['海水溫度過高','從事浮潛的人變少','海水溫度過低','珊瑚蟲體內的海藻增加'],why:'海水溫度太高，珊瑚蟲體內的共生藻離開，珊瑚就變白了。',src:'期末複習卷 戊卷'},
+ {g:4,q:'〈海中的熱帶雨林〉中，珊瑚礁正面臨「白化」危機，給我們什麼省思？',opts:['保護海洋生態很重要','這是大自然的正常現象，不用在意','全球暖化對自然環境不會有影響','人類的活動不會影響自然環境'],why:'珊瑚白化提醒我們要保護海洋生態。',src:'課次複習卷 第十課'},
+ {g:4,q:'〈海中的熱帶雨林〉中，愛好海洋活動的人最喜歡的景觀是哪一個？',opts:['繽紛的海底世界','夕陽在海平面落下','海天一色的美景','特殊的海島地形'],why:'課文描寫五彩繽紛的海底世界。',src:'課次複習卷 第十課'},
+ {g:5,q:'〈美食島〉中，下面哪一個敘述正確？',opts:['有一些動物被特別的海藻纏住了','動物們曾看過美食島','美食島上缺乏食物','島上都是螃蟹和彈塗魚'],why:'有些動物被「特別的海藻」（其實是垃圾）纏住了。',src:'期末複習卷 戊卷'},
+ {g:5,q:'〈美食島〉中，動物們為什麼天天都來美食島嘗鮮？',opts:['島上有許多美味的浮游生物','島上的風景很美','想到島上休閒度假','天堂一般清幽美麗'],why:'動物們以為島上有好多「美味的浮游生物」。',src:'課次複習卷 第十一課'},
+ {g:5,q:'〈美食島〉中，小燈籠魚吃下「浮游生物」後，發生了什麼怪事？',opts:['頭昏眼花','力氣變大了','身體很笨重','輕飄飄的'],why:'吃下塑膠的小燈籠魚覺得頭昏眼花。',src:'課次複習卷 第十一課'},
+ {g:5,q:'〈美食島〉中，海鳥叼走的「白色蝦子」，其實是什麼？',opts:['塑膠湯匙','蝦子','繩子','盤子'],why:'白色的「蝦子」其實是塑膠湯匙。',src:'課次複習卷 第十一課'},
+ {g:6,q:'〈寧靜的音樂會〉中，作者透過什麼方式知道魚兒的心聲？',opts:['讀魚兒的嘴唇','聽魚兒的歌聲','看魚兒的舞蹈','傾聽魚兒的訴說'],why:'作者在水裡聽不到聲音，是讀魚兒的嘴唇。',src:'期末複習卷 戊卷'},
+ {g:6,q:'〈寧靜的音樂會〉中，魚兒用什麼方式感動珊瑚，讓牠一起唱歌跳舞？',opts:['甜美動人的歌聲','好聽的童話故事','悅耳的鋼琴音樂','豐富美味的食物'],why:'魚兒用甜美的歌聲感動了珊瑚。',src:'課次複習卷 第十二課'},
+ {g:6,q:'〈寧靜的音樂會〉中，作者說「我是牠們的嘉賓」，這句話的涵意是什麼？',opts:['作者想像自己是受邀的客人，友善的在深海裡活動','作者收到魚兒寄來的邀請函','對海中生物來說作者是不速之客','海中生物的活動像熱鬧的音樂會'],why:'作者把自己當成受邀的客人，用友善的態度對待海洋生物。',src:'課次複習卷 第十二課'},
+ {g:6,q:'〈寧靜的音樂會〉中，作者認為美好而甜蜜的心聲在哪裡才能找到？',opts:['寧靜的深海','繁忙的都市','純樸的農村','吵雜的市場'],why:'在寧靜的深海，才能聽見美好甜蜜的心聲。',src:'課次複習卷 第十二課'},
+],
+tf:[
+ {g:1,s:'〈松鼠先生的麵包〉中，貓小姐教松鼠先生揉麵團。',a:true,why:'',src:'期末複習卷 己卷'},
+ {g:2,s:'〈平凡的大俠〉中，主角放學時天氣很好，陽光普照。',a:false,why:'主角放學時下大雨，被困在騎樓。',src:'期末複習卷 己卷'},
+ {g:3,s:'〈王子折箭〉中，王子們因為爭奪王位而感情不好。',a:true,why:'',src:'期末複習卷 己卷'},
+ {g:6,s:'〈寧靜的音樂會〉中，作者把魚的歌聲比喻為甜美的語言。',a:true,why:'',src:'期末複習卷 己卷'},
+ {g:4,s:'〈海中的熱帶雨林〉提到可以使用「海洋友善」的防曬用品，避免造成汙染。',a:true,why:'',src:'期末複習卷 己卷'},
+ {g:2,s:'〈平凡的大俠〉中，幫助主角的人借給主角一把紅雨傘。',a:true,why:'',src:'課次複習卷 第八課'},
+ {g:2,s:'〈平凡的大俠〉中，幫助主角的人是為了得到感謝。',a:false,why:'大姐姐說「江湖救急，義所當為」，不是為了得到感謝。',src:'課次複習卷 第八課'},
+ {g:2,s:'〈平凡的大俠〉中，幫助主角的人是一位熱心助人的警察。',a:false,why:'幫助主角的是一位路過的大姐姐。',src:'課次複習卷 第八課'},
+],
+read:[
+ {t:'雲（童詩）',by:'出自 期末複習卷 戊卷',body:`<p>我喜歡自由自在<br>無拘無束的生活<br>每天東跑跑<br>西跑跑</p>
+<p>白天拜訪太陽公公<br>太陽公公最熱情<br>晒得我全身鬆軟<br>晚上依賴月亮婆婆<br>月亮婆婆最體貼<br>唱著搖籃曲<br>讓我舒服的睡個好眠</p>
+<p>傷心難過的時候<br>雨姑娘總會輕聲安慰我<br>孤單寂寞時<br>彩虹妹妹會搭起滑梯<br>讓我盡情的玩耍<br>我就是無憂無慮的雲兒</p>`,
+  qs:[{q:'彩虹妹妹會做什麼讓雲兒開心？',opts:['搭起滑梯讓雲兒玩耍','唱搖籃曲給雲兒聽','跳舞給雲兒看','畫畫給雲兒欣賞'],why:'「彩虹妹妹會搭起滑梯，讓我盡情的玩耍」。'},
+      {q:'「每天東跑跑／西跑跑」是在說雲兒怎麼樣？',opts:['四處飄動','喜歡安靜','缺乏安全感','個性內向'],why:'東跑跑、西跑跑，表示雲在天空四處飄動。'},
+      {q:'詩中的雲兒、太陽、月亮、雨和彩虹會說話、有動作，是運用哪一種寫作技巧？',opts:['擬人','譬喻','映襯','誇飾'],why:'把雲和太陽等當成人來寫，是擬人。'}]},
+ {t:'看流星雨',by:'改寫自 期末複習卷 己卷',body:`<p>聽說最壯觀的流星雨將在今晚午夜登場，爸爸提早下班，帶全家上山一窺流星雨的奇景。</p>
+<p>雖然墾丁是最好的觀星地，但路途遙遠，我們只能選擇附近一座光害少的小山。我們在午夜抵達山上，山上已經擠滿了人。我們鋪好睡袋，以大地為床、天空為被，晚風徐徐吹來，好舒服！</p>
+<p>大家目不轉睛的看著東方的天空。突然，一道流星劃過天際，拖著亮閃閃的長尾巴，一下子就消失了。我問爸爸：「什麼是流星雨？」爸爸說：「大部分的流星是隨機出現的，但有一些流星會從夜空某個特定位置散射出來，短時間內出現大量的流星，就可稱為『流星雨』。」</p>
+<p>今天的天空並不清朗，不到一小時，雲層慢慢聚攏，遮住了月亮和星光。我們再也沒看見流星，但我還是對著流星許下願望，希望流星能幫我美夢成真！</p>`,
+  qs:[{q:'文章中提到，哪裡是最好的觀星地點？',opts:['墾丁','埔里','玉里','溪湖'],why:'「雖然墾丁是最好的觀星地，但路途遙遠」。'},
+      {q:'主角全家在什麼時候抵達山上？',opts:['午夜','清晨','中午','傍晚'],why:'「我們在午夜抵達山上」。'},
+      {q:'什麼樣的天候比較適合觀星？',opts:['萬里無雲','烏雲密布','傾盆大雨','狂風暴雨'],why:'雲層聚攏就會遮住星光，所以萬里無雲最適合。'}]},
+ {t:'植物界的殺手：食蟲草',by:'改寫自 校用卷 期末成績考查',body:`<p>食蟲草是植物界中的殺手，小至昆蟲，大到蜥蜴、鳥，都是它獵食的對象。它們會用特別的陷阱，讓獵物自投羅網，再把獵物消化成自己的養分。</p>
+<p>陸上的食蟲草會散發氣味或蜜汁來吸引獵物。例如豬籠草的葉子前端像附有蓋子的小瓶子，瓶口有蜜腺，小蟲一靠近就會滑進瓶底的消化液裡；毛氈苔的葉子布滿細毛，細毛頂端有露珠般的黏液，昆蟲一被黏住就逃不掉；捕蠅草的葉片像捕獸夾，昆蟲碰到葉片上的刺毛，葉片就會合起來。</p>
+<p>水中也有食蟲草，最有名的是狸藻。狸藻浮在水面下，葉子基部有一個個小囊袋，囊口長著觸鬚，小蟲碰到觸鬚，袋口就會打開，水流和蟲一起被吸進去，袋子再慢慢把蟲分解吸收。</p>
+<p>食蟲草也會用根吸收水分、用葉片行光合作用。只有在生長環境艱困時，它們才會捕食昆蟲，獲取需要的養分。</p>`,
+  qs:[{q:'下面哪一個「不是」陸上植物界的殺手？',opts:['狸藻','豬籠草','毛氈苔','捕蠅草'],why:'狸藻生長在水中。'},
+      {q:'陸上的食蟲草用什麼方式吸引昆蟲？',opts:['散發香氣或蜜汁','散發難聞的氣味嚇走昆蟲','葉片會發光','開出鮮豔的大花朵'],why:'「陸上的食蟲草會散發氣味或蜜汁來吸引獵物」。'},
+      {q:'食蟲草在艱困的環境中，怎麼獲取養分？',opts:['捕捉昆蟲','只靠行光合作用','只從根部吸收','只從葉片吸收雨水'],why:'環境艱困時，才會捕食昆蟲來獲得養分。'}]},
+],
+};
+
+(function(){
+  const tag=s=>s?`（📄 ${s}）`:'';
+  (PAPER.mcq||[]).forEach(x=>{const L=MD[x.g-1];(L.mcq=L.mcq||[]).push({q:x.q,opts:x.opts.slice(),a:0,why:(x.why||'')+tag(x.src),src:'課文',paper:1})});
+  (PAPER.tf||[]).forEach(x=>{const L=MD[x.g-1];(L.tf=L.tf||[]).push({s:x.s,a:x.a,why:(x.why||'')+tag(x.src)})});
+  (PAPER.read||[]).forEach(p=>READ.push({t:p.t,by:p.by,body:p.body,paper:1,qs:p.qs.map(q=>({q:q.q,opts:q.opts.slice(),a:0,why:q.why}))}));
+})();
 
 /* ===== 通用選擇題引擎（語詞、選詞填空、修辭、課文理解）===== */
 let wrongM=load('au4cf-wrongm',{});
@@ -1311,6 +1431,26 @@ function mqItems(key){
   if(key==='read'){
     READ.forEach((p,pi)=>p.qs.forEach((x,i)=>out.push({id:`read:${pi}:${i}`,g:0,lab:`${p.t} 第${i+1}題`,ctx:pi,q:`<p class="qask">${esc(x.q)}</p>`,opts:x.opts.map((o,k)=>NUMO[k]+' '+o),a:NUMO[x.a]+' '+x.opts[x.a],why:esc(x.why||''),long:true})));
   }
+  const SRC=t=>`<span class="srcTag">📄 ${esc(t)}</span>`;
+  if(key==='phr')PAPER.phr.forEach((x,i)=>out.push({id:`phr:${i}`,g:x.g,lab:x.opts[0],q:`${SRC(x.src)}<p class="qask">照樣寫短語：</p><p class="kai sentq">例：${esc(x.ex)}</p><p class="qask">哪一個和例子的寫法完全相同？</p>`,opts:x.opts.slice(),a:x.opts[0],why:esc(x.why),long:true}));
+  if(key==='sen')PAPER.sen.forEach((x,i)=>out.push({id:`sen:${i}`,g:x.g,lab:x.w,q:`${SRC(x.src)}<p class="qask">用「<b class="kai">${esc(x.w)}</b>」造句，哪一句用得最恰當？</p>`,opts:x.opts.slice(),a:x.opts[0],why:esc(x.why),long:true}));
+  if(key==='sy')PAPER.sy.forEach((x,i)=>out.push({id:`sy:${i}`,g:x.g,lab:x.q.slice(0,16),q:`${SRC(x.src)}<p class="qask" style="text-align:left">${esc(x.q)}</p>`,opts:x.opts.slice(),a:x.opts[0],why:esc(x.why),long:true}));
+  if(key==='radw'){
+    const allR=[...new Set(MD.flatMap(L=>L.chars.map(c=>c.r)))];
+    const cf={};RAW.trim().split('\n').forEach(l=>{const p=l.split(',');cf[p[1]]=p[7]||''});
+    const famOf=c=>FAM.flatMap(f=>f.m.some(m=>m.c===c)?f.m.map(m=>m.c):[]).filter(x=>x!==c);
+    const allW=MD.flatMap(L=>L.chars.flatMap(c=>(c.w||[]).map(w=>w)));
+    MD.forEach(L=>L.chars.forEach(ch=>{
+      const words=(ch.w||[]).filter(w=>w.includes(ch.c));if(!words.length)return;
+      const w=words[Math.floor(Math.random()*words.length)];
+      const rr=[...[...(cf[ch.c]||'')].filter(r=>r!==ch.r&&/[一-鿿⺀-⿕]/.test(r)),...shuffle(allR.filter(r=>r!==ch.r))].filter((v,i,a)=>a.indexOf(v)===i);
+      const fam=famOf(ch.c);
+      const bad=fam.length?w.replace(ch.c,fam[Math.floor(Math.random()*fam.length)]):(shuffle(allW.filter(x=>!x.includes(ch.c)))[0]||'');
+      const f=(r,ww)=>`${r}部｜${ww}`;
+      const opts=[f(ch.r,w),f(rr[0],w),f(ch.r,bad),f(rr[1],bad)].filter((v,i,a)=>a.indexOf(v)===i);
+      out.push({id:`radw:${ch.c}`,g:L.lesson,lab:ch.c,q:`${SRC('考卷題型：寫出部首並造詞')}<div class="qword kai">${ch.c}</div><p class="qask">「${ch.c}」的<b>部首</b>和<b>造詞</b>，哪一組完全正確？</p>`,opts,a:opts[0],why:`「${ch.c}」是「${ch.r}」部${VAR[ch.c]?`（寫成「${VAR[ch.c]}」）`:''}，可以造詞：${(ch.w||[]).join('、')}。${fam.length?`小心形近字：${fam.join('、')}。`:''}`});
+    }));
+  }
   return out;
 }
 const blank=s=>esc(s).replace(/（\s*）|（　）|\(\s*\)/,'<span class="box" style="min-width:4em">＿＿＿</span>');
@@ -1318,6 +1458,11 @@ const MQ={
   voc:{area:'#vocArea',name:'語詞',intro:'<b>語詞解釋</b>和<b>成語的近義詞、反義詞</b>：看語詞選意思，或看意思選語詞。'},
   fill:{area:'#fillArea',name:'選詞填空',intro:'考卷的<b>選詞填寫</b>和<b>字形辨別</b>：看句子選出最適合的語詞或字。'},
   rhe:{area:'#rheArea',name:'修辭',intro:'判斷句子用了哪一種<b>修辭</b>。先看下面的修辭小抄再挑戰。'},
+  radw:{area:'#radwArea',name:'部首造詞',intro:'考卷的<b>寫出部首並造詞</b>：部首和語詞都要對才算對，小心形近字。'},
+  sy:{area:'#syArea',name:'成語情境',intro:'考卷的<b>素養養成題</b>和<b>成語運用</b>：讀情境，選出最適合的成語、語詞或做法。每題都標出出處。'},
+  phr:{area:'#phrArea',name:'短語練習',intro:'考卷的<b>短語練習</b>（照樣寫短語）：看例子的格式，選出寫法完全相同的短語。'},
+  sen:{area:'#senArea',name:'造句',intro:'考卷的<b>造句</b>：選出把語詞或句型用得最恰當的句子。'},
+  read:{area:'#readArea',name:'閱讀題組',intro:'考卷的<b>閱讀素養題組</b>：先讀文章，再回答問題（文章改寫自期末複習卷、素養題本、校用卷）。'},
   txt:{area:'#txtArea',name:'課文理解',intro:'出自第七～十二課題庫：<b>字音字形、語詞、課文文意</b>選擇題和是非題。'},
 };
 function mqPool(key){let it=mqItems(key);if(key!=='read')it=it.filter(x=>st.groups.has(x.g));if(st.onlyWrong)it=it.filter(x=>wrongM[x.id]);return it}
