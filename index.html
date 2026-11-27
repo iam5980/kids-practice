@@ -44,11 +44,12 @@ details.old .term{color:var(--muted)}
 .dxh{font-size:15px;font-weight:800;margin:14px 0 2px}
 .hm-mask{position:fixed;inset:0;z-index:9500;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:14px}
 .hm-card{background:var(--card);color:var(--ink);border-radius:20px;padding:16px;max-width:420px;width:100%;max-height:90vh;overflow:auto;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.35)}
-.hm-card h3{margin:0 0 2px;font-size:21px}.hm-card button{font:inherit;min-height:48px;border-radius:12px;border:0;padding:10px 18px;margin:6px 4px;cursor:pointer;background:var(--c);color:#fff;font-weight:700}
+.hm-card h3{margin:0 0 2px;font-size:21px}.hm-card button{font:inherit;min-height:48px;border-radius:12px;border:0;padding:10px 18px;margin:6px 4px;cursor:pointer;background:var(--c,#c2410c);color:#fff;font-weight:700}
 .evo{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:2px;margin:10px 0}.evo .st{border:1px solid var(--line);border-radius:12px;padding:4px}.evo .st.lock{opacity:.45}.evo .ar{font-size:18px;color:var(--muted)}
 .evo .pic,.forms .pic{width:100%;aspect-ratio:1}.evo .lb,.forms .lb{font-size:12px;color:var(--muted)}
 .forms{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 4px}.forms>div{border:1px solid var(--line);border-radius:12px;padding:4px}.forms .lock{opacity:.45}
 .gacha .machine{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:8px 0}.gacha .ball{font-size:54px;line-height:1}
+.rw-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:10px 0}.rw-it{border:2px solid var(--line,#e5e0d8);border-radius:14px;padding:10px;text-align:center;background:#fff}.rw-it .em{font-size:36px;line-height:1.2}.rw-it .nm{font-weight:700;margin:4px 0}.rw-it button{font:inherit;font-weight:800;min-height:44px;width:100%;border:0;border-radius:12px;background:var(--c);color:#fff;cursor:pointer}.rw-it button[disabled]{opacity:.4;cursor:default}.rw-log{width:100%;border-collapse:collapse;font-size:14px}.rw-log td{border-top:1px solid var(--line,#e5e0d8);padding:6px 4px}.rw-in{font:inherit;font-size:20px;padding:8px 10px;border:2px solid var(--line,#ccc);border-radius:10px;width:100%;box-sizing:border-box;margin:6px 0}.rw-ed{display:grid;grid-template-columns:52px 1fr 80px 40px;gap:6px;align-items:center;margin:4px 0}.rw-ed input{font:inherit;padding:6px;border:1px solid #ccc;border-radius:8px;min-width:0}.rw-b2{font:inherit;font-weight:700;min-height:44px;border:0;border-radius:12px;padding:8px 14px;margin:4px;cursor:pointer;background:#eee}.rw-b2.pri{background:var(--c,#555);color:#fff}.hm-card .rw-b2{background:#ececec;color:#333;font-weight:700;padding:8px 14px}.hm-card .rw-b2.pri{background:var(--c,#c2410c);color:#fff}.hm-card .rw-ed .rw-b2{padding:0;margin:0;min-height:40px}
 .gbtn{font:inherit;font-weight:800;min-height:52px;border:0;border-radius:14px;padding:10px 18px;background:var(--c);color:#fff;cursor:pointer}.gbtn[disabled]{opacity:.45;cursor:default}
 .tabs{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}.tabs button{font:inherit;font-size:14px;min-height:40px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:4px 12px;cursor:pointer}.tabs button[aria-pressed=true]{border-color:var(--c);color:var(--c);font-weight:700}
 .album{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.gc{border-radius:12px;padding:8px 4px;text-align:center;border:2px solid var(--line);background:var(--card)}.gc .em{font-size:38px;line-height:1.2}.gc .nm{font-size:13px;font-weight:700}.gc .rr{font-size:11px;color:var(--muted)}.gc.off{opacity:.35}.gc.off .em{filter:grayscale(1) brightness(.4)}
@@ -68,6 +69,7 @@ details.old .term{color:var(--muted)}
 <div id="pts"></div>
 <div id="dex"></div>
 <div id="gacha"></div>
+<div id="reward"></div>
 <div id="list"></div>
 <section class="shared">
   <h2 style="--c:var(--sh)">一起練</h2>
@@ -196,6 +198,7 @@ function showGacha(kid,c){
   var doneAl=ALBUMS.filter(function(a){return cnt(a)===a.cards.length}).length;
   var dup=0;cur.cards.forEach(function(x){var n=g.c[cur.id+":"+x[1]]||0;if(n>1)dup+=n-1});var miss=cur.cards.length-cnt(cur);
   var el=document.getElementById("gacha");
+  if(typeof showReward==='function')setTimeout(function(){showReward(kid,c)},0);
   el.innerHTML='<details class="pcard gacha" style="--c:'+c+'"'+(el.dataset.open?' open':'')+'><summary style="cursor:pointer;font-weight:700">🎰 扭蛋機與卡冊 <b>'+have+' / '+total+'</b>　<span class="sm">可用點數 ⭐ '+avail+'</span></summary>'+
     '<div class="machine"><div class="ball" id="gball">🎁</div><div><button type="button" class="gbtn" id="gspin"'+(avail<GACHA_COST?' disabled':'')+'>扭「'+cur.name+'」（'+GACHA_COST+' 點）</button>'+
     '<div class="sm">'+(avail<GACHA_COST?'再集 '+(GACHA_COST-avail)+' 點就可以扭蛋！':'先在下面選一本卡冊，扭蛋就會抽那一本的卡片')+'</div><div class="sm">機率：一般 N 70%・稀有 R 24%・超稀有 SR 6%。扭蛋不會減少集點卡的總點數和徽章。</div></div></div>'+
@@ -222,6 +225,76 @@ function showGacha(kid,c){
         '<p>'+(first?'🎉 新卡片！放進卡冊了':'又抽到一張（這張有 '+g2.c[r.id]+' 張）')+(done&&first?'<br>🏅 <b>'+r.a.name+' 卡冊收集完成！</b>':'')+'</p>');
     },900);
   });
+}
+
+/* 🎁 兌換獎勵：用「可用點數」（和扭蛋共用 kp-gacha-<kid>.spent）換現實生活的獎勵品。獎勵清單存在 kp-rewards-<kid>，兌換紀錄存在 kp-gacha-<kid>.rw，家長密碼存在 kp-parent-pin。 */
+var RW_DEFAULT=[["🍦","小點心一份",150],["📺","多看 20 分鐘卡通",200],["🎮","多玩 20 分鐘遊戲",200],["🍽️","選一次晚餐",300],["✏️","新文具一樣",400],["📚","新書一本",600],["🎢","週末出遊選地點",1000],["🧸","小玩具一個",1500]];
+function rwList(kid){var r=null;try{r=JSON.parse(localStorage.getItem("kp-rewards-"+kid)||"null")}catch(e){}return (r&&r.length)?r:RW_DEFAULT.map(function(x){return x.slice()})}
+function rwSaveList(kid,r){try{localStorage.setItem("kp-rewards-"+kid,JSON.stringify(r))}catch(e){}}
+function rwPin(){try{return localStorage.getItem("kp-parent-pin")||""}catch(e){return ""}}
+function rwEsc(t){return String(t).replace(/[&<>"]/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]})}
+function rwDate(t){var d=new Date(t);return (d.getMonth()+1)+"/"+d.getDate()+" "+("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)}
+function rwModal(html,onOk,okText){
+  var m=document.createElement("div");m.className="hm-mask";m.style.setProperty("--c",getComputedStyle(document.getElementById("reward").querySelector(".pcard")||document.body).getPropertyValue("--c")||"#c2410c");
+  m.innerHTML='<div class="hm-card" role="dialog" aria-modal="true">'+html+'<p class="sm" id="rwMsg" style="color:#c0392b;min-height:1.2em;margin:4px 0"></p><div><button type="button" class="rw-b2" data-x>取消</button>'+(onOk?'<button type="button" class="rw-b2 pri" data-ok>'+(okText||'確定')+'</button>':'')+'</div></div>';
+  document.body.appendChild(m);
+  var close=function(){m.remove()};
+  m.querySelector("[data-x]").addEventListener("click",close);
+  m.addEventListener("click",function(e){if(e.target===m)close()});
+  if(onOk)m.querySelector("[data-ok]").addEventListener("click",function(){var err=onOk(m);if(err){m.querySelector("#rwMsg").textContent=err}else close()});
+  var f=m.querySelector("input");if(f)setTimeout(function(){f.focus()},50);
+  return m;
+}
+/* 需要家長密碼才能做的事：第一次使用時先設定 4 位數密碼 */
+function rwParent(title,then){
+  var pin=rwPin();
+  if(!pin){
+    rwModal('<p style="margin:0;font-weight:800">🔐 先設定家長密碼</p><p class="sm">兌換獎勵和修改清單都要輸入這組密碼，請家長設定 4 位數字。</p><input class="rw-in" id="rp1" type="password" inputmode="numeric" maxlength="8" placeholder="輸入 4 位數字"><input class="rw-in" id="rp2" type="password" inputmode="numeric" maxlength="8" placeholder="再輸入一次">',function(m){
+      var a=m.querySelector("#rp1").value.trim(),b=m.querySelector("#rp2").value.trim();
+      if(!/^\d{4,8}$/.test(a))return "請輸入 4 位數字";if(a!==b)return "兩次輸入的不一樣";
+      try{localStorage.setItem("kp-parent-pin",a)}catch(e){}setTimeout(then,0);return "";
+    },'設定');return;
+  }
+  rwModal('<p style="margin:0;font-weight:800">🔐 '+title+'</p><p class="sm">請家長輸入密碼確認。</p><input class="rw-in" id="rp" type="password" inputmode="numeric" maxlength="8" placeholder="家長密碼">',function(m){
+    if(m.querySelector("#rp").value.trim()!==rwPin())return "密碼不對喔";setTimeout(then,0);return "";
+  },'確認');
+}
+function showReward(kid,c){
+  var el=document.getElementById("reward");if(!el)return;
+  var g=gLoad(kid),avail=Math.max(0,gPoints(kid)-g.spent),list=rwList(kid),log=g.rw||[];
+  var wait=log.filter(function(x){return !x.done}).length;
+  el.innerHTML='<details class="pcard gacha" style="--c:'+c+'"'+(el.dataset.open?' open':'')+'><summary style="cursor:pointer;font-weight:700">🎁 兌換獎勵　<span class="sm">可用點數 ⭐ '+avail+(wait?'　・待兌現 '+wait+' 項':'')+'</span></summary>'+
+    '<p class="sm" style="margin:6px 0 0">用點數換真的獎勵！按「兌換」後請家長輸入密碼確認，點數會直接扣掉（和扭蛋用的是同一份點數，集點卡總點數和徽章不會減少）。</p>'+
+    '<div class="rw-list">'+list.map(function(x,i){var ok=avail>=x[2];return '<div class="rw-it"><div class="em">'+rwEsc(x[0])+'</div><div class="nm">'+rwEsc(x[1])+'</div><div class="sm">⭐ '+x[2]+' 點</div><button type="button" data-rw="'+i+'"'+(ok?'':' disabled')+'>'+(ok?'兌換':'還差 '+(x[2]-avail)+' 點')+'</button></div>'}).join('')+'</div>'+
+    (log.length?'<details'+(wait?' open':'')+'><summary class="sm" style="cursor:pointer">📋 兌換紀錄（'+log.length+'）</summary><table class="rw-log">'+log.slice().reverse().map(function(x,j){var k=log.length-1-j;return '<tr><td>'+rwDate(x.t)+'</td><td>'+rwEsc(x.e+' '+x.n)+'</td><td>−'+x.cost+'</td><td>'+(x.done?'✅ 已給':'<button type="button" class="rw-b2" style="min-height:36px;margin:0" data-done="'+k+'">⏳ 標記已給</button>')+'</td></tr>'}).join('')+'</table></details>':'')+
+    '<div style="margin-top:8px"><button type="button" class="rw-b2" id="rwEdit">⚙️ 家長設定獎勵清單</button></div></details>';
+  var det=el.querySelector("details");det.addEventListener("toggle",function(){el.dataset.open=det.open?"1":""});
+  var redraw=function(){el.dataset.open="1";showGacha(kid,c)};
+  el.querySelectorAll("[data-rw]").forEach(function(b){b.addEventListener("click",function(){
+    var x=rwList(kid)[+b.dataset.rw];if(!x)return;
+    rwParent('兌換「'+x[1]+'」（'+x[2]+' 點）',function(){
+      var g2=gLoad(kid);if(gPoints(kid)-g2.spent<x[2])return;
+      g2.spent+=x[2];(g2.rw=g2.rw||[]).push({t:Date.now(),e:x[0],n:x[1],cost:x[2],done:false});gSave(kid,g2);redraw();
+      hmModal('<p style="margin:0;font-weight:800">🎉 兌換成功！</p><div style="font-size:72px;margin:8px 0">'+rwEsc(x[0])+'</div><p><b>'+rwEsc(x[1])+'</b><br>已扣 '+x[2]+' 點，剩下 ⭐ '+Math.max(0,gPoints(kid)-g2.spent)+' 點</p><p class="sm">家長給了獎勵後，可以在「兌換紀錄」按「標記已給」。</p>');
+    });
+  })});
+  el.querySelectorAll("[data-done]").forEach(function(b){b.addEventListener("click",function(){
+    rwParent('確認已經給了獎勵',function(){var g2=gLoad(kid);var it=(g2.rw||[])[+b.dataset.done];if(it){it.done=true;gSave(kid,g2)}redraw()});
+  })});
+  document.getElementById("rwEdit").addEventListener("click",function(){rwParent('修改獎勵清單',function(){rwEditor(kid,c)})});
+}
+function rwEditor(kid,c){
+  var list=rwList(kid);
+  var row=function(x){return '<div class="rw-ed"><input value="'+rwEsc(x[0])+'" aria-label="圖示"><input value="'+rwEsc(x[1])+'" aria-label="獎勵名稱"><input type="number" inputmode="numeric" min="1" value="'+x[2]+'" aria-label="點數"><button type="button" class="rw-b2" style="min-height:36px;margin:0;padding:0" data-del>✕</button></div>'};
+  var m=rwModal('<p style="margin:0;font-weight:800">⚙️ 獎勵清單（'+(kid==="au"?"Audrey":"Howard")+'）</p><p class="sm">圖示・名稱・需要的點數。按 ✕ 刪除，最多 16 項。</p><div id="rwRows" style="text-align:left;max-height:38vh;overflow:auto">'+list.map(row).join('')+'</div><button type="button" class="rw-b2" id="rwAdd">＋ 新增一項</button> <button type="button" class="rw-b2" id="rwReset">恢復預設</button> <button type="button" class="rw-b2" id="rwPin">更改密碼</button>',function(m){
+    var out=[];m.querySelectorAll(".rw-ed").forEach(function(r){var f=r.querySelectorAll("input"),n=f[1].value.trim(),p=Math.round(+f[2].value);if(n&&p>0)out.push([f[0].value.trim()||"🎁",n.slice(0,20),p])});
+    if(!out.length)return "至少要留一項獎勵";rwSaveList(kid,out.slice(0,16));setTimeout(function(){document.getElementById("reward").dataset.open="1";showReward(kid,c)},0);return "";
+  },'儲存');
+  var rows=m.querySelector("#rwRows");
+  var bind=function(){rows.querySelectorAll("[data-del]").forEach(function(b){b.onclick=function(){b.parentNode.remove()}})};bind();
+  m.querySelector("#rwAdd").onclick=function(){if(rows.children.length>=16)return;rows.insertAdjacentHTML("beforeend",row(["🎁","",300]));bind();rows.lastChild.querySelectorAll("input")[1].focus()};
+  m.querySelector("#rwReset").onclick=function(){rows.innerHTML=RW_DEFAULT.map(row).join('');bind()};
+  m.querySelector("#rwPin").onclick=function(){m.remove();try{localStorage.removeItem("kp-parent-pin")}catch(e){}rwParent('',function(){rwEditor(kid,c)})};
 }
 function show(kid){
   document.querySelectorAll(".kid").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.kid==kid)});
