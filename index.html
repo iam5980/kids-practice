@@ -227,10 +227,7 @@ function showGacha(kid,c){
   });
 }
 
-/* 🎁 兌換獎勵：用「可用點數」（和扭蛋共用 kp-gacha-<kid>.spent）換現實生活的獎勵品。獎勵清單存在 kp-rewards-<kid>，兌換紀錄存在 kp-gacha-<kid>.rw，家長密碼存在 kp-parent-pin。 */
-var RW_DEFAULT=[["🍦","小點心一份",150],["📺","多看 20 分鐘卡通",200],["🎮","多玩 20 分鐘遊戲",200],["🍽️","選一次晚餐",300],["✏️","新文具一樣",400],["📚","新書一本",600],["🎢","週末出遊選地點",1000],["🧸","小玩具一個",1500]];
-function rwList(kid){var r=null;try{r=JSON.parse(localStorage.getItem("kp-rewards-"+kid)||"null")}catch(e){}return (r&&r.length)?r:RW_DEFAULT.map(function(x){return x.slice()})}
-function rwSaveList(kid,r){try{localStorage.setItem("kp-rewards-"+kid,JSON.stringify(r))}catch(e){}}
+/* 🎁 兌換獎勵：家長直接輸入要扣的點數（和扭蛋共用 kp-gacha-<kid>.spent）換現實獎勵。兌換紀錄存在 kp-gacha-<kid>.rw，家長密碼存在 kp-parent-pin。 */
 function rwPin(){try{return localStorage.getItem("kp-parent-pin")||""}catch(e){return ""}}
 function rwEsc(t){return String(t).replace(/[&<>"]/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]})}
 function rwDate(t){var d=new Date(t);return (d.getMonth()+1)+"/"+d.getDate()+" "+("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)}
@@ -261,40 +258,35 @@ function rwParent(title,then){
 }
 function showReward(kid,c){
   var el=document.getElementById("reward");if(!el)return;
-  var g=gLoad(kid),avail=Math.max(0,gPoints(kid)-g.spent),list=rwList(kid),log=g.rw||[];
+  var g=gLoad(kid),avail=Math.max(0,gPoints(kid)-g.spent),log=g.rw||[];
   var wait=log.filter(function(x){return !x.done}).length;
-  el.innerHTML='<details class="pcard gacha" style="--c:'+c+'"'+(el.dataset.open?' open':'')+'><summary style="cursor:pointer;font-weight:700">🎁 兌換獎勵　<span class="sm">可用點數 ⭐ '+avail+(wait?'　・待兌現 '+wait+' 項':'')+'</span></summary>'+
-    '<p class="sm" style="margin:6px 0 0">用點數換真的獎勵！按「兌換」後請家長輸入密碼確認，點數會直接扣掉（和扭蛋用的是同一份點數，集點卡總點數和徽章不會減少）。</p>'+
-    '<div class="rw-list">'+list.map(function(x,i){var ok=avail>=x[2];return '<div class="rw-it"><div class="em">'+rwEsc(x[0])+'</div><div class="nm">'+rwEsc(x[1])+'</div><div class="sm">⭐ '+x[2]+' 點</div><button type="button" data-rw="'+i+'"'+(ok?'':' disabled')+'>'+(ok?'兌換':'還差 '+(x[2]-avail)+' 點')+'</button></div>'}).join('')+'</div>'+
-    (log.length?'<details'+(wait?' open':'')+'><summary class="sm" style="cursor:pointer">📋 兌換紀錄（'+log.length+'）</summary><table class="rw-log">'+log.slice().reverse().map(function(x,j){var k=log.length-1-j;return '<tr><td>'+rwDate(x.t)+'</td><td>'+rwEsc(x.e+' '+x.n)+'</td><td>−'+x.cost+'</td><td>'+(x.done?'✅ 已給':'<button type="button" class="rw-b2" style="min-height:36px;margin:0" data-done="'+k+'">⏳ 標記已給</button>')+'</td></tr>'}).join('')+'</table></details>':'')+
-    '<div style="margin-top:8px"><button type="button" class="rw-b2" id="rwEdit">⚙️ 家長設定獎勵清單</button></div></details>';
+  el.innerHTML='<details class="pcard gacha" style="--c:'+c+'"'+(el.dataset.open?' open':'')+'><summary style="cursor:pointer;font-weight:700">🎁 兌換獎勵（扣點數）　<span class="sm">可用點數 ⭐ '+avail+(wait?'　・待兌現 '+wait+' 項':'')+'</span></summary>'+
+    '<p class="sm" style="margin:6px 0">要換現實獎勵時，輸入要扣的點數（可以寫一下換了什麼），再請家長輸入密碼確認。和扭蛋用的是同一份點數，集點卡總點數和徽章不會減少。</p>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input class="rw-in" id="rwPts" type="number" inputmode="numeric" min="1" placeholder="扣幾點" style="width:130px;margin:0"><input class="rw-in" id="rwNote" type="text" maxlength="20" placeholder="換了什麼（可不填）" style="flex:1;min-width:150px;margin:0"><button type="button" class="gbtn" id="rwGo"'+(avail>0?'':' disabled')+'>扣點兌換</button></div>'+
+    '<p class="sm" id="rwErr" style="color:#c0392b;min-height:1.2em;margin:4px 0"></p>'+
+    (log.length?'<details'+(wait?' open':'')+'><summary class="sm" style="cursor:pointer">📋 兌換紀錄（'+log.length+'）</summary><table class="rw-log">'+log.slice().reverse().map(function(x,j){var k=log.length-1-j;return '<tr><td>'+rwDate(x.t)+'</td><td>'+rwEsc(x.n||'兌換獎勵')+'</td><td>−'+x.cost+'</td><td>'+(x.done?'✅ 已給':'<button type="button" class="rw-b2" style="min-height:36px;margin:0" data-done="'+k+'">⏳ 標記已給</button>')+'</td></tr>'}).join('')+'</table></details>':'')+
+    '<div style="margin-top:8px"><button type="button" class="rw-b2" id="rwPinBtn">🔐 更改家長密碼</button></div></details>';
   var det=el.querySelector("details");det.addEventListener("toggle",function(){el.dataset.open=det.open?"1":""});
   var redraw=function(){el.dataset.open="1";showGacha(kid,c)};
-  el.querySelectorAll("[data-rw]").forEach(function(b){b.addEventListener("click",function(){
-    var x=rwList(kid)[+b.dataset.rw];if(!x)return;
-    rwParent('兌換「'+x[1]+'」（'+x[2]+' 點）',function(){
-      var g2=gLoad(kid);if(gPoints(kid)-g2.spent<x[2])return;
-      g2.spent+=x[2];(g2.rw=g2.rw||[]).push({t:Date.now(),e:x[0],n:x[1],cost:x[2],done:false});gSave(kid,g2);redraw();
-      hmModal('<p style="margin:0;font-weight:800">🎉 兌換成功！</p><div style="font-size:72px;margin:8px 0">'+rwEsc(x[0])+'</div><p><b>'+rwEsc(x[1])+'</b><br>已扣 '+x[2]+' 點，剩下 ⭐ '+Math.max(0,gPoints(kid)-g2.spent)+' 點</p><p class="sm">家長給了獎勵後，可以在「兌換紀錄」按「標記已給」。</p>');
+  document.getElementById("rwGo").addEventListener("click",function(){
+    var n=Math.round(+document.getElementById("rwPts").value),note=document.getElementById("rwNote").value.trim(),err=document.getElementById("rwErr");
+    var now=Math.max(0,gPoints(kid)-gLoad(kid).spent);
+    if(!(n>0)){err.textContent="請輸入要扣的點數";return}
+    if(n>now){err.textContent="點數不夠喔，目前只有 "+now+" 點";return}
+    err.textContent="";
+    rwParent('扣 '+n+' 點'+(note?'（'+note+'）':''),function(){
+      var g2=gLoad(kid);if(gPoints(kid)-g2.spent<n)return;
+      g2.spent+=n;(g2.rw=g2.rw||[]).push({t:Date.now(),n:note,cost:n,done:false});gSave(kid,g2);redraw();
+      hmModal('<p style="margin:0;font-weight:800">🎉 兌換成功！</p><div style="font-size:64px;margin:8px 0">🎁</div><p>'+(note?'<b>'+rwEsc(note)+'</b><br>':'')+'已扣 '+n+' 點，剩下 ⭐ '+Math.max(0,gPoints(kid)-g2.spent)+' 點</p><p class="sm">家長給了獎勵後，可以在「兌換紀錄」按「標記已給」。</p>');
     });
-  })});
+  });
   el.querySelectorAll("[data-done]").forEach(function(b){b.addEventListener("click",function(){
     rwParent('確認已經給了獎勵',function(){var g2=gLoad(kid);var it=(g2.rw||[])[+b.dataset.done];if(it){it.done=true;gSave(kid,g2)}redraw()});
   })});
-  document.getElementById("rwEdit").addEventListener("click",function(){rwParent('修改獎勵清單',function(){rwEditor(kid,c)})});
-}
-function rwEditor(kid,c){
-  var list=rwList(kid);
-  var row=function(x){return '<div class="rw-ed"><input value="'+rwEsc(x[0])+'" aria-label="圖示"><input value="'+rwEsc(x[1])+'" aria-label="獎勵名稱"><input type="number" inputmode="numeric" min="1" value="'+x[2]+'" aria-label="點數"><button type="button" class="rw-b2" style="min-height:36px;margin:0;padding:0" data-del>✕</button></div>'};
-  var m=rwModal('<p style="margin:0;font-weight:800">⚙️ 獎勵清單（'+(kid==="au"?"Audrey":"Howard")+'）</p><p class="sm">圖示・名稱・需要的點數。按 ✕ 刪除，最多 16 項。</p><div id="rwRows" style="text-align:left;max-height:38vh;overflow:auto">'+list.map(row).join('')+'</div><button type="button" class="rw-b2" id="rwAdd">＋ 新增一項</button> <button type="button" class="rw-b2" id="rwReset">恢復預設</button> <button type="button" class="rw-b2" id="rwPin">更改密碼</button>',function(m){
-    var out=[];m.querySelectorAll(".rw-ed").forEach(function(r){var f=r.querySelectorAll("input"),n=f[1].value.trim(),p=Math.round(+f[2].value);if(n&&p>0)out.push([f[0].value.trim()||"🎁",n.slice(0,20),p])});
-    if(!out.length)return "至少要留一項獎勵";rwSaveList(kid,out.slice(0,16));setTimeout(function(){document.getElementById("reward").dataset.open="1";showReward(kid,c)},0);return "";
-  },'儲存');
-  var rows=m.querySelector("#rwRows");
-  var bind=function(){rows.querySelectorAll("[data-del]").forEach(function(b){b.onclick=function(){b.parentNode.remove()}})};bind();
-  m.querySelector("#rwAdd").onclick=function(){if(rows.children.length>=16)return;rows.insertAdjacentHTML("beforeend",row(["🎁","",300]));bind();rows.lastChild.querySelectorAll("input")[1].focus()};
-  m.querySelector("#rwReset").onclick=function(){rows.innerHTML=RW_DEFAULT.map(row).join('');bind()};
-  m.querySelector("#rwPin").onclick=function(){m.remove();try{localStorage.removeItem("kp-parent-pin")}catch(e){}rwParent('',function(){rwEditor(kid,c)})};
+  document.getElementById("rwPinBtn").addEventListener("click",function(){
+    if(!rwPin()){rwParent('',function(){});return}
+    rwParent('更改家長密碼（先輸入舊密碼）',function(){try{localStorage.removeItem("kp-parent-pin")}catch(e){}rwParent('',function(){})});
+  });
 }
 function show(kid){
   document.querySelectorAll(".kid").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.kid==kid)});
